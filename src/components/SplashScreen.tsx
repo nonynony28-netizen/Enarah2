@@ -2,89 +2,41 @@ import { motion } from "framer-motion";
 
 export default function SplashScreen() {
   return (
-    <motion.div
-      className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 0 }}
-      transition={{ duration: 0.8, delay: 3.8 }}
-    >
-      {/* Cinematic Spotlight Sweep */}
+    <div className="fixed inset-0 bg-black flex items-center justify-center overflow-hidden">
+      
+      {/* Background subtle light */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,80,200,0.25),transparent_70%)]" />
+
+      {/* Moving light sweep */}
       <motion.div
-        className="absolute w-[140%] h-[140%] pointer-events-none"
-        initial={{ x: "120%" }}
-        animate={{ x: "-30%" }}
-        transition={{ duration: 1.6, ease: "easeInOut" }}
+        className="absolute w-[300px] h-[100px] bg-white/20 blur-2xl"
+        initial={{ x: -400, opacity: 0 }}
+        animate={{ x: 400, opacity: [0, 1, 0] }}
+        transition={{ duration: 1.4, ease: "easeInOut" }}
+      />
+
+      {/* Title */}
+      <motion.h1
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="text-3xl md:text-5xl font-bold text-blue-400 tracking-wide relative z-10"
         style={{
-          background:
-            "radial-gradient(700px circle at center, rgba(37,99,235,0.35), rgba(37,99,235,0.1) 40%, transparent 70%)",
-          filter: "blur(60px)",
+          textShadow: "0 0 20px rgba(59,130,246,0.6)",
         }}
-      />
-
-      {/* Electric Flicker (وميض خفيف) */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.15, 0.05, 0.2, 0.08, 0] }}
-        transition={{ duration: 1.2, delay: 1.2 }}
-        style={{ backgroundColor: "#2563eb" }}
-      />
-
-      {/* Logo */}
-      <div className="relative">
-        <motion.h1
-          className="text-4xl md:text-6xl font-extrabold text-blue-500 tracking-wide"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.8 }}
-          style={{
-            textShadow:
-              "0 0 12px rgba(37,99,235,0.7), 0 0 30px rgba(37,99,235,0.4)",
-          }}
-        >
-          الإنارة الحديثة
-        </motion.h1>
-
-        {/* Shine Sweep (لمعة تمر على النص) */}
-        <motion.div
-          className="absolute top-0 left-[-60%] w-[60%] h-full pointer-events-none"
-          initial={{ left: "-60%" }}
-          animate={{ left: "120%" }}
-          transition={{
-            duration: 1.8,
-            delay: 1,
-            ease: "easeInOut",
-          }}
-          style={{
-            background:
-              "linear-gradient(120deg, transparent, rgba(255,255,255,0.9), transparent)",
-            filter: "blur(8px)",
-          }}
-        />
-      </div>
-
-      {/* Glow Behind */}
-      <motion.div
-        className="absolute w-[320px] h-[320px] rounded-full"
-        initial={{ scale: 0.4, opacity: 0 }}
-        animate={{ scale: 1.6, opacity: 0.25 }}
-        transition={{ duration: 1.2, delay: 0.6 }}
-        style={{
-          background:
-            "radial-gradient(circle, rgba(37,99,235,0.5), transparent 70%)",
-          filter: "blur(50px)",
-        }}
-      />
-
-      {/* Sub text */}
-      <motion.p
-        className="absolute bottom-20 text-white/30 text-xs md:text-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.6 }}
       >
-        Lighting Your World
+        الإنارة الحديثة
+      </motion.h1>
+
+      {/* Tagline */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+        className="absolute bottom-20 text-gray-400 text-sm tracking-wide"
+      >
+        نضيء عالمك بأناقة
       </motion.p>
-    </motion.div>
+    </div>
   );
 }
