@@ -1,8 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Lightbulb, Cable, Star, Plug, Box, Layers } from 'lucide-react'
 
-function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function FadeIn({ children, delay = 0 }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-50px' })
   return (
@@ -18,84 +17,38 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 }
 
 export default function Products() {
-
-  // 🟢 المنتجات الأصلية (لا تحذفها)
-  const defaultCategories = [
-    {
-      name: 'ثريات',
-      description: 'تشكيلة واسعة من الثريات الكريستالية والحديثة.',
-      image: '/images/cat-chandelier.jpg',
-      icon: Lightbulb,
-    },
-    {
-      name: 'سبوتات',
-      description: 'سبوتات سقفية مدمجة وبارزة.',
-      image: '/images/cat-spotlight.jpg',
-      icon: Star,
-    },
-    {
-      name: 'أسلاك وكوابل',
-      description: 'كوابل كهربائية عالية الجودة.',
-      image: '/images/cat-cables.jpg',
-      icon: Cable,
-    },
-    {
-      name: 'LED Profile',
-      description: 'بروفايلات LED بأشكال متعددة.',
-      image: '/images/cat-ledprofile.jpg',
-      icon: Layers,
-    },
-  ]
-
-  const [categories, setCategories] = useState(defaultCategories)
+  const [categories, setCategories] = useState([])
 
   useEffect(() => {
     fetch('/products.json')
       .then(res => res.json())
-      .then(data => {
-        // 🔥 دمج القديم مع الجديد
-        setCategories([...defaultCategories, ...data])
-      })
-      .catch(() => {
-        // لو فشل JSON، يبقى القديم فقط
-        setCategories(defaultCategories)
-      })
+      .then(data => setCategories(data))
   }, [])
 
   return (
     <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4">
 
         <FadeIn>
           <div className="text-center mb-14">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">منتجاتنا</h1>
-            <p className="text-white/60 max-w-2xl mx-auto">
-              تشكيلة واسعة من الإضاءة والمواد الكهربائية بأجود الماركات العالمية
-            </p>
-            <div className="w-16 h-1 bg-gold mx-auto rounded-full mt-4" />
+            <h1 className="text-3xl font-bold text-white">منتجاتنا</h1>
           </div>
         </FadeIn>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((cat, i) => (
-            <FadeIn key={i} delay={i * 0.1}>
-              <div className="group relative bg-darkblue-light border border-white/5 rounded-xl overflow-hidden hover:border-gold/30 transition-all duration-300">
+            <FadeIn key={i}>
+              <div className="bg-darkblue-light rounded-xl overflow-hidden">
 
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                </div>
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="w-full h-[250px] object-cover"
+                />
 
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-white group-hover:text-gold transition-colors">
-                    {cat.name}
-                  </h3>
-                  <p className="text-white/60 text-sm mt-2">
-                    {cat.description}
-                  </p>
+                <div className="p-4">
+                  <h3 className="text-white font-bold">{cat.name}</h3>
+                  <p className="text-white/60 text-sm">{cat.description}</p>
                 </div>
 
               </div>
