@@ -1,1 +1,16 @@
-
+{
+  "title": "شركاؤنا من العلامات العالمية",
+  "subtitle": "نتعاون مع أفضل العلامات العالمية في الإضاءة والمواد الكهربائية",
+  "brands": [
+    {
+      "name": "ENARAH",
+      "description": "علامة تجارية رائدة في عالم الإضاءة الفاخرة والثريات والسبوتات",
+      "image": "https://i.postimg.cc/your-brand-logo.png"
+    },
+    {
+      "name": "شركة أخرى",
+      "description": "نبذة مختصرة عن الشركة",
+      "image": "https://i.postimg.cc/your-second-brand.png"
+    }
+  ]
+}
