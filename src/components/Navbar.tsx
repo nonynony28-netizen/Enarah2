@@ -6,7 +6,7 @@ import { Menu, X, Lightbulb } from 'lucide-react'
 const navLinks = [
   { path: '/', label: 'الرئيسية' },
   { path: '/products', label: 'المنتجات' },
-  { path: '/brands', label: 'الماركات' },
+  { path: '/brands', label: 'الشركات العالميه' },
   { path: '/projects', label: 'المشاريع' },
   { path: '/about', label: 'من نحن' },
   { path: '/branches', label: 'الفروع' },
