@@ -93,7 +93,7 @@ export default function Footer() {
 
               <li className="flex items-center gap-2 text-white/70 text-sm">
                 <Mail className="w-4 h-4 text-blue-400" />
-                <span>info@modernlighting.ly</span>
+                <span>enarahmodern@gmail.com</span>
               </li>
 
               <li className="flex items-start gap-2 text-white/70 text-sm leading-relaxed">
