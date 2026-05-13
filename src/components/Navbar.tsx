@@ -45,7 +45,7 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
+          <div className="flex flex-row-reverse items-center justify-between h-16 md:h-20">
 
             <Link to="/" className="flex items-center gap-3 group">
               <Lightbulb className="w-6 h-6 text-blue-400 drop-shadow-[0_0_14px_rgba(59,130,246,0.75)] group-hover:scale-110 group-hover:text-blue-300 transition-all duration-300" />
