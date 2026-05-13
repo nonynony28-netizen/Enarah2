@@ -1,7 +1,19 @@
-import { useRef } from 'react'
+// file name: src/pages/Home.tsx
+
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
-import { ChevronLeft, Award, Shield, Sparkles, Zap } from 'lucide-react'
+import {
+  ChevronLeft,
+  Award,
+  Shield,
+  Sparkles,
+  Zap,
+  Bot,
+  Send,
+  X,
+  MessageCircle,
+} from 'lucide-react'
 
 function FadeIn({
   children,
@@ -32,9 +44,136 @@ const topProducts = [
   { name: 'أسلاك وكوابل', image: '/images/cat-cables.jpg', path: '/products' },
 ]
 
+function AIChatWidget() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [prompt, setPrompt] = useState('')
+  const [messages, setMessages] = useState<
+    { role: 'user' | 'ai'; content: string }[]
+  >([])
+  const [loading, setLoading] = useState(false)
+
+  const sendMessage = async () => {
+    if (!prompt.trim() || loading) return
+
+    const userMessage = prompt
+
+    setMessages((prev) => [...prev, { role: 'user', content: userMessage }])
+    setPrompt('')
+    setLoading(true)
+
+    try {
+      const response = await fetch(
+        `https://enarah2.vercel.app/api/app?prompt=${encodeURIComponent(
+          `أنت مساعد احترافي لمتجر إنارة وكهرباء. أجب بشكل مختصر ومفيد عن: ${userMessage}`
+        )}`
+      )
+
+      const data = await response.json()
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'ai',
+          content: data.response || 'حدث خطأ أثناء المعالجة.',
+        },
+      ])
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'ai',
+          content: 'تعذر الاتصال بالمساعد الذكي حالياً.',
+        },
+      ])
+    }
+
+    setLoading(false)
+  }
+
+  return (
+    <>
+      {/* Floating Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 left-6 z-50 w-16 h-16 rounded-full bg-blue-500 hover:bg-blue-400 text-white shadow-[0_0_30px_rgba(59,130,246,0.45)] flex items-center justify-center transition-all duration-300"
+      >
+        {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
+      </button>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="fixed bottom-24 left-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[550px] bg-darkblue-light border border-blue-400/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="p-4 border-b border-white/10 bg-darkblue flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-blue-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold">مساعد الإنارة الذكي</h3>
+              <p className="text-white/50 text-sm">
+                اسأل عن المنتجات والحلول الكهربائية
+              </p>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 && (
+              <div className="text-white/50 text-sm text-center pt-10">
+                مرحباً، كيف يمكنني مساعدتك في اختيار منتجات الإنارة؟
+              </div>
+            )}
+
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`p-3 rounded-xl max-w-[85%] text-sm leading-relaxed ${
+                  msg.role === 'user'
+                    ? 'bg-blue-500 text-white ml-auto'
+                    : 'bg-white/5 text-white'
+                }`}
+              >
+                {msg.content}
+              </div>
+            ))}
+
+            {loading && (
+              <div className="bg-white/5 text-white p-3 rounded-xl max-w-[85%] text-sm">
+                جاري التفكير...
+              </div>
+            )}
+          </div>
+
+          {/* Input */}
+          <div className="p-4 border-t border-white/10 flex gap-2">
+            <input
+              type="text"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              placeholder="اكتب سؤالك..."
+              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-blue-400"
+            />
+
+            <button
+              onClick={sendMessage}
+              disabled={loading}
+              className="px-4 rounded-lg bg-blue-500 hover:bg-blue-400 text-white transition-all duration-300"
+            >
+              <Send className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export default function Home() {
   return (
     <div className="pt-16 md:pt-20">
+      {/* AI Widget */}
+      <AIChatWidget />
 
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
@@ -67,156 +206,26 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 to="/products"
-                className="px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 shadow-[0_0_22px_rgba(59,130,246,0.35)] flex items-center gap-2"
+                className="px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300"
               >
                 استعرض المنتجات
-                <ChevronLeft className="w-5 h-5" />
               </Link>
 
-              <Link
-                to="/contact"
-                className="px-8 py-3 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 hover:border-blue-400/50 transition-all duration-300"
+              <button
+                onClick={() =>
+                  document.querySelector('button.fixed')?.dispatchEvent(
+                    new MouseEvent('click', { bubbles: true })
+                  )
+                }
+                className="px-8 py-3 border border-blue-400/40 text-white font-semibold rounded-lg hover:bg-blue-500/10 transition-all duration-300 flex items-center gap-2"
               >
-                تواصل معنا
-              </Link>
+                <Bot className="w-5 h-5" />
+                تحدث مع الذكاء الاصطناعي
+              </button>
             </div>
           </motion.div>
         </div>
-
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-            <motion.div
-              className="w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.75)]"
-              animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
-        </motion.div>
       </section>
-
-      {/* Why Us Section */}
-      <section className="py-20 bg-darkblue">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn>
-            <div className="text-center mb-14">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                لماذا نحن؟
-              </h2>
-              <div className="w-16 h-1 bg-blue-400 mx-auto rounded-full" />
-            </div>
-          </FadeIn>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Award,
-                title: 'جودة عالية',
-                desc: 'نختار منتجاتنا بعناية فائقة من أفضل المصادر العالمية لضمان أعلى معايير الجودة.',
-              },
-              {
-                icon: Shield,
-                title: 'حلول متكاملة',
-                desc: 'نقدم لك جميع احتياجاتك من الإضاءة والمواد الكهربائية في مكان واحد.',
-              },
-              {
-                icon: Sparkles,
-                title: 'اختيار احترافي',
-                desc: 'فريقنا متخصص في مساعدتك لاختيار الحلول المثالية لمشروعك.',
-              },
-            ].map((item, i) => (
-              <FadeIn key={item.title} delay={i * 0.15}>
-                <div className="group relative bg-darkblue-light border border-white/5 rounded-xl p-6 hover:border-blue-400/30 transition-all duration-300 hover:shadow-glass">
-                  <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
-                    <item.icon className="w-6 h-6 text-blue-400" />
-                  </div>
-
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-white/60 text-sm leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Top Products */}
-      <section className="py-20 bg-darkblue-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn>
-            <div className="text-center mb-14">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                المنتجات الأكثر طلباً
-              </h2>
-              <div className="w-16 h-1 bg-blue-400 mx-auto rounded-full" />
-            </div>
-          </FadeIn>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {topProducts.map((product, i) => (
-              <FadeIn key={product.name} delay={i * 0.1}>
-                <Link
-                  to={product.path}
-                  className="group relative block overflow-hidden rounded-xl border border-white/5 hover:border-blue-400/30 transition-all duration-300"
-                >
-                  <div className="aspect-[4/3] overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-darkblue via-darkblue/20 to-transparent" />
-                  </div>
-
-                  <div className="absolute bottom-0 right-0 left-0 p-4">
-                    <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
-                      {product.name}
-                    </h3>
-                  </div>
-                </Link>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-darkblue relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5" />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              ابدأ مشروعك معنا{' '}
-              <span className="text-blue-400 drop-shadow-[0_0_14px_rgba(59,130,246,0.7)]">
-                اليوم
-              </span>
-            </h2>
-
-            <p className="text-white/70 mb-8 max-w-xl mx-auto">
-              نحن هنا لنساعدك في تحويل رؤيتك إلى واقع. تواصل مع فريقنا للحصول على استشارة مجانية.
-            </p>
-
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.35)]"
-            >
-              <Zap className="w-5 h-5" />
-              تواصل معنا الآن
-            </Link>
-          </FadeIn>
-        </div>
-      </section>
-
     </div>
   )
 }
