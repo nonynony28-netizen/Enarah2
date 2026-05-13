@@ -6,7 +6,7 @@ import { Menu, X, Lightbulb } from 'lucide-react'
 const navLinks = [
   { path: '/', label: 'الرئيسية' },
   { path: '/products', label: 'المنتجات' },
-  { path: '/brands', label: 'الشركات العالميه' },
+  { path: '/brands', label: 'الشركات العالمية' },
   { path: '/projects', label: 'المشاريع' },
   { path: '/about', label: 'من نحن' },
   { path: '/branches', label: 'الفروع' },
@@ -22,7 +22,9 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
+
     window.addEventListener('scroll', handleScroll)
+
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -38,28 +40,29 @@ export default function Navbar() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-darkblue/90 backdrop-blur-md shadow-glass border-b border-white/5'
+            ? 'bg-darkblue/95 backdrop-blur-xl shadow-glass border-b border-white/10'
             : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
-            <Link to="/" className="flex items-center gap-2">
-              <Lightbulb className="w-6 h-6 text-gold" />
-              <span className="text-gold font-bold text-lg md:text-xl tracking-wide">
+
+            <Link to="/" className="flex items-center gap-3 group">
+              <Lightbulb className="w-6 h-6 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.35)] group-hover:text-blue-200 transition-all duration-300" />
+              <span className="text-white font-bold text-lg md:text-xl tracking-wide drop-shadow-[0_0_12px_rgba(255,255,255,0.25)] group-hover:text-blue-100 transition-all duration-300">
                 الإنارة الحديثة
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
                     location.pathname === link.path
-                      ? 'text-gold bg-gold/10'
-                      : 'text-white/80 hover:text-gold hover:bg-white/5'
+                      ? 'text-white bg-white/10 border border-white/15 shadow-[0_0_15px_rgba(255,255,255,0.08)]'
+                      : 'text-white/85 hover:text-white hover:bg-white/5 drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]'
                   }`}
                 >
                   {link.label}
@@ -69,11 +72,16 @@ export default function Navbar() {
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-lg text-white/80 hover:text-gold hover:bg-white/5 transition-colors"
+              className="md:hidden p-2 rounded-xl text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300"
               aria-label="Toggle menu"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? (
+                <X className="w-6 h-6 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
+              ) : (
+                <Menu className="w-6 h-6 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
+              )}
             </button>
+
           </div>
         </div>
       </motion.nav>
@@ -84,41 +92,44 @@ export default function Navbar() {
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
+            transition={{ type: 'tween', duration: 0.35 }}
             className="fixed inset-0 z-40 md:hidden"
           >
             <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/70 backdrop-blur-md"
               onClick={() => setIsOpen(false)}
             />
+
             <motion.div
-              className="absolute top-0 right-0 bottom-0 w-72 bg-darkblue border-l border-white/10 shadow-glass"
+              className="absolute top-0 right-0 bottom-0 w-72 bg-darkblue/95 backdrop-blur-xl border-l border-white/10 shadow-2xl"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
+              transition={{ type: 'tween', duration: 0.35 }}
             >
-              <div className="flex flex-col pt-20 px-4 gap-1">
+              <div className="flex flex-col pt-20 px-4 gap-2">
+
                 {navLinks.map((link, index) => (
                   <motion.div
                     key={link.path}
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: 25 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * 0.06 }}
                   >
                     <Link
                       to={link.path}
                       onClick={() => setIsOpen(false)}
-                      className={`block px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                      className={`block px-4 py-3 rounded-2xl text-base font-semibold transition-all duration-300 ${
                         location.pathname === link.path
-                          ? 'text-gold bg-gold/10'
-                          : 'text-white/80 hover:text-gold hover:bg-white/5'
+                          ? 'text-white bg-white/10 border border-white/15 shadow-[0_0_15px_rgba(255,255,255,0.08)]'
+                          : 'text-white/85 hover:text-white hover:bg-white/5 drop-shadow-[0_0_8px_rgba(255,255,255,0.12)]'
                       }`}
                     >
                       {link.label}
                     </Link>
                   </motion.div>
                 ))}
+
               </div>
             </motion.div>
           </motion.div>
