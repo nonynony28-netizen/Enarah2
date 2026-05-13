@@ -79,3 +79,11 @@
     "vite": "^7.2.4"
   }
 }
+{
+  "name": "groq-vercel-api",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "groq-sdk": "^0.16.0"
+  }
+}
