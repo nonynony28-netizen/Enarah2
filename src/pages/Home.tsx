@@ -26,7 +26,6 @@ function FadeIn({
 }
 
 const topProducts = [
-  { name: 'ثريات', image: '/images/cat-chandelier.jpg', path: '/products' },
   { name: 'سبوتات', image: '/images/cat-spotlight.jpg', path: '/products' },
   { name: 'LED Profile', image: '/images/cat-ledprofile.jpg', path: '/products' },
   { name: 'أسلاك وكوابل', image: '/images/cat-cables.jpg', path: '/products' },
