@@ -43,18 +43,21 @@ export default async function handler(req, res) {
       apiKey: apiKey,
     });
 
-    // =========================================
-    // PROMPT EXTRACTION
-    // =========================================
-    let prompt = "";
+   // =========================================
+// PROMPT EXTRACTION (Modern URL API)
+// =========================================
+let prompt = "";
 
-    if (req.method === "POST") {
-      prompt = req.body?.prompt || "";
-    } else {
-      const fullUrl = new URL(req.url, `https://${req.headers.host}`);
-      prompt = fullUrl.searchParams.get("prompt") || "";
-    }
+if (req.method === "POST") {
+  prompt = req.body?.prompt || "";
+} else {
+  const requestUrl = new URL(
+    req.url,
+    `https://${req.headers.host || "enarah2.vercel.app"}`
+  );
 
+  prompt = requestUrl.searchParams.get("prompt") || "";
+}
     // Default fallback
     if (!prompt || typeof prompt !== "string") {
       prompt = "مرحبا";
