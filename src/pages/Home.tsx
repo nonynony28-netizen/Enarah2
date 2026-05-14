@@ -10,7 +10,6 @@ import {
   Sparkles,
   Zap,
   Bot,
-  MessageCircle,
   X,
   Send,
 } from 'lucide-react'
@@ -59,7 +58,7 @@ function AIChatButtons() {
     try {
       const res = await fetch(
         `https://enarah2.vercel.app/api/nour?prompt=${encodeURIComponent(
-          prompt
+          `أنت مساعد احترافي لمتجر إنارة وكهرباء. أجب بشكل واضح ومختصر: ${prompt}`
         )}`
       )
 
@@ -79,8 +78,8 @@ function AIChatButtons() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+      {/* Main Button */}
+      <div className="flex justify-center items-center mb-6">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -89,16 +88,6 @@ function AIChatButtons() {
           {isOpen ? <X className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
           {isOpen ? 'إغلاق المساعد الذكي' : 'تحدث مع الذكاء الاصطناعي'}
         </button>
-
-        <a
-          href="https://enarah2.vercel.app/api/nour?prompt=مرحبا"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="px-8 py-3 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 hover:border-blue-400/50 transition-all duration-300 flex items-center gap-2"
-        >
-          <MessageCircle className="w-5 h-5" />
-          رابط الـ API
-        </a>
       </div>
 
       {/* Chat Box */}
@@ -114,7 +103,7 @@ function AIChatButtons() {
                   handleAskAI()
                 }
               }}
-              placeholder="اسأل عن الإنارة، المنتجات، أو الخدمات..."
+              placeholder="اسأل عن الإنارة، الثريات، السبوتات، أو الخدمات..."
               className="flex-1 px-4 py-3 rounded-lg bg-darkblue border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-400"
             />
 
@@ -197,6 +186,70 @@ export default function Home() {
               </Link>
             </div>
           </motion.div>
+        </div>
+
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
+            <motion.div
+              className="w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.75)]"
+              animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Why Us Section */}
+      <section className="py-20 bg-darkblue">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn>
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                لماذا نحن؟
+              </h2>
+              <div className="w-16 h-1 bg-blue-400 mx-auto rounded-full" />
+            </div>
+          </FadeIn>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Award,
+                title: 'جودة عالية',
+                desc: 'نختار منتجاتنا بعناية فائقة من أفضل المصادر العالمية لضمان أعلى معايير الجودة.',
+              },
+              {
+                icon: Shield,
+                title: 'حلول متكاملة',
+                desc: 'نقدم لك جميع احتياجاتك من الإضاءة والمواد الكهربائية في مكان واحد.',
+              },
+              {
+                icon: Sparkles,
+                title: 'اختيار احترافي',
+                desc: 'فريقنا متخصص في مساعدتك لاختيار الحلول المثالية لمشروعك.',
+              },
+            ].map((item, i) => (
+              <FadeIn key={item.title} delay={i * 0.15}>
+                <div className="group relative bg-darkblue-light border border-white/5 rounded-xl p-6 hover:border-blue-400/30 transition-all duration-300 hover:shadow-glass">
+                  <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
+                    <item.icon className="w-6 h-6 text-blue-400" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-white mb-2">
+                    {item.title}
+                  </h3>
+
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
         </div>
       </section>
     </div>
