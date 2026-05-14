@@ -1,4 +1,4 @@
-// file name: api/app.js
+// file name: api/nour.js
 
 import Groq from "groq-sdk";
 
