@@ -1,18 +1,7 @@
-// file name: Home.tsx
-
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
-import {
-  ChevronLeft,
-  Award,
-  Shield,
-  Sparkles,
-  Zap,
-  Bot,
-  X,
-  Send,
-} from 'lucide-react'
+import { ChevronLeft, Award, Shield, Sparkles, Zap } from 'lucide-react'
 
 function FadeIn({
   children,
@@ -43,103 +32,9 @@ const topProducts = [
   { name: 'أسلاك وكوابل', image: '/images/cat-cables.jpg', path: '/products' },
 ]
 
-function AIChatButtons() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [prompt, setPrompt] = useState('')
-  const [response, setResponse] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const handleAskAI = async () => {
-    if (!prompt.trim()) return
-
-    setLoading(true)
-    setResponse('')
-
-    try {
-      const res = await fetch(
-        `https://enarah2.vercel.app/api/nour?prompt=${encodeURIComponent(
-          `أنت مساعد احترافي لمتجر إنارة وكهرباء. أجب بشكل واضح ومختصر: ${prompt}`
-        )}`
-      )
-
-      const data = await res.json()
-
-      if (data.success) {
-        setResponse(data.response)
-      } else {
-        setResponse(data.error || 'تعذر الحصول على رد حالياً.')
-      }
-    } catch (error) {
-      setResponse('حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.')
-    }
-
-    setLoading(false)
-  }
-
-  return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Main Button */}
-      <div className="flex justify-center items-center mb-6">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 shadow-[0_0_22px_rgba(59,130,246,0.35)] flex items-center gap-2"
-        >
-          {isOpen ? <X className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
-          {isOpen ? 'إغلاق المساعد الذكي' : 'تحدث مع الذكاء الاصطناعي'}
-        </button>
-      </div>
-
-      {/* Chat Box */}
-      {isOpen && (
-        <div className="bg-darkblue-light border border-blue-400/20 rounded-xl p-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleAskAI()
-                }
-              }}
-              placeholder="اسأل عن الإنارة، الثريات، السبوتات، أو الخدمات..."
-              className="flex-1 px-4 py-3 rounded-lg bg-darkblue border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-400"
-            />
-
-            <button
-              type="button"
-              onClick={handleAskAI}
-              disabled={loading}
-              className="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <Send className="w-4 h-4" />
-              {loading ? 'جاري الإرسال...' : 'إرسال'}
-            </button>
-          </div>
-
-          {response && (
-            <div className="mt-4 p-4 rounded-lg bg-darkblue border border-white/5">
-              <p className="text-white/90 leading-relaxed whitespace-pre-wrap">
-                {response}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
 export default function Home() {
   return (
     <div className="pt-16 md:pt-20">
-      {/* AI Buttons Section */}
-      <section className="bg-darkblue py-10 border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AIChatButtons />
-        </div>
-      </section>
 
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
@@ -252,6 +147,77 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Top Products */}
+      <section className="py-20 bg-darkblue-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn>
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                المنتجات الأكثر طلباً
+              </h2>
+              <div className="w-16 h-1 bg-blue-400 mx-auto rounded-full" />
+            </div>
+          </FadeIn>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {topProducts.map((product, i) => (
+              <FadeIn key={product.name} delay={i * 0.1}>
+                <Link
+                  to={product.path}
+                  className="group relative block overflow-hidden rounded-xl border border-white/5 hover:border-blue-400/30 transition-all duration-300"
+                >
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-darkblue via-darkblue/20 to-transparent" />
+                  </div>
+
+                  <div className="absolute bottom-0 right-0 left-0 p-4">
+                    <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
+                      {product.name}
+                    </h3>
+                  </div>
+                </Link>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-darkblue relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5" />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <FadeIn>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              ابدأ مشروعك معنا{' '}
+              <span className="text-blue-400 drop-shadow-[0_0_14px_rgba(59,130,246,0.7)]">
+                اليوم
+              </span>
+            </h2>
+
+            <p className="text-white/70 mb-8 max-w-xl mx-auto">
+              نحن هنا لنساعدك في تحويل رؤيتك إلى واقع. تواصل مع فريقنا للحصول على استشارة مجانية.
+            </p>
+
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.35)]"
+            >
+              <Zap className="w-5 h-5" />
+              تواصل معنا الآن
+            </Link>
+          </FadeIn>
+        </div>
+      </section>
+
     </div>
   )
 }
+
