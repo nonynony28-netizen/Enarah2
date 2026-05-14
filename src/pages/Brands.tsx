@@ -45,31 +45,35 @@ export default function Brands() {
   return (
     <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Page Header */}
         <FadeIn>
           <div className="text-center mb-14">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
               شركاؤنا من العلامات العالمية
             </h1>
 
-            <p className="text-white/60 max-w-3xl mx-auto">
+            <p className="text-white/70 max-w-3xl mx-auto leading-relaxed text-base md:text-lg">
               نتعاون مع نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية
             </p>
 
-            <div className="w-16 h-1 bg-gold mx-auto rounded-full mt-4" />
+            <div className="w-20 h-1 bg-blue-400 mx-auto rounded-full mt-5 shadow-[0_0_16px_rgba(59,130,246,0.45)]" />
           </div>
         </FadeIn>
 
-        <div className="space-y-8">
+        {/* Brands List */}
+        <div className="space-y-10">
           {brands.map((brand, i) => (
-            <FadeIn key={i} delay={i * 0.15}>
-              <div className="group relative bg-darkblue-light/60 border border-white/5 rounded-2xl overflow-hidden hover:border-gold/20 transition-all duration-300">
+            <FadeIn key={i} delay={i * 0.12}>
+              <div className="group relative bg-darkblue-light/60 border border-white/5 rounded-3xl overflow-hidden hover:border-blue-400/20 transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.08)]">
 
-                <div className="bg-black p-6">
-                  <div className="aspect-[16/9] overflow-hidden flex items-center justify-center">
+                {/* Brand Image Section */}
+                <div className="bg-black p-6 md:p-8">
+                  <div className="aspect-[16/9] overflow-hidden flex items-center justify-center rounded-2xl">
                     <img
                       src={brand.image}
                       alt={brand.name}
-                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                       onError={(e) => {
                         e.currentTarget.src = '/images/fallback.jpg'
                       }}
@@ -77,20 +81,18 @@ export default function Brands() {
                   </div>
                 </div>
 
-                <div className="p-6 md:p-8 text-center">
-                  <h2 className="text-2xl md:text-3xl font-bold text-gold mb-4">
+                {/* Brand Name Only */}
+                <div className="p-5 md:p-6 text-center border-t border-white/5 bg-darkblue-light/40">
+                  <h2 className="text-2xl md:text-3xl font-bold text-blue-400 drop-shadow-[0_0_14px_rgba(59,130,246,0.35)] tracking-wide">
                     {brand.name}
                   </h2>
-
-                  <p className="text-white/70 leading-relaxed max-w-3xl mx-auto">
-                    {brand.description}
-                  </p>
                 </div>
 
               </div>
             </FadeIn>
           ))}
         </div>
+
       </div>
     </div>
   )
