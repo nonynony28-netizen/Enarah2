@@ -1,7 +1,7 @@
-// 1) عدّل سطر الاستيراد الأول:
+// ضع هذا أعلى الملف بالكامل:
 import { useRef, useState } from 'react'
-
-// 2) عدّل استيراد الأيقونات:
+import { Link } from 'react-router-dom'
+import { motion, useInView } from 'framer-motion'
 import {
   ChevronLeft,
   Award,
@@ -14,7 +14,7 @@ import {
   Send,
 } from 'lucide-react'
 
-// 3) أضف هذا الكومبوننت فوق export default function Home()
+// أضف هذا فوق Home مباشرة (خارج أي كومبوننت)
 function AIChatButtons() {
   const [isOpen, setIsOpen] = useState(false)
   const [prompt, setPrompt] = useState('')
@@ -25,6 +25,7 @@ function AIChatButtons() {
     if (!prompt.trim()) return
 
     setLoading(true)
+    setResponse('')
 
     try {
       const res = await fetch(
@@ -36,7 +37,7 @@ function AIChatButtons() {
       setResponse(
         data.response || data.error || 'تعذر الحصول على رد حالياً.'
       )
-    } catch {
+    } catch (error) {
       setResponse('حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.')
     }
 
@@ -44,10 +45,10 @@ function AIChatButtons() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto mb-10">
-      {/* Buttons */}
+    <div className="w-full max-w-3xl mx-auto">
       <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 shadow-[0_0_22px_rgba(59,130,246,0.35)] flex items-center justify-center gap-2"
         >
@@ -66,7 +67,6 @@ function AIChatButtons() {
         </a>
       </div>
 
-      {/* Chat Box */}
       {isOpen && (
         <div className="bg-darkblue-light border border-blue-400/20 rounded-xl p-4">
           <div className="flex flex-col sm:flex-row gap-3">
@@ -74,12 +74,17 @@ function AIChatButtons() {
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAskAI()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleAskAI()
+                }
+              }}
               placeholder="اسأل عن الإنارة، المنتجات، أو الخدمات..."
               className="flex-1 px-4 py-3 rounded-lg bg-darkblue border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-400"
             />
 
             <button
+              type="button"
               onClick={handleAskAI}
               disabled={loading}
               className="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 flex items-center justify-center gap-2"
@@ -102,15 +107,14 @@ function AIChatButtons() {
   )
 }
 
-// 4) داخل export default function Home()
-// مباشرة بعد:
+// داخل Home فقط:
+// ابحث عن هذا:
 <div className="pt-16 md:pt-20">
 
-// أضف هذا فقط:
-<section className="bg-darkblue py-10 border-b border-white/5">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <AIChatButtons />
-  </div>
-</section>
-
-// ثم اترك باقي تصميم الموقع كما هو بدون أي تعديل
+// واستبدله بهذا:
+<div className="pt-16 md:pt-20">
+  <section className="bg-darkblue py-10 border-b border-white/5">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <AIChatButtons />
+    </div>
+  </section>
