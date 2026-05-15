@@ -1,62 +1,50 @@
-import { useRef, useEffect, useState } from 'react'
-import { motion, useInView } from 'framer-motion'
+// استبدل useEffect الحالي بالكامل بهذا داخل Products()
 
-function FadeIn({ children, delay = 0 }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-50px' })
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, delay, ease: 'easeOut' }}
-    >
-      {children}
-    </motion.div>
-  )
-}
+useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(
+        'https://enarah2.vercel.app/api/get-users'
+      )
 
-export default function Products() {
-  const [categories, setCategories] = useState([])
+      const data = await res.json()
 
-  useEffect(() => {
-    fetch('/products.json')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-  }, [])
+      // إذا API نجح
+      if (data.success && Array.isArray(data.data)) {
+        // تحويل بيانات MongoDB إلى شكل مناسب للواجهة
+        const formattedProducts = data.data.map((item, index) => {
+          let mediaData = {}
 
-  return (
-    <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
-      <div className="max-w-7xl mx-auto px-4">
+          try {
+            mediaData = item.phone ? JSON.parse(item.phone) : {}
+          } catch {
+            mediaData = {}
+          }
 
-        <FadeIn>
-          <div className="text-center mb-14">
-            <h1 className="text-3xl font-bold text-white">منتجاتنا</h1>
-          </div>
-        </FadeIn>
+          return {
+            id: item._id || index,
+            name: item.name || 'بدون اسم',
+            description:
+              item.description ||
+              item.email ||
+              'لا يوجد وصف متاح',
+            image:
+              mediaData.imageUrl ||
+              '/images/default-product.jpg',
+            video:
+              mediaData.videoUrl || '',
+          }
+        })
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat, i) => (
-            <FadeIn key={i}>
-              <div className="bg-darkblue-light rounded-xl overflow-hidden">
+        setCategories(formattedProducts)
+      } else {
+        setCategories([])
+      }
+    } catch (error) {
+      console.error('Fetch Products Error:', error)
+      setCategories([])
+    }
+  }
 
-                <img
-                  src={cat.image}
-                  alt={cat.name}
-                  className="w-full h-[250px] object-cover"
-                />
-
-                <div className="p-4">
-                  <h3 className="text-white font-bold">{cat.name}</h3>
-                  <p className="text-white/60 text-sm">{cat.description}</p>
-                </div>
-
-              </div>
-            </FadeIn>
-          ))}
-        </div>
-
-      </div>
-    </div>
-  )
-}
+  fetchProducts()
+}, [])
