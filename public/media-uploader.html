@@ -1,0 +1,211 @@
+<!-- file name: media-uploader.html -->
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>رفع روابط الصور والفيديو</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #071122;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      background: #0d1b34;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(59,130,246,0.15);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    p {
+      text-align: center;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: rgba(255,255,255,0.85);
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #071122;
+      color: white;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #3b82f6;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #60a5fa;
+    }
+
+    .response {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #071122;
+      border: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .success {
+      color: #86efac;
+    }
+
+    .error {
+      color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>رفع روابط الصور والفيديو</h1>
+    <p>احفظ روابط الوسائط داخل MongoDB عبر API الموقع</p>
+
+    <label for="title">عنوان المحتوى</label>
+    <input
+      type="text"
+      id="title"
+      placeholder="مثال: ثريا مودرن ذهبية"
+    />
+
+    <label for="imageUrl">رابط الصورة</label>
+    <input
+      type="url"
+      id="imageUrl"
+      placeholder="https://example.com/image.jpg"
+    />
+
+    <label for="videoUrl">رابط الفيديو</label>
+    <input
+      type="url"
+      id="videoUrl"
+      placeholder="https://example.com/video.mp4"
+    />
+
+    <button id="saveBtn">حفظ داخل MongoDB</button>
+
+    <div id="response" class="response"></div>
+  </div>
+
+  <script>
+    const saveBtn = document.getElementById("saveBtn");
+    const responseBox = document.getElementById("response");
+
+    saveBtn.addEventListener("click", async () => {
+      const title = document.getElementById("title").value.trim();
+      const imageUrl = document.getElementById("imageUrl").value.trim();
+      const videoUrl = document.getElementById("videoUrl").value.trim();
+
+      if (!title) {
+        showResponse("يرجى إدخال عنوان.", false);
+        return;
+      }
+
+      if (!imageUrl && !videoUrl) {
+        showResponse("أضف رابط صورة أو فيديو واحد على الأقل.", false);
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = "جاري الحفظ...";
+
+      try {
+        // لأن API الحالي يتطلب name + email
+        // phone سنستخدمه لتخزين الروابط JSON
+        const payload = {
+          name: title,
+          email: `media_${Date.now()}@upload.local`,
+          phone: JSON.stringify({
+            imageUrl,
+            videoUrl
+          })
+        };
+
+        const res = await fetch(
+          "https://enarah2.vercel.app/api/save-user",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+          showResponse("تم حفظ روابط الوسائط بنجاح داخل MongoDB.", true);
+
+          document.getElementById("title").value = "";
+          document.getElementById("imageUrl").value = "";
+          document.getElementById("videoUrl").value = "";
+        } else {
+          showResponse(data.error || "فشل الحفظ.", false);
+        }
+      } catch (error) {
+        showResponse("حدث خطأ أثناء الاتصال.", false);
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = "حفظ داخل MongoDB";
+    });
+
+    function showResponse(message, success) {
+      responseBox.style.display = "block";
+      responseBox.textContent = message;
+      responseBox.className =
+        "response " + (success ? "success" : "error");
+    }
+  </script>
+
+</body>
+</html>
