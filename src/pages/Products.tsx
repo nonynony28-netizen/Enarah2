@@ -11,6 +11,7 @@ function FadeIn({
   delay?: number
 }) {
   const ref = useRef(null)
+
   const isInView = useInView(ref, {
     once: true,
     margin: '-50px',
@@ -19,11 +20,20 @@ function FadeIn({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{
+        opacity: 0,
+        y: 30,
+      }}
       animate={
         isInView
-          ? { opacity: 1, y: 0 }
-          : { opacity: 0, y: 30 }
+          ? {
+              opacity: 1,
+              y: 0,
+            }
+          : {
+              opacity: 0,
+              y: 30,
+            }
       }
       transition={{
         duration: 0.6,
@@ -48,20 +58,30 @@ type ProductItem = {
 }
 
 export default function Products() {
-  const [categories, setCategories] = useState<ProductItem[]>(
-    []
-  )
+  const [categories, setCategories] = useState<
+    ProductItem[]
+  >([])
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        // ======================================
+        // جلب البيانات من MongoDB API
+        // ======================================
         const res = await fetch(
           'https://enarah2.vercel.app/api/get-users'
         )
 
         const data = await res.json()
 
-        if (res.ok && data.success && Array.isArray(data.data)) {
+        // ======================================
+        // تحقق من نجاح الجلب
+        // ======================================
+        if (
+          res.ok &&
+          data.success &&
+          Array.isArray(data.data)
+        ) {
           const formattedProducts: ProductItem[] =
             data.data.map(
               (
@@ -78,6 +98,9 @@ export default function Products() {
                   videoUrl?: string
                 } = {}
 
+                // ======================================
+                // استخراج روابط الصورة والفيديو
+                // ======================================
                 try {
                   mediaData = item.phone
                     ? JSON.parse(item.phone)
@@ -87,19 +110,40 @@ export default function Products() {
                 }
 
                 return {
-                  id: item._id || String(index),
-                  name: item.name || 'بدون اسم',
+                  id:
+                    item._id ||
+                    String(index),
+
+                  // عنوان المنتج
+                  name:
+                    item.name ||
+                    'بدون اسم',
+
+                  // إخفاء البريد الوهمي مثل media_...@upload.local
                   description:
-                    item.email || 'لا يوجد وصف متاح',
+                    item.email &&
+                    !item.email.includes(
+                      '@upload.local'
+                    )
+                      ? item.email
+                      : '',
+
+                  // الصورة
                   image:
                     mediaData.imageUrl ||
                     '/images/default-product.jpg',
-                  video: mediaData.videoUrl || '',
+
+                  // الفيديو
+                  video:
+                    mediaData.videoUrl ||
+                    '',
                 }
               }
             )
 
-          setCategories(formattedProducts)
+          setCategories(
+            formattedProducts
+          )
         } else {
           setCategories([])
         }
@@ -108,6 +152,7 @@ export default function Products() {
           'Fetch Products Error:',
           error
         )
+
         setCategories([])
       }
     }
@@ -118,7 +163,9 @@ export default function Products() {
   return (
     <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Title */}
+        {/* ======================================
+            Title
+        ====================================== */}
         <FadeIn>
           <div className="text-center mb-14">
             <h1 className="text-3xl font-bold text-white">
@@ -127,44 +174,70 @@ export default function Products() {
           </div>
         </FadeIn>
 
-        {/* Products Grid */}
+        {/* ======================================
+            Products Grid
+        ====================================== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat, i) => (
-            <FadeIn key={cat.id} delay={i * 0.1}>
-              <div className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5">
-                <img
-                  src={cat.image}
-                  alt={cat.name}
-                  className="w-full h-[250px] object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src =
-                      '/images/default-product.jpg'
-                  }}
-                />
+          {categories.map(
+            (cat, i) => (
+              <FadeIn
+                key={cat.id}
+                delay={i * 0.1}
+              >
+                <div className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5">
+                  {/* ======================================
+                      Product Image
+                  ====================================== */}
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-[250px] object-cover"
+                    onError={(
+                      e
+                    ) => {
+                      e.currentTarget.src =
+                        '/images/default-product.jpg'
+                    }}
+                  />
 
-                <div className="p-4">
-                  <h3 className="text-white font-bold mb-2">
-                    {cat.name}
-                  </h3>
+                  {/* ======================================
+                      Product Content
+                  ====================================== */}
+                  <div className="p-4">
+                    {/* Product Name */}
+                    <h3 className="text-white font-bold mb-2">
+                      {cat.name}
+                    </h3>
 
-                  <p className="text-white/60 text-sm">
-                    {cat.description}
-                  </p>
+                    {/* Product Description
+                        يظهر فقط إذا يوجد وصف حقيقي
+                    */}
+                    {cat.description && (
+                      <p className="text-white/60 text-sm">
+                        {
+                          cat.description
+                        }
+                      </p>
+                    )}
 
-                  {cat.video && (
-                    <a
-                      href={cat.video}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block mt-3 text-blue-400 text-sm hover:text-blue-300"
-                    >
-                      مشاهدة الفيديو
-                    </a>
-                  )}
+                    {/* Product Video */}
+                    {cat.video && (
+                      <a
+                        href={
+                          cat.video
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-3 text-blue-400 text-sm hover:text-blue-300"
+                      >
+                        مشاهدة الفيديو
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </FadeIn>
-          ))}
+              </FadeIn>
+            )
+          )}
         </div>
       </div>
     </div>
