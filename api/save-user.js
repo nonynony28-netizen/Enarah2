@@ -3,13 +3,12 @@
 import { MongoClient } from "mongodb";
 
 // =====================================
-// MongoDB Connection Cache
+// MongoDB Cache
 // =====================================
 let cachedClient = null;
 let cachedDb = null;
 
 async function connectToDatabase() {
-  // إعادة استخدام الاتصال إذا كان موجود
   if (cachedClient && cachedDb) {
     return {
       client: cachedClient,
@@ -17,22 +16,18 @@ async function connectToDatabase() {
     };
   }
 
-  // التحقق من المتغير
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
     throw new Error("MONGODB_URI is missing");
   }
 
-  // إنشاء الاتصال
   const client = new MongoClient(uri);
 
   await client.connect();
 
-  // اسم قاعدة البيانات
   const db = client.db("my_app_database");
 
-  // حفظ الاتصال
   cachedClient = client;
   cachedDb = db;
 
@@ -50,15 +45,33 @@ export default async function handler(req, res) {
   // CORS
   // =====================================
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Preflight
+  // =====================================
+  // OPTIONS
+  // =====================================
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // POST فقط
+  // =====================================
+  // GET → صفحة اختبار بدل 405
+  // =====================================
+  if (req.method === "GET") {
+    return res.status(200).json({
+      success: true,
+      message: "API is working. Use POST to save user data.",
+      endpoint: "/api/save-user",
+      method: "POST",
+      required_fields: ["name", "email"],
+      optional_fields: ["phone"],
+    });
+  }
+
+  // =====================================
+  // POST فقط للحفظ
+  // =====================================
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -67,14 +80,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // الاتصال
     const { db } = await connectToDatabase();
 
-    // قراءة البيانات
     const body = req.body || {};
 
     const name =
-      typeof body.name === "string" ? body.name.trim() : "";
+      typeof body.name === "string"
+        ? body.name.trim()
+        : "";
 
     const email =
       typeof body.email === "string"
@@ -97,10 +110,10 @@ export default async function handler(req, res) {
     }
 
     // =====================================
-    // منع تكرار البريد
+    // منع التكرار
     // =====================================
     const existingUser = await db.collection("users").findOne({
-      email: email,
+      email,
     });
 
     if (existingUser) {
@@ -111,7 +124,7 @@ export default async function handler(req, res) {
     }
 
     // =====================================
-    // تجهيز البيانات
+    // New User
     // =====================================
     const newUser = {
       name,
@@ -120,15 +133,12 @@ export default async function handler(req, res) {
       createdAt: new Date(),
     };
 
-    // =====================================
-    // حفظ البيانات
-    // =====================================
     const result = await db.collection("users").insertOne(
       newUser
     );
 
     // =====================================
-    // نجاح
+    // Success
     // =====================================
     return res.status(201).json({
       success: true,
