@@ -1,50 +1,172 @@
-// استبدل useEffect الحالي بالكامل بهذا داخل Products()
+// file name: src/pages/Products.tsx
 
-useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch(
-        'https://enarah2.vercel.app/api/get-users'
-      )
+import { useRef, useEffect, useState } from 'react'
+import { motion, useInView } from 'framer-motion'
 
-      const data = await res.json()
+function FadeIn({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode
+  delay?: number
+}) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, {
+    once: true,
+    margin: '-50px',
+  })
 
-      // إذا API نجح
-      if (data.success && Array.isArray(data.data)) {
-        // تحويل بيانات MongoDB إلى شكل مناسب للواجهة
-        const formattedProducts = data.data.map((item, index) => {
-          let mediaData = {}
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={
+        isInView
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 30 }
+      }
+      transition={{
+        duration: 0.6,
+        delay,
+        ease: 'easeOut',
+      }}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
-          try {
-            mediaData = item.phone ? JSON.parse(item.phone) : {}
-          } catch {
-            mediaData = {}
-          }
+// ======================================
+// Types
+// ======================================
+type ProductItem = {
+  id: string
+  name: string
+  description: string
+  image: string
+  video?: string
+}
 
-          return {
-            id: item._id || index,
-            name: item.name || 'بدون اسم',
-            description:
-              item.description ||
-              item.email ||
-              'لا يوجد وصف متاح',
-            image:
-              mediaData.imageUrl ||
-              '/images/default-product.jpg',
-            video:
-              mediaData.videoUrl || '',
-          }
-        })
+export default function Products() {
+  const [categories, setCategories] = useState<ProductItem[]>(
+    []
+  )
 
-        setCategories(formattedProducts)
-      } else {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(
+          'https://enarah2.vercel.app/api/get-users'
+        )
+
+        const data = await res.json()
+
+        if (res.ok && data.success && Array.isArray(data.data)) {
+          const formattedProducts: ProductItem[] =
+            data.data.map(
+              (
+                item: {
+                  _id?: string
+                  name?: string
+                  email?: string
+                  phone?: string
+                },
+                index: number
+              ) => {
+                let mediaData: {
+                  imageUrl?: string
+                  videoUrl?: string
+                } = {}
+
+                try {
+                  mediaData = item.phone
+                    ? JSON.parse(item.phone)
+                    : {}
+                } catch {
+                  mediaData = {}
+                }
+
+                return {
+                  id: item._id || String(index),
+                  name: item.name || 'بدون اسم',
+                  description:
+                    item.email || 'لا يوجد وصف متاح',
+                  image:
+                    mediaData.imageUrl ||
+                    '/images/default-product.jpg',
+                  video: mediaData.videoUrl || '',
+                }
+              }
+            )
+
+          setCategories(formattedProducts)
+        } else {
+          setCategories([])
+        }
+      } catch (error) {
+        console.error(
+          'Fetch Products Error:',
+          error
+        )
         setCategories([])
       }
-    } catch (error) {
-      console.error('Fetch Products Error:', error)
-      setCategories([])
     }
-  }
 
-  fetchProducts()
-}, [])
+    fetchProducts()
+  }, [])
+
+  return (
+    <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Title */}
+        <FadeIn>
+          <div className="text-center mb-14">
+            <h1 className="text-3xl font-bold text-white">
+              منتجاتنا
+            </h1>
+          </div>
+        </FadeIn>
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map((cat, i) => (
+            <FadeIn key={cat.id} delay={i * 0.1}>
+              <div className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5">
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="w-full h-[250px] object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      '/images/default-product.jpg'
+                  }}
+                />
+
+                <div className="p-4">
+                  <h3 className="text-white font-bold mb-2">
+                    {cat.name}
+                  </h3>
+
+                  <p className="text-white/60 text-sm">
+                    {cat.description}
+                  </p>
+
+                  {cat.video && (
+                    <a
+                      href={cat.video}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-3 text-blue-400 text-sm hover:text-blue-300"
+                    >
+                      مشاهدة الفيديو
+                    </a>
+                  )}
+                </div>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
