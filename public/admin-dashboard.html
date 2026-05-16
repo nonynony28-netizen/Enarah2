@@ -24,6 +24,49 @@
       margin-bottom: 30px;
     }
 
+    /* ===================================== */
+    /* Admin Actions */
+    /* ===================================== */
+    .admin-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .admin-actions a,
+    .admin-actions button {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 0;
+      width: auto;
+    }
+
+    .add-btn {
+      background: #3b82f6;
+    }
+
+    .filter-all {
+      background: #1d4ed8;
+    }
+
+    .filter-product {
+      background: #2563eb;
+    }
+
+    .filter-contact {
+      background: #16a34a;
+    }
+
     .grid {
       display: grid;
       gap: 20px;
@@ -87,7 +130,7 @@
       font-weight: bold;
     }
 
-    button {
+    .delete-btn {
       margin-top: 14px;
       width: 100%;
       padding: 12px;
@@ -100,7 +143,7 @@
       font-weight: bold;
     }
 
-    button:hover {
+    .delete-btn:hover {
       opacity: 0.9;
     }
   </style>
@@ -109,11 +152,50 @@
 
   <h1>لوحة التحكم</h1>
 
+  <!-- ===================================== -->
+  <!-- Unified Dashboard Controls -->
+  <!-- ===================================== -->
+  <div class="admin-actions">
+    <a
+      href="/media-uploader.html"
+      class="add-btn"
+    >
+      إضافة منتج
+    </a>
+
+    <button
+      class="filter-all"
+      onclick="filterType('all')"
+    >
+      الكل
+    </button>
+
+    <button
+      class="filter-product"
+      onclick="filterType('product')"
+    >
+      المنتجات
+    </button>
+
+    <button
+      class="filter-contact"
+      onclick="filterType('contact')"
+    >
+      الرسائل
+    </button>
+  </div>
+
   <div id="items" class="grid">
     جاري التحميل...
   </div>
 
   <script>
+    let allItems = [];
+    let currentFilter = "all";
+
+    // =====================================
+    // Load All Data
+    // =====================================
     async function loadItems() {
       const container =
         document.getElementById(
@@ -134,134 +216,203 @@
           return;
         }
 
-        container.innerHTML = "";
+        allItems = data.data;
 
-        data.data.forEach(
-          (item) => {
-            let media = {};
-
-            try {
-              media = item.phone
-                ? JSON.parse(
-                    item.phone
-                  )
-                : {};
-            } catch {}
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-            card.className =
-              "card";
-
-            // =====================================
-            // Contact Messages
-            // =====================================
-            if (
-              item.type ===
-              "contact"
-            ) {
-              card.classList.add(
-                "contact-card"
-              );
-
-              card.innerHTML = `
-                <span class="badge contact-badge">
-                  رسالة عميل
-                </span>
-
-                <h3>
-                  ${item.name || "بدون اسم"}
-                </h3>
-
-                <p>
-                  <span class="label">الهاتف:</span>
-                  ${
-                    item.phone ||
-                    "غير متوفر"
-                  }
-                </p>
-
-                <p>
-                  <span class="label">الرسالة:</span>
-                  ${
-                    item.email ||
-                    "لا توجد رسالة"
-                  }
-                </p>
-
-                <button onclick="deleteItem('${item._id}')">
-                  حذف الرسالة
-                </button>
-              `;
-            }
-
-            // =====================================
-            // Products
-            // =====================================
-            else {
-              card.classList.add(
-                "product-card"
-              );
-
-              card.innerHTML = `
-                <span class="badge product-badge">
-                  منتج
-                </span>
-
-                ${
-                  media.imageUrl
-                    ? `<img src="${media.imageUrl}" alt="product image" />`
-                    : ""
-                }
-
-                <h3>
-                  ${
-                    item.name ||
-                    "بدون اسم"
-                  }
-                </h3>
-
-                <p>
-                  ${
-                    item.email &&
-                    !item.email.includes(
-                      "@upload.local"
-                    )
-                      ? item.email
-                      : ""
-                  }
-                </p>
-
-                <button onclick="deleteItem('${item._id}')">
-                  حذف المنتج
-                </button>
-              `;
-            }
-
-            container.appendChild(
-              card
-            );
-          }
-        );
-
-        // =====================================
-        // Empty State
-        // =====================================
-        if (
-          !data.data.length
-        ) {
-          container.innerHTML =
-            "لا توجد بيانات حالياً";
-        }
+        renderItems();
       } catch {
         container.innerHTML =
           "حدث خطأ أثناء التحميل";
       }
     }
 
+    // =====================================
+    // Filter
+    // =====================================
+    function filterType(type) {
+      currentFilter = type;
+
+      renderItems();
+    }
+
+    // =====================================
+    // Render
+    // =====================================
+    function renderItems() {
+      const container =
+        document.getElementById(
+          "items"
+        );
+
+      container.innerHTML = "";
+
+      const filteredItems =
+        allItems.filter(
+          (item) => {
+            if (
+              currentFilter ===
+              "all"
+            ) {
+              return true;
+            }
+
+            if (
+              currentFilter ===
+              "contact"
+            ) {
+              return (
+                item.type ===
+                "contact"
+              );
+            }
+
+            if (
+              currentFilter ===
+              "product"
+            ) {
+              return (
+                item.type !==
+                "contact"
+              );
+            }
+
+            return true;
+          }
+        );
+
+      filteredItems.forEach(
+        (item) => {
+          let media = {};
+
+          try {
+            media = item.phone
+              ? JSON.parse(
+                  item.phone
+                )
+              : {};
+          } catch {}
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+          card.className =
+            "card";
+
+          // =====================================
+          // Contact Messages
+          // =====================================
+          if (
+            item.type ===
+            "contact"
+          ) {
+            card.classList.add(
+              "contact-card"
+            );
+
+            card.innerHTML = `
+              <span class="badge contact-badge">
+                رسالة عميل
+              </span>
+
+              <h3>
+                ${
+                  item.name ||
+                  "بدون اسم"
+                }
+              </h3>
+
+              <p>
+                <span class="label">الهاتف:</span>
+                ${
+                  item.phone ||
+                  "غير متوفر"
+                }
+              </p>
+
+              <p>
+                <span class="label">الرسالة:</span>
+                ${
+                  item.email ||
+                  "لا توجد رسالة"
+                }
+              </p>
+
+              <button
+                class="delete-btn"
+                onclick="deleteItem('${item._id}')"
+              >
+                حذف الرسالة
+              </button>
+            `;
+          }
+
+          // =====================================
+          // Products
+          // =====================================
+          else {
+            card.classList.add(
+              "product-card"
+            );
+
+            card.innerHTML = `
+              <span class="badge product-badge">
+                منتج
+              </span>
+
+              ${
+                media.imageUrl
+                  ? `<img src="${media.imageUrl}" alt="product image" />`
+                  : ""
+              }
+
+              <h3>
+                ${
+                  item.name ||
+                  "بدون اسم"
+                }
+              </h3>
+
+              <p>
+                ${
+                  item.email &&
+                  !item.email.includes(
+                    "@upload.local"
+                  )
+                    ? item.email
+                    : ""
+                }
+              </p>
+
+              <button
+                class="delete-btn"
+                onclick="deleteItem('${item._id}')"
+              >
+                حذف المنتج
+              </button>
+            `;
+          }
+
+          container.appendChild(
+            card
+          );
+        }
+      );
+
+      // =====================================
+      // Empty State
+      // =====================================
+      if (
+        !filteredItems.length
+      ) {
+        container.innerHTML =
+          "لا توجد بيانات حالياً";
+      }
+    }
+
+    // =====================================
+    // Delete
+    // =====================================
     async function deleteItem(
       id
     ) {
@@ -314,6 +465,9 @@
       }
     }
 
+    // =====================================
+    // Init
+    // =====================================
     loadItems();
   </script>
 
