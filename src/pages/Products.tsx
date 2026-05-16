@@ -62,6 +62,33 @@ export default function Products() {
     ProductItem[]
   >([])
 
+  // ======================================
+  // Professional Scroll Function
+  // ======================================
+  const scrollToProduct = (
+    productId: string
+  ) => {
+    const target =
+      document.getElementById(
+        productId
+      )
+
+    if (!target) return
+
+    const navbarOffset =
+      260
+
+    const elementTop =
+      target.offsetTop
+
+    window.scrollTo({
+      top:
+        elementTop -
+        navbarOffset,
+      behavior: 'smooth',
+    })
+  }
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -148,7 +175,7 @@ export default function Products() {
           )
 
           // ======================================
-          // دعم الانتقال المباشر عبر #id
+          // دعم الانتقال المباشر عبر Footer / Links
           // ======================================
           requestAnimationFrame(() => {
             setTimeout(() => {
@@ -159,29 +186,11 @@ export default function Products() {
                 )
 
               if (hash) {
-                const target =
-                  document.getElementById(
-                    hash
-                  )
-
-                if (target) {
-                  const yOffset =
-                    -180
-
-                  const y =
-                    target.getBoundingClientRect()
-                      .top +
-                    window.pageYOffset +
-                    yOffset
-
-                  window.scrollTo({
-                    top: y,
-                    behavior:
-                      'smooth',
-                  })
-                }
+                scrollToProduct(
+                  hash
+                )
               }
-            }, 500)
+            }, 1000)
           })
         } else {
           setCategories([])
@@ -230,7 +239,7 @@ export default function Products() {
               >
                 <div
                   id={`product-${cat.id}`}
-                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 scroll-mt-56"
+                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 scroll-mt-96"
                 >
                   {/* ======================================
                       Product Image
@@ -265,37 +274,15 @@ export default function Products() {
                         ) => {
                           e.preventDefault()
 
-                          const target =
-                            document.getElementById(
-                              `product-${cat.id}`
-                            )
+                          scrollToProduct(
+                            `product-${cat.id}`
+                          )
 
-                          if (
-                            target
-                          ) {
-                            const yOffset =
-                              -180
-
-                            const y =
-                              target.getBoundingClientRect()
-                                .top +
-                              window.pageYOffset +
-                              yOffset
-
-                            window.scrollTo(
-                              {
-                                top: y,
-                                behavior:
-                                  'smooth',
-                              }
-                            )
-
-                            window.history.replaceState(
-                              null,
-                              '',
-                              `#product-${cat.id}`
-                            )
-                          }
+                          window.history.replaceState(
+                            null,
+                            '',
+                            `#product-${cat.id}`
+                          )
                         }}
                       >
                         {cat.name}
