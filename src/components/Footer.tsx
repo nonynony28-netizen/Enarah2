@@ -64,19 +64,24 @@ const productLinks = [
 
 export default function Footer() {
   // ======================================
-  // Smooth Scroll Handler
+  // Professional Smooth Scroll Handler
   // ======================================
   const handleSmoothNavigation = (
     e: React.MouseEvent<HTMLAnchorElement>,
     path: string
   ) => {
-    if (path.includes('#')) {
-      e.preventDefault()
+    e.preventDefault()
 
+    // ======================================
+    // روابط تحتوي Hash
+    // ======================================
+    if (path.includes('#')) {
       const [basePath, hash] =
         path.split('#')
 
-      // نفس الصفحة
+      // ======================================
+      // إذا نفس الصفحة الحالية
+      // ======================================
       if (
         window.location.pathname ===
           basePath ||
@@ -90,17 +95,16 @@ export default function Footer() {
           )
 
         if (target) {
-          const yOffset =
-            -120
+          const navbarOffset =
+            220
 
-          const y =
-            target.getBoundingClientRect()
-              .top +
-            window.pageYOffset +
-            yOffset
+          const elementTop =
+            target.offsetTop
 
           window.scrollTo({
-            top: y,
+            top:
+              elementTop -
+              navbarOffset,
             behavior:
               'smooth',
           })
@@ -112,10 +116,18 @@ export default function Footer() {
           )
         }
       } else {
+        // ======================================
         // صفحة أخرى
+        // ======================================
         window.location.href =
           path
       }
+    } else {
+      // ======================================
+      // روابط عادية بدون Hash
+      // ======================================
+      window.location.href =
+        path
     }
   }
 
@@ -157,39 +169,24 @@ export default function Footer() {
                       link.path
                     }
                   >
-                    {link.path.includes(
-                      '#'
-                    ) ? (
-                      <a
-                        href={
+                    <a
+                      href={
+                        link.path
+                      }
+                      onClick={(
+                        e
+                      ) =>
+                        handleSmoothNavigation(
+                          e,
                           link.path
-                        }
-                        onClick={(
-                          e
-                        ) =>
-                          handleSmoothNavigation(
-                            e,
-                            link.path
-                          )
-                        }
-                        className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300 cursor-pointer"
-                      >
-                        {
-                          link.label
-                        }
-                      </a>
-                    ) : (
-                      <Link
-                        to={
-                          link.path
-                        }
-                        className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300"
-                      >
-                        {
-                          link.label
-                        }
-                      </Link>
-                    )}
+                        )
+                      }
+                      className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300 cursor-pointer"
+                    >
+                      {
+                        link.label
+                      }
+                    </a>
                   </li>
                 )
               )}
