@@ -1,273 +1,254 @@
-// file name: src/components/Footer.tsx
+// file name: src/pages/Products.tsx
 
-import { Link } from 'react-router-dom'
-import {
-  Lightbulb,
-  Phone,
-  Mail,
-  MapPin,
-} from 'lucide-react'
+import { useRef, useEffect, useState } from 'react'
+import { motion, useInView } from 'framer-motion'
 
-const quickLinks = [
-  {
-    path: '/#hero',
-    label: 'الرئيسية',
-  },
-  {
-    path: '/products',
-    label: 'المنتجات',
-  },
-  {
-    path: '/#brands',
-    label: 'الشركات العالمية',
-  },
-  {
-    path: '/#projects',
-    label: 'المشاريع',
-  },
-  {
-    path: '/#about',
-    label: 'من نحن',
-  },
-  {
-    path: '/contact',
-    label: 'تواصل معنا',
-  },
-]
+function FadeIn({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode
+  delay?: number
+}) {
+  const ref = useRef(null)
 
-const productLinks = [
-  {
-    label: 'ثريات',
-    path: '/products#product-1',
-  },
-  {
-    label: 'سبوتات',
-    path: '/products#product-2',
-  },
-  {
-    label: 'LED Profile',
-    path: '/products#product-3',
-  },
-  {
-    label: 'أسلاك وكوابل',
-    path: '/products#product-4',
-  },
-  {
-    label: 'مواد تأسيس كهربائي',
-    path: '/products#product-5',
-  },
-  {
-    label: 'مفاتيح وبرايز',
-    path: '/products#product-6',
-  },
-]
-
-export default function Footer() {
-  // ======================================
-  // Smooth Scroll داخل الصفحة الرئيسية فقط
-  // ======================================
-  const handleHomeScroll = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    hash: string
-  ) => {
-    e.preventDefault()
-
-    // إذا لسنا في الرئيسية
-    if (
-      window.location.pathname !==
-      '/'
-    ) {
-      window.location.href = `/${hash}`
-      return
-    }
-
-    const target =
-      document.getElementById(
-        hash.replace('#', '')
-      )
-
-    if (target) {
-      const navbarOffset =
-        220
-
-      const elementTop =
-        target.offsetTop
-
-      window.scrollTo({
-        top:
-          elementTop -
-          navbarOffset,
-        behavior:
-          'smooth',
-      })
-
-      window.history.replaceState(
-        null,
-        '',
-        `/${hash}`
-      )
-    }
-  }
+  const isInView = useInView(ref, {
+    once: true,
+    margin: '-50px',
+  })
 
   return (
-    <footer className="bg-darkblue-light border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand Info */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="w-5 h-5 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.55)]" />
+    <motion.div
+      ref={ref}
+      initial={{
+        opacity: 0,
+        y: 30,
+      }}
+      animate={
+        isInView
+          ? {
+              opacity: 1,
+              y: 0,
+            }
+          : {
+              opacity: 0,
+              y: 30,
+            }
+      }
+      transition={{
+        duration: 0.6,
+        delay,
+        ease: 'easeOut',
+      }}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
-              <span className="text-blue-400 font-bold text-lg drop-shadow-[0_0_14px_rgba(59,130,246,0.45)]">
-                الإنارة الحديثة
-              </span>
-            </div>
+// ======================================
+// Types
+// ======================================
+type ProductItem = {
+  id: string
+  name: string
+  description: string
+  image: string
+  video?: string
+}
 
-            <p className="text-white/70 text-sm leading-relaxed">
-              وجهتك الأولى لجميع
-              احتياجات الإضاءة
-              والمواد الكهربائية.
-              نقدم حلولاً متكاملة
-              بجودة عالية وخبرة
-              احترافية.
-            </p>
+export default function Products() {
+  const [categories, setCategories] = useState<
+    ProductItem[]
+  >([])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // ======================================
+        // جلب البيانات من MongoDB API
+        // ======================================
+        const res = await fetch(
+          'https://enarah2.vercel.app/api/get-users'
+        )
+
+        const data = await res.json()
+
+        // ======================================
+        // تحقق من نجاح الجلب
+        // ======================================
+        if (
+          res.ok &&
+          data.success &&
+          Array.isArray(data.data)
+        ) {
+          const formattedProducts: ProductItem[] =
+            data.data.map(
+              (
+                item: {
+                  _id?: string
+                  name?: string
+                  email?: string
+                  phone?: string
+                },
+                index: number
+              ) => {
+                let mediaData: {
+                  imageUrl?: string
+                  videoUrl?: string
+                } = {}
+
+                // ======================================
+                // استخراج روابط الصورة والفيديو
+                // ======================================
+                try {
+                  mediaData = item.phone
+                    ? JSON.parse(item.phone)
+                    : {}
+                } catch {
+                  mediaData = {}
+                }
+
+                return {
+                  id:
+                    item._id ||
+                    String(index),
+
+                  // عنوان المنتج
+                  name:
+                    item.name ||
+                    'بدون اسم',
+
+                  // إخفاء البريد الوهمي مثل media_...@upload.local
+                  description:
+                    item.email &&
+                    !item.email.includes(
+                      '@upload.local'
+                    )
+                      ? item.email
+                      : '',
+
+                  // الصورة
+                  image:
+                    mediaData.imageUrl ||
+                    '/images/default-product.jpg',
+
+                  // الفيديو
+                  video:
+                    mediaData.videoUrl ||
+                    '',
+                }
+              }
+            )
+
+          setCategories(
+            formattedProducts
+          )
+        } else {
+          setCategories([])
+        }
+      } catch (error) {
+        console.error(
+          'Fetch Products Error:',
+          error
+        )
+
+        setCategories([])
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
+  return (
+    <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* ======================================
+            Title
+        ====================================== */}
+        <FadeIn>
+          <div className="text-center mb-14">
+            <h1 className="text-3xl font-bold text-white">
+              منتجاتنا
+            </h1>
           </div>
+        </FadeIn>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-blue-400 font-semibold mb-4 drop-shadow-[0_0_10px_rgba(59,130,246,0.35)]">
-              روابط سريعة
-            </h3>
+        {/* ======================================
+            Products Grid
+        ====================================== */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map(
+            (cat, i) => (
+              <FadeIn
+                key={cat.id}
+                delay={i * 0.1}
+              >
+                <div className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5">
+                  {/* ======================================
+                      Product Image
+                  ====================================== */}
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-[250px] object-cover"
+                    onError={(
+                      e
+                    ) => {
+                      e.currentTarget.src =
+                        '/images/default-product.jpg'
+                    }}
+                  />
 
-            <ul className="space-y-2">
-              {quickLinks.map(
-                (link) => (
-                  <li
-                    key={
-                      link.path
-                    }
-                  >
-                    {link.path.startsWith(
-                      '/#'
-                    ) ? (
+                  {/* ======================================
+                      Product Content
+                  ====================================== */}
+                  <div className="p-4">
+                    {/* Product Name */}
+                    <h3 className="text-white font-bold mb-2">
+                      {cat.name}
+                    </h3>
+
+                    {/* Product Description
+                        يظهر فقط إذا يوجد وصف حقيقي
+                    */}
+                    {cat.description && (
+                      <p className="text-white/60 text-sm">
+                        {
+                          cat.description
+                        }
+                      </p>
+                    )}
+
+                    {/* Product Video */}
+                    {cat.video && (
                       <a
                         href={
-                          link.path
+                          cat.video
                         }
-                        onClick={(
-                          e
-                        ) =>
-                          handleHomeScroll(
-                            e,
-                            link.path.replace(
-                              '/',
-                              ''
-                            )
-                          )
-                        }
-                        className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300 cursor-pointer"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-3 text-blue-400 text-sm hover:text-blue-300"
                       >
-                        {
-                          link.label
-                        }
+                        مشاهدة الفيديو
                       </a>
-                    ) : (
-                      <Link
-                        to={
-                          link.path
-                        }
-                        className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300 cursor-pointer"
-                      >
-                        {
-                          link.label
-                        }
-                      </Link>
                     )}
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
-
-          {/* Products */}
-          <div>
-            <h3 className="text-blue-400 font-semibold mb-4 drop-shadow-[0_0_10px_rgba(59,130,246,0.35)]">
-              المنتجات
-            </h3>
-
-            <ul className="space-y-2">
-              {productLinks.map(
-                (item) => (
-                  <li
-                    key={
-                      item.label
-                    }
-                  >
-                    <Link
-                      to={
-                        item.path
-                      }
-                      className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300 cursor-pointer"
-                    >
-                      {
-                        item.label
-                      }
-                    </Link>
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-blue-400 font-semibold mb-4 drop-shadow-[0_0_10px_rgba(59,130,246,0.35)]">
-              معلومات التواصل
-            </h3>
-
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-white/70 text-sm">
-                <Phone className="w-4 h-4 text-blue-400" />
-
-                <span>
-                  0916580068 /
-                  0926580068
-                </span>
-              </li>
-
-              <li className="flex items-center gap-2 text-white/70 text-sm">
-                <Mail className="w-4 h-4 text-blue-400" />
-
-                <span>
-                  enarahmodern@gmail.com
-                </span>
-              </li>
-
-              <li className="flex items-start gap-2 text-white/70 text-sm leading-relaxed">
-                <MapPin className="w-4 h-4 text-blue-400 mt-0.5" />
-
-                <span>
-                  ليبيا - بنغازي
-                  - الليثي -
-                  مقابل مدرسة
-                  العيد الفضي
-                </span>
-              </li>
-            </ul>
-          </div>
+                  </div>
+                </div>
+              </FadeIn>
+            )
+          )}
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-10 pt-6 border-t border-white/5 text-center">
-          <p className="text-white/40 text-sm">
-            ©{' '}
-            {new Date().getFullYear()}{' '}
-            الإنارة الحديثة.
-            جميع الحقوق
-            محفوظة.
-          </p>
-        </div>
+        {/* ======================================
+            Empty State
+        ====================================== */}
+        {categories.length === 0 && (
+          <div className="text-center py-20 text-white/60">
+            لا توجد منتجات حالياً
+          </div>
+        )}
       </div>
-    </footer>
+    </div>
   )
 }
