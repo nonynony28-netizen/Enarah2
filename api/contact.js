@@ -1,41 +1,43 @@
 import mongoose from 'mongoose'
 
 const MONGO_URI =
-  'ضع_رابط_MongoDB_هنا'
+  'ضع رابط MongoDB الحالي نفسه هنا'
 
 if (!mongoose.connections[0].readyState) {
   mongoose.connect(MONGO_URI)
 }
 
-// Schema
-const ContactSchema =
+const UserSchema =
   new mongoose.Schema(
     {
       name: String,
+      email: String,
       phone: String,
-      message: String,
+      type: {
+        type: String,
+        default: 'contact',
+      },
       createdAt: {
         type: Date,
         default: Date.now,
       },
     },
     {
-      collection: 'contacts',
+      collection: 'users',
     }
   )
 
-const Contact =
-  mongoose.models.Contact ||
+const User =
+  mongoose.models.User ||
   mongoose.model(
-    'Contact',
-    ContactSchema
+    'User',
+    UserSchema
   )
 
 export default async function handler(
   req,
   res
 ) {
-  // POST فقط
   if (req.method !== 'POST') {
     return res.status(405).json({
       success: false,
@@ -51,7 +53,6 @@ export default async function handler(
       message,
     } = req.body
 
-    // تحقق من الحقول
     if (
       !name ||
       !phone ||
@@ -64,19 +65,20 @@ export default async function handler(
       })
     }
 
-    // حفظ الرسالة
-    const newMessage =
-      await Contact.create({
+    // نفس قاعدة البيانات الحالية
+    const newContact =
+      await User.create({
         name,
+        email: message, // نخزن الرسالة داخل email
         phone,
-        message,
+        type: 'contact',
       })
 
     return res.status(200).json({
       success: true,
       message:
-        'تم حفظ الرسالة بنجاح',
-      data: newMessage,
+        'تم حفظ الرسالة',
+      data: newContact,
     })
   } catch (error) {
     console.error(
