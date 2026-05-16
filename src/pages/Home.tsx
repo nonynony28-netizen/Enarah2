@@ -65,7 +65,7 @@ export default function Home() {
         {/* Video Background */}
         <div className="absolute inset-0">
           <iframe
-            src="https://streamable.com/e/6ifxtb?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1"
+            src="https://streamable.com/e/zarpqc?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1"
             allow="autoplay; fullscreen"
             className="w-full h-full object-cover scale-[1.35] translate-y-[-12%]"
             style={{
