@@ -70,14 +70,13 @@ export default function Footer() {
     e: React.MouseEvent<HTMLAnchorElement>,
     path: string
   ) => {
-    // إذا الرابط يحتوي # داخل الصفحة
     if (path.includes('#')) {
       e.preventDefault()
 
       const [basePath, hash] =
         path.split('#')
 
-      // إذا نفس الصفحة الرئيسية
+      // نفس الصفحة
       if (
         window.location.pathname ===
           basePath ||
@@ -113,7 +112,7 @@ export default function Footer() {
           )
         }
       } else {
-        // انتقال لصفحة أخرى مع hash
+        // صفحة أخرى
         window.location.href =
           path
       }
@@ -211,8 +210,8 @@ export default function Footer() {
                       item.label
                     }
                   >
-                    <a
-                      href={
+                    <Link
+                      to={
                         item.path
                       }
                       className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300 cursor-pointer"
@@ -220,7 +219,7 @@ export default function Footer() {
                       {
                         item.label
                       }
-                    </a>
+                    </Link>
                   </li>
                 )
               )}
