@@ -1,3 +1,5 @@
+// file name: src/pages/Contact.tsx
+
 import { useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react'
@@ -10,14 +12,35 @@ function FadeIn({
   delay?: number
 }) {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-50px' })
+
+  const isInView = useInView(ref, {
+    once: true,
+    margin: '-50px',
+  })
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, delay, ease: 'easeOut' }}
+      initial={{
+        opacity: 0,
+        y: 30,
+      }}
+      animate={
+        isInView
+          ? {
+              opacity: 1,
+              y: 0,
+            }
+          : {
+              opacity: 0,
+              y: 30,
+            }
+      }
+      transition={{
+        duration: 0.6,
+        delay,
+        ease: 'easeOut',
+      }}
     >
       {children}
     </motion.div>
@@ -31,26 +54,83 @@ export default function Contact() {
     message: '',
   })
 
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] =
+    useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] =
+    useState(false)
+
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault()
-    setSubmitted(true)
 
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormData({
-        name: '',
-        phone: '',
-        message: '',
-      })
-    }, 3000)
+    if (
+      !formData.name ||
+      !formData.phone ||
+      !formData.message
+    ) {
+      alert(
+        'يرجى تعبئة جميع الحقول'
+      )
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      const res = await fetch(
+        '/api/contact',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json',
+          },
+          body: JSON.stringify(
+            formData
+          ),
+        }
+      )
+
+      const data =
+        await res.json()
+
+      if (data.success) {
+        setSubmitted(true)
+
+        setFormData({
+          name: '',
+          phone: '',
+          message: '',
+        })
+
+        setTimeout(() => {
+          setSubmitted(false)
+        }, 3000)
+      } else {
+        alert(
+          data.message ||
+            'فشل إرسال الرسالة'
+        )
+      }
+    } catch (error) {
+      console.error(
+        'Submit Error:',
+        error
+      )
+
+      alert(
+        'حدث خطأ أثناء الإرسال، حاول مرة أخرى'
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
         {/* Header */}
         <FadeIn>
           <div className="text-center mb-14">
@@ -67,7 +147,6 @@ export default function Contact() {
         </FadeIn>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
           {/* Contact Form */}
           <FadeIn delay={0.1}>
             <div className="bg-darkblue-light border border-white/5 rounded-2xl p-6 md:p-8">
@@ -77,8 +156,14 @@ export default function Contact() {
 
               {submitted ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{
+                    opacity: 0,
+                    scale: 0.9,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                  }}
                   className="bg-blue-500/10 border border-blue-400/30 rounded-xl p-6 text-center"
                 >
                   <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -90,12 +175,16 @@ export default function Contact() {
                   </h3>
 
                   <p className="text-white/60 text-sm">
-                    سنقوم بالرد عليك في أقرب وقت ممكن.
+                    تم حفظ رسالتك وسنقوم بالرد عليك قريباً.
                   </p>
                 </motion.div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-
+                <form
+                  onSubmit={
+                    handleSubmit
+                  }
+                  className="space-y-4"
+                >
                   {/* Name */}
                   <div>
                     <label className="block text-white/70 text-sm mb-2">
@@ -105,9 +194,16 @@ export default function Contact() {
                     <input
                       type="text"
                       required
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
+                      value={
+                        formData.name
+                      }
+                      onChange={(
+                        e
+                      ) =>
+                        setFormData({
+                          ...formData,
+                          name: e.target.value,
+                        })
                       }
                       className="w-full px-4 py-4 bg-darkblue border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
                       placeholder="اسمك الكامل"
@@ -123,9 +219,16 @@ export default function Contact() {
                     <input
                       type="tel"
                       required
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
+                      value={
+                        formData.phone
+                      }
+                      onChange={(
+                        e
+                      ) =>
+                        setFormData({
+                          ...formData,
+                          phone: e.target.value,
+                        })
                       }
                       className="w-full px-4 py-4 bg-darkblue border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
                       placeholder="09xxxxxxxx"
@@ -141,11 +244,16 @@ export default function Contact() {
                     <textarea
                       required
                       rows={4}
-                      value={formData.message}
-                      onChange={(e) =>
+                      value={
+                        formData.message
+                      }
+                      onChange={(
+                        e
+                      ) =>
                         setFormData({
                           ...formData,
-                          message: e.target.value,
+                          message:
+                            e.target.value,
                         })
                       }
                       className="w-full px-4 py-4 bg-darkblue border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all resize-none"
@@ -156,12 +264,17 @@ export default function Contact() {
                   {/* Submit */}
                   <button
                     type="submit"
-                    className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-bold rounded-xl hover:scale-[1.02] transition-all duration-300 shadow-[0_0_18px_rgba(59,130,246,0.35)] flex items-center justify-center gap-2"
+                    disabled={
+                      loading
+                    }
+                    className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-bold rounded-xl hover:scale-[1.02] transition-all duration-300 shadow-[0_0_18px_rgba(59,130,246,0.35)] flex items-center justify-center gap-2 disabled:opacity-60"
                   >
                     <Send className="w-5 h-5" />
-                    إرسال الرسالة
-                  </button>
 
+                    {loading
+                      ? 'جاري الإرسال...'
+                      : 'إرسال الرسالة'}
+                  </button>
                 </form>
               )}
             </div>
@@ -170,29 +283,28 @@ export default function Contact() {
           {/* Contact Info */}
           <FadeIn delay={0.2}>
             <div className="space-y-6">
-
               <div className="bg-darkblue-light border border-white/5 rounded-2xl p-6 md:p-8">
                 <h2 className="text-xl font-bold text-white mb-6">
                   معلومات التواصل
                 </h2>
 
                 <div className="space-y-5">
-
-                  {/* Phone */}
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <Phone className="w-5 h-5 text-blue-400" />
                     </div>
 
                     <div>
-                      <p className="text-white/50 text-sm">الهاتف</p>
+                      <p className="text-white/50 text-sm">
+                        الهاتف
+                      </p>
+
                       <p className="text-white font-medium">
                         +218916580068
                       </p>
                     </div>
                   </div>
 
-                  {/* Email */}
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <Mail className="w-5 h-5 text-blue-400" />
@@ -202,20 +314,23 @@ export default function Contact() {
                       <p className="text-white/50 text-sm">
                         البريد الإلكتروني
                       </p>
+
                       <p className="text-white font-medium break-all">
                         enarahmodern@gmail.com
                       </p>
                     </div>
                   </div>
 
-                  {/* Address */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <MapPin className="w-5 h-5 text-blue-400" />
                     </div>
 
                     <div>
-                      <p className="text-white/50 text-sm">العنوان</p>
+                      <p className="text-white/50 text-sm">
+                        العنوان
+                      </p>
+
                       <p className="text-white font-medium leading-relaxed">
                         بنغازي، الليثي مقابل مدرسة العيد الفضي
                         <br />
@@ -224,20 +339,21 @@ export default function Contact() {
                     </div>
                   </div>
 
-                  {/* Hours */}
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <Clock className="w-5 h-5 text-blue-400" />
                     </div>
 
                     <div>
-                      <p className="text-white/50 text-sm">ساعات العمل</p>
+                      <p className="text-white/50 text-sm">
+                        ساعات العمل
+                      </p>
+
                       <p className="text-white font-medium">
                         من 8 صباحاً إلى 8 مساءً
                       </p>
                     </div>
                   </div>
-
                 </div>
               </div>
 
@@ -259,7 +375,6 @@ export default function Contact() {
                   اتصل بنا الآن
                 </a>
               </div>
-
             </div>
           </FadeIn>
         </div>
