@@ -74,10 +74,12 @@ export default function Home() {
             }}
           />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-darkblue via-darkblue/80 to-darkblue/40" />
+          {/* Enhanced Overlay for clearer video + readable text */}
+          <div className="absolute inset-0 bg-gradient-to-t from-darkblue via-darkblue/72 to-darkblue/25" />
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+        {/* Hero Content Lower for cinematic balance */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center mt-32 md:mt-48">
           <motion.div
             initial={{
               opacity: 0,
@@ -92,21 +94,21 @@ export default function Home() {
               ease: 'easeOut',
             }}
           >
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
               الإنارة{' '}
               <span className="text-blue-400 drop-shadow-[0_0_18px_rgba(59,130,246,0.75)]">
                 الحديثة
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-white/85 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base md:text-lg text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
               كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالية وحلول متكاملة
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 to="/products"
-                className="px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 shadow-[0_0_22px_rgba(59,130,246,0.35)] flex items-center gap-2"
+                className="px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 hover:scale-105 transition-all duration-300 shadow-[0_0_22px_rgba(59,130,246,0.35)] flex items-center gap-2"
               >
                 استعرض المنتجات
 
@@ -115,7 +117,7 @@ export default function Home() {
 
               <Link
                 to="/contact"
-                className="px-8 py-3 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 hover:border-blue-400/50 transition-all duration-300"
+                className="px-8 py-3 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 hover:border-blue-400/50 hover:scale-105 transition-all duration-300"
               >
                 تواصل معنا
               </Link>
@@ -123,6 +125,7 @@ export default function Home() {
           </motion.div>
         </div>
 
+        {/* Scroll Indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
           animate={{
@@ -228,7 +231,7 @@ export default function Home() {
 
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.35)]"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.35)]"
             >
               <Zap className="w-5 h-5" />
               تواصل معنا الآن
