@@ -36,7 +36,7 @@ const quickLinks = [
 
 export default function Footer() {
   // ======================================
-  // Smooth Scroll Handler
+  // Fixed Professional Smooth Navigation
   // ======================================
   const handleSmoothNavigation = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -45,21 +45,20 @@ export default function Footer() {
     e.preventDefault()
 
     // ======================================
-    // روابط تحتوي Hash
+    // روابط الصفحة الرئيسية الداخلية
     // ======================================
-    if (path.includes('#')) {
-      const [basePath, hash] =
-        path.split('#')
+    if (path.startsWith('/#')) {
+      const hash = path.replace(
+        '/#',
+        ''
+      )
 
       // ======================================
-      // إذا داخل نفس الصفحة
+      // إذا داخل الصفحة الرئيسية
       // ======================================
       if (
         window.location.pathname ===
-          basePath ||
-        (basePath === '/' &&
-          window.location.pathname ===
-            '/')
+        '/'
       ) {
         const target =
           document.getElementById(
@@ -70,12 +69,9 @@ export default function Footer() {
           const navbarOffset =
             220
 
-          const elementTop =
-            target.offsetTop
-
           window.scrollTo({
             top:
-              elementTop -
+              target.offsetTop -
               navbarOffset,
             behavior:
               'smooth',
@@ -89,20 +85,20 @@ export default function Footer() {
         }
       } else {
         // ======================================
-        // انتقال لصفحة أخرى
+        // الانتقال للرئيسية مع القسم المطلوب
         // ======================================
-        window.location.assign(
+        window.location.href =
           path
-        )
       }
-    } else {
-      // ======================================
-      // روابط عادية
-      // ======================================
-      window.location.assign(
-        path
-      )
+
+      return
     }
+
+    // ======================================
+    // صفحات مستقلة
+    // ======================================
+    window.location.href =
+      path
   }
 
   return (
