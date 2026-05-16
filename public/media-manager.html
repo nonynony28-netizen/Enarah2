@@ -2,7 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
   <title>لوحة إدارة الوسائط</title>
 
   <style>
@@ -14,7 +17,8 @@
       padding: 20px;
     }
 
-    h1, h2 {
+    h1,
+    h2 {
       text-align: center;
     }
 
@@ -29,10 +33,11 @@
       padding: 20px;
       border-radius: 16px;
       margin-bottom: 30px;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    input, textarea {
+    input,
+    textarea {
       width: 100%;
       padding: 14px;
       margin-bottom: 12px;
@@ -41,6 +46,12 @@
       background: #071427;
       color: white;
       box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
 
     button {
@@ -50,11 +61,16 @@
       border-radius: 10px;
       font-weight: bold;
       cursor: pointer;
+      font-size: 18px;
     }
 
     .save-btn {
       background: #3b82f6;
       color: white;
+    }
+
+    .save-btn:hover {
+      opacity: 0.9;
     }
 
     .delete-btn {
@@ -63,9 +79,16 @@
       margin-top: 10px;
     }
 
+    .delete-btn:hover {
+      opacity: 0.9;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(280px, 1fr)
+      );
       gap: 20px;
     }
 
@@ -73,6 +96,7 @@
       background: #071427;
       padding: 15px;
       border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
     .card img {
@@ -80,11 +104,36 @@
       height: 220px;
       object-fit: cover;
       border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .card p {
+      color: rgba(255,255,255,0.75);
+      line-height: 1.6;
+      min-height: 40px;
     }
 
     .status {
       text-align: center;
       margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .video-link {
+      display: inline-block;
+      margin-top: 8px;
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .video-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -98,26 +147,50 @@
   <div class="form-box">
     <h2>إضافة عنصر جديد</h2>
 
-    <input type="text" id="name" placeholder="اسم المنتج / الصورة" />
+    <input
+      type="text"
+      id="name"
+      placeholder="اسم المنتج / الصورة"
+    />
 
-    <textarea id="description" placeholder="الوصف"></textarea>
+    <textarea
+      id="description"
+      placeholder="الوصف (اختياري)"
+    ></textarea>
 
-    <input type="text" id="imageUrl" placeholder="رابط الصورة" />
+    <input
+      type="text"
+      id="imageUrl"
+      placeholder="رابط الصورة"
+    />
 
-    <input type="text" id="videoUrl" placeholder="رابط الفيديو (اختياري)" />
+    <input
+      type="text"
+      id="videoUrl"
+      placeholder="رابط الفيديو (اختياري)"
+    />
 
-    <button class="save-btn" onclick="saveItem()">
+    <button
+      class="save-btn"
+      onclick="saveItem()"
+    >
       حفظ العنصر
     </button>
 
-    <div class="status" id="saveStatus"></div>
+    <div
+      class="status"
+      id="saveStatus"
+    ></div>
   </div>
 
   <!-- Items Section -->
   <div class="items-box">
     <h2>كل العناصر</h2>
 
-    <div id="items" class="grid">
+    <div
+      id="items"
+      class="grid"
+    >
       جاري التحميل...
     </div>
   </div>
@@ -127,25 +200,43 @@
 <script>
   async function saveItem() {
     const name =
-      document.getElementById("name").value.trim();
+      document
+        .getElementById("name")
+        .value
+        .trim();
 
     const description =
-      document.getElementById("description").value.trim();
+      document
+        .getElementById("description")
+        .value
+        .trim();
 
     const imageUrl =
-      document.getElementById("imageUrl").value.trim();
+      document
+        .getElementById("imageUrl")
+        .value
+        .trim();
 
     const videoUrl =
-      document.getElementById("videoUrl").value.trim();
+      document
+        .getElementById("videoUrl")
+        .value
+        .trim();
 
     const saveStatus =
-      document.getElementById("saveStatus");
+      document.getElementById(
+        "saveStatus"
+      );
 
+    // مطلوب فقط الاسم + رابط الصورة
     if (!name || !imageUrl) {
       saveStatus.innerText =
         "الاسم ورابط الصورة مطلوبان.";
       return;
     }
+
+    saveStatus.innerText =
+      "جاري الحفظ...";
 
     try {
       const res = await fetch(
@@ -157,33 +248,50 @@
               "application/json",
           },
           body: JSON.stringify({
-            name,
-            email: description,
+            name: name,
+            // لأن API الحالي يتطلب email
+            email:
+              description ||
+              "بدون وصف",
             phone: JSON.stringify({
-              imageUrl,
-              videoUrl,
+              imageUrl: imageUrl,
+              videoUrl: videoUrl,
             }),
           }),
         }
       );
 
-      const data = await res.json();
+      const data =
+        await res.json();
 
-      if (data.success) {
+      if (res.ok && data.success) {
         saveStatus.innerText =
           "تم الحفظ بنجاح ✔";
 
-        document.getElementById("name").value = "";
-        document.getElementById("description").value = "";
-        document.getElementById("imageUrl").value = "";
-        document.getElementById("videoUrl").value = "";
+        // تنظيف الحقول
+        document.getElementById(
+          "name"
+        ).value = "";
+
+        document.getElementById(
+          "description"
+        ).value = "";
+
+        document.getElementById(
+          "imageUrl"
+        ).value = "";
+
+        document.getElementById(
+          "videoUrl"
+        ).value = "";
 
         loadItems();
       } else {
         saveStatus.innerText =
-          data.error || "فشل الحفظ";
+          data.error ||
+          "فشل الحفظ";
       }
-    } catch {
+    } catch (error) {
       saveStatus.innerText =
         "خطأ أثناء الاتصال";
     }
@@ -191,16 +299,23 @@
 
   async function loadItems() {
     const container =
-      document.getElementById("items");
+      document.getElementById(
+        "items"
+      );
 
     try {
       const res = await fetch(
         "/api/get-users"
       );
 
-      const data = await res.json();
+      const data =
+        await res.json();
 
-      if (!data.success) {
+      if (
+        !res.ok ||
+        !data.success ||
+        !Array.isArray(data.data)
+      ) {
         container.innerHTML =
           "فشل تحميل البيانات";
         return;
@@ -208,54 +323,105 @@
 
       container.innerHTML = "";
 
-      data.data.forEach(item => {
-        let media = {};
+      data.data.forEach(
+        (item) => {
+          let media = {};
 
-        try {
-          media = item.phone
-            ? JSON.parse(item.phone)
-            : {};
-        } catch {}
-
-        const card =
-          document.createElement("div");
-
-        card.className = "card";
-
-        card.innerHTML = `
-          ${
-            media.imageUrl
-              ? `<img src="${media.imageUrl}" alt="${item.name}" />`
-              : ""
+          try {
+            media = item.phone
+              ? JSON.parse(
+                  item.phone
+                )
+              : {};
+          } catch {
+            media = {};
           }
 
-          <h3>${item.name || ""}</h3>
+          const card =
+            document.createElement(
+              "div"
+            );
 
-          <p>${
-            item.email || ""
-          }</p>
+          card.className = "card";
 
-          ${
-            media.videoUrl
-              ? `<a href="${media.videoUrl}" target="_blank" style="color:#3b82f6;">مشاهدة الفيديو</a>`
-              : ""
-          }
+          card.innerHTML = `
+            ${
+              media.imageUrl
+                ? `
+                <img
+                  src="${media.imageUrl}"
+                  alt="${item.name || ""}"
+                  onerror="this.src='/images/default-product.jpg'"
+                />
+              `
+                : ""
+            }
 
-          <button class="delete-btn" onclick="deleteItem('${item._id}')">
-            حذف
-          </button>
-        `;
+            <h3>
+              ${
+                item.name ||
+                "بدون اسم"
+              }
+            </h3>
 
-        container.appendChild(card);
-      });
-    } catch {
+            <p>
+              ${
+                item.email ===
+                "بدون وصف"
+                  ? ""
+                  : item.email ||
+                    ""
+              }
+            </p>
+
+            ${
+              media.videoUrl
+                ? `
+                <a
+                  href="${media.videoUrl}"
+                  target="_blank"
+                  class="video-link"
+                >
+                  مشاهدة الفيديو
+                </a>
+              `
+                : ""
+            }
+
+            <button
+              class="delete-btn"
+              onclick="deleteItem('${item._id}')"
+            >
+              حذف
+            </button>
+          `;
+
+          container.appendChild(
+            card
+          );
+        }
+      );
+
+      if (
+        data.data.length === 0
+      ) {
+        container.innerHTML =
+          "لا توجد عناصر حالياً";
+      }
+    } catch (error) {
       container.innerHTML =
         "حدث خطأ أثناء التحميل";
     }
   }
 
-  async function deleteItem(id) {
-    if (!confirm("هل أنت متأكد من الحذف؟")) {
+  async function deleteItem(
+    id
+  ) {
+    if (
+      !confirm(
+        "هل أنت متأكد من الحذف؟"
+      )
+    ) {
       return;
     }
 
@@ -269,7 +435,7 @@
               "application/json",
           },
           body: JSON.stringify({
-            id,
+            id: id,
           }),
         }
       );
@@ -277,20 +443,26 @@
       const data =
         await res.json();
 
-      if (data.success) {
+      if (res.ok && data.success) {
+        alert(
+          "تم الحذف بنجاح ✔"
+        );
+
         loadItems();
       } else {
         alert(
-          data.error || "فشل الحذف"
+          data.error ||
+            "فشل الحذف"
         );
       }
-    } catch {
+    } catch (error) {
       alert(
         "خطأ أثناء الحذف"
       );
     }
   }
 
+  // تحميل العناصر عند فتح الصفحة
   loadItems();
 </script>
 
