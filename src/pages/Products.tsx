@@ -150,37 +150,39 @@ export default function Products() {
           // ======================================
           // دعم الانتقال المباشر عبر #id
           // ======================================
-          setTimeout(() => {
-            const hash =
-              window.location.hash.replace(
-                '#',
-                ''
-              )
-
-            if (hash) {
-              const target =
-                document.getElementById(
-                  hash
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              const hash =
+                window.location.hash.replace(
+                  '#',
+                  ''
                 )
 
-              if (target) {
-                const yOffset =
-                  -120
+              if (hash) {
+                const target =
+                  document.getElementById(
+                    hash
+                  )
 
-                const y =
-                  target.getBoundingClientRect()
-                    .top +
-                  window.pageYOffset +
-                  yOffset
+                if (target) {
+                  const yOffset =
+                    -180
 
-                window.scrollTo({
-                  top: y,
-                  behavior:
-                    'smooth',
-                })
+                  const y =
+                    target.getBoundingClientRect()
+                      .top +
+                    window.pageYOffset +
+                    yOffset
+
+                  window.scrollTo({
+                    top: y,
+                    behavior:
+                      'smooth',
+                  })
+                }
               }
-            }
-          }, 300)
+            }, 500)
+          })
         } else {
           setCategories([])
         }
@@ -228,7 +230,7 @@ export default function Products() {
               >
                 <div
                   id={`product-${cat.id}`}
-                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 scroll-mt-40"
+                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 scroll-mt-56"
                 >
                   {/* ======================================
                       Product Image
@@ -272,7 +274,7 @@ export default function Products() {
                             target
                           ) {
                             const yOffset =
-                              -120
+                              -180
 
                             const y =
                               target.getBoundingClientRect()
