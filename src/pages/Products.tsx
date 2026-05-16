@@ -1,7 +1,15 @@
 // file name: src/pages/Products.tsx
 
-import { useRef, useEffect, useState } from 'react'
-import { motion, useInView } from 'framer-motion'
+import {
+  useRef,
+  useEffect,
+  useState,
+} from 'react'
+import {
+  motion,
+  useInView,
+  AnimatePresence,
+} from 'framer-motion'
 
 function FadeIn({
   children,
@@ -58,29 +66,80 @@ type ProductItem = {
 }
 
 export default function Products() {
-  const [categories, setCategories] = useState<
-    ProductItem[]
-  >([])
+  const [categories, setCategories] =
+    useState<ProductItem[]>(
+      []
+    )
+
+  const [selectedCategory, setSelectedCategory] =
+    useState('الكل')
+
+  const [selectedProduct, setSelectedProduct] =
+    useState<ProductItem | null>(
+      null
+    )
+
+  // ======================================
+  // Product Category Detection
+  // ======================================
+  const filterOptions = [
+    'الكل',
+    'ثريات',
+    'سبوتات',
+    'LED',
+    'أسلاك',
+    'كهرباء',
+  ]
+
+  const getCategory = (
+    productName: string
+  ) => {
+    const name =
+      productName.toLowerCase()
+
+    if (
+      name.includes('ثريا') ||
+      name.includes('نجفة')
+    )
+      return 'ثريات'
+
+    if (
+      name.includes('سبوت') ||
+      name.includes('spot')
+    )
+      return 'سبوتات'
+
+    if (
+      name.includes('led')
+    )
+      return 'LED'
+
+    if (
+      name.includes('سلك') ||
+      name.includes('كوابل') ||
+      name.includes('كابل')
+    )
+      return 'أسلاك'
+
+    return 'كهرباء'
+  }
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // ======================================
-        // جلب البيانات من MongoDB API
-        // ======================================
         const res = await fetch(
           'https://enarah2.vercel.app/api/get-users'
         )
 
-        const data = await res.json()
+        const data =
+          await res.json()
 
-        // ======================================
-        // تحقق من نجاح الجلب
-        // ======================================
         if (
           res.ok &&
           data.success &&
-          Array.isArray(data.data)
+          Array.isArray(
+            data.data
+          )
         ) {
           const formattedProducts: ProductItem[] =
             data.data.map(
@@ -98,13 +157,13 @@ export default function Products() {
                   videoUrl?: string
                 } = {}
 
-                // ======================================
-                // استخراج روابط الصورة والفيديو
-                // ======================================
                 try {
-                  mediaData = item.phone
-                    ? JSON.parse(item.phone)
-                    : {}
+                  mediaData =
+                    item.phone
+                      ? JSON.parse(
+                          item.phone
+                        )
+                      : {}
                 } catch {
                   mediaData = {}
                 }
@@ -114,12 +173,10 @@ export default function Products() {
                     item._id ||
                     String(index),
 
-                  // عنوان المنتج
                   name:
                     item.name ||
                     'بدون اسم',
 
-                  // إخفاء البريد الوهمي مثل media_...@upload.local
                   description:
                     item.email &&
                     !item.email.includes(
@@ -128,12 +185,10 @@ export default function Products() {
                       ? item.email
                       : '',
 
-                  // الصورة
                   image:
                     mediaData.imageUrl ||
                     '/images/default-product.jpg',
 
-                  // الفيديو
                   video:
                     mediaData.videoUrl ||
                     '',
@@ -160,6 +215,23 @@ export default function Products() {
     fetchProducts()
   }, [])
 
+  // ======================================
+  // Filtered Products
+  // ======================================
+  const filteredProducts =
+    selectedCategory ===
+    'الكل'
+      ? categories
+      : categories.filter(
+          (
+            product
+          ) =>
+            getCategory(
+              product.name
+            ) ===
+            selectedCategory
+        )
+
   return (
     <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
       <div className="max-w-7xl mx-auto px-4">
@@ -167,10 +239,42 @@ export default function Products() {
             Title
         ====================================== */}
         <FadeIn>
-          <div className="text-center mb-14">
-            <h1 className="text-3xl font-bold text-white">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">
               منتجاتنا
             </h1>
+
+            {/* ======================================
+                Filter Buttons
+            ====================================== */}
+            <div className="flex flex-wrap justify-center gap-3">
+              {filterOptions.map(
+                (
+                  filter
+                ) => (
+                  <button
+                    key={
+                      filter
+                    }
+                    onClick={() =>
+                      setSelectedCategory(
+                        filter
+                      )
+                    }
+                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                      selectedCategory ===
+                      filter
+                        ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.45)]'
+                        : 'bg-darkblue-light text-white/70 hover:text-white hover:bg-blue-500/20'
+                    }`}
+                  >
+                    {
+                      filter
+                    }
+                  </button>
+                )
+              )}
+            </div>
           </div>
         </FadeIn>
 
@@ -178,63 +282,70 @@ export default function Products() {
             Products Grid
         ====================================== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map(
-            (cat, i) => (
+          {filteredProducts.map(
+            (
+              cat,
+              i
+            ) => (
               <FadeIn
-                key={cat.id}
-                delay={i * 0.1}
+                key={
+                  cat.id
+                }
+                delay={
+                  i * 0.08
+                }
               >
-                <div className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5">
-                  {/* ======================================
-                      Product Image
-                  ====================================== */}
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="w-full h-[250px] object-cover"
-                    onError={(
-                      e
-                    ) => {
-                      e.currentTarget.src =
-                        '/images/default-product.jpg'
-                    }}
-                  />
+                <motion.div
+                  whileHover={{
+                    y: -8,
+                  }}
+                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 hover:border-blue-400/30 transition-all duration-300 cursor-pointer"
+                  onClick={() =>
+                    setSelectedProduct(
+                      cat
+                    )
+                  }
+                >
+                  {/* Product Image */}
+                  <div className="overflow-hidden">
+                    <img
+                      src={
+                        cat.image
+                      }
+                      alt={
+                        cat.name
+                      }
+                      className="w-full h-[250px] object-cover transition-transform duration-500 hover:scale-110"
+                      onError={(
+                        e
+                      ) => {
+                        e.currentTarget.src =
+                          '/images/default-product.jpg'
+                      }}
+                    />
+                  </div>
 
-                  {/* ======================================
-                      Product Content
-                  ====================================== */}
+                  {/* Product Content */}
                   <div className="p-4">
-                    {/* Product Name */}
-                    <h3 className="text-white font-bold mb-2">
-                      {cat.name}
+                    <h3 className="text-white font-bold mb-2 text-lg">
+                      {
+                        cat.name
+                      }
                     </h3>
 
-                    {/* Product Description
-                        يظهر فقط إذا يوجد وصف حقيقي
-                    */}
                     {cat.description && (
-                      <p className="text-white/60 text-sm">
+                      <p className="text-white/60 text-sm line-clamp-3">
                         {
                           cat.description
                         }
                       </p>
                     )}
 
-                    {/* Product Video */}
-                    {cat.video && (
-                      <a
-                        href={
-                          cat.video
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-3 text-blue-400 text-sm hover:text-blue-300"
-                      >
-                        مشاهدة الفيديو
-                      </a>
-                    )}
+                    <button className="mt-4 text-blue-400 text-sm font-semibold hover:text-blue-300 transition-colors">
+                      عرض التفاصيل
+                    </button>
                   </div>
-                </div>
+                </motion.div>
               </FadeIn>
             )
           )}
@@ -243,11 +354,112 @@ export default function Products() {
         {/* ======================================
             Empty State
         ====================================== */}
-        {categories.length === 0 && (
+        {filteredProducts.length ===
+          0 && (
           <div className="text-center py-20 text-white/60">
-            لا توجد منتجات حالياً
+            لا توجد منتجات
+            في هذا القسم حالياً
           </div>
         )}
+
+        {/* ======================================
+            Product Popup Modal
+        ====================================== */}
+        <AnimatePresence>
+          {selectedProduct && (
+            <motion.div
+              className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center px-4"
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              exit={{
+                opacity: 0,
+              }}
+              onClick={() =>
+                setSelectedProduct(
+                  null
+                )
+              }
+            >
+              <motion.div
+                initial={{
+                  scale: 0.9,
+                  opacity: 0,
+                }}
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                }}
+                exit={{
+                  scale: 0.9,
+                  opacity: 0,
+                }}
+                transition={{
+                  duration: 0.25,
+                }}
+                onClick={(
+                  e
+                ) =>
+                  e.stopPropagation()
+                }
+                className="bg-darkblue-light max-w-3xl w-full rounded-2xl overflow-hidden border border-white/10 max-h-[90vh] overflow-y-auto"
+              >
+                <img
+                  src={
+                    selectedProduct.image
+                  }
+                  alt={
+                    selectedProduct.name
+                  }
+                  className="w-full h-[320px] object-cover"
+                />
+
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-white mb-4">
+                    {
+                      selectedProduct.name
+                    }
+                  </h2>
+
+                  {selectedProduct.description && (
+                    <p className="text-white/70 leading-relaxed mb-4">
+                      {
+                        selectedProduct.description
+                      }
+                    </p>
+                  )}
+
+                  {selectedProduct.video && (
+                    <a
+                      href={
+                        selectedProduct.video
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-blue-400 hover:text-blue-300 font-semibold"
+                    >
+                      مشاهدة الفيديو
+                    </a>
+                  )}
+
+                  <button
+                    onClick={() =>
+                      setSelectedProduct(
+                        null
+                      )
+                    }
+                    className="block mt-6 w-full bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-lg transition-colors"
+                  >
+                    إغلاق
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
