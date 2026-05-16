@@ -66,9 +66,9 @@ export default function Contact() {
     e.preventDefault()
 
     if (
-      !formData.name ||
-      !formData.phone ||
-      !formData.message
+      !formData.name.trim() ||
+      !formData.phone.trim() ||
+      !formData.message.trim()
     ) {
       alert(
         'يرجى تعبئة جميع الحقول'
@@ -79,17 +79,27 @@ export default function Contact() {
     try {
       setLoading(true)
 
+      // =====================================
+      // إرسال الرسالة إلى نفس قاعدة البيانات
+      // name = الاسم
+      // phone = الهاتف
+      // email = نص الرسالة
+      // type = contact لتمييزها داخل لوحة التحكم
+      // =====================================
       const res = await fetch(
-        '/api/contact',
+        '/api/save-user',
         {
           method: 'POST',
           headers: {
             'Content-Type':
               'application/json',
           },
-          body: JSON.stringify(
-            formData
-          ),
+          body: JSON.stringify({
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.message,
+            type: 'contact',
+          }),
         }
       )
 
@@ -110,7 +120,8 @@ export default function Contact() {
         }, 3000)
       } else {
         alert(
-          data.message ||
+          data.error ||
+            data.message ||
             'فشل إرسال الرسالة'
         )
       }
@@ -175,7 +186,7 @@ export default function Contact() {
                   </h3>
 
                   <p className="text-white/60 text-sm">
-                    تم حفظ رسالتك وسنقوم بالرد عليك قريباً.
+                    تم حفظ رسالتك في قاعدة البيانات وسنقوم بالرد عليك قريباً.
                   </p>
                 </motion.div>
               ) : (
@@ -267,7 +278,7 @@ export default function Contact() {
                     disabled={
                       loading
                     }
-                    className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-bold rounded-xl hover:scale-[1.02] transition-all duration-300 shadow-[0_0_18px_rgba(59,130,246,0.35)] flex items-center justify-center gap-2 disabled:opacity-60"
+                    className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-bold rounded-xl hover:scale-[1.02] transition-all duration-300 shadow-[0_0_18px_rgba(59,130,246,0.35)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:hover:scale-100"
                   >
                     <Send className="w-5 h-5" />
 
@@ -289,6 +300,7 @@ export default function Contact() {
                 </h2>
 
                 <div className="space-y-5">
+                  {/* Phone */}
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <Phone className="w-5 h-5 text-blue-400" />
@@ -305,6 +317,7 @@ export default function Contact() {
                     </div>
                   </div>
 
+                  {/* Email */}
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <Mail className="w-5 h-5 text-blue-400" />
@@ -321,6 +334,7 @@ export default function Contact() {
                     </div>
                   </div>
 
+                  {/* Address */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <MapPin className="w-5 h-5 text-blue-400" />
@@ -339,6 +353,7 @@ export default function Contact() {
                     </div>
                   </div>
 
+                  {/* Hours */}
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
                       <Clock className="w-5 h-5 text-blue-400" />
