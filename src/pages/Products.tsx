@@ -164,9 +164,19 @@ export default function Products() {
                 )
 
               if (target) {
-                target.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
+                const yOffset =
+                  -120
+
+                const y =
+                  target.getBoundingClientRect()
+                    .top +
+                  window.pageYOffset +
+                  yOffset
+
+                window.scrollTo({
+                  top: y,
+                  behavior:
+                    'smooth',
                 })
               }
             }
@@ -218,7 +228,7 @@ export default function Products() {
               >
                 <div
                   id={`product-${cat.id}`}
-                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 scroll-mt-28"
+                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 scroll-mt-40"
                 >
                   {/* ======================================
                       Product Image
@@ -261,12 +271,20 @@ export default function Products() {
                           if (
                             target
                           ) {
-                            target.scrollIntoView(
+                            const yOffset =
+                              -120
+
+                            const y =
+                              target.getBoundingClientRect()
+                                .top +
+                              window.pageYOffset +
+                              yOffset
+
+                            window.scrollTo(
                               {
+                                top: y,
                                 behavior:
                                   'smooth',
-                                block:
-                                  'start',
                               }
                             )
 
