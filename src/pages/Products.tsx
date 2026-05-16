@@ -119,12 +119,14 @@ export default function Products() {
                     item.name ||
                     'بدون اسم',
 
-                  // إخفاء البريد الوهمي مثل media_...@upload.local
+                  // الوصف
                   description:
                     item.email &&
                     !item.email.includes(
                       '@upload.local'
-                    )
+                    ) &&
+                    item.email !==
+                      'بدون وصف'
                       ? item.email
                       : '',
 
@@ -144,6 +146,31 @@ export default function Products() {
           setCategories(
             formattedProducts
           )
+
+          // ======================================
+          // دعم الانتقال المباشر عبر #id
+          // ======================================
+          setTimeout(() => {
+            const hash =
+              window.location.hash.replace(
+                '#',
+                ''
+              )
+
+            if (hash) {
+              const target =
+                document.getElementById(
+                  hash
+                )
+
+              if (target) {
+                target.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                })
+              }
+            }
+          }, 300)
         } else {
           setCategories([])
         }
@@ -161,7 +188,12 @@ export default function Products() {
   }, [])
 
   return (
-    <div className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen">
+    <div
+      className="pt-24 md:pt-28 pb-16 bg-darkblue min-h-screen"
+      style={{
+        scrollBehavior: 'smooth',
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4">
         {/* ======================================
             Title
@@ -184,7 +216,10 @@ export default function Products() {
                 key={cat.id}
                 delay={i * 0.1}
               >
-                <div className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5">
+                <div
+                  id={`product-${cat.id}`}
+                  className="bg-darkblue-light rounded-xl overflow-hidden border border-white/5 scroll-mt-28"
+                >
                   {/* ======================================
                       Product Image
                   ====================================== */}
@@ -204,16 +239,52 @@ export default function Products() {
                       Product Content
                   ====================================== */}
                   <div className="p-4">
-                    {/* Product Name */}
+                    {/* Product Name + Smooth Link */}
                     <h3 className="text-white font-bold mb-2">
-                      {cat.name}
+                      <a
+                        href={`#product-${cat.id}`}
+                        className="text-white hover:text-blue-400 transition-colors"
+                        style={{
+                          textDecoration:
+                            'none',
+                        }}
+                        onClick={(
+                          e
+                        ) => {
+                          e.preventDefault()
+
+                          const target =
+                            document.getElementById(
+                              `product-${cat.id}`
+                            )
+
+                          if (
+                            target
+                          ) {
+                            target.scrollIntoView(
+                              {
+                                behavior:
+                                  'smooth',
+                                block:
+                                  'start',
+                              }
+                            )
+
+                            window.history.replaceState(
+                              null,
+                              '',
+                              `#product-${cat.id}`
+                            )
+                          }
+                        }}
+                      >
+                        {cat.name}
+                      </a>
                     </h3>
 
-                    {/* Product Description
-                        يظهر فقط إذا يوجد وصف حقيقي
-                    */}
+                    {/* Product Description */}
                     {cat.description && (
-                      <p className="text-white/60 text-sm">
+                      <p className="text-white/60 text-sm leading-relaxed">
                         {
                           cat.description
                         }
@@ -228,7 +299,7 @@ export default function Products() {
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block mt-3 text-blue-400 text-sm hover:text-blue-300"
+                        className="inline-block mt-3 text-blue-400 text-sm hover:text-blue-300 transition-colors"
                       >
                         مشاهدة الفيديو
                       </a>
@@ -239,6 +310,15 @@ export default function Products() {
             )
           )}
         </div>
+
+        {/* ======================================
+            Empty State
+        ====================================== */}
+        {categories.length === 0 && (
+          <div className="text-center py-20 text-white/60">
+            لا توجد منتجات حالياً
+          </div>
+        )}
       </div>
     </div>
   )
