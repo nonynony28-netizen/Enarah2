@@ -67,7 +67,7 @@ export default function Home() {
           <iframe
             src="https://streamable.com/e/6ifxtb?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1"
             allow="autoplay; fullscreen"
-            className="w-full h-full object-cover scale-[1.15]"
+            className="w-full h-full object-cover scale-[1.35] translate-y-[-12%]"
             style={{
               border: 'none',
               pointerEvents: 'none',
