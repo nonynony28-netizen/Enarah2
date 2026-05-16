@@ -60,28 +60,28 @@ export default function Home() {
       {/* Hero Section */}
       <section
         id="hero"
-        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-black"
+        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-darkblue"
       >
         {/* Video Background */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-darkblue">
           <iframe
             src="https://streamable.com/e/zarpqc?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1&preload=auto"
             allow="autoplay; fullscreen"
             loading="eager"
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover scale-[1.2] bg-black"
+            className="w-full h-full object-cover scale-[1.2] bg-darkblue"
             style={{
               border: 'none',
               pointerEvents: 'none',
-              backgroundColor: 'black',
+              backgroundColor: '#04122b',
             }}
           />
 
-          {/* Dark Overlay to remove white flash + keep cinematic feel */}
-          <div className="absolute inset-0 bg-darkblue/35" />
+          {/* Brand Overlay for seamless blue edges */}
+          <div className="absolute inset-0 bg-gradient-to-b from-darkblue/85 via-darkblue/35 to-darkblue/85" />
         </div>
 
-        {/* Hero Content Back To Original Position */}
+        {/* Hero Content */}
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <motion.div
             initial={{
