@@ -80,7 +80,7 @@ export default function Footer() {
         path.split('#')
 
       // ======================================
-      // إذا نفس الصفحة الحالية
+      // إذا داخل نفس الصفحة
       // ======================================
       if (
         window.location.pathname ===
@@ -117,17 +117,25 @@ export default function Footer() {
         }
       } else {
         // ======================================
-        // صفحة أخرى
+        // إذا الصفحة الرئيسية
         // ======================================
-        window.location.href =
-          path
+        if (basePath === '/') {
+          window.location.assign(
+            `/#${hash}`
+          )
+        } else {
+          window.location.assign(
+            path
+          )
+        }
       }
     } else {
       // ======================================
-      // روابط عادية بدون Hash
+      // روابط عادية
       // ======================================
-      window.location.href =
+      window.location.assign(
         path
+      )
     }
   }
 
