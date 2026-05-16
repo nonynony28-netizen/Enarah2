@@ -38,7 +38,10 @@ export default function Home() {
     <div className="pt-16 md:pt-20">
 
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
+      <section
+        id="hero"
+        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden"
+      >
         <div className="absolute inset-0">
           <img
             src="/images/hero.jpg"
@@ -100,7 +103,10 @@ export default function Home() {
       </section>
 
       {/* Why Us Section */}
-      <section className="py-20 bg-darkblue">
+      <section
+        id="about"
+        className="py-20 bg-darkblue"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
@@ -150,7 +156,10 @@ export default function Home() {
       </section>
 
       {/* Top Products */}
-      <section className="py-20 bg-darkblue-light">
+      <section
+        id="brands"
+        className="py-20 bg-darkblue-light"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
@@ -191,7 +200,10 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-darkblue relative overflow-hidden">
+      <section
+        id="projects"
+        className="py-20 bg-darkblue relative overflow-hidden"
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
