@@ -29,7 +29,7 @@ async function connectToDatabase() {
 
   await client.connect();
 
-  // اسم قاعدة البيانات (يجب أن يطابق كود الحفظ)
+  // اسم قاعدة البيانات
   const db = client.db("my_app_database");
 
   // تخزين الاتصال
@@ -50,8 +50,14 @@ export default async function handler(req, res) {
   // CORS
   // =====================================
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
 
   // Preflight
   if (req.method === "OPTIONS") {
@@ -68,32 +74,54 @@ export default async function handler(req, res) {
 
   try {
     // الاتصال
-    const { db } = await connectToDatabase();
+    const { db } =
+      await connectToDatabase();
 
     // =====================================
-    // جلب البيانات
+    // جلب جميع البيانات
+    // منتجات + رسائل العملاء
     // =====================================
     const users = await db
       .collection("users")
       .find({})
-      .sort({ createdAt: -1 }) // الأحدث أولًا
+      .sort({
+        createdAt: -1,
+      })
       .toArray();
+
+    // =====================================
+    // إضافة type افتراضي للبيانات القديمة
+    // product = المنتجات القديمة
+    // contact = الرسائل الجديدة
+    // =====================================
+    const formattedUsers =
+      users.map((item) => ({
+        ...item,
+        type:
+          item.type ||
+          "product",
+      }));
 
     // =====================================
     // نجاح
     // =====================================
     return res.status(200).json({
       success: true,
-      count: users.length,
-      data: users,
+      count:
+        formattedUsers.length,
+      data: formattedUsers,
     });
   } catch (error) {
-    console.error("MongoDB Fetch Error:", error);
+    console.error(
+      "MongoDB Fetch Error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
       error:
-        error.message || "Internal Server Error",
+        error.message ||
+        "Internal Server Error",
     });
   }
 }
