@@ -1,6 +1,5 @@
 // file name: src/components/Footer.tsx
 
-import { Link } from 'react-router-dom'
 import {
   Lightbulb,
   Phone,
@@ -35,36 +34,9 @@ const quickLinks = [
   },
 ]
 
-const productLinks = [
-  {
-    label: 'ثريات',
-    path: '/products#product-1',
-  },
-  {
-    label: 'سبوتات',
-    path: '/products#product-2',
-  },
-  {
-    label: 'LED Profile',
-    path: '/products#product-3',
-  },
-  {
-    label: 'أسلاك وكوابل',
-    path: '/products#product-4',
-  },
-  {
-    label: 'مواد تأسيس كهربائي',
-    path: '/products#product-5',
-  },
-  {
-    label: 'مفاتيح وبرايز',
-    path: '/products#product-6',
-  },
-]
-
 export default function Footer() {
   // ======================================
-  // Professional Smooth Scroll Handler
+  // Smooth Scroll Handler
   // ======================================
   const handleSmoothNavigation = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -117,17 +89,11 @@ export default function Footer() {
         }
       } else {
         // ======================================
-        // إذا الصفحة الرئيسية
+        // انتقال لصفحة أخرى
         // ======================================
-        if (basePath === '/') {
-          window.location.assign(
-            `/#${hash}`
-          )
-        } else {
-          window.location.assign(
-            path
-          )
-        }
+        window.location.assign(
+          path
+        )
       }
     } else {
       // ======================================
@@ -142,7 +108,10 @@ export default function Footer() {
   return (
     <footer className="bg-darkblue-light border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* ======================================
+            Main Grid
+        ====================================== */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -195,36 +164,6 @@ export default function Footer() {
                         link.label
                       }
                     </a>
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
-
-          {/* Products */}
-          <div>
-            <h3 className="text-blue-400 font-semibold mb-4 drop-shadow-[0_0_10px_rgba(59,130,246,0.35)]">
-              المنتجات
-            </h3>
-
-            <ul className="space-y-2">
-              {productLinks.map(
-                (item) => (
-                  <li
-                    key={
-                      item.label
-                    }
-                  >
-                    <Link
-                      to={
-                        item.path
-                      }
-                      className="text-white/65 hover:text-blue-300 text-sm transition-all duration-300 cursor-pointer"
-                    >
-                      {
-                        item.label
-                      }
-                    </Link>
                   </li>
                 )
               )}
