@@ -45,8 +45,14 @@ export default async function handler(req, res) {
   // CORS
   // =====================================
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
 
   // =====================================
   // OPTIONS
@@ -56,48 +62,83 @@ export default async function handler(req, res) {
   }
 
   // =====================================
-  // GET → صفحة اختبار بدل 405
+  // GET → API Test Page
   // =====================================
   if (req.method === "GET") {
     return res.status(200).json({
       success: true,
-      message: "API is working. Use POST to save user data.",
+      message:
+        "API is working. Use POST to save data.",
       endpoint: "/api/save-user",
       method: "POST",
-      required_fields: ["name", "email"],
-      optional_fields: ["phone"],
+      required_fields: [
+        "name",
+        "email",
+      ],
+      optional_fields: [
+        "phone",
+        "type",
+      ],
+      supported_types: [
+        "user",
+        "product",
+      ],
     });
   }
 
   // =====================================
-  // POST فقط للحفظ
+  // POST only
   // =====================================
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      error: "Method Not Allowed",
+      error:
+        "Method Not Allowed",
     });
   }
 
   try {
-    const { db } = await connectToDatabase();
+    const { db } =
+      await connectToDatabase();
 
-    const body = req.body || {};
+    const body =
+      req.body || {};
 
+    // =====================================
+    // Fields
+    // =====================================
     const name =
-      typeof body.name === "string"
+      typeof body.name ===
+      "string"
         ? body.name.trim()
         : "";
 
     const email =
-      typeof body.email === "string"
-        ? body.email.trim().toLowerCase()
+      typeof body.email ===
+      "string"
+        ? body.email
+            .trim()
+            .toLowerCase()
         : "";
 
     const phone =
-      typeof body.phone === "string"
+      typeof body.phone ===
+      "string"
         ? body.phone.trim()
         : "";
+
+    // =====================================
+    // Type Support
+    // default = user
+    // product = media uploader
+    // =====================================
+    const type =
+      typeof body.type ===
+      "string"
+        ? body.type
+            .trim()
+            .toLowerCase()
+        : "user";
 
     // =====================================
     // Validation
@@ -105,53 +146,110 @@ export default async function handler(req, res) {
     if (!name || !email) {
       return res.status(400).json({
         success: false,
-        error: "name and email are required",
+        error:
+          "name and email are required",
       });
     }
 
     // =====================================
-    // منع التكرار
+    // Duplicate Protection
+    // المنتجات يسمح بتكرارها
+    // المستخدم العادي لا
     // =====================================
-    const existingUser = await db.collection("users").findOne({
-      email,
-    });
+    if (
+      type !== "product"
+    ) {
+      const existingUser =
+        await db
+          .collection(
+            "users"
+          )
+          .findOne({
+            email,
+          });
 
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        error: "User already exists",
-      });
+      if (
+        existingUser
+      ) {
+        return res.status(409).json({
+          success: false,
+          error:
+            "User already exists",
+        });
+      }
     }
 
     // =====================================
-    // New User
+    // Normalize phone/media JSON
+    // =====================================
+    let normalizedPhone =
+      phone;
+
+    try {
+      if (phone) {
+        normalizedPhone =
+          JSON.stringify(
+            JSON.parse(
+              phone
+            )
+          );
+      }
+    } catch {
+      normalizedPhone =
+        phone;
+    }
+
+    // =====================================
+    // New Record
     // =====================================
     const newUser = {
+      type,
       name,
       email,
-      phone,
-      createdAt: new Date(),
+      phone:
+        normalizedPhone,
+      createdAt:
+        new Date(),
     };
 
-    const result = await db.collection("users").insertOne(
-      newUser
-    );
+    const result =
+      await db
+        .collection(
+          "users"
+        )
+        .insertOne(
+          newUser
+        );
 
     // =====================================
     // Success
     // =====================================
     return res.status(201).json({
       success: true,
-      message: "User saved successfully",
-      insertedId: result.insertedId,
+      message:
+        type ===
+        "product"
+          ? "Product saved successfully"
+          : "User saved successfully",
+      insertedId:
+        result.insertedId,
+      savedData: {
+        type,
+        name,
+        email,
+      },
     });
   } catch (error) {
-    console.error("MongoDB Save Error:", error);
+    console.error(
+      "MongoDB Save Error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
       error:
-        error.message || "Internal Server Error",
+        error.message ||
+        "Internal Server Error",
     });
   }
 }
