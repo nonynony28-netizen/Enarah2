@@ -1,384 +1,147 @@
-<!-- file name: public/media-uploader.html -->
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-  <title>رفع روابط الصور والفيديو</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة الرفع للمنتجات والمشاريع</title>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #071122;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      margin: 0; font-family: Arial, sans-serif; background: #071122; color: white;
+      display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
     }
-
     .container {
-      width: 100%;
-      max-width: 700px;
-      background: #0d1b34;
-      border: 1px solid rgba(
-        255,
-        255,
-        255,
-        0.08
-      );
-      border-radius: 18px;
-      padding: 30px;
-      box-shadow: 0 0 25px rgba(
-        59,
-        130,
-        246,
-        0.15
-      );
+      width: 100%; max-width: 700px; background: #0d1b34; border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px; padding: 30px; box-shadow: 0 0 25px rgba(59, 130, 246, 0.15);
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 32px;
+    h1 { text-align: center; margin-bottom: 10px; font-size: 32px; }
+    p { text-align: center; color: rgba(255, 255, 255, 0.65); margin-bottom: 30px; }
+    label { display: block; margin-bottom: 8px; font-weight: bold; color: rgba(255, 255, 255, 0.85); }
+    input, textarea, select {
+      width: 100%; padding: 14px; margin-bottom: 18px; border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08); background: #071122; color: white;
+      font-size: 16px; box-sizing: border-box;
     }
-
-    p {
-      text-align: center;
-      color: rgba(
-        255,
-        255,
-        255,
-        0.65
-      );
-      margin-bottom: 30px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: rgba(
-        255,
-        255,
-        255,
-        0.85
-      );
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 18px;
-      border-radius: 10px;
-      border: 1px solid rgba(
-        255,
-        255,
-        255,
-        0.08
-      );
-      background: #071122;
-      color: white;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    input:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #3b82f6;
-    }
-
+    textarea { min-height: 120px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #3b82f6; }
     button {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      background: #3b82f6;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+      width: 100%; padding: 15px; border: none; border-radius: 10px; background: #3b82f6;
+      color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
     }
-
-    button:hover {
-      background: #60a5fa;
-    }
-
-    button:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
+    button:hover { background: #60a5fa; }
+    button:disabled { opacity: 0.7; cursor: not-allowed; }
     .response {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      background: #071122;
-      border: 1px solid rgba(
-        255,
-        255,
-        255,
-        0.05
-      );
-      text-align: center;
-      display: none;
-      white-space: pre-wrap;
+      margin-top: 20px; padding: 15px; border-radius: 10px; background: #071122;
+      border: 1px solid rgba(255, 255, 255, 0.05); text-align: center; display: none; white-space: pre-wrap;
     }
-
-    .success {
-      color: #86efac;
-    }
-
-    .error {
-      color: #fca5a5;
-    }
+    .success { color: #86efac; }
+    .error { color: #fca5a5; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>رفع روابط الصور والفيديو</h1>
+    <h1>إضافة للموقع</h1>
+    <p>ارفع منتجاتك ومشاريعك بسهولة إلى قاعدة البيانات</p>
 
-    <p>
-      احفظ المنتجات داخل MongoDB مع
-      عنوان + وصف + صورة + فيديو
-    </p>
+    <label for="itemType">ما الذي تريد رفعه؟</label>
+    <select id="itemType">
+      <option value="product">منتج (يظهر في صفحة المنتجات)</option>
+      <option value="project">مشروع (يظهر في صفحة المشاريع والرئيسية)</option>
+    </select>
 
-    <label for="title">
-      عنوان المنتج
-    </label>
+    <div id="categoryContainer" style="display: none;">
+      <label for="category">تصنيف المشروع (مثل: طبي، مول تجاري، مقهى)</label>
+      <input type="text" id="category" placeholder="التصنيف سيظهر في الشارة الذهبية للمشروع" />
+    </div>
 
-    <input
-      type="text"
-      id="title"
-      placeholder="مثال: ثريا مودرن ذهبية"
-    />
+    <label for="title">الاسم أو العنوان</label>
+    <input type="text" id="title" placeholder="اسم المنتج أو المشروع" />
 
-    <label for="description">
-      وصف المنتج
-    </label>
+    <label for="description">الوصف التفصيلي</label>
+    <textarea id="description" placeholder="اكتب وصفاً جذاباً هنا..."></textarea>
 
-    <textarea
-      id="description"
-      placeholder="اكتب وصف أو شرح المنتج هنا"
-    ></textarea>
+    <label for="imageUrl">رابط الصورة</label>
+    <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg" />
 
-    <label for="imageUrl">
-      رابط الصورة
-    </label>
+    <label for="videoUrl">رابط الفيديو (اختياري)</label>
+    <input type="url" id="videoUrl" placeholder="https://example.com/video.mp4" />
 
-    <input
-      type="url"
-      id="imageUrl"
-      placeholder="https://example.com/image.jpg"
-    />
+    <button id="saveBtn">حفظ ونشر في الموقع</button>
 
-    <label for="videoUrl">
-      رابط الفيديو
-    </label>
-
-    <input
-      type="url"
-      id="videoUrl"
-      placeholder="https://example.com/video.mp4"
-    />
-
-    <button id="saveBtn">
-      حفظ داخل MongoDB
-    </button>
-
-    <div
-      id="response"
-      class="response"
-    ></div>
+    <div id="response" class="response"></div>
   </div>
 
   <script>
-    const saveBtn =
-      document.getElementById(
-        "saveBtn"
-      );
+    const saveBtn = document.getElementById("saveBtn");
+    const responseBox = document.getElementById("response");
+    const itemTypeSelect = document.getElementById("itemType");
+    const categoryContainer = document.getElementById("categoryContainer");
 
-    const responseBox =
-      document.getElementById(
-        "response"
-      );
+    // إظهار حقل التصنيف فقط إذا كان الاختيار "مشروع"
+    itemTypeSelect.addEventListener("change", (e) => {
+      categoryContainer.style.display = e.target.value === "project" ? "block" : "none";
+    });
 
-    saveBtn.addEventListener(
-      "click",
-      async () => {
-        const title =
-          document
-            .getElementById(
-              "title"
-            )
-            .value.trim();
+    saveBtn.addEventListener("click", async () => {
+      const itemType = itemTypeSelect.value;
+      const category = document.getElementById("category").value.trim();
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const imageUrl = document.getElementById("imageUrl").value.trim();
+      const videoUrl = document.getElementById("videoUrl").value.trim();
 
-        const description =
-          document
-            .getElementById(
-              "description"
-            )
-            .value.trim();
+      if (!title) return showResponse("الرجاء كتابة الاسم أو العنوان.", false);
+      if (!description) return showResponse("الرجاء كتابة الوصف.", false);
+      if (itemType === "project" && !category) return showResponse("الرجاء كتابة تصنيف المشروع.", false);
+      if (!imageUrl && !videoUrl) return showResponse("يجب إضافة رابط صورة أو فيديو على الأقل.", false);
 
-        const imageUrl =
-          document
-            .getElementById(
-              "imageUrl"
-            )
-            .value.trim();
+      saveBtn.disabled = true;
+      saveBtn.textContent = "جاري الرفع والنشر...";
 
-        const videoUrl =
-          document
-            .getElementById(
-              "videoUrl"
-            )
-            .value.trim();
+      try {
+        const payload = {
+          name: title,
+          email: `media_${Date.now()}@upload.local`,
+          phone: JSON.stringify({
+            imageUrl,
+            videoUrl,
+            description,
+            type: itemType,        // 'product' أو 'project'
+            category: category     // 'طبي'، 'مول' الخ
+          }),
+        };
 
-        // Validation
-        if (!title) {
-          showResponse(
-            "يرجى إدخال عنوان المنتج.",
-            false
-          );
-          return;
+        const res = await fetch("https://enarah2.vercel.app/api/save-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          showResponse("تم الحفظ بنجاح! سيظهر الآن في الموقع.", true);
+          document.getElementById("title").value = "";
+          document.getElementById("description").value = "";
+          document.getElementById("imageUrl").value = "";
+          document.getElementById("videoUrl").value = "";
+          document.getElementById("category").value = "";
+        } else {
+          showResponse(data.error || "حدث خطأ غير متوقع.", false);
         }
-
-        if (!description) {
-          showResponse(
-            "يرجى إدخال وصف المنتج.",
-            false
-          );
-          return;
-        }
-
-        if (
-          !imageUrl &&
-          !videoUrl
-        ) {
-          showResponse(
-            "أضف رابط صورة أو فيديو واحد على الأقل.",
-            false
-          );
-          return;
-        }
-
-        saveBtn.disabled = true;
-        saveBtn.textContent =
-          "جاري الحفظ...";
-
-        try {
-          // حفظ المنتج داخل نفس قاعدة البيانات
-          const payload = {
-            name: title,
-
-            email: `media_${Date.now()}@upload.local`,
-
-            phone: JSON.stringify(
-              {
-                imageUrl,
-                videoUrl,
-                description,
-              }
-            ),
-          };
-
-          const res =
-            await fetch(
-              "https://enarah2.vercel.app/api/save-user",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type":
-                    "application/json",
-                },
-                body: JSON.stringify(
-                  payload
-                ),
-              }
-            );
-
-          const data =
-            await res.json();
-
-          if (data.success) {
-            showResponse(
-              "تم حفظ المنتج بنجاح داخل قاعدة البيانات.",
-              true
-            );
-
-            // Reset Fields
-            document.getElementById(
-              "title"
-            ).value = "";
-
-            document.getElementById(
-              "description"
-            ).value = "";
-
-            document.getElementById(
-              "imageUrl"
-            ).value = "";
-
-            document.getElementById(
-              "videoUrl"
-            ).value = "";
-          } else {
-            showResponse(
-              data.error ||
-                "فشل الحفظ.",
-              false
-            );
-          }
-        } catch (
-          error
-        ) {
-          showResponse(
-            "حدث خطأ أثناء الاتصال بـ API.",
-            false
-          );
-
-          console.error(
-            error
-          );
-        }
-
-        saveBtn.disabled = false;
-
-        saveBtn.textContent =
-          "حفظ داخل MongoDB";
+      } catch (error) {
+        showResponse("فشل في الاتصال بقاعدة البيانات.", false);
+        console.error(error);
       }
-    );
 
-    function showResponse(
-      message,
-      success
-    ) {
-      responseBox.style.display =
-        "block";
+      saveBtn.disabled = false;
+      saveBtn.textContent = "حفظ ونشر في الموقع";
+    });
 
-      responseBox.textContent =
-        message;
-
-      responseBox.className =
-        "response " +
-        (success
-          ? "success"
-          : "error");
+    function showResponse(message, success) {
+      responseBox.style.display = "block";
+      responseBox.textContent = message;
+      responseBox.className = "response " + (success ? "success" : "error");
     }
   </script>
 
