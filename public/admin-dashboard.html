@@ -7,6 +7,13 @@
   <style>
     body { margin: 0; font-family: Arial; background: #06152b; color: white; padding: 20px; }
     h1 { text-align: center; margin-bottom: 30px; }
+    
+    /* Stats Bar */
+    .stats-container { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+    .stat-box { flex: 1; min-width: 200px; padding: 20px; border-radius: 15px; text-align: center; }
+    .stat-visitors { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 10px 20px rgba(59,130,246,0.2); }
+    .stat-items { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 10px 20px rgba(16,185,129,0.2); }
+    
     .admin-actions { display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
     .admin-actions a, .admin-actions button {
       flex: 1; min-width: 120px; padding: 12px; text-align: center; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; transition: 0.3s;
@@ -32,6 +39,18 @@
 
   <h1>لوحة التحكم والإدارة</h1>
 
+  <!-- إحصائيات الموقع -->
+  <div class="stats-container">
+    <div class="stat-box stat-visitors">
+      <h2 style="margin: 0; font-size: 16px; color: #bfdbfe;">عدد زوار الموقع 👁️</h2>
+      <h3 id="visitorCount" style="margin: 10px 0 0; font-size: 32px; font-weight: bold;">...</h3>
+    </div>
+    <div class="stat-box stat-items">
+      <h2 style="margin: 0; font-size: 16px; color: #a7f3d0;">إجمالي المنتجات والمشاريع 📦</h2>
+      <h3 id="totalItemsCount" style="margin: 10px 0 0; font-size: 32px; font-weight: bold;">...</h3>
+    </div>
+  </div>
+
   <div class="admin-actions">
     <a href="/media-uploader.html" class="add-btn">إضافة جديد +</a>
     <button class="filter-all" onclick="filterType('all')">الكل</button>
@@ -48,6 +67,22 @@
     let allItems = [];
     let currentFilter = "all";
 
+    // =====================================
+    // جلب عدد الزوار من الـ API
+    // =====================================
+    async function loadVisitorCount() {
+      try {
+        const res = await fetch("https://api.counterapi.dev/v1/enarah2/visits");
+        const data = await res.json();
+        document.getElementById("visitorCount").innerText = data.count || 0;
+      } catch {
+        document.getElementById("visitorCount").innerText = "غير متاح";
+      }
+    }
+
+    // =====================================
+    // جلب البيانات من قاعدة البيانات
+    // =====================================
     async function loadItems() {
       const container = document.getElementById("items");
       try {
@@ -57,7 +92,12 @@
           container.innerHTML = "فشل في جلب البيانات";
           return;
         }
-        allItems = data.data.reverse(); // نعكسها لنرى الأحدث أولاً
+        allItems = data.data.reverse(); 
+
+        // حساب عدد المشاريع والمنتجات فقط (بدون الرسائل)
+        const validItemsCount = allItems.filter(item => item.type !== "contact").length;
+        document.getElementById("totalItemsCount").innerText = validItemsCount;
+
         renderItems();
       } catch {
         container.innerHTML = "حدث خطأ في الاتصال بقاعدة البيانات";
@@ -92,7 +132,6 @@
         const card = document.createElement("div");
         card.className = "card";
 
-        // === رسائل العملاء ===
         if (item.type === "contact") {
           card.innerHTML = `
             <span class="badge contact-badge">رسالة تواصل 🔴</span>
@@ -102,7 +141,6 @@
             <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف الرسالة</button>
           `;
         }
-        // === المشاريع ===
         else if (media.type === "project") {
           card.innerHTML = `
             <span class="badge project-badge">مشروع 🟡</span>
@@ -113,7 +151,6 @@
             <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المشروع</button>
           `;
         }
-        // === المنتجات ===
         else {
           card.innerHTML = `
             <span class="badge product-badge">منتج 🔵</span>
@@ -123,7 +160,6 @@
             <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المنتج</button>
           `;
         }
-
         container.appendChild(card);
       });
 
@@ -136,13 +172,12 @@
       if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
       try {
         const res = await fetch("/api/delete-user", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
+          method: "DELETE", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id }),
         });
         const data = await res.json();
         if (data.success) {
-          loadItems(); // إعادة تحميل البيانات مباشرة
+          loadItems(); 
         } else {
           alert(data.error || "فشل الحذف");
         }
@@ -151,7 +186,7 @@
       }
     }
 
-    // تشغيل الدالة لجلب البيانات عند فتح الصفحة
+    loadVisitorCount();
     loadItems();
   </script>
 
