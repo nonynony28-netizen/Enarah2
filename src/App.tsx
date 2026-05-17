@@ -13,6 +13,7 @@ import Projects from './pages/Projects'
 import About from './pages/About'
 import Branches from './pages/Branches'
 import Contact from './pages/Contact'
+import Blog from './pages/Blog' // 👈 أضفنا استيراد المدونة هنا
 
 // ======================================
 // مكون تأثير الانتقال بين الصفحات (Page Transition)
@@ -63,6 +64,10 @@ function App() {
           <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
           <Route path="/brands" element={<PageTransition><Brands /></PageTransition>} />
           <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
+          
+          {/* 👈 مسار المدونة الجديد */}
+          <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} /> 
+          
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/branches" element={<PageTransition><Branches /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
@@ -78,4 +83,3 @@ function App() {
 }
 
 export default App
-
