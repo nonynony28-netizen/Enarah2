@@ -7,6 +7,7 @@ import {
   Sparkles,
   Zap,
   ArrowLeft,
+  PlayCircle
 } from 'lucide-react'
 
 // ======================================
@@ -33,11 +34,9 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: nu
 // ======================================
 const featuredProjects = [
   {
-   const projects = [
-  {
     name: 'مول الماسة',
     category: 'مول تجاري',
-    image: '/images/project-villa.jpg', // سنقوم بتغيير الصور لاحقاً
+    image: '/images/project-villa.jpg', 
     video: '',
     desc: 'تصميم وتنفيذ حلول إضاءة شاملة وعصرية تبرز فخامة المول وتوفر تجربة تسوق مميزة.',
   },
@@ -68,7 +67,7 @@ export default function Home() {
   return (
     <div className="pt-0">
       
-      {/* 1. الواجهة السينمائية */}
+      {/* الواجهة السينمائية */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           <iframe
@@ -109,7 +108,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. لماذا نحن */}
+      {/* لماذا نحن */}
       <section id="about" className="py-24 bg-[#0a192f] relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-400/5 rounded-full blur-[150px] pointer-events-none" />
@@ -147,7 +146,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. أبرز المشاريع (القسم الجديد الذي سيظهر الآن في الرئيسية) */}
+      {/* جزء من مشاريعنا */}
       <section id="featured-projects" className="py-24 bg-[#0a192f] relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -155,7 +154,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
               <div>
                 <h2 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                  أبرز مشاريعنا
+                  جزء من مشاريعنا
                 </h2>
                 <div className="w-20 h-1.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
               </div>
@@ -175,16 +174,29 @@ export default function Home() {
                     <img src={project.image} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
                     
-                    {/* شارة التصنيف باللون الأزرق الموحد */}
                     <div className="absolute top-4 right-4 z-20">
                       <span className="px-4 py-1.5 bg-blue-500/20 backdrop-blur-md border border-blue-400/30 text-blue-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         {project.category}
                       </span>
                     </div>
+
+                    {project.video && (
+                      <div className="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                        <PlayCircle className="w-4 h-4 text-blue-400" />
+                        <span className="text-white text-xs font-bold">فيديو</span>
+                      </div>
+                    )}
                   </div>
                   <div className="p-6 relative z-20 flex-grow flex flex-col">
                     <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors mb-3 line-clamp-1">{project.name}</h3>
                     <p className="text-slate-400 text-sm leading-relaxed flex-grow line-clamp-2">{project.desc}</p>
+                    
+                    {project.video && (
+                      <a href={project.video} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center justify-center gap-2 w-full py-3 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500 hover:text-white transition-all duration-300 font-bold text-sm shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                        <PlayCircle className="w-5 h-5" />
+                        شاهد المشروع
+                      </a>
+                    )}
                   </div>
                 </div>
               </FadeIn>
@@ -193,7 +205,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. ابدأ مشروعك */}
+      {/* ابدأ مشروعك */}
       <section id="start" className="py-24 bg-[#0a192f] relative overflow-hidden">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
