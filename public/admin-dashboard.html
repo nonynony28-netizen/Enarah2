@@ -375,12 +375,16 @@
 
               <p>
                 ${
-                  item.email &&
-                  !item.email.includes(
-                    "@upload.local"
-                  )
-                    ? item.email
-                    : ""
+                  media.description ||
+                  (
+                    item.email &&
+                    !item.email.includes(
+                      "@upload.local"
+                    )
+                      ? item.email
+                      : ""
+                  ) ||
+                  "لا يوجد وصف"
                 }
               </p>
 
