@@ -8,6 +8,7 @@ const navLinks = [
   { path: '/products', label: 'المنتجات' },
   { path: '/brands', label: 'الشركات العالمية' },
   { path: '/projects', label: 'المشاريع' },
+  { path: '/blog', label: 'المدونة' }, // 👈 تمت إضافة المدونة هنا بنجاح
   { path: '/about', label: 'من نحن' },
   { path: '/branches', label: 'الفروع' },
   { path: '/contact', label: 'تواصل معنا' },
