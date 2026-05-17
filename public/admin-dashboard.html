@@ -1,477 +1,157 @@
-<!-- file name: public/admin-dashboard.html -->
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>لوحة التحكم</title>
-
   <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #06152b;
-      color: white;
-      padding: 20px;
+    body { margin: 0; font-family: Arial; background: #06152b; color: white; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 30px; }
+    .admin-actions { display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+    .admin-actions a, .admin-actions button {
+      flex: 1; min-width: 120px; padding: 12px; text-align: center; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; transition: 0.3s;
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    /* ===================================== */
-    /* Admin Actions */
-    /* ===================================== */
-    .admin-actions {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-    }
-
-    .admin-actions a,
-    .admin-actions button {
-      flex: 1;
-      min-width: 120px;
-      text-align: center;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      color: white;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
-      margin-top: 0;
-      width: auto;
-    }
-
-    .add-btn {
-      background: #3b82f6;
-    }
-
-    .filter-all {
-      background: #1d4ed8;
-    }
-
-    .filter-product {
-      background: #2563eb;
-    }
-
-    .filter-contact {
-      background: #16a34a;
-    }
-
-    .grid {
-      display: grid;
-      gap: 20px;
-    }
-
-    .card {
-      background: #0b1d39;
-      padding: 15px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .product-card {
-      border-right: 4px solid #3b82f6;
-    }
-
-    .contact-card {
-      border-right: 4px solid #22c55e;
-      background: rgba(34, 197, 94, 0.08);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-      margin-bottom: 12px;
-    }
-
-    .product-badge {
-      background: rgba(59, 130, 246, 0.15);
-      color: #60a5fa;
-    }
-
-    .contact-badge {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-    }
-
-    img {
-      width: 100%;
-      max-height: 250px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 12px;
-    }
-
-    h3 {
-      margin: 10px 0;
-    }
-
-    p {
-      line-height: 1.7;
-      color: rgba(255, 255, 255, 0.8);
-      word-break: break-word;
-    }
-
-    .label {
-      color: white;
-      font-weight: bold;
-    }
-
-    .delete-btn {
-      margin-top: 14px;
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background: red;
-      color: white;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .delete-btn:hover {
-      opacity: 0.9;
-    }
+    .add-btn { background: #10b981; color: white; }
+    .filter-all { background: #3b82f6; color: white; }
+    .filter-product { background: #8b5cf6; color: white; }
+    .filter-project { background: #eab308; color: white; }
+    .filter-contact { background: #f43f5e; color: white; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .card { background: #0d2342; border-radius: 15px; padding: 20px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
+    .badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    .contact-badge { background: rgba(244, 63, 94, 0.2); color: #fda4af; }
+    .product-badge { background: rgba(139, 92, 246, 0.2); color: #ddd6fe; }
+    .project-badge { background: rgba(234, 179, 8, 0.2); color: #fef08a; }
+    .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; margin-top: 25px; }
+    .delete-btn { margin-top: 14px; width: 100%; padding: 12px; border: none; border-radius: 10px; background: red; color: white; cursor: pointer; font-size: 15px; font-weight: bold; }
+    .delete-btn:hover { opacity: 0.9; }
+    .label { font-weight: bold; color: #94a3b8; }
   </style>
 </head>
 <body>
 
-  <h1>لوحة التحكم</h1>
+  <h1>لوحة التحكم والإدارة</h1>
 
-  <!-- ===================================== -->
-  <!-- Unified Dashboard Controls -->
-  <!-- ===================================== -->
   <div class="admin-actions">
-    <a
-      href="/media-uploader.html"
-      class="add-btn"
-    >
-      إضافة منتج
-    </a>
-
-    <button
-      class="filter-all"
-      onclick="filterType('all')"
-    >
-      الكل
-    </button>
-
-    <button
-      class="filter-product"
-      onclick="filterType('product')"
-    >
-      المنتجات
-    </button>
-
-    <button
-      class="filter-contact"
-      onclick="filterType('contact')"
-    >
-      الرسائل
-    </button>
+    <a href="/media-uploader.html" class="add-btn">إضافة جديد +</a>
+    <button class="filter-all" onclick="filterType('all')">الكل</button>
+    <button class="filter-product" onclick="filterType('product')">المنتجات 🔵</button>
+    <button class="filter-project" onclick="filterType('project')">المشاريع 🟡</button>
+    <button class="filter-contact" onclick="filterType('contact')">الرسائل 🔴</button>
   </div>
 
   <div id="items" class="grid">
-    جاري التحميل...
+    جاري تحميل البيانات...
   </div>
 
   <script>
     let allItems = [];
     let currentFilter = "all";
 
-    // =====================================
-    // Load All Data
-    // =====================================
     async function loadItems() {
-      const container =
-        document.getElementById(
-          "items"
-        );
-
+      const container = document.getElementById("items");
       try {
-        const res = await fetch(
-          "/api/get-users"
-        );
-
-        const data =
-          await res.json();
-
+        const res = await fetch("/api/get-users");
+        const data = await res.json();
         if (!data.success) {
-          container.innerHTML =
-            "فشل تحميل البيانات";
+          container.innerHTML = "فشل في جلب البيانات";
           return;
         }
-
-        allItems = data.data;
-
+        allItems = data.data.reverse(); // نعكسها لنرى الأحدث أولاً
         renderItems();
       } catch {
-        container.innerHTML =
-          "حدث خطأ أثناء التحميل";
+        container.innerHTML = "حدث خطأ في الاتصال بقاعدة البيانات";
       }
     }
 
-    // =====================================
-    // Filter
-    // =====================================
     function filterType(type) {
       currentFilter = type;
-
       renderItems();
     }
 
-    // =====================================
-    // Render
-    // =====================================
     function renderItems() {
-      const container =
-        document.getElementById(
-          "items"
-        );
-
+      const container = document.getElementById("items");
       container.innerHTML = "";
 
-      const filteredItems =
-        allItems.filter(
-          (item) => {
-            if (
-              currentFilter ===
-              "all"
-            ) {
-              return true;
-            }
+      const filteredItems = allItems.filter((item) => {
+        let media = {};
+        try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
 
-            if (
-              currentFilter ===
-              "contact"
-            ) {
-              return (
-                item.type ===
-                "contact"
-              );
-            }
+        if (currentFilter === "all") return true;
+        if (currentFilter === "contact") return item.type === "contact";
+        if (currentFilter === "project") return item.type !== "contact" && media.type === "project";
+        if (currentFilter === "product") return item.type !== "contact" && media.type !== "project";
+        
+        return true;
+      });
 
-            if (
-              currentFilter ===
-              "product"
-            ) {
-              return (
-                item.type !==
-                "contact"
-              );
-            }
+      filteredItems.forEach((item) => {
+        let media = {};
+        try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
 
-            return true;
-          }
-        );
+        const card = document.createElement("div");
+        card.className = "card";
 
-      filteredItems.forEach(
-        (item) => {
-          let media = {};
-
-          try {
-            media = item.phone
-              ? JSON.parse(
-                  item.phone
-                )
-              : {};
-          } catch {}
-
-          const card =
-            document.createElement(
-              "div"
-            );
-
-          card.className =
-            "card";
-
-          // =====================================
-          // Contact Messages
-          // =====================================
-          if (
-            item.type ===
-            "contact"
-          ) {
-            card.classList.add(
-              "contact-card"
-            );
-
-            card.innerHTML = `
-              <span class="badge contact-badge">
-                رسالة عميل
-              </span>
-
-              <h3>
-                ${
-                  item.name ||
-                  "بدون اسم"
-                }
-              </h3>
-
-              <p>
-                <span class="label">الهاتف:</span>
-                ${
-                  item.phone ||
-                  "غير متوفر"
-                }
-              </p>
-
-              <p>
-                <span class="label">الرسالة:</span>
-                ${
-                  item.email ||
-                  "لا توجد رسالة"
-                }
-              </p>
-
-              <button
-                class="delete-btn"
-                onclick="deleteItem('${item._id}')"
-              >
-                حذف الرسالة
-              </button>
-            `;
-          }
-
-          // =====================================
-          // Products
-          // =====================================
-          else {
-            card.classList.add(
-              "product-card"
-            );
-
-            card.innerHTML = `
-              <span class="badge product-badge">
-                منتج
-              </span>
-
-              ${
-                media.imageUrl
-                  ? `<img src="${media.imageUrl}" alt="product image" />`
-                  : ""
-              }
-
-              <h3>
-                ${
-                  item.name ||
-                  "بدون اسم"
-                }
-              </h3>
-
-              <p>
-                ${
-                  media.description ||
-                  (
-                    item.email &&
-                    !item.email.includes(
-                      "@upload.local"
-                    )
-                      ? item.email
-                      : ""
-                  ) ||
-                  "لا يوجد وصف"
-                }
-              </p>
-
-              <button
-                class="delete-btn"
-                onclick="deleteItem('${item._id}')"
-              >
-                حذف المنتج
-              </button>
-            `;
-          }
-
-          container.appendChild(
-            card
-          );
+        // === رسائل العملاء ===
+        if (item.type === "contact") {
+          card.innerHTML = `
+            <span class="badge contact-badge">رسالة تواصل 🔴</span>
+            <h3 style="margin-top: 30px;">${item.name || "بدون اسم"}</h3>
+            <p><span class="label">الهاتف:</span> ${item.phone || "لا يوجد"}</p>
+            <p><span class="label">الرسالة:</span> ${item.email || "لا يوجد"}</p>
+            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف الرسالة</button>
+          `;
         }
-      );
+        // === المشاريع ===
+        else if (media.type === "project") {
+          card.innerHTML = `
+            <span class="badge project-badge">مشروع 🟡</span>
+            ${media.imageUrl ? `<img src="${media.imageUrl}" alt="project image" />` : ""}
+            <h3>${item.name || "مشروع بدون اسم"}</h3>
+            <p><span class="label">التصنيف:</span> ${media.category || "غير محدد"}</p>
+            <p>${media.description || ""}</p>
+            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المشروع</button>
+          `;
+        }
+        // === المنتجات ===
+        else {
+          card.innerHTML = `
+            <span class="badge product-badge">منتج 🔵</span>
+            ${media.imageUrl ? `<img src="${media.imageUrl}" alt="product image" />` : ""}
+            <h3>${item.name || "منتج بدون اسم"}</h3>
+            <p>${media.description || (item.email && !item.email.includes("@upload.local") ? item.email : "") || "لا يوجد وصف"}</p>
+            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المنتج</button>
+          `;
+        }
 
-      // =====================================
-      // Empty State
-      // =====================================
-      if (
-        !filteredItems.length
-      ) {
-        container.innerHTML =
-          "لا توجد بيانات حالياً";
+        container.appendChild(card);
+      });
+
+      if (!filteredItems.length) {
+        container.innerHTML = "<h3 style='text-align:center; grid-column: 1/-1;'>لا توجد بيانات متاحة في هذا القسم</h3>";
       }
     }
 
-    // =====================================
-    // Delete
-    // =====================================
-    async function deleteItem(
-      id
-    ) {
-      if (
-        !confirm(
-          "هل أنت متأكد من الحذف؟"
-        )
-      ) {
-        return;
-      }
-
+    async function deleteItem(id) {
+      if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
       try {
-        const res = await fetch(
-          "/api/delete-user",
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify(
-              {
-                id,
-              }
-            ),
-          }
-        );
-
-        const data =
-          await res.json();
-
-        if (
-          data.success
-        ) {
-          alert(
-            "تم الحذف بنجاح"
-          );
-
-          loadItems();
+        const res = await fetch("/api/delete-user", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadItems(); // إعادة تحميل البيانات مباشرة
         } else {
-          alert(
-            data.error ||
-              "فشل الحذف"
-          );
+          alert(data.error || "فشل الحذف");
         }
       } catch {
-        alert(
-          "حدث خطأ أثناء الحذف"
-        );
+        alert("خطأ في الاتصال بالخادم");
       }
     }
 
-    // =====================================
-    // Init
-    // =====================================
+    // تشغيل الدالة لجلب البيانات عند فتح الصفحة
     loadItems();
   </script>
 
