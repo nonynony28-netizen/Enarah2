@@ -14,20 +14,20 @@ import About from './pages/About'
 import Branches from './pages/Branches'
 import Contact from './pages/Contact'
 import Blog from './pages/Blog'
+import WirePrices from './pages/WirePrices' // 👈 أضفنا صفحة الأسعار هنا
 
 // ======================================
-// مكون تأثير الانتقال بين الصفحات (Page Transition)
-// يضمن هذا المكون حركة ناعمة جداً واحترافية عند تغيير الصفحات
+// مكون تأثير الانتقال بين الصفحات
 // ======================================
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation()
   
   return (
     <motion.div
-      key={location.pathname} // تحديث الحركة تلقائياً عند تغير الرابط
+      key={location.pathname} 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} // منحنى حركة ناعم (Smooth Easing)
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} 
       className="w-full"
     >
       {children}
@@ -38,23 +38,17 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [loading, setLoading] = useState(true)
 
-  // ======================================
-  // 1. شاشة البداية (Splash Screen)
-  // ======================================
+  // 1. شاشة البداية
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
     }, 3000)
-
     return () => clearTimeout(timer)
   }, [])
 
-  // ======================================
-  // 2. عداد الزوار الذكي الخفي (لا يؤثر على أداء الموقع)
-  // ======================================
+  // 2. عداد الزوار 
   useEffect(() => {
     const recordVisit = async () => {
-      // يتأكد إذا كان الزائر لم يدخل الموقع من قبل من هذا الجهاز
       if (!localStorage.getItem('enarah_visited')) {
         try {
           await fetch('https://enarah2.vercel.app/api/save-user', {
@@ -62,14 +56,12 @@ function App() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               name: 'Visitor',
-              email: `visit_${Date.now()}@analytics.local`, // علامة برمجية لإحصائيات الزوار
+              email: `visit_${Date.now()}@analytics.local`, 
               phone: JSON.stringify({ type: 'visit' })
             })
           });
-          // يحفظ علامة في متصفح الزائر حتى لا يتم حسابه مرتين
           localStorage.setItem('enarah_visited', 'true');
         } catch (error) {
-          // في حال وجود مشكلة في الإنترنت، يتم تجاهل الخطأ بصمت لكي لا يتأثر الموقع
           console.error('Error recording visit:', error);
         }
       }
@@ -77,9 +69,6 @@ function App() {
     recordVisit();
   }, []);
 
-  // ======================================
-  // واجهة الموقع (لم يتم تغيير أي شيء فيها)
-  // ======================================
   if (loading) {
     return <SplashScreen />
   }
@@ -93,13 +82,16 @@ function App() {
           <Route path="/brands" element={<PageTransition><Brands /></PageTransition>} />
           <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
           <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} /> 
+          
+          {/* 👈 مسار صفحة أسعار الأسلاك */}
+          <Route path="/wire-prices" element={<PageTransition><WirePrices /></PageTransition>} /> 
+
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/branches" element={<PageTransition><Branches /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         </Route>
       </Routes>
 
-      {/* زر الواتساب العائم */}
       <WhatsAppButton />
     </>
   )
