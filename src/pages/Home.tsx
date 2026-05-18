@@ -24,7 +24,6 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: nu
 type ProjectItem = { id: string; name: string; description: string; image: string; video?: string; category: string }
 type TrendType = 'up' | 'down' | 'same'
 
-// القيم الافتراضية
 const defaultWireData = [
   { id: '1.5', size: '1.5 ملي', type: 'مفرد (لفة 100 متر)', price: '45.00', trend: 'same' as TrendType },
   { id: '2.5', size: '2.5 ملي', type: 'مفرد (لفة 100 متر)', price: '75.00', trend: 'same' as TrendType },
@@ -57,7 +56,6 @@ export default function Home() {
         const data = await res.json()
         if (res.ok && data.success && Array.isArray(data.data)) {
           
-          // 1. معالجة المشاريع المميزة
           const projectsOnly = data.data
             .filter((item: any) => item.type !== 'contact')
             .filter((item: any) => {
@@ -77,17 +75,21 @@ export default function Home() {
             })
           setFeaturedProjects(projectsOnly.reverse().slice(0, 4))
 
-          // 2. معالجة أسعار الأسلاك الديناميكية (والمؤشرات)
+          // معالجة أسعار الأسلاك
           const wireUpdates = data.data.filter((item: any) => item.email === 'admin_wire_prices@app.local')
           if (wireUpdates.length > 0) {
-             // ترتيب زمني من الأقدم للأحدث
              const chronological = wireUpdates.reverse() 
              const latestObj = JSON.parse(chronological[chronological.length - 1].phone).prices
-             const previousObj = chronological.length > 1 ? JSON.parse(chronological[chronological.length - 2].phone).prices : latestObj
+             
+             // مقارنة مع التحديث السابق (أو السعر الافتراضي إذا لم يوجد تحديث سابق)
+             const previousObj = chronological.length > 1 
+               ? JSON.parse(chronological[chronological.length - 2].phone).prices 
+               : null
 
              const updatedWires = defaultWireData.map(wire => {
                 const newPrice = parseFloat(latestObj[wire.id] || wire.price)
-                const oldPrice = parseFloat(previousObj[wire.id] || wire.price)
+                const oldPrice = previousObj ? parseFloat(previousObj[wire.id] || wire.price) : parseFloat(wire.price)
+                
                 let trend: TrendType = 'same'
                 if (newPrice > oldPrice) trend = 'up'
                 if (newPrice < oldPrice) trend = 'down'
