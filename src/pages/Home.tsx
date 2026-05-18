@@ -126,8 +126,8 @@ export default function Home() {
       // =========================================
       // 2. إرسال الإشعار الفوري والخفي لتيليجرام
       // =========================================
-      const telegramBotToken = "AAFxThF562Xt9LxsQZMibNOxrFJeTtuScOM" 
-      const telegramChatId = "enarahmodern"
+      const telegramBotToken = "8951369127:AAFxThF562Xt9LxsQZMibNOxrFTeJtuScOM" 
+      const telegramChatId = "8372746727"
       const telegramMessage = `🚨 *طلب أسلاك جديد!*\n\n` +
                               `🛒 *المقاس:* ${selectedWire.size}\n` +
                               `📦 *الكمية:* ${orderForm.quantity} لفة\n` +
