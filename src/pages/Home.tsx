@@ -75,13 +75,11 @@ export default function Home() {
             })
           setFeaturedProjects(projectsOnly.reverse().slice(0, 4))
 
-          // معالجة أسعار الأسلاك
           const wireUpdates = data.data.filter((item: any) => item.email === 'admin_wire_prices@app.local')
           if (wireUpdates.length > 0) {
              const chronological = wireUpdates.reverse() 
              const latestObj = JSON.parse(chronological[chronological.length - 1].phone).prices
              
-             // مقارنة مع التحديث السابق (أو السعر الافتراضي إذا لم يوجد تحديث سابق)
              const previousObj = chronological.length > 1 
                ? JSON.parse(chronological[chronological.length - 2].phone).prices 
                : null
@@ -91,8 +89,8 @@ export default function Home() {
                 const oldPrice = previousObj ? parseFloat(previousObj[wire.id] || wire.price) : parseFloat(wire.price)
                 
                 let trend: TrendType = 'same'
-                if (newPrice > oldPrice) trend = 'up'
-                if (newPrice < oldPrice) trend = 'down'
+                if (newPrice > oldPrice) trend = 'up'     // أعلى من القديم
+                if (newPrice < oldPrice) trend = 'down'   // أقل من القديم
                 
                 return { ...wire, price: newPrice.toFixed(2), trend }
              })
@@ -292,9 +290,10 @@ export default function Home() {
                       </div>
                       
                       <div className="flex items-center gap-3">
+                        {/* 👈 هنا تم عكس الألوان حسب طلبك (أخضر للارتفاع وأحمر للانخفاض) */}
                         <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${
-                          wire.trend === 'up' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
-                          wire.trend === 'down' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                          wire.trend === 'up' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                          wire.trend === 'down' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
                           'bg-slate-500/10 border-slate-500/30 text-slate-400'
                         }`}>
                           {wire.trend === 'up' && <TrendingUp className="w-4 h-4" title="ارتفع السعر" />}
