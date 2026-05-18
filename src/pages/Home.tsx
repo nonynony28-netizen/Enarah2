@@ -2,14 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import {
-  Award,
-  Shield,
-  Sparkles,
-  Zap,
-  ArrowLeft,
-  PlayCircle,
-  Loader2,
-  PackageSearch
+  Award, Shield, Sparkles, Zap, ArrowLeft, PlayCircle, Loader2, PackageSearch,
+  TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar
 } from 'lucide-react'
 
 // ======================================
@@ -31,7 +25,6 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: nu
   )
 }
 
-// تعريف نوع المشروع
 type ProjectItem = {
   id: string
   name: string
@@ -41,13 +34,29 @@ type ProjectItem = {
   category: string
 }
 
+// ======================================
+// بيانات نشرة الأسلاك الإيطالية
+// ======================================
+const wireData = [
+  { id: 1, size: '1.5 ملي', type: 'مفرد (لفة 100 متر)', price: '45.00', trend: 'up' },
+  { id: 2, size: '2.5 ملي', type: 'مفرد (لفة 100 متر)', price: '75.00', trend: 'same' },
+  { id: 3, size: '4.0 ملي', type: 'مفرد (لفة 100 متر)', price: '115.00', trend: 'down' },
+  { id: 4, size: '6.0 ملي', type: 'مفرد (لفة 100 متر)', price: '165.00', trend: 'same' },
+  { id: 5, size: '10.0 ملي', type: 'مفرد (لفة 100 متر)', price: '290.00', trend: 'up' },
+  { id: 6, size: '16.0 ملي', type: 'مفرد (لفة 100 متر)', price: '450.00', trend: 'same' },
+  { id: 7, size: '25.0 ملي', type: 'مفرد (لفة 100 متر)', price: '680.00', trend: 'same' },
+]
+
 export default function Home() {
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>([])
   const [loadingProjects, setLoadingProjects] = useState(true)
+  const [currentDate, setCurrentDate] = useState('')
 
-  // ======================================
-  // جلب أحدث 4 مشاريع من لوحة التحكم
-  // ======================================
+  useEffect(() => {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+    setCurrentDate(new Date().toLocaleDateString('ar-EG', options))
+  }, [])
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -61,14 +70,11 @@ export default function Home() {
                try {
                  const phoneData = item.phone ? JSON.parse(item.phone) : {}
                  return phoneData.type === 'project'
-               } catch {
-                 return false
-               }
+               } catch { return false }
             })
             .map((item: any, index: number) => {
               let mediaData: any = {}
               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
-
               return {
                 id: item._id || String(index),
                 name: item.name || 'مشروع مميز',
@@ -78,20 +84,16 @@ export default function Home() {
                 category: mediaData.category || 'مشاريعنا',
               }
             })
-          
-          // عكس المصفوفة لجلب الأحدث، ثم أخذ أول 4 مشاريع فقط للرئيسية
           setFeaturedProjects(projectsOnly.reverse().slice(0, 4))
         } else {
           setFeaturedProjects([])
         }
       } catch (error) {
-        console.error('Fetch Error:', error)
         setFeaturedProjects([])
       } finally {
         setLoadingProjects(false)
       }
     }
-
     fetchProjects()
   }, [])
 
@@ -101,18 +103,8 @@ export default function Home() {
       {/* 1. الواجهة السينمائية */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
         <div className="absolute inset-0 z-0 flex items-center justify-center">
-          <iframe
-            src="https://streamable.com/e/zarpqc?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1&preload=auto"
-            allow="autoplay; fullscreen"
-            className="hidden md:block w-full h-full object-cover scale-[1.2] opacity-60"
-            style={{ border: 'none', pointerEvents: 'none' }}
-          />
-          <iframe
-            src="https://streamable.com/e/lm701e?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1&preload=auto"
-            allow="autoplay; fullscreen"
-            className="block md:hidden w-full h-full object-cover scale-[1.05] opacity-60"
-            style={{ border: 'none', pointerEvents: 'none' }}
-          />
+          <iframe src="https://streamable.com/e/zarpqc?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1&preload=auto" allow="autoplay; fullscreen" className="hidden md:block w-full h-full object-cover scale-[1.2] opacity-60" style={{ border: 'none', pointerEvents: 'none' }} />
+          <iframe src="https://streamable.com/e/lm701e?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1&preload=auto" allow="autoplay; fullscreen" className="block md:hidden w-full h-full object-cover scale-[1.05] opacity-60" style={{ border: 'none', pointerEvents: 'none' }} />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/90 via-[#0a192f]/40 to-[#0a192f] pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0a192f]/80 via-transparent to-[#0a192f]/80 pointer-events-none" />
         </div>
@@ -140,10 +132,9 @@ export default function Home() {
       </section>
 
       {/* 2. لماذا نحن */}
-      <section id="about" className="py-24 bg-[#0a192f] relative overflow-hidden">
+      <section id="about" className="py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-400/5 rounded-full blur-[150px] pointer-events-none" />
-
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="text-center mb-16">
@@ -178,7 +169,7 @@ export default function Home() {
       </section>
 
       {/* 3. جزء من مشاريعنا (ديناميكي) */}
-      <section id="featured-projects" className="py-24 bg-[#0a192f] relative overflow-hidden">
+      <section id="featured-projects" className="py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
@@ -215,9 +206,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {featuredProjects.map((project, i) => (
                 <FadeIn key={project.id} delay={i * 0.1}>
-                  <div className="group relative bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] overflow-hidden hover:bg-white/[0.04] hover:border-blue-400/30 transition-all duration-500 hover:-translate-y-2 shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_40px_rgba(59,130,246,0.15)] flex flex-col h-full">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
-                    
+                  <div className="group relative bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] overflow-hidden hover:bg-white/[0.04] hover:border-blue-400/30 transition-all duration-500 hover:-translate-y-2 shadow-[0_8px_30px_rgba(0,0,0,0.3)] flex flex-col h-full">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#0d2342]/50">
                       <img src={project.image} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
@@ -227,25 +216,11 @@ export default function Home() {
                           {project.category}
                         </span>
                       </div>
-
-                      {project.video && (
-                        <div className="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-                          <PlayCircle className="w-4 h-4 text-blue-400" />
-                          <span className="text-white text-xs font-bold">فيديو</span>
-                        </div>
-                      )}
                     </div>
 
                     <div className="p-6 relative z-20 flex-grow flex flex-col">
                       <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors mb-3 line-clamp-1">{project.name}</h3>
                       <p className="text-slate-400 text-sm leading-relaxed flex-grow line-clamp-2">{project.description}</p>
-                      
-                      {project.video && (
-                        <a href={project.video} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center justify-center gap-2 w-full py-3 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500 hover:text-white transition-all duration-300 font-bold text-sm shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]">
-                          <PlayCircle className="w-5 h-5" />
-                          شاهد المشروع
-                        </a>
-                      )}
                     </div>
                   </div>
                 </FadeIn>
@@ -255,8 +230,74 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. ابدأ مشروعك */}
-      <section id="start" className="py-24 bg-[#0a192f] relative overflow-hidden">
+      {/* 4. نشرة الأسلاك الإيطالية (القسم المدمج) */}
+      <section id="wire-prices" className="py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
+        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-green-500/5 rounded-full blur-[150px] pointer-events-none" />
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center p-3 bg-white/[0.02] border border-white/10 rounded-full mb-4 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+                <Zap className="w-6 h-6 text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]" />
+              </div>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 mb-6 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                نشرة الأسلاك الإيطالية
+              </h2>
+              
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-blue-500/10 border border-blue-500/30 rounded-full backdrop-blur-md text-blue-300 font-bold text-sm shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                <Calendar className="w-4 h-4" />
+                تحديث اليوم: {currentDate}
+              </div>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.2}>
+            <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+              <div className="bg-gradient-to-r from-white/[0.05] to-transparent p-5 border-b border-white/[0.05] flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-green-400" />
+                  الأسعار التقريبية المعتمدة
+                </h3>
+              </div>
+
+              <div className="divide-y divide-white/[0.05]">
+                {wireData.map((wire, idx) => (
+                  <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-[#0d2342] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold shadow-inner">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-white mb-0.5">{wire.size}</h4>
+                        <p className="text-xs text-slate-400">{wire.type}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 border-white/[0.05] pt-3 md:pt-0">
+                      <div className="text-right">
+                        <div className="text-xl font-extrabold text-blue-300">
+                          {wire.price} <span className="text-xs font-normal text-slate-400">د.ل</span>
+                        </div>
+                      </div>
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${
+                        wire.trend === 'up' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
+                        wire.trend === 'down' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                        'bg-slate-500/10 border-slate-500/30 text-slate-400'
+                      }`}>
+                        {wire.trend === 'up' && <TrendingUp className="w-4 h-4" />}
+                        {wire.trend === 'down' && <TrendingDown className="w-4 h-4" />}
+                        {wire.trend === 'same' && <Minus className="w-4 h-4" />}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* 5. ابدأ مشروعك */}
+      <section id="start" className="py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="relative bg-gradient-to-br from-blue-900/40 to-blue-600/10 backdrop-blur-3xl border border-blue-400/20 rounded-[3rem] p-10 md:p-16 text-center overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] group">
