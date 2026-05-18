@@ -6,9 +6,6 @@ import {
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle
 } from 'lucide-react'
 
-// ======================================
-// مكون الظهور المتدرج
-// ======================================
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-50px' })
@@ -25,27 +22,26 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: nu
 }
 
 type ProjectItem = { id: string; name: string; description: string; image: string; video?: string; category: string }
+type TrendType = 'up' | 'down' | 'same'
 
-// ======================================
-// بيانات نشرة الأسلاك الإيطالية
-// ======================================
-const wireData = [
-  { id: 1, size: '1.5 ملي', type: 'مفرد (لفة 100 متر)', price: '45.00', trend: 'up' },
-  { id: 2, size: '2.5 ملي', type: 'مفرد (لفة 100 متر)', price: '75.00', trend: 'same' },
-  { id: 3, size: '4.0 ملي', type: 'مفرد (لفة 100 متر)', price: '115.00', trend: 'down' },
-  { id: 4, size: '6.0 ملي', type: 'مفرد (لفة 100 متر)', price: '165.00', trend: 'same' },
-  { id: 5, size: '10.0 ملي', type: 'مفرد (لفة 100 متر)', price: '290.00', trend: 'up' },
-  { id: 6, size: '16.0 ملي', type: 'مفرد (لفة 100 متر)', price: '450.00', trend: 'same' },
-  { id: 7, size: '25.0 ملي', type: 'مفرد (لفة 100 متر)', price: '680.00', trend: 'same' },
+// القيم الافتراضية
+const defaultWireData = [
+  { id: '1.5', size: '1.5 ملي', type: 'مفرد (لفة 100 متر)', price: '45.00', trend: 'same' as TrendType },
+  { id: '2.5', size: '2.5 ملي', type: 'مفرد (لفة 100 متر)', price: '75.00', trend: 'same' as TrendType },
+  { id: '4.0', size: '4.0 ملي', type: 'مفرد (لفة 100 متر)', price: '115.00', trend: 'same' as TrendType },
+  { id: '6.0', size: '6.0 ملي', type: 'مفرد (لفة 100 متر)', price: '165.00', trend: 'same' as TrendType },
+  { id: '10.0', size: '10.0 ملي', type: 'مفرد (لفة 100 متر)', price: '290.00', trend: 'same' as TrendType },
+  { id: '16.0', size: '16.0 ملي', type: 'مفرد (لفة 100 متر)', price: '450.00', trend: 'same' as TrendType },
+  { id: '25.0', size: '25.0 ملي', type: 'مفرد (لفة 100 متر)', price: '680.00', trend: 'same' as TrendType },
 ]
 
 export default function Home() {
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>([])
   const [loadingProjects, setLoadingProjects] = useState(true)
   const [currentDate, setCurrentDate] = useState('')
+  const [wirePrices, setWirePrices] = useState(defaultWireData)
 
-  // نظام الطلبات السريعة
-  const [selectedWire, setSelectedWire] = useState<typeof wireData[0] | null>(null)
+  const [selectedWire, setSelectedWire] = useState<typeof wirePrices[0] | null>(null)
   const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
   const [orderStatus, setOrderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
@@ -55,11 +51,13 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchHomeData = async () => {
       try {
         const res = await fetch('https://enarah2.vercel.app/api/get-users')
         const data = await res.json()
         if (res.ok && data.success && Array.isArray(data.data)) {
+          
+          // 1. معالجة المشاريع المميزة
           const projectsOnly = data.data
             .filter((item: any) => item.type !== 'contact')
             .filter((item: any) => {
@@ -78,18 +76,37 @@ export default function Home() {
               }
             })
           setFeaturedProjects(projectsOnly.reverse().slice(0, 4))
+
+          // 2. معالجة أسعار الأسلاك الديناميكية (والمؤشرات)
+          const wireUpdates = data.data.filter((item: any) => item.email === 'admin_wire_prices@app.local')
+          if (wireUpdates.length > 0) {
+             // ترتيب زمني من الأقدم للأحدث
+             const chronological = wireUpdates.reverse() 
+             const latestObj = JSON.parse(chronological[chronological.length - 1].phone).prices
+             const previousObj = chronological.length > 1 ? JSON.parse(chronological[chronological.length - 2].phone).prices : latestObj
+
+             const updatedWires = defaultWireData.map(wire => {
+                const newPrice = parseFloat(latestObj[wire.id] || wire.price)
+                const oldPrice = parseFloat(previousObj[wire.id] || wire.price)
+                let trend: TrendType = 'same'
+                if (newPrice > oldPrice) trend = 'up'
+                if (newPrice < oldPrice) trend = 'down'
+                
+                return { ...wire, price: newPrice.toFixed(2), trend }
+             })
+             setWirePrices(updatedWires)
+          }
+
         } else setFeaturedProjects([])
       } catch { setFeaturedProjects([]) } finally { setLoadingProjects(false) }
     }
-    fetchProjects()
+    fetchHomeData()
   }, [])
 
-  // دالة إرسال الطلب للوحة التحكم
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedWire) return
     setOrderStatus('loading')
-    
     try {
       const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
       await fetch('https://enarah2.vercel.app/api/save-user', {
@@ -98,8 +115,8 @@ export default function Home() {
         body: JSON.stringify({
           name: `🛒 طلبية أسلاك: مقاس ${selectedWire.size}`,
           phone: orderForm.phone,
-          email: `المدينة: ${orderForm.city} | العدد: ${orderForm.quantity} لفة | السعر الإجمالي: ${totalPrice} د.ل`,
-          type: 'contact' // لكي يظهر في قسم الرسائل
+          email: `المدينة: ${orderForm.city} | العدد: ${orderForm.quantity} لفة | الإجمالي: ${totalPrice} د.ل`,
+          type: 'contact' 
         })
       })
       setOrderStatus('success')
@@ -108,9 +125,7 @@ export default function Home() {
         setSelectedWire(null)
         setOrderForm({ phone: '', city: '', quantity: 1 })
       }, 3000)
-    } catch {
-      setOrderStatus('error')
-    }
+    } catch { setOrderStatus('error') }
   }
 
   return (
@@ -254,7 +269,7 @@ export default function Home() {
               </div>
 
               <div className="divide-y divide-white/[0.05]">
-                {wireData.map((wire, idx) => (
+                {wirePrices.map((wire, idx) => (
                   <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors duration-300">
                     
                     <div className="flex items-center gap-4">
@@ -274,23 +289,18 @@ export default function Home() {
                         </div>
                       </div>
                       
-                      {/* أزرار السهم والطلب */}
                       <div className="flex items-center gap-3">
                         <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${
                           wire.trend === 'up' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
                           wire.trend === 'down' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
                           'bg-slate-500/10 border-slate-500/30 text-slate-400'
                         }`}>
-                          {wire.trend === 'up' && <TrendingUp className="w-4 h-4" />}
-                          {wire.trend === 'down' && <TrendingDown className="w-4 h-4" />}
-                          {wire.trend === 'same' && <Minus className="w-4 h-4" />}
+                          {wire.trend === 'up' && <TrendingUp className="w-4 h-4" title="ارتفع السعر" />}
+                          {wire.trend === 'down' && <TrendingDown className="w-4 h-4" title="انخفض السعر" />}
+                          {wire.trend === 'same' && <Minus className="w-4 h-4" title="السعر ثابت" />}
                         </div>
                         
-                        {/* زر اطلب الآن الجديد */}
-                        <button 
-                          onClick={() => setSelectedWire(wire)}
-                          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.6)]"
-                        >
+                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.6)]">
                           <ShoppingCart className="w-4 h-4" />
                           اطلب الآن
                         </button>
@@ -333,21 +343,11 @@ export default function Home() {
       ====================================== */}
       <AnimatePresence>
         {selectedWire && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
             <div className="absolute inset-0 bg-[#06152b]/90 backdrop-blur-sm" onClick={() => setSelectedWire(null)} />
             
-            <motion.div
-              initial={{ opacity: 0, y: 50, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className="relative w-full max-w-md bg-[#0d2342] border border-blue-500/20 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
-            >
-              <button onClick={() => setSelectedWire(null)} className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10">
-                <X className="w-5 h-5" />
-              </button>
+            <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="relative w-full max-w-md bg-[#0d2342] border border-blue-500/20 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+              <button onClick={() => setSelectedWire(null)} className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10"><X className="w-5 h-5" /></button>
 
               <div className="p-8">
                 {orderStatus === 'success' ? (
@@ -366,12 +366,10 @@ export default function Home() {
                         <label className="block text-slate-300 text-sm font-bold mb-2">رقم الهاتف للتواصل</label>
                         <input required type="tel" value={orderForm.phone} onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:bg-blue-500/5 transition-all text-right" placeholder="09X XXX XXXX" />
                       </div>
-                      
                       <div>
                         <label className="block text-slate-300 text-sm font-bold mb-2">المدينة</label>
                         <input required type="text" value={orderForm.city} onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:bg-blue-500/5 transition-all text-right" placeholder="اسم مدينتك" />
                       </div>
-
                       <div>
                         <label className="block text-slate-300 text-sm font-bold mb-2">الكمية (عدد اللفات)</label>
                         <div className="flex items-center bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
@@ -383,9 +381,7 @@ export default function Home() {
 
                       <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl flex justify-between items-center mt-6">
                         <span className="text-slate-300 font-bold">الإجمالي:</span>
-                        <span className="text-2xl font-extrabold text-white">
-                          {(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span>
-                        </span>
+                        <span className="text-2xl font-extrabold text-white">{(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span></span>
                       </div>
 
                       <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl font-bold text-lg mt-4 transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] disabled:opacity-50">
