@@ -20,6 +20,7 @@
     .filter-product { background: #8b5cf6; color: white; }
     .filter-project { background: #eab308; color: white; }
     .filter-contact { background: #f43f5e; color: white; }
+    .update-prices-btn { background: #f59e0b; color: white; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
     .card { background: #0d2342; border-radius: 15px; padding: 20px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
     .badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
@@ -30,6 +31,9 @@
     .delete-btn { margin-top: 14px; width: 100%; padding: 12px; border: none; border-radius: 10px; background: red; color: white; cursor: pointer; font-size: 15px; font-weight: bold; }
     .delete-btn:hover { opacity: 0.9; }
     .label { font-weight: bold; color: #94a3b8; }
+    /* ستايل نافذة الأسعار */
+    .modal-input { width: 100px; padding: 8px; border-radius: 8px; text-align: center; border: 1px solid #3b82f6; background: #06152b; color: white; font-weight: bold;}
+    .modal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
   </style>
 </head>
 <body>
@@ -49,15 +53,34 @@
   </div>
 
   <div class="admin-actions">
-    <a href="/media-uploader.html" class="add-btn">إضافة جديد +</a>
+    <button class="update-prices-btn" onclick="openWireModal()">تحديث أسعار الأسلاك ⚡</button>
+    <a href="/media-uploader.html" class="add-btn">إضافة منتج/مشروع +</a>
     <button class="filter-all" onclick="filterType('all')">الكل</button>
     <button class="filter-product" onclick="filterType('product')">المنتجات 🔵</button>
     <button class="filter-project" onclick="filterType('project')">المشاريع 🟡</button>
-    <button class="filter-contact" onclick="filterType('contact')">الرسائل 🔴</button>
+    <button class="filter-contact" onclick="filterType('contact')">الرسائل/الطلبات 🔴</button>
   </div>
 
-  <div id="items" class="grid">
-    جاري تحميل البيانات...
+  <div id="items" class="grid">جاري تحميل البيانات...</div>
+
+  <!-- نافذة تحديث الأسعار المنبثقة -->
+  <div id="wireModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
+    <div style="background:#0d2342; padding:30px; border-radius:20px; width:350px; border:1px solid rgba(59,130,246,0.3); box-shadow: 0 0 30px rgba(59,130,246,0.2);">
+       <h2 style="margin-top:0; color:white; text-align:center;">تحديث أسعار الأسلاك (د.ل)</h2>
+       <div style="margin-top:20px;">
+         <div class="modal-row"><label>1.5 ملي:</label> <input type="number" id="p_1_5" class="modal-input" /></div>
+         <div class="modal-row"><label>2.5 ملي:</label> <input type="number" id="p_2_5" class="modal-input" /></div>
+         <div class="modal-row"><label>4.0 ملي:</label> <input type="number" id="p_4_0" class="modal-input" /></div>
+         <div class="modal-row"><label>6.0 ملي:</label> <input type="number" id="p_6_0" class="modal-input" /></div>
+         <div class="modal-row"><label>10.0 ملي:</label> <input type="number" id="p_10_0" class="modal-input" /></div>
+         <div class="modal-row"><label>16.0 ملي:</label> <input type="number" id="p_16_0" class="modal-input" /></div>
+         <div class="modal-row"><label>25.0 ملي:</label> <input type="number" id="p_25_0" class="modal-input" /></div>
+       </div>
+       <div style="display:flex; gap:10px; margin-top:25px;">
+         <button id="savePricesBtn" onclick="saveWirePrices()" style="flex:1; padding:12px; background:#3b82f6; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">حفظ ونشر</button>
+         <button onclick="closeWireModal()" style="flex:1; padding:12px; background:#f43f5e; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">إلغاء</button>
+       </div>
+    </div>
   </div>
 
   <script>
@@ -69,112 +92,125 @@
       try {
         const res = await fetch("/api/get-users");
         const data = await res.json();
-        if (!data.success) {
-          container.innerHTML = "فشل في جلب البيانات";
-          return;
-        }
+        if (!data.success) { container.innerHTML = "فشل في جلب البيانات"; return; }
         allItems = data.data.reverse(); 
 
-        // 1. حساب عدد الزوار من قاعدة البيانات
         const visits = allItems.filter(item => item.email && item.email.includes("@analytics.local"));
         document.getElementById("visitorCount").innerText = visits.length;
 
-        // 2. حساب عدد المشاريع والمنتجات (استبعاد الزيارات والرسائل)
-        const validItems = allItems.filter(item => item.type !== "contact" && (!item.email || !item.email.includes("@analytics.local")));
+        const validItems = allItems.filter(item => item.type !== "contact" && (!item.email || !item.email.includes("@analytics.local")) && item.email !== "admin_wire_prices@app.local");
         document.getElementById("totalItemsCount").innerText = validItems.length;
 
         renderItems();
-      } catch {
-        container.innerHTML = "حدث خطأ في الاتصال بقاعدة البيانات";
-        document.getElementById("visitorCount").innerText = "خطأ";
-        document.getElementById("totalItemsCount").innerText = "خطأ";
-      }
-    }
-
-    function filterType(type) {
-      currentFilter = type;
-      renderItems();
+      } catch { container.innerHTML = "حدث خطأ"; }
     }
 
     function renderItems() {
       const container = document.getElementById("items");
       container.innerHTML = "";
-
-      // تصفية العناصر (مع إخفاء ملفات إحصائيات الزوار حتى لا تظهر ككروت)
       const filteredItems = allItems.filter((item) => {
-        if (item.email && item.email.includes("@analytics.local")) return false; // هذا السطر هو الذي يخفي الكروت الوهمية
-
-        let media = {};
-        try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
+        // إخفاء إحصائيات الزوار وأسعار الأسلاك المخفية من الكروت
+        if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local")) return false; 
+        
+        let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
 
         if (currentFilter === "all") return true;
         if (currentFilter === "contact") return item.type === "contact";
         if (currentFilter === "project") return item.type !== "contact" && media.type === "project";
         if (currentFilter === "product") return item.type !== "contact" && media.type !== "project";
-        
         return true;
       });
 
       filteredItems.forEach((item) => {
-        let media = {};
-        try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
-
-        const card = document.createElement("div");
-        card.className = "card";
+        let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
+        const card = document.createElement("div"); card.className = "card";
 
         if (item.type === "contact") {
-          card.innerHTML = `
-            <span class="badge contact-badge">رسالة تواصل 🔴</span>
+          card.innerHTML = `<span class="badge contact-badge">طلب/رسالة 🔴</span>
             <h3 style="margin-top: 30px;">${item.name || "بدون اسم"}</h3>
-            <p><span class="label">الهاتف:</span> ${item.phone || "لا يوجد"}</p>
-            <p><span class="label">الرسالة:</span> ${item.email || "لا يوجد"}</p>
-            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف الرسالة</button>
-          `;
+            <p><span class="label">رقم الهاتف:</span> ${item.phone || "لا يوجد"}</p>
+            <p><span class="label">التفاصيل:</span> ${item.email || "لا يوجد"}</p>
+            <button class="delete-btn" onclick="deleteItem('${item._id}')">مسح الطلب</button>`;
         }
         else if (media.type === "project") {
-          card.innerHTML = `
-            <span class="badge project-badge">مشروع 🟡</span>
+          card.innerHTML = `<span class="badge project-badge">مشروع 🟡</span>
             ${media.imageUrl ? `<img src="${media.imageUrl}" alt="project image" />` : ""}
             <h3>${item.name || "مشروع بدون اسم"}</h3>
             <p><span class="label">التصنيف:</span> ${media.category || "غير محدد"}</p>
             <p>${media.description || ""}</p>
-            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المشروع</button>
-          `;
+            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المشروع</button>`;
         }
         else {
-          card.innerHTML = `
-            <span class="badge product-badge">منتج 🔵</span>
+          card.innerHTML = `<span class="badge product-badge">منتج 🔵</span>
             ${media.imageUrl ? `<img src="${media.imageUrl}" alt="product image" />` : ""}
             <h3>${item.name || "منتج بدون اسم"}</h3>
-            <p>${media.description || (item.email && !item.email.includes("@upload.local") ? item.email : "") || "لا يوجد وصف"}</p>
-            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المنتج</button>
-          `;
+            <p>${media.description || ""}</p>
+            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المنتج</button>`;
         }
         container.appendChild(card);
       });
-
-      if (!filteredItems.length) {
-        container.innerHTML = "<h3 style='text-align:center; grid-column: 1/-1;'>لا توجد بيانات متاحة في هذا القسم</h3>";
-      }
+      if (!filteredItems.length) container.innerHTML = "<h3 style='text-align:center; grid-column: 1/-1;'>لا توجد بيانات متاحة</h3>";
     }
 
+    function filterType(type) { currentFilter = type; renderItems(); }
+
     async function deleteItem(id) {
-      if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
-      try {
-        const res = await fetch("/api/delete-user", {
-          method: "DELETE", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        });
-        const data = await res.json();
-        if (data.success) loadItems(); 
-        else alert(data.error || "فشل الحذف");
-      } catch {
-        alert("خطأ في الاتصال بالخادم");
+      if (!confirm("هل أنت متأكد من الحذف؟")) return;
+      await fetch("/api/delete-user", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+      loadItems(); 
+    }
+
+    // دوال أسعار الأسلاك
+    function openWireModal() {
+      document.getElementById('wireModal').style.display = 'flex';
+      const wireUpdates = allItems.filter(item => item.email === "admin_wire_prices@app.local");
+      if(wireUpdates.length > 0) {
+         try {
+           const latest = JSON.parse(wireUpdates[0].phone).prices; // allItems is reversed
+           document.getElementById('p_1_5').value = latest['1.5'] || 45;
+           document.getElementById('p_2_5').value = latest['2.5'] || 75;
+           document.getElementById('p_4_0').value = latest['4.0'] || 115;
+           document.getElementById('p_6_0').value = latest['6.0'] || 165;
+           document.getElementById('p_10_0').value = latest['10.0'] || 290;
+           document.getElementById('p_16_0').value = latest['16.0'] || 450;
+           document.getElementById('p_25_0').value = latest['25.0'] || 680;
+         }catch(e){}
+      } else {
+           document.getElementById('p_1_5').value = 45;
+           document.getElementById('p_2_5').value = 75;
+           document.getElementById('p_4_0').value = 115;
+           document.getElementById('p_6_0').value = 165;
+           document.getElementById('p_10_0').value = 290;
+           document.getElementById('p_16_0').value = 450;
+           document.getElementById('p_25_0').value = 680;
       }
+    }
+    
+    function closeWireModal() { document.getElementById('wireModal').style.display = 'none'; }
+
+    async function saveWirePrices() {
+      const btn = document.getElementById('savePricesBtn');
+      btn.innerText = 'جاري النشر...';
+      const prices = {
+        '1.5': document.getElementById('p_1_5').value,
+        '2.5': document.getElementById('p_2_5').value,
+        '4.0': document.getElementById('p_4_0').value,
+        '6.0': document.getElementById('p_6_0').value,
+        '10.0': document.getElementById('p_10_0').value,
+        '16.0': document.getElementById('p_16_0').value,
+        '25.0': document.getElementById('p_25_0').value,
+      };
+      await fetch("/api/save-user", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Wire Prices Update", email: "admin_wire_prices@app.local", phone: JSON.stringify({ type: "wire_prices", prices }) })
+      });
+      alert('تم تحديث الأسعار بنجاح في الموقع!');
+      btn.innerText = 'حفظ ونشر';
+      closeWireModal();
+      loadItems();
     }
 
     loadItems();
   </script>
-
 </body>
 </html>
