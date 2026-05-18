@@ -3,12 +3,14 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Lightbulb } from 'lucide-react'
 
+// 👈 أضفنا "أسعار الأسلاك" في القائمة
 const navLinks = [
   { path: '/', label: 'الرئيسية' },
   { path: '/products', label: 'المنتجات' },
+  { path: '/wire-prices', label: 'أسعار الأسلاك' }, 
   { path: '/brands', label: 'الشركات العالمية' },
   { path: '/projects', label: 'المشاريع' },
-  { path: '/blog', label: 'المدونة' }, // 👈 تمت إضافة المدونة هنا بنجاح
+  { path: '/blog', label: 'المدونة' },
   { path: '/about', label: 'من نحن' },
   { path: '/branches', label: 'الفروع' },
   { path: '/contact', label: 'تواصل معنا' },
@@ -19,7 +21,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
 
-  // تأثير التمرير لتغيير خلفية الهيدر
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
@@ -28,10 +29,8 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // إغلاق القائمة في الجوال والتمرير لأعلى الصفحة عند الانتقال
   useEffect(() => {
     setIsOpen(false)
-    // هذا السطر يحل مشكلة البقاء في نفس مستوى النزول عند تغيير الصفحة
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [location.pathname])
 
@@ -50,7 +49,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-row-reverse items-center justify-between h-14 md:h-16">
 
-            {/* Logo Section */}
+            {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <motion.div
                 whileHover={{ rotate: 15, scale: 1.1 }}
@@ -59,16 +58,12 @@ export default function Navbar() {
                 <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
               </motion.div>
               <span className="font-extrabold text-xl md:text-2xl tracking-wide">
-                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">
-                  الإنارة
-                </span>{' '}
-                <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">
-                  الحديثة
-                </span>
+                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">الإنارة</span>{' '}
+                <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">الحديثة</span>
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-1 relative">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
@@ -77,9 +72,7 @@ export default function Navbar() {
                     key={link.path}
                     to={link.path}
                     className={`relative px-5 py-2.5 rounded-full text-sm font-bold transition-colors duration-300 z-10 ${
-                      isActive
-                        ? 'text-white'
-                        : 'text-slate-300 hover:text-white'
+                      isActive ? 'text-white' : 'text-slate-300 hover:text-white'
                     }`}
                   >
                     {isActive && (
@@ -99,40 +92,25 @@ export default function Navbar() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="md:hidden p-2 rounded-full text-slate-300 hover:text-white hover:bg-blue-500/20 active:scale-95 transition-all duration-300"
-              aria-label="Toggle menu"
             >
-              {isOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
           </div>
         </div>
       </motion.nav>
 
-      {/* Mobile Navigation Menu */}
+      {/* Mobile Nav */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 md:hidden"
           >
-            {/* Backdrop */}
-            <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setIsOpen(false)}
-            />
-
-            {/* Sidebar */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
             <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="absolute top-0 right-0 bottom-0 w-[75%] max-w-sm bg-gradient-to-b from-[#0a192f] to-[#0d2342] border-l border-blue-500/20 shadow-2xl"
             >
@@ -142,8 +120,7 @@ export default function Navbar() {
                   return (
                     <motion.div
                       key={link.path}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
                       <Link
