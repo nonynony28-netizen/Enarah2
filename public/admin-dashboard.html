@@ -7,13 +7,10 @@
   <style>
     body { margin: 0; font-family: Arial; background: #06152b; color: white; padding: 20px; }
     h1 { text-align: center; margin-bottom: 30px; }
-    
-    /* Stats Bar */
     .stats-container { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
     .stat-box { flex: 1; min-width: 200px; padding: 20px; border-radius: 15px; text-align: center; }
     .stat-visitors { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 10px 20px rgba(59,130,246,0.2); }
     .stat-items { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 10px 20px rgba(16,185,129,0.2); }
-    
     .admin-actions { display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
     .admin-actions a, .admin-actions button {
       flex: 1; min-width: 120px; padding: 12px; text-align: center; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; transition: 0.3s;
@@ -42,7 +39,7 @@
   <!-- إحصائيات الموقع -->
   <div class="stats-container">
     <div class="stat-box stat-visitors">
-      <h2 style="margin: 0; font-size: 16px; color: #bfdbfe;">عدد زوار الموقع 👁️</h2>
+      <h2 style="margin: 0; font-size: 16px; color: #bfdbfe;">عدد الزوار (أجهزة فريدة) 👁️</h2>
       <h3 id="visitorCount" style="margin: 10px 0 0; font-size: 32px; font-weight: bold;">...</h3>
     </div>
     <div class="stat-box stat-items">
@@ -67,22 +64,6 @@
     let allItems = [];
     let currentFilter = "all";
 
-    // =====================================
-    // جلب عدد الزوار من الـ API
-    // =====================================
-    async function loadVisitorCount() {
-      try {
-        const res = await fetch("https://api.counterapi.dev/v1/enarah2/visits");
-        const data = await res.json();
-        document.getElementById("visitorCount").innerText = data.count || 0;
-      } catch {
-        document.getElementById("visitorCount").innerText = "غير متاح";
-      }
-    }
-
-    // =====================================
-    // جلب البيانات من قاعدة البيانات
-    // =====================================
     async function loadItems() {
       const container = document.getElementById("items");
       try {
@@ -94,13 +75,19 @@
         }
         allItems = data.data.reverse(); 
 
-        // حساب عدد المشاريع والمنتجات فقط (بدون الرسائل)
-        const validItemsCount = allItems.filter(item => item.type !== "contact").length;
-        document.getElementById("totalItemsCount").innerText = validItemsCount;
+        // 1. حساب عدد الزوار من قاعدة البيانات
+        const visits = allItems.filter(item => item.email && item.email.includes("@analytics.local"));
+        document.getElementById("visitorCount").innerText = visits.length;
+
+        // 2. حساب عدد المشاريع والمنتجات (استبعاد الزيارات والرسائل)
+        const validItems = allItems.filter(item => item.type !== "contact" && (!item.email || !item.email.includes("@analytics.local")));
+        document.getElementById("totalItemsCount").innerText = validItems.length;
 
         renderItems();
       } catch {
         container.innerHTML = "حدث خطأ في الاتصال بقاعدة البيانات";
+        document.getElementById("visitorCount").innerText = "خطأ";
+        document.getElementById("totalItemsCount").innerText = "خطأ";
       }
     }
 
@@ -113,7 +100,10 @@
       const container = document.getElementById("items");
       container.innerHTML = "";
 
+      // تصفية العناصر (مع إخفاء ملفات إحصائيات الزوار حتى لا تظهر ككروت)
       const filteredItems = allItems.filter((item) => {
+        if (item.email && item.email.includes("@analytics.local")) return false; // هذا السطر هو الذي يخفي الكروت الوهمية
+
         let media = {};
         try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
 
@@ -176,17 +166,13 @@
           body: JSON.stringify({ id }),
         });
         const data = await res.json();
-        if (data.success) {
-          loadItems(); 
-        } else {
-          alert(data.error || "فشل الحذف");
-        }
+        if (data.success) loadItems(); 
+        else alert(data.error || "فشل الحذف");
       } catch {
         alert("خطأ في الاتصال بالخادم");
       }
     }
 
-    loadVisitorCount();
     loadItems();
   </script>
 
