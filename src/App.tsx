@@ -13,7 +13,7 @@ import Projects from './pages/Projects'
 import About from './pages/About'
 import Branches from './pages/Branches'
 import Contact from './pages/Contact'
-import Blog from './pages/Blog' // 👈 أضفنا استيراد المدونة هنا
+import Blog from './pages/Blog'
 
 // ======================================
 // مكون تأثير الانتقال بين الصفحات (Page Transition)
@@ -38,6 +38,9 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [loading, setLoading] = useState(true)
 
+  // ======================================
+  // 1. شاشة البداية (Splash Screen)
+  // ======================================
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
@@ -47,7 +50,35 @@ function App() {
   }, [])
 
   // ======================================
-  // Splash Screen
+  // 2. عداد الزوار الذكي الخفي (لا يؤثر على أداء الموقع)
+  // ======================================
+  useEffect(() => {
+    const recordVisit = async () => {
+      // يتأكد إذا كان الزائر لم يدخل الموقع من قبل من هذا الجهاز
+      if (!localStorage.getItem('enarah_visited')) {
+        try {
+          await fetch('https://enarah2.vercel.app/api/save-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: 'Visitor',
+              email: `visit_${Date.now()}@analytics.local`, // علامة برمجية لإحصائيات الزوار
+              phone: JSON.stringify({ type: 'visit' })
+            })
+          });
+          // يحفظ علامة في متصفح الزائر حتى لا يتم حسابه مرتين
+          localStorage.setItem('enarah_visited', 'true');
+        } catch (error) {
+          // في حال وجود مشكلة في الإنترنت، يتم تجاهل الخطأ بصمت لكي لا يتأثر الموقع
+          console.error('Error recording visit:', error);
+        }
+      }
+    };
+    recordVisit();
+  }, []);
+
+  // ======================================
+  // واجهة الموقع (لم يتم تغيير أي شيء فيها)
   // ======================================
   if (loading) {
     return <SplashScreen />
@@ -55,28 +86,20 @@ function App() {
 
   return (
     <>
-      {/* ======================================
-          Main Routes with Smooth Transitions
-      ====================================== */}
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
           <Route path="/brands" element={<PageTransition><Brands /></PageTransition>} />
           <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
-          
-          {/* 👈 مسار المدونة الجديد */}
           <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} /> 
-          
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/branches" element={<PageTransition><Branches /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         </Route>
       </Routes>
 
-      {/* ======================================
-          Fixed WhatsApp Button
-      ====================================== */}
+      {/* زر الواتساب العائم */}
       <WhatsAppButton />
     </>
   )
