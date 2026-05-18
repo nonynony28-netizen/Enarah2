@@ -89,8 +89,8 @@ export default function Home() {
                 const oldPrice = previousObj ? parseFloat(previousObj[wire.id] || wire.price) : parseFloat(wire.price)
                 
                 let trend: TrendType = 'same'
-                if (newPrice > oldPrice) trend = 'up'
-                if (newPrice < oldPrice) trend = 'down'
+                if (newPrice > oldPrice) trend = 'up'     
+                if (newPrice < oldPrice) trend = 'down'   
                 
                 return { ...wire, price: newPrice.toFixed(2), trend }
              })
@@ -103,7 +103,7 @@ export default function Home() {
     fetchHomeData()
   }, [])
 
-  // دالة إرسال الطلب المطورة (ربط بالواتساب)
+  // دالة الإرسال مع الربط المخفي بـ (تيليجرام)
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedWire) return
@@ -111,7 +111,7 @@ export default function Home() {
     try {
       const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
       
-      // 1. حفظ الطلب في لوحة التحكم
+      // 1. حفظ الطلب في لوحة التحكم (الباك إند)
       await fetch('https://enarah2.vercel.app/api/save-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,20 +123,31 @@ export default function Home() {
         })
       })
 
-      // 2. تجهيز رسالة الواتساب للعميل ليرسلها لك مباشرة
-      const adminPhoneNumber = "218916580068" // 👈 استبدل الأصفار برقم هاتفك الحقيقي
-      const message = `مرحباً الإنارة الحديثة، أود تأكيد طلبيتي:\n\n` + 
-                      `🛒 *المنتج:* سلك إيطالي ${selectedWire.size}\n` +
-                      `📦 *العدد:* ${orderForm.quantity} لفة\n` +
-                      `💰 *الإجمالي:* ${totalPrice} د.ل\n` +
-                      `📍 *المدينة:* ${orderForm.city}\n` +
-                      `📞 *هاتفي للتواصل:* ${orderForm.phone}\n\nأرجو تأكيد الطلبية!`;
-      
-      const whatsappUrl = `https://wa.me/${adminPhoneNumber}?text=${encodeURIComponent(message)}`
-      
-      // فتح الواتساب في هاتف العميل
-      window.open(whatsappUrl, '_blank')
+      // =========================================
+      // 2. إرسال الإشعار الفوري والخفي لتيليجرام
+      // =========================================
+      const telegramBotToken = "AAFxThF562Xt9LxsQZMibNOxrFJeTtuScOM" 
+      const telegramChatId = "enarahmodern"
+      const telegramMessage = `🚨 *طلب أسلاك جديد!*\n\n` +
+                              `🛒 *المقاس:* ${selectedWire.size}\n` +
+                              `📦 *الكمية:* ${orderForm.quantity} لفة\n` +
+                              `💰 *الإجمالي:* ${totalPrice} د.ل\n` +
+                              `📍 *المدينة:* ${orderForm.city}\n` +
+                              `📞 *الهاتف:* ${orderForm.phone}`;
 
+      if (telegramBotToken !== "ضع_توكن_البوت_هنا") {
+        fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: telegramChatId,
+            text: telegramMessage,
+            parse_mode: 'Markdown'
+          })
+        }).catch(err => console.log("Telegram Error:", err));
+      }
+
+      // إظهار رسالة النجاح للعميل
       setOrderStatus('success')
       setTimeout(() => {
         setOrderStatus('idle')
@@ -371,8 +382,8 @@ export default function Home() {
                 {orderStatus === 'success' ? (
                   <div className="text-center py-10">
                     <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" />
-                    <h3 className="text-2xl font-bold text-white mb-2">تم تجهيز طلبك!</h3>
-                    <p className="text-slate-400">سيتم نقلك للواتساب لتأكيد الطلب معنا...</p>
+                    <h3 className="text-2xl font-bold text-white mb-2">تم استلام طلبك بنجاح!</h3>
+                    <p className="text-slate-400">سنتصل بك في أقرب وقت لتأكيد الطلبية وتجهيزها.</p>
                   </div>
                 ) : (
                   <>
@@ -403,7 +414,7 @@ export default function Home() {
                       </div>
 
                       <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl font-bold text-lg mt-4 transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] disabled:opacity-50">
-                        {orderStatus === 'loading' ? <Loader2 className="w-6 h-6 animate-spin" /> : 'تأكيد وإرسال عبر واتساب'}
+                        {orderStatus === 'loading' ? <Loader2 className="w-6 h-6 animate-spin" /> : 'تأكيد الطلب'}
                       </button>
                     </form>
                   </>
