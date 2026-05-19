@@ -7,41 +7,137 @@ import {
 } from 'lucide-react'
 
 // ==========================================
-// 1. النبضة الكهربائية (نقية للكمبيوتر فقط)
+// 1. الشبكة الكهربائية التفاعلية للخلفية (Canvas) أداء خارق!
 // ==========================================
-function ElectricCursor() {
-  const [position, setPosition] = useState({ x: -100, y: -100 }) 
-  const [isHovering, setIsHovering] = useState(false)
+function ParticlesBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const updatePosition = (e: MouseEvent) => setPosition({ x: e.clientX, y: e.clientY })
-    const handleInteract = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      setIsHovering(target.tagName === 'BUTTON' || target.tagName === 'A' || !!target.closest('a') || !!target.closest('button'))
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let animationFrameId: number
+    let particles: any[] = []
+    
+    const resize = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      initParticles()
     }
-    window.addEventListener("mousemove", updatePosition)
-    window.addEventListener("mouseover", handleInteract)
+    
+    const initParticles = () => {
+      particles = []
+      // عدد النقاط أقل على الهواتف لضمان أداء فائق
+      const numParticles = window.innerWidth < 768 ? 30 : 80 
+      for (let i = 0; i < numParticles; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 2 + 1
+        })
+      }
+    }
+
+    let mouse = { x: -1000, y: -1000 }
+    
+    const onMouseMove = (e: MouseEvent) => {
+      mouse.x = e.clientX
+      mouse.y = e.clientY
+    }
+    
+    const onTouchMove = (e: TouchEvent) => {
+      if(e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX
+        mouse.y = e.touches[0].clientY
+      }
+    }
+
+    const onMouseLeave = () => {
+      mouse.x = -1000
+      mouse.y = -1000
+    }
+
+    window.addEventListener('resize', resize)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('mouseleave', onMouseLeave)
+    window.addEventListener('touchend', onMouseLeave)
+    
+    resize()
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      
+      for (let i = 0; i < particles.length; i++) {
+        let p = particles[i]
+        p.x += p.vx
+        p.y += p.vy
+        
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1
+        
+        // رسم النقطة
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(96, 165, 250, 0.8)' 
+        ctx.fill()
+        
+        // ربط النقاط ببعضها (تأثير الأسلاك)
+        for (let j = i + 1; j < particles.length; j++) {
+          let p2 = particles[j]
+          let dx = p.x - p2.x
+          let dy = p.y - p2.y
+          let dist = Math.sqrt(dx*dx + dy*dy)
+          if (dist < 100) {
+            ctx.beginPath()
+            ctx.moveTo(p.x, p.y)
+            ctx.lineTo(p2.x, p2.y)
+            ctx.strokeStyle = `rgba(96, 165, 250, ${0.2 - dist/500})`
+            ctx.lineWidth = 1
+            ctx.stroke()
+          }
+        }
+
+        // تفاعل النقاط مع الماوس أو الإصبع (تنجذب للإصبع)
+        let mdx = p.x - mouse.x
+        let mdy = p.y - mouse.y
+        let mDist = Math.sqrt(mdx*mdx + mdy*mdy)
+        if (mDist < 150) {
+          ctx.beginPath()
+          ctx.moveTo(p.x, p.y)
+          ctx.lineTo(mouse.x, mouse.y)
+          ctx.strokeStyle = `rgba(96, 165, 250, ${0.4 - mDist/375})`
+          ctx.lineWidth = 1.5
+          ctx.stroke()
+          
+          p.x -= mdx * 0.02
+          p.y -= mdy * 0.02
+        }
+      }
+      animationFrameId = requestAnimationFrame(draw)
+    }
+    
+    draw()
+
     return () => {
-      window.removeEventListener("mousemove", updatePosition)
-      window.removeEventListener("mouseover", handleInteract)
+      window.removeEventListener('resize', resize)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('mouseleave', onMouseLeave)
+      window.removeEventListener('touchend', onMouseLeave)
+      cancelAnimationFrame(animationFrameId)
     }
   }, [])
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-[100] flex items-center justify-center mix-blend-screen"
-      animate={{ x: position.x - (isHovering ? 24 : 12), y: position.y - (isHovering ? 24 : 12) }}
-      transition={{ x: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 }, y: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 } }}
-    >
-      <motion.div 
-        animate={{ scale: isHovering ? 1.5 : 1 }}
-        className={`relative flex items-center justify-center ${isHovering ? 'w-12 h-12' : 'w-6 h-6'} transition-all duration-300`}
-      >
-        <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-md animate-pulse" />
-        <div className="absolute inset-0 border border-blue-400/50 rounded-full animate-ping" style={{ animationDuration: '1.5s' }} />
-        <div className={`bg-white rounded-full shadow-[0_0_15px_5px_rgba(96,165,250,0.8)] ${isHovering ? 'w-4 h-4' : 'w-2 h-2'}`} />
-      </motion.div>
-    </motion.div>
+    <canvas 
+      ref={canvasRef} 
+      className="absolute inset-0 z-0 pointer-events-none opacity-60" 
+    />
   )
 }
 
@@ -79,16 +175,11 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState('')
   const [wirePrices, setWirePrices] = useState(defaultWireData)
   
-  // نظام اكتشاف الهواتف لإلغاء الحركات الثقيلة
-  const [isMobile, setIsMobile] = useState(false)
-
   const [selectedWire, setSelectedWire] = useState<typeof wirePrices[0] | null>(null)
   const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
   const [orderStatus, setOrderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window)
-    
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
     setCurrentDate(new Date().toLocaleDateString('ar-EG', options))
   }, [])
@@ -191,59 +282,36 @@ export default function Home() {
   }
 
   return (
-    <div className="pt-0 relative cursor-default">
+    <div className="pt-0 relative cursor-default bg-[#0a192f]">
       
-      {/* المؤشر المضيء يظهر للكمبيوتر فقط لتوفير الموارد */}
-      {!isMobile && <ElectricCursor />}
-
       {/* 1. الواجهة التفاعلية */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
+      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         
-        {/* خلفية الأجرام المضيئة (ثابتة على الهاتف ومتحركة للكمبيوتر) */}
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          {!isMobile ? (
-            <>
-              <motion.div 
-                animate={{ y: [0, -40, 0], x: [0, 20, 0] }} 
-                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-600/30 rounded-full blur-[100px]"
-              />
-              <motion.div 
-                animate={{ y: [0, 40, 0], x: [0, -30, 0] }} 
-                transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/20 rounded-full blur-[120px]"
-              />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[150px]" />
-            </>
-          ) : (
-            <>
-              {/* نسخ ثابتة للهاتف لا تستهلك معالج الرسوميات */}
-              <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-blue-600/20 rounded-full blur-[60px]" />
-              <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-cyan-400/10 rounded-full blur-[80px]" />
-            </>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/80 via-transparent to-[#0a192f] pointer-events-none" />
-        </div>
+        {/* خلفية الشبكة الكهربائية التفاعلية الجديدة! */}
+        <ParticlesBackground />
+        
+        {/* تدرج لوني لدمج الخلفية */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none z-0" />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }} 
             animate={{ opacity: 1, scale: 1 }} 
             transition={{ duration: 1, ease: 'easeOut' }}
-            className="p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] bg-[#0d2342]/80 md:bg-white/[0.02] md:backdrop-blur-sm border border-white/[0.05] shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all"
+            className="p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] bg-[#0d2342]/80 md:bg-white/[0.02] border border-white/[0.05] shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all"
           >
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-4 md:mb-6 leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
-              الإنارة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-[0_0_25px_rgba(59,130,246,0.6)]">الحديثة</span>
+            <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-4 md:mb-6 leading-tight">
+              الإنارة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">الحديثة</span>
             </h1>
             <p className="text-base md:text-2xl text-blue-50/80 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
               كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
-              <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-gradient-to-l from-blue-600 to-blue-400 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] flex items-center justify-center gap-3">
+              <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-gradient-to-l from-blue-600 to-blue-400 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] flex items-center justify-center gap-3 hover:scale-105">
                 استعرض المنتجات
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform duration-300" />
               </Link>
-              <Link to="/contact" className="px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-[#1a365d] md:bg-white/[0.05] md:backdrop-blur-md border border-white/10 text-white font-bold text-base md:text-lg rounded-2xl flex items-center justify-center">
+              <Link to="/contact" className="px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-[#1a365d] border border-white/10 text-white font-bold text-base md:text-lg rounded-2xl flex items-center justify-center hover:bg-[#20406d] transition-all hover:scale-105">
                 تواصل معنا
               </Link>
             </div>
@@ -252,8 +320,7 @@ export default function Home() {
       </section>
 
       {/* 2. لماذا نحن */}
-      <section id="about" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none hidden md:block" />
+      <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.02]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="text-center mb-12 md:mb-16">
@@ -268,8 +335,7 @@ export default function Home() {
               { icon: Sparkles, title: 'احترافية بالعمل', desc: 'فريقنا الهندسي متخصص في مساعدتك لاختيار الحلول المثالية والتصاميم لمشروعك.' },
             ].map((item, i) => (
               <FadeIn key={item.title} delay={i * 0.15}>
-                {/* استبدلنا الزجاج الشفاف بألوان صلبة على الهاتف لتوفير الأداء */}
-                <div className="group relative bg-[#112a4f] md:bg-white/[0.02] md:backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] p-6 md:p-8 h-full">
+                <div className="group relative bg-[#112a4f] border border-white/[0.05] rounded-[2rem] p-6 md:p-8 h-full transition-transform hover:-translate-y-2">
                   <div className="w-16 h-16 bg-blue-500/20 border border-blue-400/20 rounded-2xl flex items-center justify-center mb-6">
                     <item.icon className="w-8 h-8 text-blue-400" />
                   </div>
@@ -283,8 +349,7 @@ export default function Home() {
       </section>
 
       {/* 3. جزء من مشاريعنا */}
-      <section id="featured-projects" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none hidden md:block" />
+      <section id="featured-projects" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.02]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
@@ -292,7 +357,7 @@ export default function Home() {
                 <h2 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 mb-4">جزء من مشاريعنا</h2>
                 <div className="w-20 h-1.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" />
               </div>
-              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#112a4f] md:bg-white/[0.05] border border-white/10 rounded-xl text-white font-bold">
+              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#112a4f] hover:bg-[#1a365d] border border-white/10 rounded-xl text-white font-bold transition-all">
                 شاهد كل المشاريع
                 <ArrowLeft className="w-5 h-5" />
               </Link>
@@ -310,7 +375,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {featuredProjects.map((project, i) => (
                 <FadeIn key={project.id} delay={i * 0.1}>
-                  <div className="bg-[#112a4f] md:bg-white/[0.02] md:backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] overflow-hidden flex flex-col h-full">
+                  <div className="bg-[#112a4f] border border-white/[0.05] rounded-[2rem] overflow-hidden flex flex-col h-full transition-transform hover:-translate-y-2">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#0d2342]/50">
                       <img src={project.image} alt={project.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
@@ -331,8 +396,7 @@ export default function Home() {
       </section>
 
       {/* 4. نشرة الأسلاك الإيطالية */}
-      <section id="wire-prices" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
-        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-green-500/5 rounded-full blur-[150px] pointer-events-none hidden md:block" />
+      <section id="wire-prices" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.02]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="text-center mb-10 md:mb-12">
@@ -350,7 +414,7 @@ export default function Home() {
           </FadeIn>
 
           <FadeIn delay={0.2}>
-            <div className="bg-[#112a4f] md:bg-white/[0.02] md:backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] overflow-hidden">
+            <div className="bg-[#112a4f] border border-white/[0.05] rounded-[2rem] overflow-hidden shadow-lg">
               <div className="bg-white/[0.02] p-5 border-b border-white/[0.05] flex items-center justify-between">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-green-400" />
@@ -390,7 +454,7 @@ export default function Home() {
                           {wire.trend === 'same' && <Minus className="w-4 h-4" />}
                         </div>
                         
-                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold">
+                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-500 transition-colors">
                           <ShoppingCart className="w-4 h-4" />
                           اطلب الآن
                         </button>
@@ -406,10 +470,10 @@ export default function Home() {
       </section>
 
       {/* 5. ابدأ مشروعك */}
-      <section id="start" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
+      <section id="start" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.02]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
-            <div className="relative bg-[#112a4f] md:bg-blue-900/40 md:backdrop-blur-3xl border border-blue-400/20 rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 text-center overflow-hidden">
+            <div className="relative bg-[#112a4f] border border-blue-400/20 rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 text-center overflow-hidden">
               <div className="relative z-10">
                 <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6">
                   ابدأ مشروعك معنا <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-300">اليوم</span>
@@ -417,7 +481,7 @@ export default function Home() {
                 <p className="text-blue-100/80 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
                   نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك.
                 </p>
-                <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl">
+                <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:scale-105 transition-transform">
                   <Zap className="w-6 h-6" />
                   تواصل معنا الآن
                 </Link>
@@ -473,7 +537,7 @@ export default function Home() {
                         <span className="text-2xl font-extrabold text-white">{(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span></span>
                       </div>
 
-                      <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50">
+                      <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 hover:bg-blue-500 transition-colors">
                         {orderStatus === 'loading' ? <Loader2 className="w-6 h-6 animate-spin" /> : 'تأكيد الطلب'}
                       </button>
                     </form>
