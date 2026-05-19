@@ -6,6 +6,82 @@ import {
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle
 } from 'lucide-react'
 
+// ==========================================
+// 1. النبضة الكهربائية (مجهزة للهواتف والكمبيوتر)
+// ==========================================
+function ElectricCursor() {
+  const [position, setPosition] = useState({ x: -100, y: -100 }) 
+  const [isHovering, setIsHovering] = useState(false)
+  const [isVisible, setIsVisible] = useState(false) 
+
+  useEffect(() => {
+    const updatePosition = (x: number, y: number) => {
+      setPosition({ x, y })
+      if (!isVisible) setIsVisible(true)
+    }
+
+    // للكمبيوتر
+    const onMouseMove = (e: MouseEvent) => updatePosition(e.clientX, e.clientY)
+    
+    // للهواتف (تتبع حركة الإصبع عند اللمس أو التمرير)
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        updatePosition(e.touches[0].clientX, e.touches[0].clientY)
+      }
+    }
+
+    // زيادة التوهج عند لمس الأزرار
+    const handleInteract = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.closest('a') || target.closest('button')) {
+        setIsHovering(true)
+      } else {
+        setIsHovering(false)
+      }
+    }
+    
+    window.addEventListener("mousemove", onMouseMove)
+    window.addEventListener("touchmove", onTouchMove, { passive: true })
+    window.addEventListener("touchstart", onTouchMove, { passive: true })
+    
+    window.addEventListener("mouseover", handleInteract)
+    window.addEventListener("touchstart", handleInteract, { passive: true })
+    
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove)
+      window.removeEventListener("touchmove", onTouchMove)
+      window.removeEventListener("touchstart", onTouchMove)
+      window.removeEventListener("mouseover", handleInteract)
+      window.removeEventListener("touchstart", handleInteract)
+    }
+  }, [isVisible])
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 pointer-events-none z-[100] flex items-center justify-center mix-blend-screen"
+      animate={{
+        x: position.x - (isHovering ? 24 : 12),
+        y: position.y - (isHovering ? 24 : 12),
+        opacity: isVisible ? 1 : 0
+      }}
+      transition={{ 
+        x: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 },
+        y: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 },
+        opacity: { duration: 0.5 }
+      }}
+    >
+      <motion.div 
+        animate={{ scale: isHovering ? 1.5 : 1 }}
+        className={`relative flex items-center justify-center ${isHovering ? 'w-12 h-12' : 'w-6 h-6'} transition-all duration-300`}
+      >
+        <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-md animate-pulse" />
+        <div className="absolute inset-0 border border-blue-400/50 rounded-full animate-ping" style={{ animationDuration: '1.5s' }} />
+        <div className={`bg-white rounded-full shadow-[0_0_15px_5px_rgba(96,165,250,0.8)] ${isHovering ? 'w-4 h-4' : 'w-2 h-2'}`} />
+      </motion.div>
+    </motion.div>
+  )
+}
+
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-50px' })
@@ -121,7 +197,6 @@ export default function Home() {
         })
       })
 
-      // الربط مع تيليجرام بأرقامك الصحيحة
       const telegramBotToken = "8951369127:AAFxThF562Xt9LxsQZMibNOxrFTeJtuScOM" 
       const telegramChatId = "8372746727"
       const telegramMessage = `🚨 *طلب أسلاك جديد!*\n\n` +
@@ -153,12 +228,15 @@ export default function Home() {
   }
 
   return (
-    <div className="pt-0">
+    <div className="pt-0 relative cursor-default">
       
-      {/* 1. الواجهة التفاعلية (بدون مشاكل، سريعة ومبهرة) */}
+      {/* مؤشر النبضة الكهربائية (يعمل على الهاتف والكمبيوتر) */}
+      <ElectricCursor />
+
+      {/* 1. الواجهة التفاعلية */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
         
-        {/* خلفية الأجرام المضيئة (تعطي إيحاء الإضاءة الحديثة) */}
+        {/* خلفية الأجرام المضيئة */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <motion.div 
             animate={{ y: [0, -50, 0], x: [0, 30, 0], scale: [1, 1.2, 1] }} 
@@ -178,7 +256,6 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/80 via-transparent to-[#0a192f] pointer-events-none" />
         </div>
 
-        {/* النصوص والأزرار (بمؤثرات الـ 3D عند تمرير الماوس) */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }} 
