@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom' // استدعاء الرابط
+import { Link } from 'react-router-dom'
 
 // نمط الوهج الأزرق للعناوين الفخمة
 const glowingTitleStyle = {
@@ -22,7 +22,7 @@ export default function Products() {
   const [loading, setLoading] = useState(true)
 
   // ======================================
-  // المنطق البرمجي (جلب المنتجات فقط)
+  // المنطق البرمجي (جلب المنتجات الحقيقية فقط وإخفاء الزوار)
   // ======================================
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,14 +32,27 @@ export default function Products() {
 
         if (res.ok && data.success && Array.isArray(data.data)) {
           const formattedProducts: ProductItem[] = data.data
-            .filter((item: { type?: string }) => item.type !== 'contact')
-            .filter((item: { phone?: string }) => {
+            // 1. إخفاء رسائل وطلبات التواصل
+            .filter((item: any) => item.type !== 'contact')
+            
+            // 2. الفلترة الذكية للزوار والأسعار والمشاريع
+            .filter((item: any) => {
+               // أ. إخفاء سجلات الزوار (Visitor Analytics) تماماً
+               if (item.name === 'Visitor' || (item.email && item.email.includes('@analytics.local'))) return false;
+               
+               // ب. إخفاء ملفات نظام أسعار الأسلاك
+               if (item.email === 'admin_wire_prices@app.local') return false;
+
+               // ج. إخفاء المشاريع (Projects)
                try {
                  const phoneData = item.phone ? JSON.parse(item.phone) : {}
-                 return phoneData.type !== 'project'
+                 if (phoneData.type === 'project') return false;
                } catch {
-                 return true
+                 // إذا لم يكن بصيغة JSON، دعه يمر
                }
+               
+               // إذا تجاوز العنصر كل هذه الفلاتر، فهو منتج حقيقي 100%
+               return true;
             })
             .map((item: any, index: number) => {
               let mediaData: any = {}
