@@ -158,20 +158,18 @@ export default function Home() {
       {/* 1. الواجهة الترحيبية بالفيديو */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         
-        {/* فيديو الخلفية المباشر والفائق السرعة */}
+        {/* استرجاع كود Streamable كما كان مع تحسين السرعة */}
         <div className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] overflow-hidden flex items-center justify-center">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="absolute top-0 left-0 w-full h-full object-cover opacity-60 mix-blend-screen pointer-events-none"
-            style={{ willChange: 'transform', transform: 'translateZ(0)' }}
-          >
-            {/* ضع اسم الفيديو الخاص بك هنا بدلاً من bg-video.mp4 */}
-            <source src="/bg-video.mp4" type="video/mp4" />
-          </video>
+          <div className="absolute top-1/2 left-1/2 w-[250vw] h-[150vh] md:w-[120vw] md:h-[150vh] -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            <iframe
+              src="https://streamable.com/e/lm701e?autoplay=1&nocontrols=1&muted=1&loop=1&title=0&byline=0&portrait=0"
+              frameBorder="0"
+              allow="autoplay; fullscreen"
+              className="w-full h-full object-cover opacity-50"
+              style={{ transform: "translateZ(0)" }}
+              loading="eager" // هذا السطر يجبر المتصفح على تحميل الفيديو بأقصى سرعة
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none" />
         </div>
 
@@ -271,147 +269,4 @@ export default function Home() {
       {/* 4. نشرة الأسلاك الإيطالية */}
       <section id="wire-prices" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-10 md:mb-12">
-            <div className="inline-flex items-center justify-center p-3 bg-white/5 border border-white/10 rounded-full mb-4">
-              <Zap className="w-6 h-6 text-yellow-400" />
-            </div>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6" style={glowingTitleStyle}>
-              نشرة الأسلاك الإيطالية
-            </h2>
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-200 font-bold text-sm">
-              <Calendar className="w-4 h-4" />
-              تحديث اليوم: {currentDate}
-            </div>
-          </div>
-
-          <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden">
-            <div className="bg-white/5 p-5 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-green-400" />
-                الأسعار التقريبية المعتمدة
-              </h3>
-            </div>
-
-            <div className="divide-y divide-white/5">
-              {wirePrices.map((wire, idx) => (
-                <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/5 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-[#0a192f] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-bold text-white mb-0.5">{wire.size}</h4>
-                      <p className="text-xs text-slate-400">{wire.type}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-white/5 pt-3 md:pt-0">
-                    <div className="text-right">
-                      <div className="text-xl font-extrabold text-blue-300">
-                        {wire.price} <span className="text-xs font-normal text-slate-400">د.ل</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${
-                        wire.trend === 'up' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
-                        wire.trend === 'down' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
-                        'bg-slate-500/10 border-slate-500/30 text-slate-400'
-                      }`}>
-                        {wire.trend === 'up' && <TrendingUp className="w-4 h-4" />}
-                        {wire.trend === 'down' && <TrendingDown className="w-4 h-4" />}
-                        {wire.trend === 'same' && <Minus className="w-4 h-4" />}
-                      </div>
-                      
-                      <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:bg-blue-500 transition-colors">
-                        <ShoppingCart className="w-4 h-4" />
-                        اطلب الآن
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. ابدأ مشروعك */}
-      <section id="start" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="relative bg-[#0f213a] border border-blue-500/20 rounded-[2rem] p-8 md:p-16 text-center overflow-hidden">
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>
-              ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span>
-            </h2>
-            <p className="text-blue-100/80 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
-              نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك.
-            </p>
-            <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-slate-100 transition-colors">
-              <Zap className="w-6 h-6" />
-              تواصل معنا الآن
-            </Link>
-          </div>
-        </div>
-      </section>
-      
-      {/* ======================================
-          نافذة الطلب المنبثقة (Modal)
-      ====================================== */}
-      <AnimatePresence>
-        {selectedWire && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-            <div className="absolute inset-0 bg-[#06152b]/95" onClick={() => setSelectedWire(null)} />
-            
-            <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="relative w-full max-w-md bg-[#0d2342] border border-blue-500/20 rounded-[2rem] overflow-hidden shadow-2xl">
-              <button onClick={() => setSelectedWire(null)} className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10"><X className="w-5 h-5" /></button>
-
-              <div className="p-6 md:p-8">
-                {orderStatus === 'success' ? (
-                  <div className="text-center py-10">
-                    <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4 shadow-[0_0_20px_rgba(74,222,128,0.3)] rounded-full" />
-                    <h3 className="text-2xl font-bold text-white mb-2">تم استلام طلبك بنجاح!</h3>
-                    <p className="text-slate-400">سنتصل بك في أقرب وقت لتأكيد الطلبية وتجهيزها.</p>
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="text-2xl font-bold text-white mb-2 pr-6">طلب سريع</h3>
-                    <p className="text-blue-300 mb-6 font-medium">سلك إيطالي مقاس {selectedWire.size}</p>
-
-                    <form onSubmit={submitOrder} className="space-y-4 md:space-y-5">
-                      <div>
-                        <label className="block text-slate-300 text-sm font-bold mb-2">رقم الهاتف للتواصل</label>
-                        <input required type="tel" value={orderForm.phone} onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="09X XXX XXXX" />
-                      </div>
-                      <div>
-                        <label className="block text-slate-300 text-sm font-bold mb-2">المدينة</label>
-                        <input required type="text" value={orderForm.city} onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="اسم مدينتك" />
-                      </div>
-                      <div>
-                        <label className="block text-slate-300 text-sm font-bold mb-2">الكمية (عدد اللفات)</label>
-                        <div className="flex items-center bg-[#0a192f] border border-white/10 rounded-xl overflow-hidden">
-                          <button type="button" onClick={() => setOrderForm({...orderForm, quantity: Math.max(1, orderForm.quantity - 1)})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">-</button>
-                          <input type="number" min="1" value={orderForm.quantity} onChange={(e) => setOrderForm({...orderForm, quantity: parseInt(e.target.value) || 1})} className="w-full bg-transparent text-white text-center font-bold outline-none" />
-                          <button type="button" onClick={() => setOrderForm({...orderForm, quantity: orderForm.quantity + 1})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">+</button>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6">
-                        <span className="text-slate-300 font-bold">الإجمالي:</span>
-                        <span className="text-2xl font-extrabold text-white">{(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span></span>
-                      </div>
-
-                      <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 hover:bg-blue-500 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                        {orderStatus === 'loading' ? <Loader2 className="w-6 h-6 animate-spin" /> : 'تأكيد الطلب'}
-                      </button>
-                    </form>
-                  </>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-    </div>
-  )
-}
+          <div className="text
