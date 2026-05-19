@@ -6,6 +6,58 @@ import {
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle
 } from 'lucide-react'
 
+// === استدعاء مكتبات الـ 3D ===
+import { Canvas, useFrame } from '@react-three/fiber'
+import { OrbitControls, Stars, Float, MeshDistortMaterial } from '@react-three/drei'
+import * as THREE from 'three'
+
+// ==========================================
+// 1. برمجة مجسم الإنارة الذكية 3D (حصري)
+// ==========================================
+function ModernChandelier() {
+  const ringRef = useRef<THREE.Mesh>(null!)
+  const coreRef = useRef<THREE.Mesh>(null!)
+
+  // تحريك المجسم برمجياً مع مرور الوقت
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime()
+    if (ringRef.current) {
+       ringRef.current.rotation.x = Math.sin(t / 4) * 0.5
+       ringRef.current.rotation.y = t * 0.3
+    }
+    if (coreRef.current) {
+       coreRef.current.position.y = Math.sin(t) * 0.1
+    }
+  })
+
+  return (
+    <group>
+      {/* الحلقة المضيئة الخارجية (LED Ring) */}
+      <mesh ref={ringRef} rotation-x={Math.PI / 2}>
+        <torusGeometry args={[1.8, 0.02, 32, 100]} />
+        <meshStandardMaterial color="#ffffff" emissive="#3b82f6" emissiveIntensity={2} />
+      </mesh>
+      
+      {/* الحلقة الداخلية المعاكسة */}
+      <mesh rotation-x={Math.PI / 2} rotation-y={Math.PI / 2}>
+        <torusGeometry args={[1.4, 0.01, 32, 100]} />
+        <meshStandardMaterial color="#ffffff" emissive="#60a5fa" emissiveIntensity={1.5} />
+      </mesh>
+
+      {/* القلب النابض (الكرة المضيئة التي تتغير شكلها) */}
+      <mesh ref={coreRef}>
+        <sphereGeometry args={[0.5, 64, 64]} />
+        <MeshDistortMaterial color="#ffffff" emissive="#2563eb" emissiveIntensity={2} distort={0.4} speed={3} />
+      </mesh>
+
+      {/* إضاءات محيطة تنبعث من المجسم لتضيء ما حوله */}
+      <pointLight color="#3b82f6" intensity={4} distance={10} />
+      <pointLight color="#ffffff" intensity={2} distance={5} />
+    </group>
+  )
+}
+
+
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-50px' })
@@ -103,7 +155,6 @@ export default function Home() {
     fetchHomeData()
   }, [])
 
-  // دالة الإرسال مع الربط المخفي بـ (تيليجرام)
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedWire) return
@@ -111,7 +162,6 @@ export default function Home() {
     try {
       const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
       
-      // 1. حفظ الطلب في لوحة التحكم (الباك إند)
       await fetch('https://enarah2.vercel.app/api/save-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,9 +173,6 @@ export default function Home() {
         })
       })
 
-      // =========================================
-      // 2. إرسال الإشعار الفوري والخفي لتيليجرام
-      // =========================================
       const telegramBotToken = "8951369127:AAFxThF562Xt9LxsQZMibNOxrFTeJtuScOM" 
       const telegramChatId = "8372746727"
       const telegramMessage = `🚨 *طلب أسلاك جديد!*\n\n` +
@@ -147,7 +194,6 @@ export default function Home() {
         }).catch(err => console.log("Telegram Error:", err));
       }
 
-      // إظهار رسالة النجاح للعميل
       setOrderStatus('success')
       setTimeout(() => {
         setOrderStatus('idle')
@@ -160,24 +206,40 @@ export default function Home() {
   return (
     <div className="pt-0">
       
-      {/* 1. الواجهة السينمائية */}
+      {/* 1. الواجهة الـ 3D التفاعلية (بديلة الفيديو) */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
-        <div className="absolute inset-0 z-0 flex items-center justify-center">
-          <iframe src="https://streamable.com/e/zarpqc?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1&preload=auto" allow="autoplay; fullscreen" className="hidden md:block w-full h-full object-cover scale-[1.2] opacity-60" style={{ border: 'none', pointerEvents: 'none' }} />
-          <iframe src="https://streamable.com/e/lm701e?autoplay=1&muted=1&nocontrols=1&loop=1&playsinline=1&preload=auto" allow="autoplay; fullscreen" className="block md:hidden w-full h-full object-cover scale-[1.05] opacity-60" style={{ border: 'none', pointerEvents: 'none' }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/90 via-[#0a192f]/40 to-[#0a192f] pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a192f]/80 via-transparent to-[#0a192f]/80 pointer-events-none" />
+        
+        {/* بيئة الـ 3D في الخلفية */}
+        <div className="absolute inset-0 z-0">
+          <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
+            <ambientLight intensity={0.2} />
+            <directionalLight position={[10, 10, 5]} intensity={1} />
+            
+            <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+              <ModernChandelier />
+            </Float>
+
+            {/* نجوم/جسيمات في الخلفية تتفاعل مع الكاميرا */}
+            <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
+            
+            {/* أداة التحكم بالماوس (تسمح للزبون بتدوير المجسم) */}
+            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
+          </Canvas>
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
+        {/* تدرجات لونية زجاجية فوق الـ 3D لدمجه مع التصميم */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/80 via-transparent to-[#0a192f] pointer-events-none" />
+        
+        {/* النصوص والأزرار (فوق الـ 3D) */}
+        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20 pointer-events-none">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: 'easeOut' }}>
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-4 md:mb-6 leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
+            <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-4 md:mb-6 leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] pointer-events-auto">
               الإنارة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-[0_0_25px_rgba(59,130,246,0.6)]">الحديثة</span>
             </h1>
-            <p className="text-base md:text-2xl text-blue-50/80 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
+            <p className="text-base md:text-2xl text-blue-50/80 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 pointer-events-auto">
               كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5 pointer-events-auto">
               <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-gradient-to-l from-blue-600 to-blue-400 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] flex items-center justify-center gap-3 overflow-hidden hover:scale-105">
                 <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 استعرض المنتجات
