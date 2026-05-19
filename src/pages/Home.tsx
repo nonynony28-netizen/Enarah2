@@ -7,31 +7,25 @@ import {
 } from 'lucide-react'
 
 // ==========================================
-// 1. النبضة الكهربائية (مجهزة للهواتف والكمبيوتر)
+// 1. النبضة الكهربائية (تعمل بذكاء على الكمبيوتر فقط)
 // ==========================================
 function ElectricCursor() {
   const [position, setPosition] = useState({ x: -100, y: -100 }) 
   const [isHovering, setIsHovering] = useState(false)
-  const [isVisible, setIsVisible] = useState(false) 
+  const [isDesktop, setIsDesktop] = useState(true)
 
   useEffect(() => {
-    const updatePosition = (x: number, y: number) => {
-      setPosition({ x, y })
-      if (!isVisible) setIsVisible(true)
+    // إيقاف التأثير تماماً على الهواتف لتسريع الموقع
+    if (window.matchMedia("(max-width: 768px)").matches || 'ontouchstart' in window) {
+      setIsDesktop(false)
+      return
     }
 
-    // للكمبيوتر
-    const onMouseMove = (e: MouseEvent) => updatePosition(e.clientX, e.clientY)
-    
-    // للهواتف (تتبع حركة الإصبع عند اللمس أو التمرير)
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        updatePosition(e.touches[0].clientX, e.touches[0].clientY)
-      }
+    const updatePosition = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY })
     }
 
-    // زيادة التوهج عند لمس الأزرار
-    const handleInteract = (e: MouseEvent | TouchEvent) => {
+    const handleInteract = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.closest('a') || target.closest('button')) {
         setIsHovering(true)
@@ -40,21 +34,17 @@ function ElectricCursor() {
       }
     }
     
-    window.addEventListener("mousemove", onMouseMove)
-    window.addEventListener("touchmove", onTouchMove, { passive: true })
-    window.addEventListener("touchstart", onTouchMove, { passive: true })
-    
+    window.addEventListener("mousemove", updatePosition)
     window.addEventListener("mouseover", handleInteract)
-    window.addEventListener("touchstart", handleInteract, { passive: true })
     
     return () => {
-      window.removeEventListener("mousemove", onMouseMove)
-      window.removeEventListener("touchmove", onTouchMove)
-      window.removeEventListener("touchstart", onTouchMove)
+      window.removeEventListener("mousemove", updatePosition)
       window.removeEventListener("mouseover", handleInteract)
-      window.removeEventListener("touchstart", handleInteract)
     }
-  }, [isVisible])
+  }, [])
+
+  // عدم رسم أي شيء في الهواتف لحماية الأداء
+  if (!isDesktop) return null;
 
   return (
     <motion.div
@@ -62,12 +52,10 @@ function ElectricCursor() {
       animate={{
         x: position.x - (isHovering ? 24 : 12),
         y: position.y - (isHovering ? 24 : 12),
-        opacity: isVisible ? 1 : 0
       }}
       transition={{ 
         x: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 },
-        y: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 },
-        opacity: { duration: 0.5 }
+        y: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 }
       }}
     >
       <motion.div 
@@ -230,29 +218,25 @@ export default function Home() {
   return (
     <div className="pt-0 relative cursor-default">
       
-      {/* مؤشر النبضة الكهربائية (يعمل على الهاتف والكمبيوتر) */}
+      {/* مؤشر النبضة الكهربائية */}
       <ElectricCursor />
 
       {/* 1. الواجهة التفاعلية */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
         
-        {/* خلفية الأجرام المضيئة */}
+        {/* خلفية الأجرام المضيئة (مُحسنة جداً للهواتف) */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <motion.div 
-            animate={{ y: [0, -50, 0], x: [0, 30, 0], scale: [1, 1.2, 1] }} 
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-600/30 rounded-full blur-[100px]"
+            animate={{ y: [0, -20, 0], x: [0, 15, 0] }} 
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/4 left-1/4 w-40 h-40 md:w-72 md:h-72 bg-blue-600/20 md:bg-blue-600/30 rounded-full blur-[60px] md:blur-[100px]"
           />
           <motion.div 
-            animate={{ y: [0, 60, 0], x: [0, -50, 0], scale: [1, 1.5, 1] }} 
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/20 rounded-full blur-[120px]"
+            animate={{ y: [0, 30, 0], x: [0, -20, 0] }} 
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute bottom-1/4 right-1/4 w-60 h-60 md:w-96 md:h-96 bg-cyan-400/10 md:bg-cyan-400/20 rounded-full blur-[80px] md:blur-[120px]"
           />
-          <motion.div 
-            animate={{ opacity: [0.3, 0.6, 0.3] }} 
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[150px]"
-          />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[800px] md:h-[800px] bg-indigo-500/5 md:bg-indigo-500/10 rounded-full blur-[100px] md:blur-[150px]" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/80 via-transparent to-[#0a192f] pointer-events-none" />
         </div>
 
