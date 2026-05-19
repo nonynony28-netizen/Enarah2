@@ -143,7 +143,7 @@ export default function Home() {
             muted
             playsInline
             preload="auto"
-           poster="/images/video-poster.jpg..PNG"
+           poster="/poster.jpg"
             className="absolute top-0 left-0 w-full h-full object-cover opacity-60 mix-blend-screen pointer-events-none transition-opacity duration-1000"
             style={{ willChange: 'transform', transform: 'translateZ(0)' }}
           >
