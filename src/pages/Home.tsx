@@ -158,17 +158,20 @@ export default function Home() {
       {/* 1. الواجهة الترحيبية بالفيديو */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         
-        {/* الفيديو الطولي الخاص بك من Streamable */}
+        {/* فيديو الخلفية المباشر والفائق السرعة */}
         <div className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] overflow-hidden flex items-center justify-center">
-          <div className="absolute top-1/2 left-1/2 w-[250vw] h-[150vh] md:w-[120vw] md:h-[150vh] -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-            <iframe
-              src="https://streamable.com/e/lm701e?autoplay=1&nocontrols=1&muted=1&loop=1&title=0&byline=0&portrait=0"
-              frameBorder="0"
-              allow="autoplay; fullscreen"
-              className="w-full h-full object-cover opacity-50"
-              style={{ transform: "translateZ(0)" }}
-            />
-          </div>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="absolute top-0 left-0 w-full h-full object-cover opacity-60 mix-blend-screen pointer-events-none"
+            style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+          >
+            {/* ضع اسم الفيديو الخاص بك هنا بدلاً من bg-video.mp4 */}
+            <source src="/bg-video.mp4" type="video/mp4" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none" />
         </div>
 
