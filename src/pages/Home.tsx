@@ -7,63 +7,53 @@ import {
 } from 'lucide-react'
 
 // ==========================================
-// نمط الوهج الشعاعي الأزرق للعناوين (يضيء الكلمات بوزن خفيف جداً)
+// 1. النبضة الكهربائية (نقية للكمبيوتر فقط)
 // ==========================================
-const glowingTitleStyle = {
-  textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
-}
+function ElectricCursor() {
+  const [position, setPosition] = useState({ x: -100, y: -100 }) 
+  const [isHovering, setIsHovering] = useState(false)
 
-// ==========================================
-// 1. الإضاءة التفاعلية التي تتبع الإصبع (أداء صاروخي على الهاتف)
-// ==========================================
-function InteractiveGlow() {
-  const glowRef = useRef<HTMLDivElement>(null)
-  
   useEffect(() => {
-    const update = (x: number, y: number) => {
-      if (glowRef.current) {
-        // نستخدم translate3d لتعمل على المعالج الرسومي فوراً بدون ثقل
-        glowRef.current.style.transform = `translate3d(${x - 200}px, ${y - 200}px, 0)`
-      }
+    const updatePosition = (e: MouseEvent) => setPosition({ x: e.clientX, y: e.clientY })
+    const handleInteract = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      setIsHovering(target.tagName === 'BUTTON' || target.tagName === 'A' || !!target.closest('a') || !!target.closest('button'))
     }
-    const onMouse = (e: MouseEvent) => update(e.clientX, e.clientY)
-    const onTouch = (e: TouchEvent) => { if(e.touches[0]) update(e.touches[0].clientX, e.touches[0].clientY) }
-    
-    // المنتصف كبداية
-    update(window.innerWidth / 2, window.innerHeight / 2)
-
-    window.addEventListener('mousemove', onMouse)
-    window.addEventListener('touchmove', onTouch, { passive: true })
+    window.addEventListener("mousemove", updatePosition)
+    window.addEventListener("mouseover", handleInteract)
     return () => {
-      window.removeEventListener('mousemove', onMouse)
-      window.removeEventListener('touchmove', onTouch)
+      window.removeEventListener("mousemove", updatePosition)
+      window.removeEventListener("mouseover", handleInteract)
     }
   }, [])
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* شبكة التأسيس الكهربائي (خفيفة جداً) */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f615_1px,transparent_1px),linear-gradient(to_bottom,#3b82f615_1px,transparent_1px)] bg-[size:40px_40px]" />
-      
-      {/* جرم الإضاءة الذي يتبعك */}
-      <div 
-        ref={glowRef}
-        className="absolute top-0 left-0 w-[400px] h-[400px] rounded-full bg-blue-500/20 blur-[80px]"
-        style={{ willChange: 'transform' }} 
-      />
-    </div>
+    <motion.div
+      className="fixed top-0 left-0 pointer-events-none z-[100] flex items-center justify-center mix-blend-screen"
+      animate={{ x: position.x - (isHovering ? 24 : 12), y: position.y - (isHovering ? 24 : 12) }}
+      transition={{ x: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 }, y: { type: "spring", stiffness: 150, damping: 15, mass: 0.5 } }}
+    >
+      <motion.div 
+        animate={{ scale: isHovering ? 1.5 : 1 }}
+        className={`relative flex items-center justify-center ${isHovering ? 'w-12 h-12' : 'w-6 h-6'} transition-all duration-300`}
+      >
+        <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-md animate-pulse" />
+        <div className="absolute inset-0 border border-blue-400/50 rounded-full animate-ping" style={{ animationDuration: '1.5s' }} />
+        <div className={`bg-white rounded-full shadow-[0_0_15px_5px_rgba(96,165,250,0.8)] ${isHovering ? 'w-4 h-4' : 'w-2 h-2'}`} />
+      </motion.div>
+    </motion.div>
   )
 }
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '0px' })
+  const isInView = useInView(ref, { once: true, margin: '-50px' })
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, delay, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -89,11 +79,16 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState('')
   const [wirePrices, setWirePrices] = useState(defaultWireData)
   
+  // نظام اكتشاف الهواتف لإلغاء الحركات الثقيلة
+  const [isMobile, setIsMobile] = useState(false)
+
   const [selectedWire, setSelectedWire] = useState<typeof wirePrices[0] | null>(null)
   const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
   const [orderStatus, setOrderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   useEffect(() => {
+    setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window)
+    
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
     setCurrentDate(new Date().toLocaleDateString('ar-EG', options))
   }, [])
@@ -196,37 +191,59 @@ export default function Home() {
   }
 
   return (
-    <div className="pt-0 relative cursor-default bg-[#0a192f] text-white">
+    <div className="pt-0 relative cursor-default">
       
-      {/* 1. الإضاءة التفاعلية الشاملة (تغطي الموقع كله بوزن الريشة) */}
-      <InteractiveGlow />
+      {/* المؤشر المضيء يظهر للكمبيوتر فقط لتوفير الموارد */}
+      {!isMobile && <ElectricCursor />}
 
-      {/* 2. الواجهة الترحيبية */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* 1. الواجهة التفاعلية */}
+      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
         
-        {/* تدرج لوني يعطي عمق فوق الشبكة */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/20 via-transparent to-[#0a192f] pointer-events-none z-0" />
+        {/* خلفية الأجرام المضيئة (ثابتة على الهاتف ومتحركة للكمبيوتر) */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {!isMobile ? (
+            <>
+              <motion.div 
+                animate={{ y: [0, -40, 0], x: [0, 20, 0] }} 
+                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-600/30 rounded-full blur-[100px]"
+              />
+              <motion.div 
+                animate={{ y: [0, 40, 0], x: [0, -30, 0] }} 
+                transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/20 rounded-full blur-[120px]"
+              />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[150px]" />
+            </>
+          ) : (
+            <>
+              {/* نسخ ثابتة للهاتف لا تستهلك معالج الرسوميات */}
+              <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-blue-600/20 rounded-full blur-[60px]" />
+              <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-cyan-400/10 rounded-full blur-[80px]" />
+            </>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/80 via-transparent to-[#0a192f] pointer-events-none" />
+        </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="p-6 md:p-12 transition-all"
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            transition={{ duration: 1, ease: 'easeOut' }}
+            className="p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] bg-[#0d2342]/80 md:bg-white/[0.02] md:backdrop-blur-sm border border-white/[0.05] shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all"
           >
-            {/* عنوان بوهج أزرق نيون */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-6 leading-tight" style={glowingTitleStyle}>
-              الإنارة <span className="text-blue-300">الحديثة</span>
+            <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-4 md:mb-6 leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
+              الإنارة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-[0_0_25px_rgba(59,130,246,0.6)]">الحديثة</span>
             </h1>
-            <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
+            <p className="text-base md:text-2xl text-blue-50/80 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
               كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
-              <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-blue-600 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:shadow-[0_0_30px_rgba(59,130,246,0.7)] flex items-center justify-center gap-3">
+              <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-gradient-to-l from-blue-600 to-blue-400 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] flex items-center justify-center gap-3">
                 استعرض المنتجات
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform duration-300" />
               </Link>
-              <Link to="/contact" className="px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-white/5 border border-white/10 text-white font-bold text-base md:text-lg rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors">
+              <Link to="/contact" className="px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-[#1a365d] md:bg-white/[0.05] md:backdrop-blur-md border border-white/10 text-white font-bold text-base md:text-lg rounded-2xl flex items-center justify-center">
                 تواصل معنا
               </Link>
             </div>
@@ -234,16 +251,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. لماذا نحن */}
-      <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]/50">
+      {/* 2. لماذا نحن */}
+      <section id="about" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none hidden md:block" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="text-center mb-12 md:mb-16">
-              {/* عنوان بوهج أزرق */}
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6" style={glowingTitleStyle}>
-                لماذا نحن؟
-              </h2>
-              <div className="w-20 h-1.5 bg-blue-500 mx-auto rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <h2 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 mb-6">لماذا نحن؟</h2>
+              <div className="w-20 h-1.5 bg-gradient-to-r from-blue-400 to-blue-600 mx-auto rounded-full" />
             </div>
           </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
@@ -252,10 +267,10 @@ export default function Home() {
               { icon: Shield, title: 'حلول متكاملة', desc: 'نقدم لك جميع احتياجاتك من الإضاءة والمواد الكهربائية الذكية في مكان واحد.' },
               { icon: Sparkles, title: 'احترافية بالعمل', desc: 'فريقنا الهندسي متخصص في مساعدتك لاختيار الحلول المثالية والتصاميم لمشروعك.' },
             ].map((item, i) => (
-              <FadeIn key={item.title} delay={i * 0.1}>
-                {/* كروت بتصميم مسطح وسريع جداً */}
-                <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-6 md:p-8 h-full hover:border-blue-500/30 transition-colors">
-                  <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
+              <FadeIn key={item.title} delay={i * 0.15}>
+                {/* استبدلنا الزجاج الشفاف بألوان صلبة على الهاتف لتوفير الأداء */}
+                <div className="group relative bg-[#112a4f] md:bg-white/[0.02] md:backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] p-6 md:p-8 h-full">
+                  <div className="w-16 h-16 bg-blue-500/20 border border-blue-400/20 rounded-2xl flex items-center justify-center mb-6">
                     <item.icon className="w-8 h-8 text-blue-400" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
@@ -267,19 +282,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. جزء من مشاريعنا */}
-      <section id="featured-projects" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+      {/* 3. جزء من مشاريعنا */}
+      <section id="featured-projects" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none hidden md:block" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
               <div>
-                {/* عنوان بوهج أزرق */}
-                <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4" style={glowingTitleStyle}>
-                  جزء من مشاريعنا
-                </h2>
-                <div className="w-20 h-1.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                <h2 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 mb-4">جزء من مشاريعنا</h2>
+                <div className="w-20 h-1.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" />
               </div>
-              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all">
+              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#112a4f] md:bg-white/[0.05] border border-white/10 rounded-xl text-white font-bold">
                 شاهد كل المشاريع
                 <ArrowLeft className="w-5 h-5" />
               </Link>
@@ -289,7 +302,7 @@ export default function Home() {
           {loadingProjects && (
              <div className="flex flex-col items-center justify-center py-20">
                <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
-               <p className="text-blue-200 mt-4">جاري جلب المشاريع...</p>
+               <p className="text-blue-100 mt-4 animate-pulse">جاري جلب المشاريع...</p>
              </div>
           )}
 
@@ -297,12 +310,12 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {featuredProjects.map((project, i) => (
                 <FadeIn key={project.id} delay={i * 0.1}>
-                  <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/30 transition-colors">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
+                  <div className="bg-[#112a4f] md:bg-white/[0.02] md:backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] overflow-hidden flex flex-col h-full">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-[#0d2342]/50">
                       <img src={project.image} alt={project.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
                       <div className="absolute top-4 right-4 z-20">
-                        <span className="px-4 py-1.5 bg-blue-500/20 text-blue-200 text-xs font-bold rounded-full">{project.category}</span>
+                        <span className="px-4 py-1.5 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full">{project.category}</span>
                       </div>
                     </div>
                     <div className="p-6 relative z-20 flex-grow flex flex-col">
@@ -317,40 +330,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. نشرة الأسلاك الإيطالية */}
-      <section id="wire-prices" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]/50">
+      {/* 4. نشرة الأسلاك الإيطالية */}
+      <section id="wire-prices" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
+        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-green-500/5 rounded-full blur-[150px] pointer-events-none hidden md:block" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
             <div className="text-center mb-10 md:mb-12">
-              <div className="inline-flex items-center justify-center p-3 bg-white/5 border border-white/10 rounded-full mb-4">
+              <div className="inline-flex items-center justify-center p-3 bg-white/[0.02] border border-white/10 rounded-full mb-4">
                 <Zap className="w-6 h-6 text-yellow-400" />
               </div>
-              {/* عنوان بوهج أزرق */}
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6" style={glowingTitleStyle}>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 mb-6">
                 نشرة الأسلاك الإيطالية
               </h2>
-              <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-200 font-bold text-sm">
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-300 font-bold text-sm">
                 <Calendar className="w-4 h-4" />
                 تحديث اليوم: {currentDate}
               </div>
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.1}>
-            <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden shadow-lg">
-              <div className="bg-white/5 p-5 border-b border-white/5 flex items-center justify-between">
+          <FadeIn delay={0.2}>
+            <div className="bg-[#112a4f] md:bg-white/[0.02] md:backdrop-blur-2xl border border-white/[0.05] rounded-[2rem] overflow-hidden">
+              <div className="bg-white/[0.02] p-5 border-b border-white/[0.05] flex items-center justify-between">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-green-400" />
                   الأسعار التقريبية المعتمدة
                 </h3>
               </div>
 
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-white/[0.05]">
                 {wirePrices.map((wire, idx) => (
                   <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-[#0a192f] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
+                      <div className="w-10 h-10 rounded-lg bg-[#0d2342] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
                         {idx + 1}
                       </div>
                       <div>
@@ -359,7 +372,7 @@ export default function Home() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-white/5 pt-3 md:pt-0">
+                    <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-white/[0.05] pt-3 md:pt-0">
                       <div className="text-right">
                         <div className="text-xl font-extrabold text-blue-300">
                           {wire.price} <span className="text-xs font-normal text-slate-400">د.ل</span>
@@ -377,11 +390,12 @@ export default function Home() {
                           {wire.trend === 'same' && <Minus className="w-4 h-4" />}
                         </div>
                         
-                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-500 transition-colors shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold">
                           <ShoppingCart className="w-4 h-4" />
                           اطلب الآن
                         </button>
                       </div>
+
                     </div>
                   </div>
                 ))}
@@ -391,20 +405,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. ابدأ مشروعك */}
-      <section id="start" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+      {/* 5. ابدأ مشروعك */}
+      <section id="start" className="py-16 md:py-24 bg-[#0a192f] relative overflow-hidden border-t border-white/[0.02]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeIn>
-            <div className="relative bg-[#0f213a] border border-blue-500/20 rounded-[2rem] p-8 md:p-16 text-center overflow-hidden">
+            <div className="relative bg-[#112a4f] md:bg-blue-900/40 md:backdrop-blur-3xl border border-blue-400/20 rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 text-center overflow-hidden">
               <div className="relative z-10">
-                {/* عنوان بوهج أزرق */}
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>
-                  ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span>
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6">
+                  ابدأ مشروعك معنا <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-300">اليوم</span>
                 </h2>
                 <p className="text-blue-100/80 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
                   نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك.
                 </p>
-                <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-slate-100 transition-colors">
+                <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl">
                   <Zap className="w-6 h-6" />
                   تواصل معنا الآن
                 </Link>
@@ -428,7 +441,7 @@ export default function Home() {
               <div className="p-6 md:p-8">
                 {orderStatus === 'success' ? (
                   <div className="text-center py-10">
-                    <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4 shadow-[0_0_20px_rgba(74,222,128,0.3)] rounded-full" />
+                    <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
                     <h3 className="text-2xl font-bold text-white mb-2">تم استلام طلبك بنجاح!</h3>
                     <p className="text-slate-400">سنتصل بك في أقرب وقت لتأكيد الطلبية وتجهيزها.</p>
                   </div>
@@ -460,7 +473,7 @@ export default function Home() {
                         <span className="text-2xl font-extrabold text-white">{(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span></span>
                       </div>
 
-                      <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 hover:bg-blue-500 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                      <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50">
                         {orderStatus === 'loading' ? <Loader2 className="w-6 h-6 animate-spin" /> : 'تأكيد الطلب'}
                       </button>
                     </form>
