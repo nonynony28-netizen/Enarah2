@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck } from 'lucide-react'
+import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom' // استدعاء الرابط
 
-// نمط الوهج الأزرق للعناوين (يضيء الكلمات بوزن خفيف جداً)
+// نمط الوهج الأزرق للعناوين
 const glowingTitleStyle = {
   textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
 }
 
-// مكون الأنيميشن السريع (تم تخفيفه ليكون فائق السرعة)
+// مكون الأنيميشن السريع
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '50px' })
@@ -48,19 +49,28 @@ export default function WirePrices() {
   return (
     <div className="pt-24 md:pt-32 pb-24 bg-[#0a192f] min-h-screen relative overflow-hidden text-white">
       
-      {/* شبكة هندسية خفيفة جداً في الخلفية (بدل الدوائر الثقيلة) */}
+      {/* شبكة هندسية خفيفة جداً في الخلفية */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f610_1px,transparent_1px),linear-gradient(to_bottom,#3b82f610_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* رأس الصفحة */}
+        {/* زر الرجوع للرئيسية */}
         <FadeIn>
+          <div className="mb-6 flex justify-start">
+            <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+              <ArrowRight className="w-5 h-5" />
+              العودة للرئيسية
+            </Link>
+          </div>
+        </FadeIn>
+
+        {/* رأس الصفحة */}
+        <FadeIn delay={0.1}>
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center p-4 bg-white/5 border border-white/10 rounded-full mb-6">
               <Zap className="w-8 h-8 text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]" />
             </div>
             
-            {/* أضفنا توهج النيون الفخم للعنوان */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight" style={glowingTitleStyle}>
               أسعار الأسلاك الإيطالية
             </h1>
@@ -77,11 +87,10 @@ export default function WirePrices() {
           </div>
         </FadeIn>
 
-        {/* جدول الأسعار - بدون أي زجاج شفاف ثقيل */}
-        <FadeIn delay={0.1}>
+        {/* جدول الأسعار */}
+        <FadeIn delay={0.2}>
           <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
             
-            {/* عنوان الجدول */}
             <div className="bg-white/5 p-6 border-b border-white/5 flex items-center justify-between">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
                 <ShieldCheck className="w-6 h-6 text-green-400" />
@@ -92,12 +101,10 @@ export default function WirePrices() {
               </span>
             </div>
 
-            {/* قائمة الأسلاك */}
             <div className="divide-y divide-white/5">
               {wireData.map((wire, idx) => (
                 <div key={wire.id} className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/5 transition-colors duration-300">
                   
-                  {/* معلومات السلك */}
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-[#0a192f] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-lg shadow-[0_0_10px_rgba(59,130,246,0.1)]">
                       {idx + 1}
@@ -108,7 +115,6 @@ export default function WirePrices() {
                     </div>
                   </div>
 
-                  {/* السعر والمؤشر */}
                   <div className="flex items-center justify-between md:justify-end gap-6 md:gap-10 border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
                     <div className="text-right">
                       <span className="text-sm text-slate-400 block mb-1">السعر التقريبي</span>
@@ -117,7 +123,6 @@ export default function WirePrices() {
                       </div>
                     </div>
 
-                    {/* مؤشر السعر */}
                     <div className={`flex items-center justify-center w-10 h-10 rounded-full border ${
                       wire.trend === 'up' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
                       wire.trend === 'down' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
@@ -132,7 +137,6 @@ export default function WirePrices() {
               ))}
             </div>
             
-            {/* تذييل الجدول */}
             <div className="bg-[#0a192f]/50 p-4 text-center text-sm text-slate-500 border-t border-white/5">
               * الأسعار تقريبية وقابلة للتغيير الطفيف حسب تقلبات السوق وكمية الطلب.
             </div>
