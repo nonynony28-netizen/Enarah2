@@ -6,58 +6,6 @@ import {
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle
 } from 'lucide-react'
 
-// === استدعاء مكتبات الـ 3D ===
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Stars, Float, MeshDistortMaterial } from '@react-three/drei'
-import * as THREE from 'three'
-
-// ==========================================
-// 1. برمجة مجسم الإنارة الذكية 3D (حصري)
-// ==========================================
-function ModernChandelier() {
-  const ringRef = useRef<THREE.Mesh>(null!)
-  const coreRef = useRef<THREE.Mesh>(null!)
-
-  // تحريك المجسم برمجياً مع مرور الوقت
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime()
-    if (ringRef.current) {
-       ringRef.current.rotation.x = Math.sin(t / 4) * 0.5
-       ringRef.current.rotation.y = t * 0.3
-    }
-    if (coreRef.current) {
-       coreRef.current.position.y = Math.sin(t) * 0.1
-    }
-  })
-
-  return (
-    <group>
-      {/* الحلقة المضيئة الخارجية (LED Ring) */}
-      <mesh ref={ringRef} rotation-x={Math.PI / 2}>
-        <torusGeometry args={[1.8, 0.02, 32, 100]} />
-        <meshStandardMaterial color="#ffffff" emissive="#3b82f6" emissiveIntensity={2} />
-      </mesh>
-      
-      {/* الحلقة الداخلية المعاكسة */}
-      <mesh rotation-x={Math.PI / 2} rotation-y={Math.PI / 2}>
-        <torusGeometry args={[1.4, 0.01, 32, 100]} />
-        <meshStandardMaterial color="#ffffff" emissive="#60a5fa" emissiveIntensity={1.5} />
-      </mesh>
-
-      {/* القلب النابض (الكرة المضيئة التي تتغير شكلها) */}
-      <mesh ref={coreRef}>
-        <sphereGeometry args={[0.5, 64, 64]} />
-        <MeshDistortMaterial color="#ffffff" emissive="#2563eb" emissiveIntensity={2} distort={0.4} speed={3} />
-      </mesh>
-
-      {/* إضاءات محيطة تنبعث من المجسم لتضيء ما حوله */}
-      <pointLight color="#3b82f6" intensity={4} distance={10} />
-      <pointLight color="#ffffff" intensity={2} distance={5} />
-    </group>
-  )
-}
-
-
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-50px' })
@@ -173,6 +121,7 @@ export default function Home() {
         })
       })
 
+      // الربط مع تيليجرام بأرقامك الصحيحة
       const telegramBotToken = "8951369127:AAFxThF562Xt9LxsQZMibNOxrFTeJtuScOM" 
       const telegramChatId = "8372746727"
       const telegramMessage = `🚨 *طلب أسلاك جديد!*\n\n` +
@@ -182,7 +131,7 @@ export default function Home() {
                               `📍 *المدينة:* ${orderForm.city}\n` +
                               `📞 *الهاتف:* ${orderForm.phone}`;
 
-      if (telegramBotToken !== "ضع_توكن_البوت_هنا") {
+      if (telegramBotToken) {
         fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -206,40 +155,45 @@ export default function Home() {
   return (
     <div className="pt-0">
       
-      {/* 1. الواجهة الـ 3D التفاعلية (بديلة الفيديو) */}
+      {/* 1. الواجهة التفاعلية (بدون مشاكل، سريعة ومبهرة) */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a192f]">
         
-        {/* بيئة الـ 3D في الخلفية */}
-        <div className="absolute inset-0 z-0">
-          <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
-            <ambientLight intensity={0.2} />
-            <directionalLight position={[10, 10, 5]} intensity={1} />
-            
-            <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-              <ModernChandelier />
-            </Float>
-
-            {/* نجوم/جسيمات في الخلفية تتفاعل مع الكاميرا */}
-            <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-            
-            {/* أداة التحكم بالماوس (تسمح للزبون بتدوير المجسم) */}
-            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-          </Canvas>
+        {/* خلفية الأجرام المضيئة (تعطي إيحاء الإضاءة الحديثة) */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <motion.div 
+            animate={{ y: [0, -50, 0], x: [0, 30, 0], scale: [1, 1.2, 1] }} 
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-600/30 rounded-full blur-[100px]"
+          />
+          <motion.div 
+            animate={{ y: [0, 60, 0], x: [0, -50, 0], scale: [1, 1.5, 1] }} 
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/20 rounded-full blur-[120px]"
+          />
+          <motion.div 
+            animate={{ opacity: [0.3, 0.6, 0.3] }} 
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[150px]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/80 via-transparent to-[#0a192f] pointer-events-none" />
         </div>
 
-        {/* تدرجات لونية زجاجية فوق الـ 3D لدمجه مع التصميم */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/80 via-transparent to-[#0a192f] pointer-events-none" />
-        
-        {/* النصوص والأزرار (فوق الـ 3D) */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20 pointer-events-none">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: 'easeOut' }}>
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-4 md:mb-6 leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] pointer-events-auto">
+        {/* النصوص والأزرار (بمؤثرات الـ 3D عند تمرير الماوس) */}
+        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            transition={{ duration: 1, ease: 'easeOut' }}
+            whileHover={{ scale: 1.02 }}
+            className="p-8 md:p-12 rounded-[3rem] bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm shadow-[0_0_50px_rgba(59,130,246,0.15)] transition-all"
+          >
+            <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-4 md:mb-6 leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
               الإنارة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-[0_0_25px_rgba(59,130,246,0.6)]">الحديثة</span>
             </h1>
-            <p className="text-base md:text-2xl text-blue-50/80 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 pointer-events-auto">
+            <p className="text-base md:text-2xl text-blue-50/80 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
               كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5 pointer-events-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
               <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-gradient-to-l from-blue-600 to-blue-400 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] flex items-center justify-center gap-3 overflow-hidden hover:scale-105">
                 <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 استعرض المنتجات
