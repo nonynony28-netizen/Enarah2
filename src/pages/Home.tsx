@@ -136,19 +136,21 @@ export default function Home() {
       {/* 1. الواجهة الترحيبية بالفيديو فائق السرعة */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] overflow-hidden flex items-center justify-center">
-          {/* تمت إضافة الغلاف (poster) ليظهر فوراً ريثما يجهز الفيديو */}
+          
+          {/* الكود النهائي للفيديو: تحميل مسبق قوي، وبدون تأثيرات بطء */}
           <video
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
-           poster="/poster.jpg"
-            className="absolute top-0 left-0 w-full h-full object-cover opacity-60 mix-blend-screen pointer-events-none transition-opacity duration-1000"
+            poster="/poster.jpg"
+            className="absolute top-0 left-0 w-full h-full object-cover opacity-60 mix-blend-screen pointer-events-none"
             style={{ willChange: 'transform', transform: 'translateZ(0)' }}
           >
             <source src="/bg-video.mp4" type="video/mp4" />
           </video>
+          
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none" />
         </div>
 
