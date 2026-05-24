@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown } from 'lucide-react'
+import { 
+  Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
+  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Facebook, Instagram 
+} from 'lucide-react'
 
 // نمط الوهج للعناوين والشعارات المضيئة
 const glowingTitleStyle = { textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)' }
-
-// القوائم المنفصلة
-const mainLinks = [
-  { path: '/', label: 'الرئيسية' },
-]
 
 const servicesDropdown = {
   label: 'الأقسام والأسعار',
@@ -22,10 +20,10 @@ const servicesDropdown = {
 }
 
 const otherLinks = [
-  { path: '/blog', label: 'المدونة' },
-  { path: '/about', label: 'من نحن' },
-  { path: '/branches', label: 'الفروع' },
-  { path: '/contact', label: 'تواصل معنا' },
+  { path: '/blog', label: 'المدونة', icon: BookOpen },
+  { path: '/about', label: 'من نحن', icon: Info },
+  { path: '/branches', label: 'الفروع', icon: MapPin },
+  { path: '/contact', label: 'تواصل معنا', icon: PhoneCall },
 ]
 
 export default function Navbar() {
@@ -193,90 +191,145 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 md:hidden"
           >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+            {/* الخلفية المظلمة الضبابية */}
+            <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={() => setIsOpen(false)} />
+            
             <motion.div
               initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="absolute top-0 right-0 bottom-0 w-[75%] max-w-sm bg-gradient-to-b from-[#0a192f] to-[#0d2342] border-l border-blue-500/20 shadow-2xl overflow-y-auto"
+              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+              className="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] border-l border-blue-500/20 shadow-2xl overflow-y-auto flex flex-col justify-between"
             >
-              <div className="flex flex-col pt-24 px-6 gap-3 pb-8">
-                {/* الرئيسية */}
-                <Link
-                  to="/"
-                  onClick={() => setIsOpen(false)}
-                  className={`block px-5 py-3.5 rounded-2xl text-base font-bold transition-all duration-300 ${
-                    location.pathname === '/' ? 'text-white bg-blue-500/15 border border-blue-400/30' : 'text-slate-300 hover:text-white'
-                  }`}
-                >
-                  الرئيسية
-                </Link>
+              {/* نقوش وخلفيات النيون داخل المنيو لجعلها حية */}
+              <div className="absolute inset-0 z-0 bg-animated-grid opacity-30 pointer-events-none" />
+              <div className="absolute -top-20 -right-20 w-48 h-48 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none z-0 animate-float-1" />
+              <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-blue-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-float-2" />
 
-                {/* قائمة الأكورديون للجوال (أقسامنا وأسعارنا) */}
-                <div className="border border-white/5 rounded-2xl bg-white/[0.02] p-2">
-                  <button
-                    onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 text-base font-bold text-slate-300 outline-none"
+              <div className="relative z-10">
+                {/* رأس المنيو الجانبي */}
+                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/5">
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="w-6 h-6 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse" />
+                    <span className="font-black text-lg text-white">
+                      الإنارة <span className="text-blue-400">الحديثة</span>
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => setIsOpen(false)}
+                    className="p-2 rounded-full bg-white/5 text-slate-300 hover:text-white active:scale-95 transition-all"
                   >
-                    <span>{servicesDropdown.label}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isMobileDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
+                    <X className="w-5 h-5" />
                   </button>
-
-                  <AnimatePresence>
-                    {isMobileDropdownOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="overflow-hidden flex flex-col gap-1.5 px-2 mt-1 border-t border-white/5 pt-2"
-                      >
-                        {servicesDropdown.items.map((item) => {
-                          const isSubActive = location.pathname === item.path;
-                          return (
-                            <Link
-                              key={item.path}
-                              to={item.path}
-                              onClick={() => setIsOpen(false)}
-                              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                                isSubActive ? 'text-white bg-blue-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'
-                              }`}
-                            >
-                              <item.icon className="w-4 h-4 text-blue-400" />
-                              <span>{item.label}</span>
-                            </Link>
-                          )
-                        })}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
 
-                {/* باقي الروابط للجوال */}
-                {otherLinks.map((link, index) => {
-                  const isActive = location.pathname === link.path;
-                  return (
-                    <motion.div
-                      key={link.path}
-                      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                {/* روابط القائمة */}
+                <div className="flex flex-col px-5 pt-6 gap-3">
+                  {/* الرئيسية */}
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 }}>
+                    <Link
+                      to="/"
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl text-base font-bold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
+                        location.pathname === '/' 
+                          ? 'text-white bg-blue-500/15 border border-blue-400/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]' 
+                          : 'text-slate-300 hover:text-white hover:bg-white/5'
+                      }`}
                     >
-                      <Link
-                        to={link.path}
-                        onClick={() => setIsOpen(false)}
-                        className={`block relative px-5 py-3.5 rounded-2xl text-base font-bold transition-all duration-300 overflow-hidden ${
-                          isActive
-                            ? 'text-white bg-blue-500/15 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]'
-                            : 'text-slate-300 hover:text-white hover:bg-white/5'
-                        }`}
+                      <Home className="w-5 h-5 text-blue-400" />
+                      <span>الرئيسية</span>
+                    </Link>
+                  </motion.div>
+
+                  {/* قائمة الأكورديون للجوال (الأقسام والأسعار) */}
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+                    <div className="border border-white/5 rounded-2xl bg-white/[0.02] p-2 transition-all duration-300">
+                      <button
+                        onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-base font-bold text-slate-300 outline-none hover:text-white"
                       >
-                        {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                        <div className="flex items-center gap-3">
+                          <Award className="w-5 h-5 text-blue-400" />
+                          <span>{servicesDropdown.label}</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isMobileDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
+                      </button>
+
+                      <AnimatePresence>
+                        {isMobileDropdownOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="overflow-hidden flex flex-col gap-1.5 px-2 mt-1 border-t border-white/5 pt-2"
+                          >
+                            {servicesDropdown.items.map((item) => {
+                              const isSubActive = location.pathname === item.path;
+                              return (
+                                <Link
+                                  key={item.path}
+                                  to={item.path}
+                                  onClick={() => setIsOpen(false)}
+                                  className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all hover:translate-x-[-4px] ${
+                                    isSubActive ? 'text-white bg-blue-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                  }`}
+                                >
+                                  <item.icon className="w-4.5 h-4.5 text-blue-400" />
+                                  <span>{item.label}</span>
+                                </Link>
+                              )
+                            })}
+                          </motion.div>
                         )}
-                        {link.label}
-                      </Link>
-                    </motion.div>
-                  )
-                })}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
+
+                  {/* باقي الروابط للجوال */}
+                  {otherLinks.map((link, index) => {
+                    const isActive = location.pathname === link.path;
+                    return (
+                      <motion.div
+                        key={link.path}
+                        initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: (index + 3) * 0.05 }}
+                      >
+                        <Link
+                          to={link.path}
+                          onClick={() => setIsOpen(false)}
+                          className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl text-base font-bold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
+                            isActive
+                              ? 'text-white bg-blue-500/15 border border-blue-400/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                              : 'text-slate-300 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <link.icon className="w-5 h-5 text-blue-400" />
+                          <span>{link.label}</span>
+                        </Link>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* ذيل القائمة الجانبية (بيانات التواصل والروابط الاجتماعية) */}
+              <div className="relative z-10 p-6 border-t border-white/5 bg-white/[0.01] flex flex-col gap-4">
+                <div className="text-right">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1">مركز الاتصال</span>
+                  <a href="tel:+218910000000" className="text-sm font-bold text-white flex items-center justify-end gap-2 hover:text-blue-400 transition-colors">
+                    <span>091 000 0000</span>
+                    <Phone className="w-4 h-4 text-blue-400" />
+                  </a>
+                </div>
+                
+                {/* روابط التواصل الاجتماعي */}
+                <div className="flex items-center gap-3 justify-end mt-2">
+                  <a href="#" className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-blue-600 transition-all active:scale-90">
+                    <Facebook className="w-4.5 h-4.5" />
+                  </a>
+                  <a href="#" className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-pink-600 transition-all active:scale-90">
+                    <Instagram className="w-4.5 h-4.5" />
+                  </a>
+                </div>
               </div>
             </motion.div>
           </motion.div>
