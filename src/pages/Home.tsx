@@ -44,24 +44,38 @@ export default function Home() {
   const [orderStatus, setOrderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   useEffect(() => {
-    const handleLoad = () => {
-      setPageLoading(false)
-    }
+    const startTime = Date.now();
+
+    const hideLoader = () => {
+      const elapsedTime = Date.now() - startTime;
+      const minDuration = 1200; // وقت أدنى 1.2 ثانية لتظهر شاشة التحميل بشكل أنيق
+
+      if (elapsedTime >= minDuration) {
+        setPageLoading(false);
+      } else {
+        setTimeout(() => {
+          setPageLoading(false);
+        }, minDuration - elapsedTime);
+      }
+    };
 
     if (document.readyState === 'complete') {
-      setPageLoading(false)
+      hideLoader();
     } else {
-      window.addEventListener('load', handleLoad)
-    }
+      const handleLoad = () => {
+        hideLoader();
+      };
+      window.addEventListener('load', handleLoad);
 
-    // كحد أقصى ثانيتين في حال كان هناك أي عنصر بطيء التحميل لمنع الملل
-    const timeout = setTimeout(() => {
-      setPageLoading(false)
-    }, 2000)
+      // احتياطياً في حال تعطل أي عنصر أو استغرق طويلاً، يختفي بعد ثانيتين
+      const backupTimeout = setTimeout(() => {
+        setPageLoading(false);
+      }, 2000);
 
-    return () => {
-      window.removeEventListener('load', handleLoad)
-      clearTimeout(timeout)
+      return () => {
+        window.removeEventListener('load', handleLoad);
+        clearTimeout(backupTimeout);
+      };
     }
   }, [])
 
