@@ -30,6 +30,8 @@
     .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; margin-top: 25px; }
     .delete-btn { margin-top: 14px; width: 100%; padding: 12px; border: none; border-radius: 10px; background: red; color: white; cursor: pointer; font-size: 15px; font-weight: bold; }
     .delete-btn:hover { opacity: 0.9; }
+    .edit-btn { margin-top: 14px; width: 100%; padding: 12px; border: none; border-radius: 10px; background: #3b82f6; color: white; cursor: pointer; font-size: 15px; font-weight: bold; }
+    .edit-btn:hover { opacity: 0.9; }
     .label { font-weight: bold; color: #94a3b8; }
     /* ستايل نافذة الأسعار */
     .modal-input { width: 100px; padding: 8px; border-radius: 8px; text-align: center; border: 1px solid #3b82f6; background: #06152b; color: white; font-weight: bold;}
@@ -79,6 +81,42 @@
        <div style="display:flex; gap:10px; margin-top:25px;">
          <button id="savePricesBtn" onclick="saveWirePrices()" style="flex:1; padding:12px; background:#3b82f6; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">حفظ ونشر</button>
          <button onclick="closeWireModal()" style="flex:1; padding:12px; background:#f43f5e; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">إلغاء</button>
+       </div>
+    </div>
+  </div>
+
+  <!-- نافذة تعديل المنتجات والمشاريع المنبثقة -->
+  <div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; justify-content:center; align-items:center; padding: 20px;">
+    <div style="background:#0d2342; padding:30px; border-radius:20px; width:100%; max-width:450px; border:1px solid rgba(59,130,246,0.3); box-shadow: 0 0 30px rgba(59,130,246,0.2); max-height: 90vh; overflow-y: auto;">
+       <h2 id="editModalTitle" style="margin-top:0; color:white; text-align:center;">تعديل العنصر</h2>
+       <input type="hidden" id="edit_id" />
+       <input type="hidden" id="edit_type" />
+       
+       <div style="margin-top:20px;">
+         <div style="margin-bottom: 15px;">
+           <label style="display:block; margin-bottom:5px; font-weight:bold;">الاسم / العنوان:</label>
+           <input type="text" id="edit_name" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+         </div>
+         <div style="margin-bottom: 15px;">
+           <label style="display:block; margin-bottom:5px; font-weight:bold;">الوصف:</label>
+           <textarea id="edit_description" style="width:100%; min-height:80px; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box; resize: vertical;"></textarea>
+         </div>
+         <div style="margin-bottom: 15px;">
+           <label style="display:block; margin-bottom:5px; font-weight:bold;">رابط الصورة:</label>
+           <input type="text" id="edit_imageUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+         </div>
+         <div style="margin-bottom: 15px;">
+           <label style="display:block; margin-bottom:5px; font-weight:bold;">رابط الفيديو (اختياري):</label>
+           <input type="text" id="edit_videoUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+         </div>
+         <div id="editCategoryRow" style="margin-bottom: 15px; display: none;">
+           <label style="display:block; margin-bottom:5px; font-weight:bold;">التصنيف (للمشاريع):</label>
+           <input type="text" id="edit_category" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+         </div>
+       </div>
+       <div style="display:flex; gap:10px; margin-top:25px;">
+         <button id="saveEditBtn" onclick="saveItemEdit()" style="flex:1; padding:12px; background:#10b981; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:16px;">حفظ التغييرات</button>
+         <button onclick="closeEditModal()" style="flex:1; padding:12px; background:#f43f5e; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:16px;">إلغاء</button>
        </div>
     </div>
   </div>
@@ -138,14 +176,20 @@
             <h3>${item.name || "مشروع بدون اسم"}</h3>
             <p><span class="label">التصنيف:</span> ${media.category || "غير محدد"}</p>
             <p>${media.description || ""}</p>
-            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المشروع</button>`;
+            <div style="display: flex; gap: 10px; margin-top: 14px;">
+              <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
+              <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
+            </div>`;
         }
         else {
           card.innerHTML = `<span class="badge product-badge">منتج 🔵</span>
             ${media.imageUrl ? `<img src="${media.imageUrl}" alt="product image" />` : ""}
             <h3>${item.name || "منتج بدون اسم"}</h3>
             <p>${media.description || ""}</p>
-            <button class="delete-btn" onclick="deleteItem('${item._id}')">حذف المنتج</button>`;
+            <div style="display: flex; gap: 10px; margin-top: 14px;">
+              <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
+              <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
+            </div>`;
         }
         container.appendChild(card);
       });
@@ -208,6 +252,102 @@
       btn.innerText = 'حفظ ونشر';
       closeWireModal();
       loadItems();
+    }
+
+    // دوال تعديل المنتجات والمشاريع
+    function openEditModal(id) {
+      const item = allItems.find(i => i._id === id);
+      if (!item) return;
+
+      document.getElementById('edit_id').value = id;
+      document.getElementById('edit_name').value = item.name || '';
+      
+      let media = {};
+      try {
+        media = item.phone ? JSON.parse(item.phone) : {};
+      } catch (e) {
+        media = {};
+      }
+      
+      document.getElementById('edit_type').value = media.type || 'product';
+      document.getElementById('edit_description').value = media.description || '';
+      document.getElementById('edit_imageUrl').value = media.imageUrl || '';
+      document.getElementById('edit_videoUrl').value = media.videoUrl || '';
+      
+      const categoryRow = document.getElementById('editCategoryRow');
+      const categoryInput = document.getElementById('edit_category');
+      
+      if (media.type === 'project') {
+        categoryRow.style.display = 'block';
+        categoryInput.value = media.category || '';
+        document.getElementById('editModalTitle').innerText = 'تعديل المشروع 🟡';
+      } else {
+        categoryRow.style.display = 'none';
+        categoryInput.value = '';
+        document.getElementById('editModalTitle').innerText = 'تعديل المنتج 🔵';
+      }
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function saveItemEdit() {
+      const id = document.getElementById('edit_id').value;
+      const name = document.getElementById('edit_name').value.trim();
+      const type = document.getElementById('edit_type').value;
+      const description = document.getElementById('edit_description').value.trim();
+      const imageUrl = document.getElementById('edit_imageUrl').value.trim();
+      const videoUrl = document.getElementById('edit_videoUrl').value.trim();
+      const category = document.getElementById('edit_category').value.trim();
+
+      if (!name) {
+        alert('الاسم مطلوب.');
+        return;
+      }
+
+      const saveEditBtn = document.getElementById('saveEditBtn');
+      saveEditBtn.innerText = 'جاري الحفظ...';
+      saveEditBtn.disabled = true;
+
+      try {
+        const phoneObj = {
+          imageUrl,
+          videoUrl,
+          description,
+          type,
+        };
+        if (type === 'project') {
+          phoneObj.category = category;
+        }
+
+        const res = await fetch("/api/update-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id,
+            name,
+            phone: JSON.stringify(phoneObj)
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          alert('تم تعديل البيانات بنجاح!');
+          closeEditModal();
+          loadItems();
+        } else {
+          alert(data.error || 'حدث خطأ أثناء التعديل');
+        }
+      } catch (error) {
+        alert('فشل في الاتصال بالسيرفر.');
+      } finally {
+        saveEditBtn.innerText = 'حفظ التغييرات';
+        saveEditBtn.disabled = false;
+      }
     }
 
     loadItems();
