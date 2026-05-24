@@ -191,9 +191,15 @@ export default function Home() {
               </div>
 
               {/* الاسم المتوهج */}
-              <h2 className="text-3xl font-extrabold text-white mb-2 tracking-wider" style={glowingTitleStyle}>
+              <motion.h2 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15, duration: 0.4, ease: 'easeOut' }}
+                className="text-3xl font-black text-white mb-2 tracking-wider" 
+                style={glowingTitleStyle}
+              >
                 الإنارة <span className="text-blue-300">الحديثة</span>
-              </h2>
+              </motion.h2>
               <div className="flex items-center gap-1.5 mt-2">
                 <span className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                 <span className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
@@ -229,7 +235,7 @@ export default function Home() {
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
             <div className="p-6 md:p-12 transition-all">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-6 leading-tight" style={glowingTitleStyle}>الإنارة <span className="text-blue-300">الحديثة</span></h1>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 leading-tight" style={glowingTitleStyle}>الإنارة <span className="text-blue-300">الحديثة</span></h1>
               <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
                 <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-blue-600 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center gap-3">
