@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
-  TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb
+  TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb,
+  Facebook, Instagram
 } from 'lucide-react'
 
 // نمط الوهج
@@ -246,6 +247,40 @@ export default function Home() {
                   تواصل معنا
                 </Link>
               </div>
+
+              {/* روابط التواصل الاجتماعي للفيسبوك وتيك توك وإنستغرام */}
+              <div className="flex flex-wrap items-center justify-center gap-4 mt-12">
+                <span className="text-slate-400 text-sm font-semibold">تابعنا على:</span>
+                <a 
+                  href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-blue-400 hover:text-white hover:bg-blue-600 hover:border-blue-500 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm font-bold shadow-[0_0_15px_rgba(59,130,246,0.05)]"
+                >
+                  <Facebook className="w-4.5 h-4.5" />
+                  فيسبوك
+                </a>
+                <a 
+                  href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:border-pink-500 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm font-bold shadow-[0_0_15px_rgba(236,72,153,0.05)]"
+                >
+                  <Instagram className="w-4.5 h-4.5" />
+                  إنستغرام
+                </a>
+                <a 
+                  href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 hover:text-white hover:bg-black hover:border-slate-800 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm font-bold shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                >
+                  <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
+                  </svg>
+                  تيك توك
+                </a>
+              </div>
             </div>
           </div>
         </section>
@@ -413,6 +448,39 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* 🚀 الأيقونات الاجتماعية العائمة */}
+        <div className="fixed left-6 bottom-24 z-40 hidden md:flex flex-col gap-3 animate-fade-in">
+          <a 
+            href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-blue-400 hover:text-white hover:bg-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+            title="تابعنا على فيسبوك"
+          >
+            <Facebook className="w-5 h-5" />
+          </a>
+          <a 
+            href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(236,72,153,0.1)] hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]"
+            title="تابعنا على إنستغرام"
+          >
+            <Instagram className="w-5 h-5" />
+          </a>
+          <a 
+            href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-slate-300 hover:text-white hover:bg-black flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            title="تابعنا على تيك توك"
+          >
+            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
+            </svg>
+          </a>
+        </div>
 
       </div>
     </>
