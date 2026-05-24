@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
-  TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle
+  TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb
 } from 'lucide-react'
 
 // نمط الوهج
@@ -186,7 +186,7 @@ export default function Home() {
                 <div className="absolute inset-2 rounded-full border-4 border-blue-300/10"></div>
                 <div className="absolute inset-2 rounded-full border-4 border-b-blue-300 animate-spin [animation-direction:reverse] [animation-duration:1.5s]"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-blue-300 animate-pulse" />
+                  <Lightbulb className="w-9 h-9 text-blue-300 animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
                 </div>
               </div>
 
@@ -210,7 +210,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="pt-0 relative cursor-default bg-[#0a192f] text-white">
+      <div className="pt-0 relative cursor-default bg-[#0a192f] bg-animated-grid text-white">
         
         {/* 1. الواجهة الترحيبية بالفيديو فائق السرعة */}
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -252,9 +252,9 @@ export default function Home() {
 
         {/* 2. لماذا نحن */}
         <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
-          {/* بقع توهج نيونية خفيفة */}
-          <div className="absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-          <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0" />
+          {/* بقع توهج نيونية خفيفة عائمة */}
+          <div className="absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0 animate-float-1" />
+          <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0 animate-float-2" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12 md:mb-16">
@@ -281,9 +281,9 @@ export default function Home() {
 
         {/* 3. جزء من مشاريعنا */}
         <section id="featured-projects" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
-          {/* بقع توهج نيونية خفيفة */}
-          <div className="absolute top-1/3 right-0 w-80 h-80 bg-blue-50/5 rounded-full blur-[150px] pointer-events-none z-0" />
-          <div className="absolute bottom-1/3 left-0 w-80 h-80 bg-blue-400/10 rounded-full blur-[150px] pointer-events-none z-0" />
+          {/* بقع توهج نيونية خفيفة عائمة */}
+          <div className="absolute top-1/3 right-0 w-80 h-80 bg-blue-50/5 rounded-full blur-[150px] pointer-events-none z-0 animate-float-2" />
+          <div className="absolute bottom-1/3 left-0 w-80 h-80 bg-blue-400/10 rounded-full blur-[150px] pointer-events-none z-0 animate-float-1" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
