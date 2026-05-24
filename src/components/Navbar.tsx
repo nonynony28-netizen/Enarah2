@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
-  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Facebook, Instagram 
+  Home, BookOpen, Info, MapPin, PhoneCall, Phone 
 } from 'lucide-react'
 
 // نمط الوهج للعناوين والشعارات المضيئة
@@ -315,19 +315,9 @@ export default function Navbar() {
               <div className="relative z-10 p-6 border-t border-white/5 bg-white/[0.01] flex flex-col gap-4">
                 <div className="text-right">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1">مركز الاتصال</span>
-                  <a href="tel:+218910000000" className="text-sm font-bold text-white flex items-center justify-end gap-2 hover:text-blue-400 transition-colors">
-                    <span>091 000 0000</span>
+                  <a href="tel:0916580068" className="text-sm font-bold text-white flex items-center justify-end gap-2 hover:text-blue-400 transition-colors">
+                    <span>0916580068</span>
                     <Phone className="w-4 h-4 text-blue-400" />
-                  </a>
-                </div>
-                
-                {/* روابط التواصل الاجتماعي */}
-                <div className="flex items-center gap-3 justify-end mt-2">
-                  <a href="#" className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-blue-600 transition-all active:scale-90">
-                    <Facebook className="w-4.5 h-4.5" />
-                  </a>
-                  <a href="#" className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-pink-600 transition-all active:scale-90">
-                    <Instagram className="w-4.5 h-4.5" />
                   </a>
                 </div>
               </div>
