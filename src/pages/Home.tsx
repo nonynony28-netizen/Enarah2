@@ -13,7 +13,7 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: nu
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '50px' })
   return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} transition={{ duration: 0.5, delay, ease: "easeOut" }} style={{ willChange: "opacity, transform" }}>
+    <motion.div ref={ref} initial={{ opacity: 0, y: 15 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }} transition={{ duration: 0.5, delay, ease: "easeOut" }} style={{ willChange: "opacity, transform" }}>
       {children}
     </motion.div>
   )
@@ -238,11 +238,11 @@ export default function Home() {
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 leading-tight" style={glowingTitleStyle}>الإنارة <span className="text-blue-300">الحديثة</span></h1>
               <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
-                <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-blue-600 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center gap-3">
+                <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-blue-600 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98]">
                   استعرض المنتجات
                   <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform duration-300" />
                 </Link>
-                <Link to="/contact" className="px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-white/5 border border-white/10 text-white font-bold text-base md:text-lg rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors">
+                <Link to="/contact" className="px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-white/5 border border-white/10 text-white font-bold text-base md:text-lg rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
                   تواصل معنا
                 </Link>
               </div>
@@ -252,6 +252,10 @@ export default function Home() {
 
         {/* 2. لماذا نحن */}
         <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+          {/* بقع توهج نيونية خفيفة */}
+          <div className="absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
+          <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0" />
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12 md:mb-16">
               <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6" style={glowingTitleStyle}>لماذا نحن؟</h2>
@@ -264,7 +268,7 @@ export default function Home() {
                 { icon: Sparkles, title: 'احترافية بالعمل', desc: 'فريقنا الهندسي متخصص في مساعدتك لاختيار الحلول المثالية والتصاميم لمشروعك.' },
               ].map((item, i) => (
                 <FadeIn key={item.title} delay={i * 0.1}>
-                  <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-6 md:p-8 h-full hover:border-blue-500/30 transition-colors">
+                  <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-6 md:p-8 h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300">
                     <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mb-6"><item.icon className="w-8 h-8 text-blue-400" /></div>
                     <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
                     <p className="text-slate-400 text-base leading-relaxed">{item.desc}</p>
@@ -277,13 +281,17 @@ export default function Home() {
 
         {/* 3. جزء من مشاريعنا */}
         <section id="featured-projects" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+          {/* بقع توهج نيونية خفيفة */}
+          <div className="absolute top-1/3 right-0 w-80 h-80 bg-blue-50/5 rounded-full blur-[150px] pointer-events-none z-0" />
+          <div className="absolute bottom-1/3 left-0 w-80 h-80 bg-blue-400/10 rounded-full blur-[150px] pointer-events-none z-0" />
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
               <div>
                 <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4" style={glowingTitleStyle}>جزء من مشاريعنا</h2>
                 <div className="w-20 h-1.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
               </div>
-              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all">
+              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
                 شاهد كل المشاريع <ArrowLeft className="w-5 h-5" />
               </Link>
             </div>
@@ -296,7 +304,7 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                 {featuredProjects.map((project) => (
-                  <div key={project.id} className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/30 transition-colors">
+                  <div key={project.id} className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
                       <img src={project.image} alt={project.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
@@ -330,7 +338,7 @@ export default function Home() {
               </div>
               <div className="divide-y divide-white/5">
                 {wirePrices.map((wire, idx) => (
-                  <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/5 transition-colors">
+                  <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] border-r-2 border-transparent hover:border-blue-500 transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-[#0a192f] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">{idx + 1}</div>
                       <div><h4 className="text-lg font-bold text-white mb-0.5">{wire.size}</h4><p className="text-xs text-slate-400">{wire.type}</p></div>
@@ -341,7 +349,7 @@ export default function Home() {
                         <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${wire.trend === 'up' ? 'bg-green-500/10 border-green-500/30 text-green-400' : wire.trend === 'down' ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-slate-500/10 border-slate-500/30 text-slate-400'}`}>
                           {wire.trend === 'up' && <TrendingUp className="w-4 h-4" />}{wire.trend === 'down' && <TrendingDown className="w-4 h-4" />}{wire.trend === 'same' && <Minus className="w-4 h-4" />}
                         </div>
-                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:bg-blue-500 transition-colors"><ShoppingCart className="w-4 h-4" /> اطلب الآن</button>
+                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97]"><ShoppingCart className="w-4 h-4" /> اطلب الآن</button>
                       </div>
                     </div>
                   </div>
