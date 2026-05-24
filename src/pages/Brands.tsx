@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom' // استدعاء الرابط
@@ -32,24 +32,16 @@ function FadeIn({
   )
 }
 
-type Brand = {
-  name: string
-  description: string
-  image: string
-}
+// 👈 هنا قمنا بوضع رابط صورتك الجديد مباشرة في الكود بدلاً من ملف خارجي
+const brands = [
+  {
+    name: "الوكالات العالمية",
+    description: "نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية",
+    image: "https://i.postimg.cc/9XqR1x8c/IMG-3397.webp" // 👈 رابط صورتك الجديد
+  }
+]
 
 export default function Brands() {
-  const [brands, setBrands] = useState<Brand[]>([])
-
-  useEffect(() => {
-    fetch('/brands.json')
-      .then((res) => res.json())
-      .then((data) => setBrands(data))
-      .catch((error) => {
-        console.error('Brands JSON Error:', error)
-      })
-  }, [])
-
   return (
     <div className="pt-24 md:pt-32 pb-24 bg-[#0a192f] min-h-screen relative overflow-hidden text-white">
       
