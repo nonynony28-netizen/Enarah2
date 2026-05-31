@@ -60,7 +60,7 @@
     <label for="description">الوصف التفصيلي</label>
     <textarea id="description" placeholder="اكتب وصفاً جذاباً هنا..."></textarea>
 
-    <label for="imageUrl">رابط الصورة</label>
+    <label for="imageUrl" id="imageLabel">رابط الصورة</label>
     <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg" />
 
     <label for="videoUrl">رابط الفيديو (اختياري)</label>
@@ -77,9 +77,21 @@
     const itemTypeSelect = document.getElementById("itemType");
     const categoryContainer = document.getElementById("categoryContainer");
 
-    // إظهار حقل التصنيف فقط إذا كان الاختيار "مشروع"
+    // إظهار حقل التصنيف وتعديل حقل الصور بناءً على الاختيار
     itemTypeSelect.addEventListener("change", (e) => {
-      categoryContainer.style.display = e.target.value === "project" ? "block" : "none";
+      const isProject = e.target.value === "project";
+      categoryContainer.style.display = isProject ? "block" : "none";
+      
+      const imageLabel = document.getElementById("imageLabel");
+      const imageUrlInput = document.getElementById("imageUrl");
+      
+      if (isProject) {
+        imageLabel.textContent = 'روابط الصور (يمكنك وضع عدة روابط مفصولة بفاصلة ",")';
+        imageUrlInput.placeholder = "https://example.com/1.jpg, https://example.com/2.jpg";
+      } else {
+        imageLabel.textContent = 'رابط الصورة';
+        imageUrlInput.placeholder = "https://example.com/image.jpg";
+      }
     });
 
     saveBtn.addEventListener("click", async () => {
