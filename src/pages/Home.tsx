@@ -533,7 +533,7 @@ export default function Home() {
                   >
                     <X className="w-5 h-5" />
                   </button>
-                  
+
                   {/* الجانب الأيمن (معرض الصور) */}
                   <div className="w-full lg:w-2/3 p-5 md:p-8 flex flex-col justify-between border-b lg:border-b-0 lg:border-l border-white/5 bg-black/25">
                     <div className="relative aspect-[4/3] w-full max-h-[45vh] lg:max-h-[50vh] rounded-[1.8rem] overflow-hidden bg-[#0a192f] flex items-center justify-center shadow-inner group/viewer">
@@ -649,7 +649,7 @@ export default function Home() {
             href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-slate-300 hover:text-white hover:bg-black flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-slate-300 hover:text-white hover:bg-black flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
             title="تابعنا على تيك توك"
           >
             <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">

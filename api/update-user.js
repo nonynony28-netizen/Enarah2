@@ -41,7 +41,7 @@ async function connectToDatabase() {
 // API Handler
 // =====================================
 export default async function handler(req, res) {
-  // إعدادات CORS
+  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -105,7 +105,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // تجهيز حقول التحديث
+    // Prepare update payload
     const updateData = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;

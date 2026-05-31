@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 
 import SplashScreen from './components/SplashScreen'
 import WhatsAppButton from './components/WhatsAppButton'
+import AIChatWidget from './components/AIChatWidget'
 import Layout from './Layout'
 
 import Home from './pages/Home'
@@ -93,6 +94,7 @@ function App() {
       </Routes>
 
       <WhatsAppButton />
+      <AIChatWidget />
     </>
   )
 }
