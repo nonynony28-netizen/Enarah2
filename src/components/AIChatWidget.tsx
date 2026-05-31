@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, X, Send, Bot, Loader2 } from 'lucide-react'
+import { Lightbulb, X, Send, Bot, Loader2 } from 'lucide-react'
 
 type Message = {
   id: string
@@ -122,37 +122,61 @@ export default function AIChatWidget() {
   return (
     <>
       {/* زر الشات العائم */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-[92px] right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 hover:from-blue-500 hover:to-blue-300 flex items-center justify-center text-white shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:shadow-[0_0_35px_rgba(59,130,246,0.85)] hover:scale-110 active:scale-95 transition-all duration-300 group"
-        aria-label="مساعد الذكاء الاصطناعي"
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
+      <div className="fixed bottom-[92px] right-6 z-50 flex items-center">
+        {/* فقاعة المحادثة الإبداعية "مساعدك الذكي" */}
+        <AnimatePresence>
+          {!isOpen && (
             <motion.div
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, x: 20, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 10, scale: 0.9 }}
+              transition={{ delay: 0.5, duration: 0.4 }}
+              className="relative ml-auto mr-4 px-4 py-2.5 rounded-2xl bg-[#0d2342]/95 border border-blue-500/30 text-blue-100 text-xs font-bold whitespace-nowrap shadow-[0_0_20px_rgba(59,130,246,0.2)] flex items-center gap-2 select-none pointer-events-none"
+              style={{ textShadow: '0 0 10px rgba(59, 130, 246, 0.4)' }}
             >
-              <X className="w-7 h-7" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="chat"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="relative flex items-center justify-center"
-            >
-              <Sparkles className="w-7 h-7 text-white animate-pulse" />
-              <span className="absolute -top-1 -left-1 w-3 h-3 bg-green-400 border-2 border-blue-500 rounded-full"></span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+              اسأل مساعدك الذكي 💡
+              {/* ذيل الفقاعة الصغير */}
+              <div className="absolute top-1/2 -right-[6px] -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent border-l-[6px] border-l-[#0d2342]" />
             </motion.div>
           )}
         </AnimatePresence>
-      </button>
+
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 hover:from-blue-500 hover:to-blue-300 flex items-center justify-center text-white shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:shadow-[0_0_35px_rgba(59,130,246,0.85)] hover:scale-110 active:scale-95 transition-all duration-300 group"
+          aria-label="مساعد الذكاء الاصطناعي"
+        >
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X className="w-7 h-7" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="chat"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="relative flex items-center justify-center"
+              >
+                <Lightbulb className="w-7 h-7 text-white animate-pulse" />
+                <span className="absolute -top-1 -left-1 w-3 h-3 bg-green-400 border-2 border-blue-500 rounded-full"></span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </button>
+      </div>
 
       {/* نافذة الشات */}
       <AnimatePresence>
