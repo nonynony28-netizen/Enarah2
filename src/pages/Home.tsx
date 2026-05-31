@@ -4,7 +4,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb,
-  Facebook, Instagram
+  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle
 } from 'lucide-react'
 
 // نمط الوهج
@@ -20,7 +20,7 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: nu
   )
 }
 
-type ProjectItem = { id: string; name: string; description: string; image: string; category: string }
+type ProjectItem = { id: string; name: string; description: string; image: string; coverImage: string; video?: string; category: string }
 type TrendType = 'up' | 'down' | 'same'
 
 const defaultWireData = [
@@ -43,6 +43,9 @@ export default function Home() {
   const [selectedWire, setSelectedWire] = useState<typeof wirePrices[0] | null>(null)
   const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
   const [orderStatus, setOrderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   useEffect(() => {
     const startTime = Date.now();
@@ -99,11 +102,18 @@ export default function Home() {
             .map((item: any, index: number) => {
               let mediaData: any = {}
               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
+
+              const rawImage = mediaData.imageUrl || '/images/default-product.jpg'
+              const imageUrls = rawImage.split(',').map((url: string) => url.trim()).filter(Boolean)
+              const coverImage = imageUrls[0] || '/images/default-product.jpg'
+
               return {
                 id: item._id || String(index),
                 name: item.name || 'مشروع مميز',
                 description: mediaData.description || '',
-                image: mediaData.imageUrl || '/images/default-product.jpg',
+                image: rawImage,
+                coverImage: coverImage,
+                video: mediaData.videoUrl || '',
                 category: mediaData.category || 'مشاريعنا',
               }
             })
@@ -166,6 +176,20 @@ export default function Home() {
         setOrderForm({ phone: '', city: '', quantity: 1 })
       }, 3000)
     } catch { setOrderStatus('error') }
+  }
+
+  // فتح معرض الصور للمشروع
+  const openGallery = (project: ProjectItem) => {
+    setSelectedProject(project)
+    setActiveImageIndex(0)
+  }
+
+  const handleNextImage = (length: number) => {
+    setActiveImageIndex((prev) => (prev + 1) % length)
+  }
+
+  const handlePrevImage = (length: number) => {
+    setActiveImageIndex((prev) => (prev - 1 + length) % length)
   }
 
   return (
@@ -339,15 +363,43 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                 {featuredProjects.map((project) => (
-                  <div key={project.id} className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300">
+                  <div 
+                    key={project.id} 
+                    onClick={() => openGallery(project)}
+                    className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
+                  >
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
-                      <img src={project.image} alt={project.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                      <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
-                      <div className="absolute top-4 right-4 z-20"><span className="px-4 py-1.5 bg-blue-500/20 text-blue-200 text-xs font-bold rounded-full">{project.category}</span></div>
+                      
+                      <div className="absolute top-4 right-4 z-20">
+                        <span className="px-4 py-1.5 bg-[#0a192f]/80 border border-blue-500/30 text-blue-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                          {project.category}
+                        </span>
+                      </div>
+                      
+                      {project.video && (
+                        <div className="absolute top-4 left-4 z-20 bg-[#0a192f]/80 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                          <PlayCircle className="w-4 h-4 text-blue-400" />
+                          <span className="text-white text-xs font-bold">فيديو</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="p-6 relative z-20 flex-grow flex flex-col">
-                      <h3 className="text-xl font-bold text-white mb-3 line-clamp-1">{project.name}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed flex-grow line-clamp-2">{project.description}</p>
+                    
+                    <div className="p-6 relative z-20 flex-grow flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors mb-3 line-clamp-1">{project.name}</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed line-clamp-2 mb-4">{project.description}</p>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-xs text-blue-400 font-bold border-t border-white/5 pt-3">
+                        <span>عرض تفاصيل المعرض ←</span>
+                        {project.image.includes(',') && (
+                          <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
+                            +{project.image.split(',').length - 1} صور
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -449,6 +501,130 @@ export default function Home() {
           )}
         </AnimatePresence>
 
+        {/* معرض الصور المنبثق التفاعلي للمشاريع (Lightbox Gallery) */}
+        <AnimatePresence>
+          {selectedProject && (() => {
+            const imageUrls = selectedProject.image
+              .split(',')
+              .map((url) => url.trim())
+              .filter(Boolean)
+
+            return (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/95 backdrop-blur-md overflow-y-auto"
+              >
+                <div className="absolute inset-0 z-0" onClick={() => setSelectedProject(null)} />
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 30, scale: 0.95 }}
+                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                  className="relative z-10 w-full max-w-5xl bg-[#0d2342]/95 border border-blue-500/25 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row max-h-[90vh] lg:max-h-[85vh]"
+                >
+                  {/* زر الإغلاق */}
+                  <button
+                    onClick={() => setSelectedProject(null)}
+                    className="absolute top-5 left-5 z-30 p-2.5 bg-white/5 hover:bg-red-500/80 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-300 active:scale-95 shadow-md"
+                    aria-label="إغلاق المعرض"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  
+                  {/* الجانب الأيمن (معرض الصور) */}
+                  <div className="w-full lg:w-2/3 p-5 md:p-8 flex flex-col justify-between border-b lg:border-b-0 lg:border-l border-white/5 bg-black/25">
+                    <div className="relative aspect-[4/3] w-full max-h-[45vh] lg:max-h-[50vh] rounded-[1.8rem] overflow-hidden bg-[#0a192f] flex items-center justify-center shadow-inner group/viewer">
+                      <motion.img
+                        key={activeImageIndex}
+                        src={imageUrls[activeImageIndex] || '/images/default-product.jpg'}
+                        alt={`${selectedProject.name} image`}
+                        initial={{ opacity: 0, scale: 1.02 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }}
+                      />
+                      
+                      {/* أزرار التنقل */}
+                      {imageUrls.length > 1 && (
+                        <>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handlePrevImage(imageUrls.length); }}
+                            className="absolute right-4 p-3 bg-black/40 hover:bg-blue-600/80 border border-white/5 text-white rounded-2xl transition-all duration-300 active:scale-90 shadow-md backdrop-blur-sm"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleNextImage(imageUrls.length); }}
+                            className="absolute left-4 p-3 bg-black/40 hover:bg-blue-600/80 border border-white/5 text-white rounded-2xl transition-all duration-300 active:scale-90 shadow-md backdrop-blur-sm"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {/* الصور المصغرة */}
+                    {imageUrls.length > 1 && (
+                      <div className="flex items-center gap-3 overflow-x-auto py-3 px-1 mt-4 scrollbar-thin scrollbar-thumb-white/10 justify-center">
+                        {imageUrls.map((url, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setActiveImageIndex(idx)}
+                            className={`relative w-16 h-12 rounded-xl overflow-hidden border-2 transition-all duration-300 flex-shrink-0 ${
+                              idx === activeImageIndex
+                                ? 'border-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.6)] scale-105'
+                                : 'border-white/10 opacity-60 hover:opacity-100 hover:border-white/30'
+                            }`}
+                          >
+                            <img src={url} alt="thumbnail" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* الجانب الأيسر (تفاصيل المشروع) */}
+                  <div className="w-full lg:w-1/3 p-6 md:p-8 flex flex-col justify-between overflow-y-auto">
+                    <div className="space-y-6">
+                      <div>
+                        <span className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.1)] inline-block mb-3">
+                          {selectedProject.category}
+                        </span>
+                        <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">{selectedProject.name}</h2>
+                      </div>
+
+                      <div className="h-px bg-white/5 w-full" />
+
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-bold text-slate-400 font-sans">عن المشروع:</h4>
+                        <p className="text-slate-300 text-base leading-relaxed whitespace-pre-wrap font-medium">{selectedProject.description}</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-8 space-y-3">
+                      {selectedProject.video && (
+                        <a
+                          href={selectedProject.video}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-base rounded-2xl transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.35)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] active:scale-98"
+                        >
+                          <PlayCircle className="w-5.5 h-5.5" />
+                          شاهد فيديو المشروع
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )
+          })()}
+        </AnimatePresence>
+
         {/* 🚀 الأيقونات الاجتماعية العائمة */}
         <div className="fixed left-6 bottom-24 z-40 hidden md:flex flex-col gap-3 animate-fade-in">
           <a 
@@ -473,7 +649,7 @@ export default function Home() {
             href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-slate-300 hover:text-white hover:bg-black flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-slate-300 hover:text-white hover:bg-black flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
             title="تابعنا على تيك توك"
           >
             <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
