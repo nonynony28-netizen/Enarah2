@@ -131,7 +131,8 @@ export default function AIChatWidget() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 10, scale: 0.9 }}
               transition={{ delay: 0.5, duration: 0.4 }}
-              className="relative ml-auto mr-4 px-4 py-2.5 rounded-2xl bg-[#0d2342]/95 border border-blue-500/30 text-blue-100 text-xs font-bold whitespace-nowrap shadow-[0_0_20px_rgba(59,130,246,0.2)] flex items-center gap-2 select-none pointer-events-none"
+              onClick={() => setIsOpen(true)}
+              className="relative ml-auto mr-4 px-4 py-2.5 rounded-2xl bg-[#0d2342]/95 border border-blue-500/30 text-blue-100 text-xs font-bold whitespace-nowrap shadow-[0_0_20px_rgba(59,130,246,0.2)] flex items-center gap-2 select-none cursor-pointer hover:bg-[#122e54] hover:border-blue-500/50 transition-all duration-300"
               style={{ textShadow: '0 0 10px rgba(59, 130, 246, 0.4)' }}
             >
               <span className="relative flex h-2 w-2">
