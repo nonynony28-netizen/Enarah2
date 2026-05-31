@@ -122,7 +122,7 @@ export default function AIChatWidget() {
   return (
     <>
       {/* زر الشات العائم */}
-      <div className="fixed bottom-[92px] right-6 z-50 flex items-center">
+      <div className="fixed bottom-6 right-[96px] z-50 flex items-center">
         {/* فقاعة المحادثة الإبداعية "مساعدك الذكي" */}
         <AnimatePresence>
           {!isOpen && (
@@ -186,7 +186,7 @@ export default function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="fixed bottom-[168px] left-4 right-4 md:left-auto md:right-6 z-50 w-auto md:w-[400px] h-[500px] md:h-[600px] bg-[#0a192f]/95 backdrop-blur-xl border border-blue-500/25 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden text-right"
+            className="fixed bottom-[100px] left-4 right-4 md:left-auto md:right-[96px] z-50 w-auto md:w-[400px] h-[500px] md:h-[600px] bg-[#0a192f]/95 backdrop-blur-xl border border-blue-500/25 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden text-right"
           >
             {/* الخلفيات الجمالية لتصميم نيون راقي */}
             <div className="absolute inset-0 bg-animated-grid opacity-10 pointer-events-none z-0" />
