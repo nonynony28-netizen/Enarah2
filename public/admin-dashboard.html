@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>لوحة التحكم</title>
   <style>
-    body { margin: 0; font-family: Arial; background: #06152b; color: white; padding: 20px; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #06152b; color: white; padding: 20px; }
     h1 { text-align: center; margin-bottom: 30px; }
     .stats-container { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
     .stat-box { flex: 1; min-width: 200px; padding: 20px; border-radius: 15px; text-align: center; }
@@ -33,7 +33,8 @@
     .edit-btn { margin-top: 14px; width: 100%; padding: 12px; border: none; border-radius: 10px; background: #3b82f6; color: white; cursor: pointer; font-size: 15px; font-weight: bold; }
     .edit-btn:hover { opacity: 0.9; }
     .label { font-weight: bold; color: #94a3b8; }
-    /* ستايل نافذة الأسعار */
+    
+    /* ستايل النوافذ المنبثقة */
     .modal-input { width: 100px; padding: 8px; border-radius: 8px; text-align: center; border: 1px solid #3b82f6; background: #06152b; color: white; font-weight: bold;}
     .modal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
   </style>
@@ -94,24 +95,24 @@
        
        <div style="margin-top:20px;">
          <div style="margin-bottom: 15px;">
-           <label style="display:block; margin-bottom:5px; font-weight:bold;">الاسم / العنوان:</label>
-           <input type="text" id="edit_name" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">الاسم / العنوان:</label>
+            <input type="text" id="edit_name" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
          </div>
          <div style="margin-bottom: 15px;">
-           <label style="display:block; margin-bottom:5px; font-weight:bold;">الوصف:</label>
-           <textarea id="edit_description" style="width:100%; min-height:80px; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box; resize: vertical;"></textarea>
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">الوصف:</label>
+            <textarea id="edit_description" style="width:100%; min-height:80px; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box; resize: vertical;"></textarea>
          </div>
-          <div style="margin-bottom: 15px;">
+         <div style="margin-bottom: 15px;">
             <label id="editImageLabel" style="display:block; margin-bottom:5px; font-weight:bold;">رابط الصورة:</label>
             <input type="text" id="edit_imageUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
-          </div>
+         </div>
          <div style="margin-bottom: 15px;">
-           <label style="display:block; margin-bottom:5px; font-weight:bold;">رابط الفيديو (اختياري):</label>
-           <input type="text" id="edit_videoUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">رابط الفيديو (اختياري):</label>
+            <input type="text" id="edit_videoUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
          </div>
          <div id="editCategoryRow" style="margin-bottom: 15px; display: none;">
-           <label style="display:block; margin-bottom:5px; font-weight:bold;">التصنيف (للمشاريع):</label>
-           <input type="text" id="edit_category" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">التصنيف (للمشاريع):</label>
+            <input type="text" id="edit_category" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
          </div>
        </div>
        <div style="display:flex; gap:10px; margin-top:25px;">
@@ -147,7 +148,6 @@
       const container = document.getElementById("items");
       container.innerHTML = "";
       const filteredItems = allItems.filter((item) => {
-        // إخفاء إحصائيات الزوار وأسعار الأسلاك المخفية من الكروت
         if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local")) return false; 
         
         let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
@@ -171,8 +171,10 @@
             <button class="delete-btn" onclick="deleteItem('${item._id}')">مسح الطلب</button>`;
         }
         else if (media.type === "project") {
+          const rawImage = media.imageUrl || '';
+          const coverImage = rawImage.split(',')[0]?.trim() || '/images/default-product.jpg';
           card.innerHTML = `<span class="badge project-badge">مشروع 🟡</span>
-            ${media.imageUrl ? `<img src="${media.imageUrl}" alt="project image" />` : ""}
+            ${rawImage ? `<img src="${coverImage}" alt="project image" />` : ""}
             <h3>${item.name || "مشروع بدون اسم"}</h3>
             <p><span class="label">التصنيف:</span> ${media.category || "غير محدد"}</p>
             <p>${media.description || ""}</p>
@@ -210,23 +212,23 @@
       const wireUpdates = allItems.filter(item => item.email === "admin_wire_prices@app.local");
       if(wireUpdates.length > 0) {
          try {
-           const latest = JSON.parse(wireUpdates[0].phone).prices; // allItems is reversed
-           document.getElementById('p_1_5').value = latest['1.5'] || 45;
-           document.getElementById('p_2_5').value = latest['2.5'] || 75;
-           document.getElementById('p_4_0').value = latest['4.0'] || 115;
-           document.getElementById('p_6_0').value = latest['6.0'] || 165;
-           document.getElementById('p_10_0').value = latest['10.0'] || 290;
-           document.getElementById('p_16_0').value = latest['16.0'] || 450;
-           document.getElementById('p_25_0').value = latest['25.0'] || 680;
+            const latest = JSON.parse(wireUpdates[0].phone).prices; 
+            document.getElementById('p_1_5').value = latest['1.5'] || 45;
+            document.getElementById('p_2_5').value = latest['2.5'] || 75;
+            document.getElementById('p_4_0').value = latest['4.0'] || 115;
+            document.getElementById('p_6_0').value = latest['6.0'] || 165;
+            document.getElementById('p_10_0').value = latest['10.0'] || 290;
+            document.getElementById('p_16_0').value = latest['16.0'] || 450;
+            document.getElementById('p_25_0').value = latest['25.0'] || 680;
          }catch(e){}
       } else {
-           document.getElementById('p_1_5').value = 45;
-           document.getElementById('p_2_5').value = 75;
-           document.getElementById('p_4_0').value = 115;
-           document.getElementById('p_6_0').value = 165;
-           document.getElementById('p_10_0').value = 290;
-           document.getElementById('p_16_0').value = 450;
-           document.getElementById('p_25_0').value = 680;
+            document.getElementById('p_1_5').value = 45;
+            document.getElementById('p_2_5').value = 75;
+            document.getElementById('p_4_0').value = 115;
+            document.getElementById('p_6_0').value = 165;
+            document.getElementById('p_10_0').value = 290;
+            document.getElementById('p_16_0').value = 450;
+            document.getElementById('p_25_0').value = 680;
       }
     }
     
@@ -360,8 +362,3 @@
   </script>
 </body>
 </html>
-هذا الكود هو نفسه اللي رسلته؟
-</USER_REQUEST>
-<ADDITIONAL_METADATA>
-The current local time is: 2026-05-31T13:17:15+02:00.
-</ADDITIONAL_METADATA>
