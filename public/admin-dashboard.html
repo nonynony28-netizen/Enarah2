@@ -101,10 +101,10 @@
            <label style="display:block; margin-bottom:5px; font-weight:bold;">الوصف:</label>
            <textarea id="edit_description" style="width:100%; min-height:80px; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box; resize: vertical;"></textarea>
          </div>
-         <div style="margin-bottom: 15px;">
-           <label style="display:block; margin-bottom:5px; font-weight:bold;">رابط الصورة:</label>
-           <input type="text" id="edit_imageUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
-         </div>
+          <div style="margin-bottom: 15px;">
+            <label id="editImageLabel" style="display:block; margin-bottom:5px; font-weight:bold;">رابط الصورة:</label>
+            <input type="text" id="edit_imageUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
+          </div>
          <div style="margin-bottom: 15px;">
            <label style="display:block; margin-bottom:5px; font-weight:bold;">رابط الفيديو (اختياري):</label>
            <input type="text" id="edit_videoUrl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
@@ -276,15 +276,21 @@
       
       const categoryRow = document.getElementById('editCategoryRow');
       const categoryInput = document.getElementById('edit_category');
+      const editImageLabel = document.getElementById('editImageLabel');
+      const editImageUrlInput = document.getElementById('edit_imageUrl');
       
       if (media.type === 'project') {
         categoryRow.style.display = 'block';
         categoryInput.value = media.category || '';
         document.getElementById('editModalTitle').innerText = 'تعديل المشروع 🟡';
+        editImageLabel.innerText = 'روابط الصور (يمكنك وضع عدة روابط مفصولة بفاصلة ",")';
+        editImageUrlInput.placeholder = 'https://example.com/1.jpg, https://example.com/2.jpg';
       } else {
         categoryRow.style.display = 'none';
         categoryInput.value = '';
         document.getElementById('editModalTitle').innerText = 'تعديل المنتج 🔵';
+        editImageLabel.innerText = 'رابط الصورة:';
+        editImageUrlInput.placeholder = 'https://example.com/image.jpg';
       }
 
       document.getElementById('editModal').style.display = 'flex';
@@ -354,3 +360,8 @@
   </script>
 </body>
 </html>
+هذا الكود هو نفسه اللي رسلته؟
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-05-31T13:17:15+02:00.
+</ADDITIONAL_METADATA>
