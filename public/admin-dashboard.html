@@ -147,55 +147,70 @@
     function renderItems() {
       const container = document.getElementById("items");
       container.innerHTML = "";
-      const filteredItems = allItems.filter((item) => {
-        if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local")) return false; 
-        
-        let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
+      try {
+        const filteredItems = allItems.filter((item) => {
+          // إخفاء إحصائيات الزوار وأسعار الأسلاك المخفية من الكروت
+          if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local")) return false; 
+          
+          let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
 
-        if (currentFilter === "all") return true;
-        if (currentFilter === "contact") return item.type === "contact";
-        if (currentFilter === "project") return item.type !== "contact" && media.type === "project";
-        if (currentFilter === "product") return item.type !== "contact" && media.type !== "project";
-        return true;
-      });
+          if (currentFilter === "all") return true;
+          if (currentFilter === "contact") return item.type === "contact";
+          if (currentFilter === "project") return item.type !== "contact" && media.type === "project";
+          if (currentFilter === "product") return item.type !== "contact" && media.type !== "project";
+          return true;
+        });
 
-      filteredItems.forEach((item) => {
-        let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
-        const card = document.createElement("div"); card.className = "card";
+        filteredItems.forEach((item) => {
+          let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
+          const card = document.createElement("div"); card.className = "card";
 
-        if (item.type === "contact") {
-          card.innerHTML = `<span class="badge contact-badge">طلب/رسالة 🔴</span>
-            <h3 style="margin-top: 30px;">${item.name || "بدون اسم"}</h3>
-            <p><span class="label">رقم الهاتف:</span> ${item.phone || "لا يوجد"}</p>
-            <p><span class="label">التفاصيل:</span> ${item.email || "لا يوجد"}</p>
-            <button class="delete-btn" onclick="deleteItem('${item._id}')">مسح الطلب</button>`;
+          if (item.type === "contact") {
+            card.innerHTML = `<span class="badge contact-badge">طلب/رسالة 🔴</span>
+              <h3 style="margin-top: 30px;">${item.name || "بدون اسم"}</h3>
+              <p><span class="label">رقم الهاتف:</span> ${item.phone || "لا يوجد"}</p>
+              <p><span class="label">التفاصيل:</span> ${item.email || "لا يوجد"}</p>
+              <button class="delete-btn" onclick="deleteItem('${item._id}')">مسح الطلب</button>`;
+          }
+          else if (media.type === "project") {
+            const rawImage = media.imageUrl || '';
+            const coverImage = rawImage.split(',')[0]?.trim() || '/images/default-product.jpg';
+            card.innerHTML = `<span class="badge project-badge">مشروع 🟡</span>
+              ${rawImage ? `<img src="${coverImage}" alt="project image" />` : ""}
+              <h3>${item.name || "مشروع بدون اسم"}</h3>
+              <p><span class="label">التصنيف:</span> ${media.category || "غير محدد"}</p>
+              <p>${media.description || ""}</p>
+              <div style="display: flex; gap: 10px; margin-top: 14px;">
+                <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
+                <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
+              </div>`;
+          }
+          else {
+            card.innerHTML = `<span class="badge product-badge">منتج 🔵</span>
+              ${media.imageUrl ? `<img src="${media.imageUrl}" alt="product image" />` : ""}
+              <h3>${item.name || "منتج بدون اسم"}</h3>
+              <p>${media.description || ""}</p>
+              <div style="display: flex; gap: 10px; margin-top: 14px;">
+                <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
+                <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
+              </div>`;
+          }
+          container.appendChild(card);
+        });
+
+        if (!filteredItems.length) {
+          container.innerHTML = `<div style="text-align:center; grid-column: 1/-1; padding: 20px;">
+            <h3>لا توجد بيانات متاحة</h3>
+            <p style="color: #64748b; font-size: 14px;">نوع الفلتر الحالي: ${currentFilter} | إجمالي العناصر: ${allItems.length}</p>
+          </div>`;
         }
-        else if (media.type === "project") {
-          const rawImage = media.imageUrl || '';
-          const coverImage = rawImage.split(',')[0]?.trim() || '/images/default-product.jpg';
-          card.innerHTML = `<span class="badge project-badge">مشروع 🟡</span>
-            ${rawImage ? `<img src="${coverImage}" alt="project image" />` : ""}
-            <h3>${item.name || "مشروع بدون اسم"}</h3>
-            <p><span class="label">التصنيف:</span> ${media.category || "غير محدد"}</p>
-            <p>${media.description || ""}</p>
-            <div style="display: flex; gap: 10px; margin-top: 14px;">
-              <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
-              <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
-            </div>`;
-        }
-        else {
-          card.innerHTML = `<span class="badge product-badge">منتج 🔵</span>
-            ${media.imageUrl ? `<img src="${media.imageUrl}" alt="product image" />` : ""}
-            <h3>${item.name || "منتج بدون اسم"}</h3>
-            <p>${media.description || ""}</p>
-            <div style="display: flex; gap: 10px; margin-top: 14px;">
-              <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
-              <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
-            </div>`;
-        }
-        container.appendChild(card);
-      });
-      if (!filteredItems.length) container.innerHTML = "<h3 style='text-align:center; grid-column: 1/-1;'>لا توجد بيانات متاحة</h3>";
+      } catch (err) {
+        container.innerHTML = `<div style="text-align:center; grid-column: 1/-1; color: #f43f5e; padding: 20px; border: 1px dashed #f43f5e; border-radius: 10px; background: rgba(244, 63, 94, 0.05);">
+          <h3>حدث خطأ أثناء عرض العناصر</h3>
+          <p>${err.message}</p>
+          <pre style="text-align: left; background: #06152b; padding: 10px; border-radius: 5px; overflow-x: auto; color: #fda4af;">${err.stack}</pre>
+        </div>`;
+      }
     }
 
     function filterType(type) { currentFilter = type; renderItems(); }
