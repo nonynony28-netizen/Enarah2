@@ -47,6 +47,10 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
+  const [simColor, setSimColor] = useState<'warm' | 'natural' | 'cool'>('warm')
+  const [simSpot, setSimSpot] = useState(true)
+  const [simLed, setSimLed] = useState(false)
+
   useEffect(() => {
     const startTime = Date.now();
 
@@ -335,6 +339,185 @@ export default function Home() {
                 </FadeIn>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* 2.5 مُحاكي الإضاءة التفاعلي المبتكر */}
+        <section id="simulator" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4" style={glowingTitleStyle}>مُحاكي الإضاءة التفاعلي</h2>
+              <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+                جرب توزيع ألوان ومقاسات الإضاءة بنفسك في صالة افتراضية، واختر ما يناسب ذوقك وبيتك
+              </p>
+              <div className="w-20 h-1.5 bg-blue-500 mx-auto rounded-full mt-4 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+            </div>
+
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
+              
+              {/* شاشة العرض - الصالة الافتراضية بمقاس صغير ملموم */}
+              <div className="w-full lg:w-[38%] max-w-[360px] aspect-[4/3] rounded-2xl overflow-hidden relative bg-black shadow-2xl border border-white/10 group">
+                {/* الصورة الأساسية للصالة بنمط معتم */}
+                <img 
+                  src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80" 
+                  alt="Virtual Room" 
+                  className="absolute inset-0 w-full h-full object-cover transition-all duration-500"
+                  style={{
+                    filter: `brightness(${
+                      (!simSpot && !simLed) ? 0.25 : (simSpot && simLed) ? 1.0 : simSpot ? 0.7 : 0.55
+                    })`
+                  }}
+                />
+
+                {/* طبقة محاكاة لون الإضاءة العام (Color Overlay) */}
+                <div 
+                  className="absolute inset-0 transition-opacity duration-500 pointer-events-none mix-blend-color-dodge"
+                  style={{
+                    backgroundColor: 
+                      (!simSpot && !simLed) ? 'transparent' :
+                      simColor === 'warm' ? 'rgba(251, 191, 36, 0.2)' : 
+                      simColor === 'natural' ? 'rgba(253, 224, 71, 0.15)' : 
+                      'rgba(186, 230, 253, 0.15)',
+                    opacity: (simSpot || simLed) ? 1 : 0
+                  }}
+                />
+
+                {/* تأثير مخاريط الإضاءة (Spotlight Cones) */}
+                {simSpot && (
+                  <div className="absolute inset-0 pointer-events-none z-10 transition-opacity duration-500">
+                    {/* السبوت الأول (يمين) */}
+                    <div 
+                      className="absolute top-0 right-[25%] w-32 h-full opacity-60 mix-blend-screen"
+                      style={{
+                        background: `radial-gradient(ellipse at top, ${
+                          simColor === 'warm' ? 'rgba(251, 191, 36, 0.65)' : 
+                          simColor === 'natural' ? 'rgba(254, 240, 138, 0.55)' : 
+                          'rgba(186, 230, 253, 0.55)'
+                        } 0%, transparent 75%)`,
+                        clipPath: 'polygon(45% 0, 55% 0, 100% 100%, 0 100%)'
+                      }}
+                    />
+                    {/* السبوت الثاني (يسار) */}
+                    <div 
+                      className="absolute top-0 left-[25%] w-32 h-full opacity-60 mix-blend-screen"
+                      style={{
+                        background: `radial-gradient(ellipse at top, ${
+                          simColor === 'warm' ? 'rgba(251, 191, 36, 0.65)' : 
+                          simColor === 'natural' ? 'rgba(254, 240, 138, 0.55)' : 
+                          'rgba(186, 230, 253, 0.55)'
+                        } 0%, transparent 75%)`,
+                        clipPath: 'polygon(45% 0, 55% 0, 100% 100%, 0 100%)'
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* تأثير الإنارة المخفية من السقف (LED Cove Glow) */}
+                {simLed && (
+                  <div 
+                    className="absolute top-0 left-0 right-0 h-16 pointer-events-none z-10 mix-blend-screen transition-opacity duration-500"
+                    style={{
+                      background: `linear-gradient(to bottom, ${
+                        simColor === 'warm' ? 'rgba(251, 191, 36, 0.5)' : 
+                        simColor === 'natural' ? 'rgba(254, 240, 138, 0.4)' : 
+                        'rgba(186, 230, 253, 0.4)'
+                      }, transparent)`,
+                      boxShadow: `0 8px 30px -4px ${
+                        simColor === 'warm' ? 'rgba(251, 191, 36, 0.6)' : 
+                        simColor === 'natural' ? 'rgba(254, 240, 138, 0.5)' : 
+                        'rgba(186, 230, 253, 0.5)'
+                      }`
+                    }}
+                  />
+                )}
+
+                {/* نص توضيحي داخلي */}
+                <div className="absolute bottom-4 right-4 z-20 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/5">
+                  <span className="text-[11px] font-bold text-blue-200">
+                    {!simSpot && !simLed ? 'الإنارة مطفأة 🌑' : `حرارة اللون: ${
+                      simColor === 'warm' ? 'أصفر دافئ (3000K)' : 
+                      simColor === 'natural' ? 'شمسي طبيعي (4000K)' : 
+                      'أبيض بارد (6000K)'
+                    }`}
+                  </span>
+                </div>
+              </div>
+
+              {/* أزرار التحكم - لوحة التحكم الجانبية */}
+              <div className="w-full lg:w-[62%] flex flex-col justify-center space-y-6">
+                
+                {/* 1. اختيار حرارة ولون الضوء */}
+                <div>
+                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">1. اختر حرارة لون الإضاءة:</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { key: 'warm', name: 'أصفر 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
+                      { key: 'natural', name: 'شمسي 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
+                      { key: 'cool', name: 'أبيض 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
+                    ].map((btn) => (
+                      <button
+                        key={btn.key}
+                        onClick={() => setSimColor(btn.key as any)}
+                        className={`py-3 px-2 rounded-xl text-xs font-bold border transition-all duration-300 ${
+                          simColor === btn.key 
+                            ? `${btn.bg} ring-2 ring-blue-500/50 scale-105 shadow-[0_0_15px_rgba(59,130,246,0.15)]` 
+                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        {btn.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. تشغيل مصادر الإضاءة المختلفة */}
+                <div>
+                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">2. مصادر الإضاءة المتوفرة:</h4>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    {/* زر السبوت لايت */}
+                    <button
+                      onClick={() => setSimSpot(!simSpot)}
+                      className={`flex-1 py-4 px-5 rounded-2xl border font-bold flex items-center justify-between transition-all duration-300 ${
+                        simSpot
+                          ? 'bg-blue-600/20 border-blue-500/50 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="text-sm">السبوت لايت (Spotlight)</span>
+                      <span className={`w-3.5 h-3.5 rounded-full border ${simSpot ? 'bg-blue-500 border-blue-400 animate-pulse' : 'border-slate-500'}`} />
+                    </button>
+                    
+                    {/* زر الإنارة المخفية */}
+                    <button
+                      onClick={() => setSimLed(!simLed)}
+                      className={`flex-1 py-4 px-5 rounded-2xl border font-bold flex items-center justify-between transition-all duration-300 ${
+                        simLed
+                          ? 'bg-blue-600/20 border-blue-500/50 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="text-sm">الإنارة المخفية (LED Strip)</span>
+                      <span className={`w-3.5 h-3.5 rounded-full border ${simLed ? 'bg-blue-500 border-blue-400 animate-pulse' : 'border-slate-500'}`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* نصيحة الخبراء الهندسية */}
+                <div className="bg-[#0a192f] border border-blue-500/15 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300">
+                  <div className="text-xl">💡</div>
+                  <div>
+                    <span className="font-bold text-blue-300 block mb-0.5">نصيحة مهندسي الإنارة الحديثة:</span>
+                    {simColor === 'warm' && 'الإنارة الصفراء (3000K) تضفي حميمية ودفئاً، وهي مثالية لغرف النوم والمجالس لتعزز الشعور بالاسترخاء.'}
+                    {simColor === 'natural' && 'الإنارة الشمسية (4000K) هي الأقرب لضوء النهار، وهي مناسبة جداً للمطابخ، الممرات، والمنطقة التي تحتاج لألوان حقيقية.'}
+                    {simColor === 'cool' && 'الإنارة البيضاء (6000K) تمنح نشاطاً ووضوحاً عالياً، وهي خيار رائع للمكاتب، أماكن القراءة والدراسة.'}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
         </section>
 
