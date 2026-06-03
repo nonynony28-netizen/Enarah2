@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
-  TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb,
+  TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
   Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle
 } from 'lucide-react'
 
@@ -172,6 +172,11 @@ export default function Home() {
           body: JSON.stringify({ chat_id: telegramChatId, text: telegramMessage, parse_mode: 'Markdown' })
         }).catch(() => {});
       }
+
+      // تحويل المستخدم إلى الواتس اب للتأكيد الفوري
+      const whatsappMsg = `السلام عليكم، أريد تأكيد طلب شراء سلك إيطالي:\n\n*المقاس:* ${selectedWire.size}\n*الكمية:* ${orderForm.quantity} لفة\n*الإجمالي:* ${totalPrice} د.ل\n*المدينة:* ${orderForm.city}\n*الهاتف:* ${orderForm.phone}`;
+      const whatsappUrl = `https://wa.me/218916580068?text=${encodeURIComponent(whatsappMsg)}`;
+      window.open(whatsappUrl, '_blank');
 
       setOrderStatus('success')
       setTimeout(() => {
@@ -653,8 +658,8 @@ export default function Home() {
                   {orderStatus === 'success' ? (
                     <div className="text-center py-10">
                       <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4 shadow-[0_0_20px_rgba(74,222,128,0.3)] rounded-full" />
-                      <h3 className="text-2xl font-bold text-white mb-2">تم استلام طلبك بنجاح!</h3>
-                      <p className="text-slate-400">سنتصل بك في أقرب وقت لتأكيد الطلبية وتجهيزها.</p>
+                      <h3 className="text-2xl font-bold text-white mb-2">تم تسجيل طلبك بنجاح!</h3>
+                      <p className="text-slate-400">جاري توجيهك الآن إلى الواتساب لتأكيد الطلب الفوري...</p>
                     </div>
                   ) : (
                     <>
@@ -672,8 +677,15 @@ export default function Home() {
                           </div>
                         </div>
                         <div className="p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6"><span className="text-slate-300 font-bold">الإجمالي:</span><span className="text-2xl font-extrabold text-white">{(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span></span></div>
-                        <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 hover:bg-blue-500 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                          {orderStatus === 'loading' ? <Loader2 className="w-6 h-6 animate-spin" /> : 'تأكيد الطلب'}
+                        <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                          {orderStatus === 'loading' ? (
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                          ) : (
+                            <>
+                              <MessageCircle className="w-6 h-6 animate-pulse" />
+                              تأكيد الطلب وإرساله بالواتساب
+                            </>
+                          )}
                         </button>
                       </form>
                     </>
