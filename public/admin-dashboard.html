@@ -125,12 +125,50 @@
     let allItems = [];
     let currentFilter = "all";
 
+    function getAdminPassword() {
+      let pwd = sessionStorage.getItem('admin_password');
+      if (!pwd) {
+        pwd = prompt('الرجاء إدخال كلمة مرور مدير النظام:');
+        if (pwd) {
+          sessionStorage.setItem('admin_password', pwd);
+        }
+      }
+      return pwd || "";
+    }
+
     async function loadItems() {
       const container = document.getElementById("items");
       try {
-        const res = await fetch("/api/get-users");
+        const pwd = getAdminPassword();
+        if (!pwd) {
+          container.innerHTML = "<div style='text-align:center; padding:20px;'><h3>يرجى إدخال كلمة مرور صالحة لتصفح لوحة التحكم.</h3><button onclick='location.reload()' style='padding:10px 20px; background:#3b82f6; border:none; border-radius:5px; color:white; font-weight:bold; cursor:pointer;'>إعادة المحاولة</button></div>";
+          return;
+        }
+
+        const res = await fetch("/api/get-users", {
+          headers: {
+            "x-admin-password": pwd
+          }
+        });
+
+        if (res.status === 401) {
+          alert("كلمة المرور غير صحيحة أو منتهية الصلاحية!");
+          sessionStorage.removeItem("admin_password");
+          location.reload();
+          return;
+        }
+
         const data = await res.json();
         if (!data.success) { container.innerHTML = "فشل في جلب البيانات"; return; }
+        
+        // التحقق من حالة الإدارة في الاستجابة
+        if (!data.isAdmin) {
+          alert("تنبيه: أنت تتصفح لوحة التحكم بوضع غير مصرح (البيانات العامة فقط معروضة). يرجى إدخال كلمة المرور الصحيحة.");
+          sessionStorage.removeItem("admin_password");
+          location.reload();
+          return;
+        }
+
         allItems = data.data.reverse(); 
 
         const visits = allItems.filter(item => item.email && item.email.includes("@analytics.local"));
@@ -140,7 +178,10 @@
         document.getElementById("totalItemsCount").innerText = validItems.length;
 
         renderItems();
-      } catch { container.innerHTML = "حدث خطأ"; }
+      } catch (err) { 
+        container.innerHTML = "حدث خطأ أثناء الاتصال بالسيرفر"; 
+        console.error(err);
+      }
     }
 
     function renderItems() {
@@ -148,7 +189,6 @@
       container.innerHTML = "";
       try {
         const filteredItems = allItems.filter((item) => {
-          // إخفاء إحصائيات الزوار وأسعار الأسلاك المخفية من الكروت
           if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local")) return false; 
           
           let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
@@ -216,7 +256,23 @@
 
     async function deleteItem(id) {
       if (!confirm("هل أنت متأكد من الحذف؟")) return;
-      await fetch("/api/delete-user", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+      const pwd = getAdminPassword();
+      const res = await fetch("/api/delete-user", { 
+        method: "DELETE", 
+        headers: { 
+          "Content-Type": "application/json",
+          "x-admin-password": pwd
+        }, 
+        body: JSON.stringify({ id }) 
+      });
+
+      if (res.status === 401) {
+        alert("انتهت صلاحية الجلسة أو كلمة المرور غير صحيحة!");
+        sessionStorage.removeItem("admin_password");
+        location.reload();
+        return;
+      }
+
       loadItems(); 
     }
 
@@ -260,10 +316,24 @@
         '16.0': document.getElementById('p_16_0').value,
         '25.0': document.getElementById('p_25_0').value,
       };
-      await fetch("/api/save-user", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+      
+      const pwd = getAdminPassword();
+      const res = await fetch("/api/save-user", {
+        method: "POST", 
+        headers: { 
+          "Content-Type": "application/json",
+          "x-admin-password": pwd
+        },
         body: JSON.stringify({ name: "Wire Prices Update", email: "admin_wire_prices@app.local", phone: JSON.stringify({ type: "wire_prices", prices }) })
       });
+
+      if (res.status === 401) {
+        alert("غير مصرح لك بالعملية أو كلمة المرور غير صحيحة!");
+        sessionStorage.removeItem("admin_password");
+        location.reload();
+        return;
+      }
+
       alert('تم تحديث الأسعار بنجاح في الموقع!');
       btn.innerText = 'حفظ ونشر';
       closeWireModal();
@@ -345,15 +415,26 @@
           phoneObj.category = category;
         }
 
+        const pwd = getAdminPassword();
         const res = await fetch("/api/update-user", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "x-admin-password": pwd
+          },
           body: JSON.stringify({
             id,
             name,
             phone: JSON.stringify(phoneObj)
           })
         });
+
+        if (res.status === 401) {
+          alert("غير مصرح لك بالعملية أو كلمة المرور غير صحيحة!");
+          sessionStorage.removeItem("admin_password");
+          location.reload();
+          return;
+        }
 
         const data = await res.json();
 

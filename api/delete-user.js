@@ -52,7 +52,7 @@ export default async function handler(req, res) {
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type"
+    "Content-Type, x-admin-password"
   );
 
   // =====================================
@@ -85,6 +85,16 @@ export default async function handler(req, res) {
     return res.status(405).json({
       success: false,
       error: "Method Not Allowed",
+    });
+  }
+
+  // التحقق من صلاحية كلمة مرور المسؤول
+  const adminPassword = process.env.ADMIN_PASSWORD || "EnarahAdmin2026";
+  const clientPassword = req.headers["x-admin-password"];
+  if (clientPassword !== adminPassword) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized: Invalid admin password",
     });
   }
 

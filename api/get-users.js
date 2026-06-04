@@ -56,7 +56,7 @@ export default async function handler(req, res) {
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type"
+    "Content-Type, x-admin-password"
   );
 
   // Preflight
@@ -89,13 +89,31 @@ export default async function handler(req, res) {
       })
       .toArray();
 
+    // التحقق من صلاحية كلمة مرور المسؤول
+    const adminPassword = process.env.ADMIN_PASSWORD || "EnarahAdmin2026";
+    const clientPassword = req.headers["x-admin-password"];
+    const isAuthenticated = clientPassword === adminPassword;
+
+    let filteredUsers = users;
+
+    if (!isAuthenticated) {
+      // للزوار العاديين: تصفية وحجب الرسائل والطلبات وإحصائيات الزوار
+      filteredUsers = users.filter(item => {
+        const type = item.type || "product";
+        const email = item.email || "";
+        const isContact = type === "contact";
+        const isAnalytics = email.includes("@analytics.local");
+        return !isContact && !isAnalytics;
+      });
+    }
+
     // =====================================
     // إضافة type افتراضي للبيانات القديمة
     // product = المنتجات القديمة
     // contact = الرسائل الجديدة
     // =====================================
     const formattedUsers =
-      users.map((item) => ({
+      filteredUsers.map((item) => ({
         ...item,
         type:
           item.type ||
@@ -110,6 +128,7 @@ export default async function handler(req, res) {
       count:
         formattedUsers.length,
       data: formattedUsers,
+      isAdmin: isAuthenticated
     });
   } catch (error) {
     console.error(

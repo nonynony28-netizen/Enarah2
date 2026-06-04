@@ -77,6 +77,17 @@
     const itemTypeSelect = document.getElementById("itemType");
     const categoryContainer = document.getElementById("categoryContainer");
 
+    function getAdminPassword() {
+      let pwd = sessionStorage.getItem('admin_password');
+      if (!pwd) {
+        pwd = prompt('الرجاء إدخال كلمة مرور مدير النظام:');
+        if (pwd) {
+          sessionStorage.setItem('admin_password', pwd);
+        }
+      }
+      return pwd || "";
+    }
+
     // إظهار حقل التصنيف وتعديل حقل الصور بناءً على الاختيار
     itemTypeSelect.addEventListener("change", (e) => {
       const isProject = e.target.value === "project";
@@ -102,6 +113,11 @@
       const imageUrl = document.getElementById("imageUrl").value.trim();
       const videoUrl = document.getElementById("videoUrl").value.trim();
 
+      const pwd = getAdminPassword();
+      if (!pwd) {
+        return showResponse("الرجاء إدخال كلمة مرور صالحة للنشر.", false);
+      }
+
       if (!title) return showResponse("الرجاء كتابة الاسم أو العنوان.", false);
       if (!description) return showResponse("الرجاء كتابة الوصف.", false);
       if (itemType === "project" && !category) return showResponse("الرجاء كتابة تصنيف المشروع.", false);
@@ -114,6 +130,7 @@
         const payload = {
           name: title,
           email: `media_${Date.now()}@upload.local`,
+          type: itemType, // 'product' أو 'project' لتفعيل التحقق في السيرفر
           phone: JSON.stringify({
             imageUrl,
             videoUrl,
@@ -125,9 +142,19 @@
 
         const res = await fetch("https://enarah2.vercel.app/api/save-user", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "x-admin-password": pwd
+          },
           body: JSON.stringify(payload),
         });
+
+        if (res.status === 401) {
+          alert("غير مصرح لك بالنشر! كلمة المرور غير صحيحة.");
+          sessionStorage.removeItem("admin_password");
+          location.reload();
+          return;
+        }
 
         const data = await res.json();
 
