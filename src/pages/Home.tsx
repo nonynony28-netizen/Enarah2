@@ -33,6 +33,34 @@ const defaultWireData = [
   { id: '25.0', size: '25.0 ملي', type: 'مفرد (لفة 100 متر)', price: '680.00', trend: 'same' as TrendType },
 ]
 
+const paintColors = [
+  { id: 'white', name: 'أبيض ناصع', hex: '#ffffff', advice: {
+    warm: 'يعطي دفئاً ومظهراً كلاسيكياً مريحاً للعين، مناسب لغرف النوم والمجالس.',
+    natural: 'الخيار الأمثل للأبيض! يظهر البياض الطبيعي والنقاء دون اصفرار أو برودة.',
+    cool: 'يعطي إضاءة قوية ونشيطة تشبه المكاتب، قد يكون ساطعاً جداً للمنازل.'
+  }},
+  { id: 'beige', name: 'بيج دافئ', hex: '#f5ebe0', advice: {
+    warm: 'تطابق رائع! يعزز دفء البيج ويخلق أجواء حميمية وغنية جداً ومثالية للمجالس.',
+    natural: 'خيار ممتاز ومتوازن يظهر نعومة لون البيج بشكل طبيعي دون تزييف.',
+    cool: 'غير محبذ كثيراً، حيث يجعل لون البيج الدافئ يبدو شاحباً أو رمادياً ميتًا.'
+  }},
+  { id: 'grey', name: 'رمادي عصري', hex: '#e5e5e5', advice: {
+    warm: 'تحذير: الإضاءة الصفراء قد تحول الرمادي إلى مظهر مائل للاخضرار أو الاتساخ.',
+    natural: 'تطابق رائع! يحافظ على برودة الرمادي وجماله العصري دون تغيير لونه الأصلي.',
+    cool: 'يعزز جمال الرمادي البارد ويعطي شعوراً بنظافة ومستقبلية المكان.'
+  }},
+  { id: 'navy', name: 'أزرق كحلي', hex: '#1e293b', advice: {
+    warm: 'يخلق تبايناً درامياً فخماً، مناسب للجدران المميزة (Accent Walls) لتبدو فخمة.',
+    natural: 'خيار ممتاز يظهر جمال اللون الكحلي وعمقه بوضوح تحت الضوء الطبيعي.',
+    cool: 'يبرز درجات الأزرق الحقيقية ويجعل الجدار يبدو بارداً وحديثاً للغاية.'
+  }},
+  { id: 'green', name: 'أخضر زيتي', hex: '#3f4e3f', advice: {
+    warm: 'يزيد من حميمية اللون الأخضر ويجعله يبدو ترابياً ودافئاً جداً ومريحاً.',
+    natural: 'يظهر درجات الأخضر الطبيعية بشكل مذهل ويحافظ على حيوية ونضارة اللون.',
+    cool: 'يجعل الأخضر يبدو بارداً وأقل دفئاً، يفضل استخدامه في المكاتب وأماكن العمل.'
+  }},
+]
+
 export default function Home() {
   const [pageLoading, setPageLoading] = useState(true)
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>([])
@@ -50,6 +78,8 @@ export default function Home() {
   const [simColor, setSimColor] = useState<'warm' | 'natural' | 'cool'>('warm')
   const [simSpot, setSimSpot] = useState(true)
   const [simLed, setSimLed] = useState(false)
+  const [selectedPaintId, setSelectedPaintId] = useState('white')
+  const [paintColorTemp, setPaintColorTemp] = useState<'warm' | 'natural' | 'cool'>('warm')
 
   useEffect(() => {
     const startTime = Date.now();
@@ -516,6 +546,124 @@ export default function Home() {
                     {simColor === 'warm' && 'الإنارة الصفراء (3000K) تضفي حميمية ودفئاً، وهي مثالية لغرف النوم والمجالس لتعزز الشعور بالاسترخاء.'}
                     {simColor === 'natural' && 'الإنارة الشمسية (4000K) هي الأقرب لضوء النهار، وهي مناسبة جداً للمطابخ، الممرات، والمنطقة التي تحتاج لألوان حقيقية.'}
                     {simColor === 'cool' && 'الإنارة البيضاء (6000K) تمنح نشاطاً ووضوحاً عالياً، وهي خيار رائع للمكاتب، أماكن القراءة والدراسة.'}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* دليل تطابق طلاء الجدران والإضاءة */}
+        <section id="paint-matching" className="py-16 md:py-20 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+          {/* بقعة توهج نيونية خفيفة */}
+          <div className="absolute top-1/2 left-0 w-80 h-80 bg-blue-500/5 rounded-full blur-[150px] pointer-events-none z-0" />
+          
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 font-sans" style={glowingTitleStyle}>دليل تطابق الطلاء والإضاءة</h2>
+              <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+                اكتشف كيف يتأثر لون طلاء جدران بيتك بحرارة لون الإضاءة المختلفة لتتجنب الأخطاء الشائعة في التصميم الداخلي
+              </p>
+              <div className="w-20 h-1.5 bg-blue-500 mx-auto rounded-full mt-4 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+            </div>
+
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
+              
+              {/* شاشة العرض - الجدار الافتراضي بتأثير CSS خالص */}
+              <div className="w-full lg:w-[38%] max-w-[360px] flex flex-col gap-4">
+                <div 
+                  className="w-full aspect-[4/3] rounded-2xl relative overflow-hidden bg-black shadow-2xl border border-white/10 transition-all duration-500 group"
+                  style={{ backgroundColor: (paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).hex }}
+                >
+                  {/* تأثير مخروط الإضاءة بتأثير mix-blend-multiply لمحاكاة تراكب الإضاءة الحقيقي */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none transition-all duration-500 mix-blend-multiply"
+                    style={{
+                      background: `radial-gradient(circle at top, ${
+                        paintColorTemp === 'warm' ? 'rgba(251, 191, 36, 0.65)' : 
+                        paintColorTemp === 'natural' ? 'rgba(254, 240, 138, 0.55)' : 
+                        'rgba(186, 230, 253, 0.55)'
+                      } 0%, rgba(0,0,0,0.15) 85%)`
+                    }}
+                  />
+                  
+                  {/* حافة الغرفة والزوايا بشكل كرتوني أنيق ثلاثي الأبعاد */}
+                  <div className="absolute top-0 bottom-0 left-1/2 w-[1px] bg-black/10 shadow-sm" />
+                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-black/15 border-t border-black/5 flex items-center justify-between px-4">
+                    <span className="text-[10px] text-white/40 font-bold">زاوية الصالة الافتراضية</span>
+                    <span className="text-[10px] text-white/40 font-bold">إنارة 💡</span>
+                  </div>
+                </div>
+
+                {/* مؤشر اللون الحالي */}
+                <div className="flex items-center justify-between bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/5 text-xs text-slate-300">
+                  <span>الطلاء: <strong className="text-white">{(paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).name}</strong></span>
+                  <span>الضوء: <strong className="text-blue-300">
+                    {paintColorTemp === 'warm' ? 'أصفر (3000K)' : paintColorTemp === 'natural' ? 'شمسي (4000K)' : 'أبيض (6000K)'}
+                  </strong></span>
+                </div>
+              </div>
+
+              {/* أزرار التحكم والخيارات */}
+              <div className="w-full lg:w-[62%] flex flex-col justify-center space-y-6">
+                
+                {/* 1. اختيار لون صبغ الجدار */}
+                <div>
+                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">1. اختر لون طلاء الجدار:</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    {paintColors.map((color) => (
+                      <button
+                        key={color.id}
+                        onClick={() => setSelectedPaintId(color.id)}
+                        className={`py-3 px-2 rounded-xl text-xs font-bold border transition-all duration-300 flex flex-col items-center gap-2 ${
+                          selectedPaintId === color.id
+                            ? 'bg-blue-600/10 border-blue-500 text-white ring-2 ring-blue-500/30'
+                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        }`}
+                      >
+                        <span 
+                          className="w-5 h-5 rounded-full border border-white/20 shadow-inner" 
+                          style={{ backgroundColor: color.hex }}
+                        />
+                        {color.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. اختيار لون الإضاءة */}
+                <div>
+                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">2. اختر حرارة لون الإضاءة:</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { key: 'warm', name: 'أصفر 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
+                      { key: 'natural', name: 'شمسي 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
+                      { key: 'cool', name: 'أبيض 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
+                    ].map((btn) => (
+                      <button
+                        key={btn.key}
+                        onClick={() => setPaintColorTemp(btn.key as any)}
+                        className={`py-3 px-2 rounded-xl text-xs font-bold border transition-all duration-300 ${
+                          paintColorTemp === btn.key
+                            ? `${btn.bg} ring-2 ring-blue-500/50 scale-105 shadow-[0_0_15px_rgba(59,130,246,0.15)]`
+                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        {btn.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* النصيحة الهندسية الذكية */}
+                <div className="bg-[#0a192f] border border-blue-500/15 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300">
+                  <div className="text-xl">📐</div>
+                  <div>
+                    <span className="font-bold text-blue-300 block mb-1">رأي مهندس الديكور والتصميم الداخلي:</span>
+                    {(paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).advice[paintColorTemp]}
                   </div>
                 </div>
 
