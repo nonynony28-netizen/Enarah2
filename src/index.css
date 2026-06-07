@@ -182,3 +182,14 @@ html {
   0% { transform: translate(0, -50%) translateX(0) scale(1); opacity: 1; }
   100% { transform: translate(0, -50%) translateX(25px) scale(0); opacity: 0; }
 }
+
+/* تأثير اللمعة المارة عبر الأزرار بشكل متكرر */
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-25deg);
+  }
+}
+

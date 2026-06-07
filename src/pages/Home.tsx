@@ -311,12 +311,21 @@ export default function Home() {
               </h1>
               <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
-                <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-blue-600 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98]">
-                  استعرض المنتجات
-                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform duration-300" />
+                <Link 
+                  to="/products" 
+                  className="group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 bg-[length:200%_auto] text-white font-black text-base md:text-lg rounded-2xl transition-all duration-500 hover:bg-[right_center] flex items-center justify-center gap-3 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_20px_rgba(59,130,246,0.45)] hover:shadow-[0_0_35px_rgba(59,130,246,0.65)] ring-2 ring-blue-500/10 hover:ring-blue-400/30"
+                >
+                  {/* تأثير لمعة نيون متحركة */}
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmerSweep_1.8s_infinite_ease-in-out]" />
+                  <span>استعرض المنتجات</span>
+                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-2 transition-transform duration-300" />
                 </Link>
-                <Link to="/contact" className="px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-white/5 border border-white/10 text-white font-bold text-base md:text-lg rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
-                  تواصل معنا
+                <Link 
+                  to="/contact" 
+                  className="group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-[#0d2342]/60 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:bg-blue-600/10 text-white hover:text-blue-300 font-extrabold text-base md:text-lg rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_15px_rgba(255,255,255,0.02)] hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] ring-2 ring-white/5 hover:ring-blue-500/15"
+                >
+                  <MessageCircle className="w-5 h-5 text-slate-400 group-hover:text-blue-400 group-hover:rotate-12 transition-all duration-300" />
+                  <span>تواصل معنا</span>
                 </Link>
               </div>
 
