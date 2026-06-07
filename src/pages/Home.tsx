@@ -274,7 +274,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="pt-0 relative cursor-default bg-[#0a192f] bg-animated-grid text-white">
+      <div className="pt-0 relative cursor-default bg-transparent text-white">
         
         {/* 1. الواجهة الترحيبية بالفيديو فائق السرعة */}
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -349,7 +349,7 @@ export default function Home() {
         </section>
 
         {/* 2. لماذا نحن */}
-        <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+        <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           {/* بقع توهج نيونية خفيفة عائمة */}
           <div className="absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0 animate-float-1" />
           <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0 animate-float-2" />
@@ -378,7 +378,7 @@ export default function Home() {
         </section>
 
         {/* 2.5 مُحاكي الإضاءة التفاعلي المبتكر */}
-        <section id="simulator" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+        <section id="simulator" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
             <div className="text-center mb-12">
@@ -557,7 +557,7 @@ export default function Home() {
         </section>
 
         {/* دليل تطابق طلاء الجدران والإضاءة */}
-        <section id="paint-matching" className="py-16 md:py-20 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+        <section id="paint-matching" className="py-16 md:py-20 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           {/* بقعة توهج نيونية خفيفة */}
           <div className="absolute top-1/2 left-0 w-80 h-80 bg-blue-500/5 rounded-full blur-[150px] pointer-events-none z-0" />
           
@@ -675,7 +675,7 @@ export default function Home() {
         </section>
 
         {/* 3. جزء من مشاريعنا */}
-        <section id="featured-projects" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+        <section id="featured-projects" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           {/* بقع توهج نيونية خفيفة عائمة */}
           <div className="absolute top-1/3 right-0 w-80 h-80 bg-blue-50/5 rounded-full blur-[150px] pointer-events-none z-0 animate-float-2" />
           <div className="absolute bottom-1/3 left-0 w-80 h-80 bg-blue-400/10 rounded-full blur-[150px] pointer-events-none z-0 animate-float-1" />
@@ -745,7 +745,7 @@ export default function Home() {
         </section>
 
         {/* 4. نشرة الأسلاك الإيطالية */}
-        <section id="wire-prices" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+        <section id="wire-prices" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-10 md:mb-12">
               <div className="inline-flex items-center justify-center p-3 bg-white/5 border border-white/10 rounded-full mb-4"><Zap className="w-6 h-6 text-yellow-400" /></div>
@@ -783,7 +783,7 @@ export default function Home() {
         </section>
 
         {/* 5. ابدأ مشروعك */}
-        <section id="start" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-[#0a192f]">
+        <section id="start" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="relative bg-[#0f213a] border border-blue-500/20 rounded-[2rem] p-8 md:p-16 text-center overflow-hidden">
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span></h2>
