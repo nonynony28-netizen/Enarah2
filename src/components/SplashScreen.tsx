@@ -1,6 +1,88 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 export default function SplashScreen() {
+  const [mascotSrc, setMascotSrc] = useState<string>("/mascot.png");
+
+  // معالجة الصورة في المتصفح لجعل الخلفية البيضاء/الرمادية شفافة بالكامل
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/mascot.png";
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0);
+
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imgData.data;
+        const width = imgData.width;
+        const height = imgData.height;
+
+        // دالة للتحقق من لون الخلفية الفاتح
+        const isBackground = (x: number, y: number) => {
+          const idx = (y * width + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          const a = data[idx + 3];
+          if (a === 0) return false;
+          // تصفية ألوان الخلفية الفاتحة والرمادية
+          return r > 210 && g > 210 && b > 210;
+        };
+
+        const queue: number[] = [];
+        const visited = new Uint8Array(width * height);
+
+        const pushPixel = (x: number, y: number) => {
+          if (x >= 0 && x < width && y >= 0 && y < height) {
+            const idx = y * width + x;
+            if (!visited[idx] && isBackground(x, y)) {
+              visited[idx] = 1;
+              queue.push(idx);
+            }
+          }
+        };
+
+        // البدء من الزوايا الأربعة والحواف لإزالة الخلفية المتصلة بالكامل
+        for (let x = 0; x < width; x++) {
+          pushPixel(x, 0);
+          pushPixel(x, height - 1);
+        }
+        for (let y = 0; y < height; y++) {
+          pushPixel(0, y);
+          pushPixel(width - 1, y);
+        }
+
+        // خوارزمية ملء الفراغ (Flood Fill BFS)
+        let head = 0;
+        while (head < queue.length) {
+          const idx = queue[head++];
+          const x = idx % width;
+          const y = Math.floor(idx / width);
+
+          const pIdx = idx * 4;
+          data[pIdx + 3] = 0; // جعل البكسل شفافاً
+
+          // فحص الجيران الأربعة
+          pushPixel(x + 1, y);
+          pushPixel(x - 1, y);
+          pushPixel(x, y + 1);
+          pushPixel(x, y - 1);
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        setMascotSrc(canvas.toDataURL());
+      } catch (err) {
+        console.error("Failed to make mascot background transparent:", err);
+      }
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-[#050b14] flex flex-col items-center justify-center overflow-hidden z-[9999]">
       
@@ -22,23 +104,25 @@ export default function SplashScreen() {
 
       <div className="flex flex-col items-center gap-6 relative z-10">
         
-        {/* التميمة المتحركة */}
+        {/* الحاوية العائمة للتميمة لتعطي حركة الكرتون الحية */}
         <motion.div
           initial={{ opacity: 0, scale: 0.3, y: 30 }}
           animate={{ 
             opacity: 1, 
             scale: [0.3, 1.15, 1],
-            y: 0 
+            y: [0, -10, 0], // حركة العوم المستمرة
+            rotate: [0, 2, -2, 0] // أرجحة طفيفة
           }}
           transition={{ 
-            duration: 0.8, 
-            ease: [0.34, 1.56, 0.64, 1] 
+            scale: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] },
+            y: { delay: 0.8, duration: 3, repeat: Infinity, ease: "easeInOut" },
+            rotate: { delay: 0.8, duration: 4, repeat: Infinity, ease: "easeInOut" }
           }}
           className="relative w-44 h-44 md:w-56 md:h-56 flex items-center justify-center"
         >
           {/* صورة التميمة مع تأثير الإضاءة التدريجي الفخم */}
           <motion.img
-            src="/mascot.png"
+            src={mascotSrc}
             alt="الإنارة الحديثة Mascot"
             className="w-full h-full object-contain"
             initial={{ filter: "brightness(0.5) grayscale(0.2)" }}
