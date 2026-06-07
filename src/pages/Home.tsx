@@ -354,7 +354,6 @@ export default function Home() {
                 </a>
               </div>
             </div>
-          </div>
         </section>
 
         {/* 2. لماذا نحن */}
