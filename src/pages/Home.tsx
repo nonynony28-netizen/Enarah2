@@ -305,8 +305,10 @@ export default function Home() {
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
-            <div className="p-6 md:p-12 transition-all">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 leading-tight" style={glowingTitleStyle}>الإنارة <span className="text-blue-300">الحديثة</span></h1>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight tracking-tight text-white">
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-200 drop-shadow-[0_2px_8px_rgba(255,255,255,0.15)]">الإنارة</span>{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_20px_rgba(59,130,246,0.45)]">الحديثة</span>
+              </h1>
               <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
                 <Link to="/products" className="group relative px-6 py-3.5 md:px-8 md:py-4 w-full sm:w-auto bg-blue-600 text-white font-bold text-base md:text-lg rounded-2xl transition-all duration-300 hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98]">
@@ -363,8 +365,14 @@ export default function Home() {
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12 md:mb-16">
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6" style={glowingTitleStyle}>لماذا نحن؟</h2>
-              <div className="w-20 h-1.5 bg-blue-500 mx-auto rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-white">
+                لماذا <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">نحن؟</span>
+              </h2>
+              <div className="flex items-center justify-center gap-1.5 mt-4">
+                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
+                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
               {[
@@ -389,11 +397,17 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4" style={glowingTitleStyle}>مُحاكي الإضاءة التفاعلي</h2>
+              <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
+                مُحاكي الإضاءة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">التفاعلي</span>
+              </h2>
               <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
                 جرب توزيع ألوان ومقاسات الإضاءة بنفسك في صالة افتراضية، واختر ما يناسب ذوقك وبيتك
               </p>
-              <div className="w-20 h-1.5 bg-blue-500 mx-auto rounded-full mt-4 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <div className="flex items-center justify-center gap-1.5 mt-4">
+                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
+                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+              </div>
             </div>
 
             <div className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
@@ -571,11 +585,17 @@ export default function Home() {
           
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 font-sans" style={glowingTitleStyle}>دليل تطابق الطلاء والإضاءة</h2>
+              <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight font-sans text-white">
+                دليل تطابق <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">الطلاء والإضاءة</span>
+              </h2>
               <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
                 اكتشف كيف يتأثر لون طلاء جدران بيتك بحرارة لون الإضاءة المختلفة لتتجنب الأخطاء الشائعة في التصميم الداخلي
               </p>
-              <div className="w-20 h-1.5 bg-blue-500 mx-auto rounded-full mt-4 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <div className="flex items-center justify-center gap-1.5 mt-4">
+                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
+                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+              </div>
             </div>
 
             <div className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
@@ -778,8 +798,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
               <div>
-                <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4" style={glowingTitleStyle}>جزء من مشاريعنا</h2>
-                <div className="w-20 h-1.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
+                  جزء من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">مشاريعنا</span>
+                </h2>
+                <div className="w-20 h-[3px] bg-gradient-to-l from-blue-500 to-indigo-500 rounded-full mt-3 shadow-[0_1px_5px_rgba(59,130,246,0.3)]" />
               </div>
               <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
                 شاهد كل المشاريع <ArrowLeft className="w-5 h-5" />
@@ -844,7 +866,14 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-10 md:mb-12">
               <div className="inline-flex items-center justify-center p-3 bg-white/5 border border-white/10 rounded-full mb-4"><Zap className="w-6 h-6 text-yellow-400" /></div>
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6" style={glowingTitleStyle}>نشرة الأسلاك الإيطالية</h2>
+              <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-white">
+                نشرة الأسلاك <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">الإيطالية</span>
+              </h2>
+              <div className="flex items-center justify-center gap-1.5 mt-4 mb-6">
+                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
+                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+              </div>
               <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-200 font-bold text-sm">
                 <Calendar className="w-4 h-4" /> تحديث اليوم: {currentDate}
               </div>

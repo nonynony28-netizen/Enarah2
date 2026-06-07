@@ -215,8 +215,8 @@ export default function WirePrices() {
               <Zap className="w-8 h-8 text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]" />
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight" style={glowingTitleStyle}>
-              أسعار الأسلاك الإيطالية
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
+              أسعار الأسلاك <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">الإيطالية</span>
             </h1>
             
             <p className="text-slate-400 max-w-2xl mx-auto text-lg mb-8 shadow-sm">

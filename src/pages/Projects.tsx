@@ -130,16 +130,17 @@ export default function Projects() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight" style={glowingTitleStyle}>
-              جزء من مشاريعنا
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
+              جزء من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">مشاريعنا</span>
             </h1>
             <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm">
               نماذج من أعمالنا المتميزة في مختلف القطاعات، تعكس التزامنا بالجودة والاحترافية (اضغط على أي مشروع لفتح معرض الصور)
             </p>
-            <motion.div 
-              initial={{ width: 0 }} animate={{ width: "80px" }} transition={{ delay: 0.4, duration: 0.8 }}
-              className="h-1.5 bg-blue-500 mx-auto rounded-full mt-6 shadow-[0_0_15px_rgba(59,130,246,0.8)]" 
-            />
+            <div className="flex items-center justify-center gap-1.5 mt-6">
+              <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
+              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
+              <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+            </div>
           </div>
         </FadeIn>
 
