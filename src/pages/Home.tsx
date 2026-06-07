@@ -80,6 +80,13 @@ export default function Home() {
   const [simLed, setSimLed] = useState(false)
   const [selectedPaintId, setSelectedPaintId] = useState('white')
   const [paintColorTemp, setPaintColorTemp] = useState<'warm' | 'natural' | 'cool'>('warm')
+  const [paintFlicker, setPaintFlicker] = useState(false)
+
+  useEffect(() => {
+    setPaintFlicker(true)
+    const t = setTimeout(() => setPaintFlicker(false), 80)
+    return () => clearTimeout(t)
+  }, [paintColorTemp, selectedPaintId])
 
   useEffect(() => {
     const startTime = Date.now();
@@ -571,30 +578,117 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
-              
-              {/* شاشة العرض - الجدار الافتراضي بتأثير CSS خالص */}
+              {/* شاشة العرض - زاوية ثلاثية الأبعاد 3D Room Corner */}
               <div className="w-full lg:w-[38%] max-w-[360px] flex flex-col gap-4">
-                <div 
-                  className="w-full aspect-[4/3] rounded-2xl relative overflow-hidden bg-black shadow-2xl border border-white/10 transition-all duration-500 group"
-                  style={{ backgroundColor: (paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).hex }}
-                >
-                  {/* تأثير مخروط الإضاءة بتأثير mix-blend-multiply لمحاكاة تراكب الإضاءة الحقيقي */}
+                <div className="w-full aspect-[4/3] rounded-2xl relative overflow-hidden bg-[#080d1a] shadow-2xl border border-white/10 transition-all duration-500">
+                  {/* Left Wall */}
                   <div 
-                    className="absolute inset-0 pointer-events-none transition-all duration-500 mix-blend-multiply"
+                    className="absolute inset-0 transition-all duration-500"
                     style={{
-                      background: `radial-gradient(circle at top, ${
-                        paintColorTemp === 'warm' ? 'rgba(251, 191, 36, 0.65)' : 
-                        paintColorTemp === 'natural' ? 'rgba(254, 240, 138, 0.55)' : 
-                        'rgba(186, 230, 253, 0.55)'
-                      } 0%, rgba(0,0,0,0.15) 85%)`
+                      backgroundColor: (paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).hex,
+                      clipPath: 'polygon(0% 5%, 50% 18%, 50% 80%, 0% 68%)',
+                    }}
+                  >
+                    {/* Wall Shadow overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/5 to-black/25 pointer-events-none" />
+                    {/* Direct Spotlight reflection */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none transition-all duration-500"
+                      style={{
+                        background: `radial-gradient(circle at 50% 12%, ${
+                          paintColorTemp === 'warm' ? 'rgba(251, 191, 36, 0.45)' : 
+                          paintColorTemp === 'natural' ? 'rgba(254, 240, 138, 0.35)' : 
+                          'rgba(186, 230, 253, 0.35)'
+                        } 0%, transparent 70%)`,
+                        opacity: paintFlicker ? 0.15 : 1,
+                      }}
+                    />
+                  </div>
+
+                  {/* Right Wall */}
+                  <div 
+                    className="absolute inset-0 transition-all duration-500"
+                    style={{
+                      backgroundColor: (paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).hex,
+                      clipPath: 'polygon(50% 18%, 100% 5%, 100% 68%, 50% 80%)',
+                    }}
+                  >
+                    {/* Shaded wall overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-l from-black/15 to-black/35 pointer-events-none" />
+                    {/* Direct Spotlight reflection */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none transition-all duration-500"
+                      style={{
+                        background: `radial-gradient(circle at 50% 12%, ${
+                          paintColorTemp === 'warm' ? 'rgba(251, 191, 36, 0.45)' : 
+                          paintColorTemp === 'natural' ? 'rgba(254, 240, 138, 0.35)' : 
+                          'rgba(186, 230, 253, 0.35)'
+                        } 0%, transparent 70%)`,
+                        opacity: paintFlicker ? 0.15 : 1,
+                      }}
+                    />
+                  </div>
+
+                  {/* Center Seam Shadow */}
+                  <div className="absolute top-[18%] bottom-[20%] left-1/2 w-[1px] -translate-x-1/2 pointer-events-none z-10 bg-black/20" />
+
+                  {/* Floor */}
+                  <div 
+                    className="absolute inset-0 transition-all duration-500"
+                    style={{
+                      background: 'linear-gradient(135deg, #111522 0%, #1d2232 100%)',
+                      clipPath: 'polygon(0% 68%, 50% 80%, 100% 68%, 50% 100%)',
+                    }}
+                  >
+                    {/* Subtle floor plank pattern lines */}
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_100%] opacity-20 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent pointer-events-none" />
+                    
+                    {/* Spotlight floor reflection */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none transition-all duration-500"
+                      style={{
+                        background: `radial-gradient(circle at 50% 80%, ${
+                          paintColorTemp === 'warm' ? 'rgba(251, 191, 36, 0.4)' : 
+                          paintColorTemp === 'natural' ? 'rgba(254, 240, 138, 0.3)' : 
+                          'rgba(186, 230, 253, 0.3)'
+                        } 0%, transparent 65%)`,
+                        opacity: paintFlicker ? 0.15 : 1,
+                      }}
+                    />
+                  </div>
+
+                  {/* Spotlight Cone */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none z-10 transition-all duration-500"
+                    style={{
+                      clipPath: 'polygon(50% 12%, 0% 100%, 100% 100%)',
+                      background: `linear-gradient(to bottom, ${
+                        paintColorTemp === 'warm' ? 'rgba(251, 191, 36, 0.28)' : 
+                        paintColorTemp === 'natural' ? 'rgba(254, 240, 138, 0.18)' : 
+                        'rgba(186, 230, 253, 0.18)'
+                      }, transparent 85%)`,
+                      opacity: paintFlicker ? 0.1 : 0.85,
                     }}
                   />
-                  
-                  {/* حافة الغرفة والزوايا بشكل كرتوني أنيق ثلاثي الأبعاد */}
-                  <div className="absolute top-0 bottom-0 left-1/2 w-[1px] bg-black/10 shadow-sm" />
-                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-black/15 border-t border-black/5 flex items-center justify-between px-4">
-                    <span className="text-[10px] text-white/40 font-bold">زاوية الصالة الافتراضية</span>
-                    <span className="text-[10px] text-white/40 font-bold">إنارة 💡</span>
+
+                  {/* Spotlight Physical Fixture */}
+                  <div className="absolute top-[3%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none">
+                    <div className="w-10 h-2 bg-slate-800 rounded-full border border-slate-700/50 shadow-inner" />
+                    <div className="w-1.5 h-3 bg-gradient-to-r from-slate-600 to-slate-500" />
+                    <div className="w-7 h-7 bg-slate-900 border border-slate-700 rounded-t-sm rounded-b-md flex items-center justify-center shadow-lg relative">
+                      <div className={`w-5 h-2 rounded-full blur-[1px] transition-all duration-300 ${
+                        paintColorTemp === 'warm' ? 'bg-amber-300 shadow-[0_0_12px_#f59e0b]' :
+                        paintColorTemp === 'natural' ? 'bg-yellow-100 shadow-[0_0_12px_#fef08a]' :
+                        'bg-sky-200 shadow-[0_0_12px_#38bdf8]'
+                      }`} />
+                    </div>
+                  </div>
+
+                  {/* 3D Indicator Badge */}
+                  <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-md border border-white/5 pointer-events-none">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                    <span className="text-[9px] text-white/60 font-bold font-sans">عرض ثلاثي الأبعاد 3D</span>
                   </div>
                 </div>
 
