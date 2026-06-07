@@ -188,21 +188,19 @@ export default function Navbar() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
             className="fixed inset-0 z-40 md:hidden"
           >
-            {/* الخلفية المظلمة الضبابية */}
-            <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={() => setIsOpen(false)} />
+            {/* الخلفية المظلمة الضبابية الخفيفة */}
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
             
             <motion.div
               initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+              transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
               className="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] border-l border-blue-500/20 shadow-2xl overflow-y-auto flex flex-col justify-between"
             >
-              {/* نقوش وخلفيات النيون داخل المنيو لجعلها حية */}
-              <div className="absolute inset-0 z-0 bg-animated-grid opacity-30 pointer-events-none" />
-              <div className="absolute -top-20 -right-20 w-48 h-48 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none z-0 animate-float-1" />
-              <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-blue-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-float-2" />
+              {/* نقوش الخلفية الثابتة للأداء العالي */}
+              <div className="absolute inset-0 z-0 bg-animated-grid opacity-20 pointer-events-none" />
 
               <div className="relative z-10">
                 {/* رأس المنيو الجانبي */}
@@ -253,34 +251,30 @@ export default function Navbar() {
                         <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isMobileDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
                       </button>
 
-                      <AnimatePresence>
-                        {isMobileDropdownOpen && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="overflow-hidden flex flex-col gap-1.5 px-2 mt-1 border-t border-white/5 pt-2"
-                          >
-                            {servicesDropdown.items.map((item) => {
-                              const isSubActive = location.pathname === item.path;
-                              return (
-                                <Link
-                                  key={item.path}
-                                  to={item.path}
-                                  onClick={() => setIsOpen(false)}
-                                  className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all hover:translate-x-[-4px] ${
-                                    isSubActive ? 'text-white bg-blue-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                  }`}
-                                >
-                                  <item.icon className="w-4.5 h-4.5 text-blue-400" />
-                                  <span>{item.label}</span>
-                                </Link>
-                              )
-                            })}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      <div 
+                        className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-1.5 px-2 ${
+                          isMobileDropdownOpen 
+                            ? 'max-h-[300px] opacity-100 border-t border-white/5 pt-2 mt-1' 
+                            : 'max-h-0 opacity-0 pointer-events-none border-transparent pt-0 mt-0'
+                        }`}
+                      >
+                        {servicesDropdown.items.map((item) => {
+                          const isSubActive = location.pathname === item.path;
+                          return (
+                            <Link
+                              key={item.path}
+                              to={item.path}
+                              onClick={() => setIsOpen(false)}
+                              className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all hover:translate-x-[-4px] ${
+                                isSubActive ? 'text-white bg-blue-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                              }`}
+                            >
+                              <item.icon className="w-4.5 h-4.5 text-blue-400" />
+                              <span>{item.label}</span>
+                            </Link>
+                          )
+                        })}
+                      </div>
                     </div>
                   </motion.div>
 
