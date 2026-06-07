@@ -118,7 +118,7 @@ export default function WirePrices() {
       // تحويل المستخدم إلى الواتس اب للتأكيد الفوري
       const whatsappMsg = `السلام عليكم، أريد تأكيد طلب شراء سلك إيطالي:\n\n*المقاس:* ${selectedWire.size}\n*الكمية:* ${orderForm.quantity} لفة\n*الإجمالي:* ${totalPrice} د.ل\n*المدينة:* ${orderForm.city}\n*الهاتف:* ${orderForm.phone}`;
       const whatsappUrl = `https://wa.me/218916580068?text=${encodeURIComponent(whatsappMsg)}`;
-      window.open(whatsappUrl, '_blank');
+      window.location.href = whatsappUrl;
 
       setOrderStatus('success')
       setTimeout(() => {
