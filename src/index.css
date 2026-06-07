@@ -143,3 +143,42 @@ html {
   animation: textShine 2.5s linear infinite;
   display: inline-block;
 }
+
+/* انيميشن شريط معالجة الطلب الدائم الحركة */
+@keyframes loadingBar {
+  0% { left: -40%; width: 40%; }
+  50% { left: 30%; width: 60%; }
+  100% { left: 100%; width: 20%; }
+}
+
+/* انيميشن نبض ودخول أيقونة النجاح */
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* انيميشن خط تقدم النجاح بالتوجيه */
+@keyframes successProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* جزيئات نجاح الطلب التفاعلية */
+@keyframes particleTop {
+  0% { transform: translate(-50%, 0) translateY(0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, 0) translateY(-25px) scale(0); opacity: 0; }
+}
+@keyframes particleBottom {
+  0% { transform: translate(-50%, 0) translateY(0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, 0) translateY(25px) scale(0); opacity: 0; }
+}
+@keyframes particleLeft {
+  0% { transform: translate(0, -50%) translateX(0) scale(1); opacity: 1; }
+  100% { transform: translate(0, -50%) translateX(-25px) scale(0); opacity: 0; }
+}
+@keyframes particleRight {
+  0% { transform: translate(0, -50%) translateX(0) scale(1); opacity: 1; }
+  100% { transform: translate(0, -50%) translateX(25px) scale(0); opacity: 0; }
+}

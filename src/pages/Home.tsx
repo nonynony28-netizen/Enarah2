@@ -900,11 +900,66 @@ export default function Home() {
               <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="relative w-full max-w-md bg-[#0d2342] border border-blue-500/20 rounded-[2rem] overflow-hidden shadow-2xl">
                 <button onClick={() => setSelectedWire(null)} className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10"><X className="w-5 h-5" /></button>
                 <div className="p-6 md:p-8">
-                  {orderStatus === 'success' ? (
-                    <div className="text-center py-10">
-                      <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4 shadow-[0_0_20px_rgba(74,222,128,0.3)] rounded-full" />
-                      <h3 className="text-2xl font-bold text-white mb-2">تم تسجيل طلبك بنجاح!</h3>
-                      <p className="text-slate-400">جاري توجيهك الآن إلى الواتساب لتأكيد الطلب الفوري...</p>
+                  {orderStatus === 'loading' || orderStatus === 'success' ? (
+                    <div className="text-center py-10 px-4 flex flex-col items-center justify-center relative min-h-[360px]">
+                      {/* بقعة وهج خلفية خفيفة */}
+                      <div className="absolute w-40 h-40 bg-blue-500/10 rounded-full blur-[80px] -z-10 pointer-events-none animate-pulse" />
+                      
+                      {orderStatus === 'loading' ? (
+                        <div className="flex flex-col items-center justify-center space-y-6">
+                          {/* حلقات التوجيه الإلكتروني */}
+                          <div className="relative w-24 h-24 flex items-center justify-center">
+                            <span className="absolute inset-0 rounded-full border-2 border-dashed border-blue-500/30 animate-spin [animation-duration:15s]" />
+                            <span className="absolute inset-2.5 rounded-full border border-blue-400/40 animate-pulse" />
+                            <span className="absolute inset-5 rounded-full bg-blue-600/10 border border-blue-500/20" />
+                            <Loader2 className="w-9 h-9 text-blue-400 animate-spin relative z-10" />
+                          </div>
+                          
+                          <div>
+                            <h3 className="text-2xl font-bold text-white mb-2 animate-pulse font-sans">تجهيز طلبك الرقمي</h3>
+                            <p className="text-blue-300 text-sm max-w-xs mx-auto leading-relaxed">
+                              نقوم بإنشاء اتصال آمن ونقل بياناتك إلى سجل المبيعات والواتساب...
+                            </p>
+                          </div>
+
+                          {/* خط تقدم مستمر */}
+                          <div className="w-full max-w-[200px] h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
+                            <div className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full animate-[loadingBar_1.8s_ease-out_infinite]" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center space-y-6">
+                          {/* دائرة النجاح المنبثقة مع الجزيئات المتطايرة */}
+                          <div className="relative w-24 h-24 flex items-center justify-center">
+                            {/* موجات نجاح نابضة */}
+                            <div className="absolute inset-0 rounded-full bg-green-500/10 border border-green-500/30 animate-ping [animation-duration:1.5s]" />
+                            <div className="absolute inset-2.5 rounded-full bg-green-600/20 border border-green-400/20" />
+                            
+                            {/* زر النجاح ثلاثي الأبعاد المضيء */}
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-[0_0_25px_rgba(34,197,94,0.4)] relative z-10 scale-100 animate-[bounceIn_0.5s_cubic-bezier(0.175,0.885,0.32,1.275)]">
+                              <CheckCircle className="w-9 h-9 text-white" />
+                            </div>
+
+                            {/* جزيئات نيون تتلاشى للخارج */}
+                            <span className="absolute w-2.5 h-2.5 rounded-full bg-green-400 animate-[particleTop_1.2s_ease-out_infinite] top-0 left-1/2" />
+                            <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-400 animate-[particleBottom_1.2s_ease-out_infinite] bottom-0 left-1/2" />
+                            <span className="absolute w-2 h-2 rounded-full bg-green-300 animate-[particleLeft_1.2s_ease-out_infinite] left-0 top-1/2" />
+                            <span className="absolute w-2 h-2 rounded-full bg-emerald-300 animate-[particleRight_1.2s_ease-out_infinite] right-0 top-1/2" />
+                          </div>
+                          
+                          <div>
+                            <h3 className="text-2xl font-bold text-white mb-2">تم تسجيل طلبك بنجاح!</h3>
+                            <p className="text-emerald-200 text-sm max-w-xs mx-auto leading-relaxed">
+                              تم التوثيق الرقمي. جاري تحويلك الآن للواتساب للتأكيد الفوري والمتابعة...
+                            </p>
+                          </div>
+
+                          {/* خط تعبئة تقدم توجيه الواتساب */}
+                          <div className="w-full max-w-[220px] h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                            <div className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full animate-[successProgress_2.5s_ease-in-out_forwards]" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <>
