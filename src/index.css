@@ -88,6 +88,19 @@ html {
   will-change: transform;
 }
 
+/* On mobile/tablet screens, turn off slow rotation and floating animations to prevent scrolling lag */
+@media (max-width: 768px) {
+  .animate-slow-rotate {
+    animation: none !important;
+    transform: rotate(15deg) scale(1.05) !important;
+    will-change: auto;
+  }
+  .animate-float-1,
+  .animate-float-2 {
+    animation: none !important;
+  }
+}
+
 /* التدرج اللوني الشبكي فائق الأداء والمعزز بالـ GPU */
 .bg-ultra-ambient {
   background-image: 
