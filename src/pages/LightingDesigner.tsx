@@ -1,273 +1,157 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Lightbulb, Zap, Award, Sparkles, Sliders,
-  Upload, ArrowLeft, RefreshCw, Eye, EyeOff, MessageCircle, CheckCircle, ChevronRight
+  Calculator, Ruler, Lightbulb, Zap, Sparkles, Award,
+  MessageCircle, CheckCircle, ArrowLeft, Layers, Compass, Clipboard, HelpCircle
 } from 'lucide-react'
 
-interface FixtureConfig {
-  id: string;
-  type: 'spotlight' | 'chandelier' | 'led_profile';
-  x: number; // percentage (0-100)
-  y: number; // percentage (0-100)
-  scale?: number;
-  style?: 'modern' | 'classic' | 'minimalist';
-  angle?: number;
-  length?: number;
-  thickness?: 'thin' | 'medium' | 'thick';
-  isCove?: boolean;
-}
-
-const ROOM_CONFIGS = {
+// الفئات والسيناريوهات الضوئية الجاهزة للتوهج الفوري
+const SCENARIO_ROOMS = {
   living: {
     title: 'صالة معيشة حديثة',
-    description: 'مساحة معيشة نموذجية (4م × 5م) تجمع بين الجلسات العائلية ومشاهدة التلفزيون.',
-    explanation: 'توزيع الإضاءة في هذه الصالة يعتمد على أسلوب الحد الأدنى (Minimalist) الفاخر. قمنا بدمج 3 خطوط ليد بروفايل ممتدة في السقف المستعار لتعطي إنارة عامة ناعمة تتبع خط المنظور بدقة، مع شريط ليد جداري مخفي (Cove Light) خلف الأريكة يوجه الضوء للأسفل لينير الجدار بنعومة. كما تم توفير 4 سبوتات خافتة في الزوايا للإنارة الإضافية، وثريا مودرن معلقة لتكتمل فخامة المكان.',
-    spotlightReason: '4 سبوتات خافتة موزعة في الزوايا المفتوحة لتوفير إضاءة محيطية داعمة عند الحاجة دون الإخلال بالمظهر البسيط والهادئ للسقف. المقاسات تختلف تدريجياً لتتوافق مع عمق السقف ثلاثي الأبعاد.',
-    ledReason: '4 خطوط ليد بروفايل: 3 منها تسير بالتوازي في السقف لتتبع خطوط منظور الغرفة، وخط جداري (Cove Light) يتدفق بنعومة خلف الأريكة ليوفر إضاءة دافئة وجمالية للغاية.',
-    chandelierReason: 'ثريا مودرن بحلقات دائرية تتوسط منطقة الجلوس لتعمل كقطعة ديكور مضيئة ومنسجمة مع أسلوب الصالة العصري.',
-    recommendedTemp: 'warm' as const,
-    spotlightCount: 4,
-    ledCount: 4,
-    chandelierCount: 1,
-    url: '/images/living-preset.jpg',
-    fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 35, y: 11, scale: 0.6 },
-      { id: 'spot_2', type: 'spotlight', x: 82, y: 16, scale: 0.75 },
-      { id: 'spot_3', type: 'spotlight', x: 18, y: 23, scale: 1.0 },
-      { id: 'spot_4', type: 'spotlight', x: 72, y: 28, scale: 1.2 },
-      { id: 'led_1', type: 'led_profile', x: 62.5, y: 14, length: 500, angle: 9.5, thickness: 'thin' },
-      { id: 'led_2', type: 'led_profile', x: 38, y: 25, length: 540, angle: 7, thickness: 'thin' },
-      { id: 'led_3', type: 'led_profile', x: 30, y: 32, length: 420, angle: 6, thickness: 'thin' },
-      { id: 'led_cove', type: 'led_profile', x: 30.5, y: 33.5, length: 420, angle: 6.5, thickness: 'medium', isCove: true },
-      { id: 'ch_1', type: 'chandelier', x: 52, y: 23, scale: 1.3, style: 'modern' }
-    ] as FixtureConfig[]
+    description: 'مساحة معيشة عصرية تحتاج لسيناريوهات إضاءة تجمع بين الاسترخاء والأنشطة اليومية.',
+    scenarios: [
+      { id: 'cove', label: '1. الإنارة المخفية (Cove Light)', url: 'https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?auto=format&fit=crop&w=1200&q=80', desc: 'إضاءة غير مباشرة ناعمة تضفي دفئاً وهدوءاً وتقلل من إجهاد العين أثناء مشاهدة التلفاز.' },
+      { id: 'spots', label: '2. سبوت لايت فقط (Spotlights)', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80', desc: 'إضاءة مركزة بزوايا مدروسة لتسليط الضوء على اللوحات، الديكورات الجدارية، وقطع الأثاث.' },
+      { id: 'led', label: '3. ليد بروفايل فقط (LED Profile)', url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80', desc: 'خطوط إضاءة هندسية حديثة ممتدة تمنح السقف مظهراً مستقبلياً وتزيد الارتفاع البصري للمكان.' },
+      { id: 'all', label: '4. الإنارة الكاملة (All Lights On)', url: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1200&q=80', desc: 'تشغيل جميع المصادر معاً (المخفي، الليد بروفايل، السبوتات) لإنتاج إضاءة ساطعة ومتكاملة الأبعاد.' },
+    ]
   },
   kitchen: {
     title: 'مطبخ مودرن عصري',
-    description: 'مطبخ عصري (3م × 4م) يتطلب إضاءة عالية لسهولة العمل وتجهيز الطعام.',
-    explanation: 'تتطلب المطابخ إضاءة عمل (Task Lighting) قوية وواضحة. تم توزيع 4 سبوتات فوق أسطح العمل والمجلى مباشرة بزاوية سقوط مستقيمة لتسهيل الرؤية وتفادي الظلال أثناء الطهي. يمتد الليد بروفايل أسفل الخزائن العلوية ليوفر إنارة ساطعة ومركزة لسطح العمل، وشريط سقف مستعار للإضاءة العامة. تم اعتماد إضاءة طبيعية (4000K) لألوان حقيقية للأطعمة، وتجنب الثريات الكلاسيكية لسهولة التنظيف والحفاظ على البساطة.',
-    spotlightReason: 'وزعنا كشافين في الخلف للإضاءة العامة، وكشافين أماميين كبيرين مباشرة فوق منضدة العمل والمجلى لتسليط إضاءة مركزة وقوية تمنع تشكل الظلال أثناء إعداد الأطعمة.',
-    ledReason: 'شريط ليد علوي متناسق مع السقف مائل بـ (-14°) لإبراز الديكور الخشبي، وشريط أخر مائل بـ (8°) مثبت أسفل الخزائن العلوية لينير منطقة التحضير بكفاءة تامة كإضاءة عمل.',
-    chandelierReason: 'ثريا تعليق مودرن وبسيطة تتدلى فوق جزيرة المطبخ، لتعطي إنارة مركزة ومظهر عصري دون التسبب في تجميع الأتربة أو صعوبة التنظيف.',
-    recommendedTemp: 'natural' as const,
-    spotlightCount: 4,
-    ledCount: 2,
-    chandelierCount: 1,
-    url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
-    fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 42, y: 20, scale: 0.7 },
-      { id: 'spot_2', type: 'spotlight', x: 58, y: 20, scale: 0.7 },
-      { id: 'spot_3', type: 'spotlight', x: 25, y: 45, scale: 1.2 },
-      { id: 'spot_4', type: 'spotlight', x: 75, y: 45, scale: 1.2 },
-      { id: 'led_1', type: 'led_profile', x: 35, y: 14, length: 160, angle: -14, thickness: 'thin' },
-      { id: 'led_2', type: 'led_profile', x: 68, y: 48, length: 150, angle: 8, thickness: 'thin', isCove: true },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 35, scale: 0.9, style: 'minimalist' }
-    ] as FixtureConfig[]
+    description: 'مساحة عمل مخصصة تتطلب إضاءة عالية لسهولة العمل وتجهيز الطعام بأمان ودقة.',
+    scenarios: [
+      { id: 'cove', label: '1. إضاءة الخزائن (Cabinet Wash)', url: 'https://images.unsplash.com/photo-1556912173-3bb406ef7e77?auto=format&fit=crop&w=1200&q=80', desc: 'إضاءة مخفية تحت الخزائن العلوية تسقط مباشرة على سطح العمل لمنع تشكل الظلال أثناء الطهي.' },
+      { id: 'spots', label: '2. سبوت لايت فقط (Spotlights)', url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80', desc: 'كشافات سقفية موزعة بانتظام للإضاءة العامة لضمان رؤية جيدة في أرجاء المطبخ.' },
+      { id: 'all', label: '3. الإنارة الكاملة (Full Illumination)', url: 'https://images.unsplash.com/photo-1565183997392-2f6f122e5912?auto=format&fit=crop&w=1200&q=80', desc: 'دمج إضاءة الخزائن والسبوتات لتغطية المساحة بإنارة عمل عامة وخاصة ممتازة.' },
+    ]
   },
   bedroom: {
     title: 'غرفة نوم هادئة',
-    description: 'غرفة نوم رئيسية (4م × 4م) مصممة للاسترخاء والراحة النفسية.',
-    explanation: 'تم توزيع 4 سبوتات دافئة خافتة (3000K) في زوايا الغرفة وبعيداً عن منطقة سرير النوم تماماً، وذلك لتفادي سقوط الضوء مباشرة على العينين أثناء الاستلقاء. تم اعتماد إضاءة الليد بروفايل المخفي خلف السرير أو الستارة لإضفاء توهج ناعم يبعث على الهدوء والاسترخاء، مع ثريا مودرن ناعمة وقابلة للتحكم بشدتها لتوفير إضاءة محيطية جمالية.',
-    spotlightReason: 'توزيع 4 كشافات سبوت لايت في زوايا الغرفة بعيداً عن منطقة سرير النوم تماماً، وذلك لتجنب سقوط الضوء مباشرة على العينين وتفادي الوهج المزعج أثناء الاستلقاء.',
-    ledReason: 'شريط ليد بروفايل خلف خلفية السرير ليعطي إضاءة خافتة وناعمة ومريحة للنوم والاسترخاء، وشريط ليد آخر في الجيب الجبسي لتأثير ارتفاع السقف.',
-    chandelierReason: 'ثريا مركزية بتصميم ناعم وهادئ توزع الضوء بزاوية 360 درجة، وتعمل كإضاءة عامة للمكان قبل النوم.',
-    recommendedTemp: 'warm' as const,
-    spotlightCount: 4,
-    ledCount: 2,
-    chandelierCount: 1,
-    url: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
-    fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 35, y: 20, scale: 0.75 },
-      { id: 'spot_2', type: 'spotlight', x: 65, y: 20, scale: 0.75 },
-      { id: 'spot_3', type: 'spotlight', x: 20, y: 38, scale: 1.1 },
-      { id: 'spot_4', type: 'spotlight', x: 80, y: 38, scale: 1.1 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 58, length: 240, angle: 0, thickness: 'medium', isCove: true },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 14, length: 180, angle: 0, thickness: 'thin', isCove: true },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 26, scale: 1.1, style: 'modern' }
-    ] as FixtureConfig[]
-  },
-  salon: {
-    title: 'صالون / مجلس ضيوف',
-    description: 'مجلس ضيوف فخم وواسع (5م × 6م) يحتاج لإبراز الفخامة والديكورات.',
-    explanation: 'مجلس الضيوف يعبر عن الكرم والفخامة. وزعنا 8 سبوتات مركزة وموجهة بزوايا مدروسة لتسليط الضوء على الديكورات الجدارية واللوحات والممرات. تم وضع ثريتين كلاسيكيتين فخمتين لتعزيز الطابع الفخم وتأكيد فخامة المجلس ومركزيته. يحيط الليد بروفايل بأطراف السقف المستعار ليوفر إضاءة عامة ناعمة ودافئة (3000K) تناسب اللقاءات الطويلة وتمنح المكان اتساعاً بصرياً.',
-    spotlightReason: 'تم توزيع 8 سبوتات مركزة وموجهة بزوايا مدروسة ومقاسات تتدرج مع عمق الصورة (0.65 إلى 1.35)، لتسليط الضوء على الديكورات الجدارية واللوحات والممرات وإبراز الفخامة.',
-    ledReason: 'أربعة خطوط ليد بروفايل في السقف المستعار تتبع بدقة أبعاد المجلس المربع بزوايا ميل تناسب منظور الصورة، لتعطي إضاءة غير مباشرة دافئة ومريحة للجلسات الطويلة.',
-    chandelierReason: 'تم تعليق ثريتين كلاسيكيتين فخمتين بالكريستال بمستويين متدرجين في الحجم والارتفاع لملء الفراغ البصري لصالون الضيوف وتأكيد مركز الفخامة.',
-    recommendedTemp: 'warm' as const,
-    spotlightCount: 8,
-    ledCount: 4,
-    chandelierCount: 2,
-    url: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1200&q=80',
-    fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 34, y: 18, scale: 0.65 },
-      { id: 'spot_2', type: 'spotlight', x: 66, y: 18, scale: 0.65 },
-      { id: 'spot_3', type: 'spotlight', x: 25, y: 28, scale: 0.9 },
-      { id: 'spot_4', type: 'spotlight', x: 75, y: 28, scale: 0.9 },
-      { id: 'spot_5', type: 'spotlight', x: 12, y: 42, scale: 1.35 },
-      { id: 'spot_6', type: 'spotlight', x: 88, y: 42, scale: 1.35 },
-      { id: 'spot_7', type: 'spotlight', x: 50, y: 16, scale: 0.7 },
-      { id: 'spot_8', type: 'spotlight', x: 50, y: 34, scale: 1.15 },
-      { id: 'led_1', type: 'led_profile', x: 26, y: 20, length: 180, angle: -22, thickness: 'medium' },
-      { id: 'led_2', type: 'led_profile', x: 74, y: 20, length: 180, angle: 22, thickness: 'medium' },
-      { id: 'led_3', type: 'led_profile', x: 50, y: 11, length: 120, angle: 0, thickness: 'medium' },
-      { id: 'led_4', type: 'led_profile', x: 50, y: 52, length: 260, angle: 0, thickness: 'medium' },
-      { id: 'ch_1', type: 'chandelier', x: 42, y: 24, scale: 0.95, style: 'classic' },
-      { id: 'ch_2', type: 'chandelier', x: 58, y: 36, scale: 1.35, style: 'classic' }
-    ] as FixtureConfig[]
-  },
-  custom: {
-    title: 'توزيع مخصص لصورتك المرفوعة',
-    description: 'توزيع هندسي ذكي ومناسب لجميع الصالونات والغرف السكنية.',
-    explanation: 'لهذه الصورة قمنا بتطبيق توزيع هندسي متوازن ومناسب لأغلب الغرف: شبكة متوزعة من 4 سبوتات لتوزيع الضوء بالتساوي وبطريقة هندسية صحيحة، شريطي ليد بروفايل في السقف المستعار لمنح الغرفة إضاءة غير مباشرة (Indirect) تزيد من الارتفاع البصري، وثريا مركزية فخمة لتمثل القطعة الجمالية المضيئة في المنتصف.',
-    spotlightReason: 'شبكة متوزعة من 4 سبوتات لتوزيع الضوء بالتساوي وبطريقة هندسية صحيحة تمنع تشكل الظلام في أركان الغرفة المرفوعة.',
-    ledReason: 'شريطي ليد بروفايل في السقف لخلق إضاءة غير مباشرة (Indirect) تزيد من الارتفاع البصري وتضفي لمسة عصرية على الصورة.',
-    chandelierReason: 'ثريا مركزية فخمة لتمثل القطعة الجمالية المضيئة في المنتصف لتوزيع الضوء في مركز المساحة.',
-    recommendedTemp: 'warm' as const,
-    spotlightCount: 4,
-    ledCount: 2,
-    chandelierCount: 1,
-    url: '',
-    fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 30, y: 25, scale: 0.8 },
-      { id: 'spot_2', type: 'spotlight', x: 70, y: 25, scale: 0.8 },
-      { id: 'spot_3', type: 'spotlight', x: 20, y: 55, scale: 1.2 },
-      { id: 'spot_4', type: 'spotlight', x: 80, y: 55, scale: 1.2 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 15, length: 220, angle: 0, thickness: 'medium' },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 65, length: 220, angle: 0, thickness: 'medium' },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 35, scale: 1.1, style: 'modern' }
-    ] as FixtureConfig[]
+    description: 'ملاذ الراحة والاسترخاء، تعتمد على التدرج والنعومة في توزيع العناصر الضوئية.',
+    scenarios: [
+      { id: 'cove', label: '1. خلفية السرير (Accent Glow)', url: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80', desc: 'توهج دافئ غير مباشر خلف ظهر السرير يبعث على الراحة النفسية التامة ويساعد على النوم.' },
+      { id: 'spots', label: '2. سبوتات الزوايا (Corner Spots)', url: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80', desc: 'سبوتات خافتة موزعة في الزوايا وبعيداً عن مستوى السرير لتفادي التوهج المزعج للعين.' },
+      { id: 'all', label: '3. الإنارة الكاملة (Full Illumination)', url: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80', desc: 'تشغيل كافة العناصر لتهيئة الغرفة للقراءة أو تنسيق الملابس برؤية واضحة وطبيعية.' },
+    ]
   }
 };
 
 export default function LightingDesigner() {
-  const [roomType, setRoomType] = useState<keyof typeof ROOM_CONFIGS>('living');
-  const [customImage, setCustomImage] = useState<string | null>(null);
-  
-  // خيارات تشغيل/إطفاء المجموعات الضوئية
-  const [showSpotlights, setShowSpotlights] = useState(true);
-  const [showLedProfiles, setShowLedProfiles] = useState(true);
-  const [showChandeliers, setShowChandeliers] = useState(true);
-  
-  // خيارات شدة الإضاءة العامة وحرارة الألوان
-  const [brightness, setBrightness] = useState(80);
-  const [temp, setTemp] = useState<'warm' | 'natural' | 'cool'>('warm');
-  const [showLights, setShowLights] = useState(true);
-  
-  const [copiedText, setCopiedText] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // حالات الحاسبة
+  const [length, setLength] = useState<number>(5);
+  const [width, setWidth] = useState<number>(4);
+  const [roomUse, setRoomUse] = useState<keyof typeof SCENARIO_ROOMS | 'salon' | 'hallway'>('living');
+  const [ceilingType, setCeilingType] = useState<'gypsum_full' | 'gypsum_perimeter' | 'flat'>('gypsum_full');
+  const [lightLevel, setLightLevel] = useState<'relax' | 'medium' | 'bright'>('medium');
 
-  // استرجاع الصورة من الجلسة الآمنة عند التحميل والتأكد من عدم انتهاء الصلاحية (ساعة واحدة)
+  // حالات مقارن السيناريوهات
+  const [activeRoom, setActiveRoom] = useState<keyof typeof SCENARIO_ROOMS>('living');
+  const [activeScenarioId, setActiveScenarioId] = useState<string>('all');
+  const [copiedText, setCopiedText] = useState(false);
+
+  // تحميل مسبق للصور لمنع الوميض عند التبديل
   useEffect(() => {
-    const savedImage = sessionStorage.getItem('enarah_custom_image');
-    const savedTime = sessionStorage.getItem('enarah_custom_image_time');
-    
-    if (savedImage && savedTime) {
-      const elapsed = Date.now() - parseInt(savedTime);
-      if (elapsed < 3600000) { // أقل من ساعة
-        setCustomImage(savedImage);
-        setRoomType('custom');
-      } else {
-        sessionStorage.removeItem('enarah_custom_image');
-        sessionStorage.removeItem('enarah_custom_image_time');
-      }
-    }
+    Object.values(SCENARIO_ROOMS).forEach((room) => {
+      room.scenarios.forEach((sc) => {
+        const img = new Image();
+        img.src = sc.url;
+      });
+    });
   }, []);
 
-  // مؤقت لمسح الصورة تلقائياً بعد مرور ساعة من الرفع
+  // إعادة ضبط السيناريو الافتراضي عند تغيير الغرفة المعروضة
   useEffect(() => {
-    const interval = setInterval(() => {
-      const savedTime = sessionStorage.getItem('enarah_custom_image_time');
-      if (savedTime) {
-        const elapsed = Date.now() - parseInt(savedTime);
-        if (elapsed >= 3600000) {
-          setCustomImage(null);
-          if (roomType === 'custom') {
-            setRoomType('living');
-          }
-          sessionStorage.removeItem('enarah_custom_image');
-          sessionStorage.removeItem('enarah_custom_image_time');
-          alert("تنبيه أمني: انتهت صلاحية الجلسة الآمنة (ساعة واحدة) وتم إزالة صورتك المرفوعة تلقائياً لحماية خصوصيتك ولتسريع أداء متصفح الهاتف.");
-        }
-      }
-    }, 15000);
-    return () => clearInterval(interval);
-  }, [roomType]);
+    const defaultSc = SCENARIO_ROOMS[activeRoom].scenarios.find(s => s.id === 'all') || SCENARIO_ROOMS[activeRoom].scenarios[0];
+    setActiveScenarioId(defaultSc.id);
+  }, [activeRoom]);
 
-  // تحديث درجة اللون المفضلة تلقائياً عند تغيير الغرفة لمساعدة الزبون
-  useEffect(() => {
-    setTemp(ROOM_CONFIGS[roomType].recommendedTemp);
-  }, [roomType]);
+  // الحسابات الهندسية بناءً على معايير لوكس (Lux) العالمية
+  const area = parseFloat((length * width).toFixed(1));
 
-  const getBgImage = () => {
-    if (roomType === 'custom' && customImage) {
-      return customImage;
-    }
-    return ROOM_CONFIGS[roomType].url || ROOM_CONFIGS.living.url;
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2.5 * 1024 * 1024) {
-        alert("تنبيه: حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 2.5 ميجابايت لضمان سرعة واستجابة اللوحة على الهواتف.");
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          const base64 = event.target.result as string;
-          setCustomImage(base64);
-          setRoomType('custom');
-          try {
-            sessionStorage.setItem('enarah_custom_image', base64);
-            sessionStorage.setItem('enarah_custom_image_time', Date.now().toString());
-          } catch (err) {
-            console.warn("فشل حفظ الصورة في sessionStorage، سيتم الاحتفاظ بها في ذاكرة الصفحة المؤقتة.", err);
-          }
-        }
-      };
-      reader.readAsDataURL(file);
+  // الحصول على معدل لوكس المطلوب
+  const getRequiredLux = () => {
+    switch (roomUse) {
+      case 'living':
+        return lightLevel === 'relax' ? 100 : lightLevel === 'medium' ? 150 : 250;
+      case 'kitchen':
+        return lightLevel === 'relax' ? 150 : lightLevel === 'medium' ? 250 : 350;
+      case 'bedroom':
+        return lightLevel === 'relax' ? 80 : lightLevel === 'medium' ? 120 : 180;
+      case 'salon':
+        return lightLevel === 'relax' ? 150 : lightLevel === 'medium' ? 200 : 300;
+      case 'hallway':
+        return lightLevel === 'relax' ? 80 : lightLevel === 'medium' ? 100 : 150;
+      default:
+        return 150;
     }
   };
 
-  const getTempColor = (t: 'warm' | 'natural' | 'cool', alpha: number = 1) => {
-    switch (t) {
-      case 'warm': return `rgba(251, 191, 36, ${alpha})`;
-      case 'natural': return `rgba(254, 240, 138, ${alpha})`;
-      case 'cool': return `rgba(224, 242, 254, ${alpha})`;
-    }
-  };
+  const reqLux = getRequiredLux();
+  const totalLumensNeeded = Math.round(area * reqLux);
 
-  const currentConfig = ROOM_CONFIGS[roomType];
-  const activeFixtures = currentConfig.fixtures.filter(f => {
-    if (f.type === 'spotlight') return showSpotlights;
-    if (f.type === 'led_profile') return showLedProfiles;
-    if (f.type === 'chandelier') return showChandeliers;
-    return true;
-  });
+  // كفاءة المصباح الافتراضية للسبوتات (بقوة 7 واط وتعطي تقريباً 550 لومن)
+  const spotLumens = 550;
+  let recommendedSpots = Math.ceil(totalLumensNeeded / spotLumens);
+  
+  // لضمان التناسق البصري والتناظر في الأسقف، يفضل تقريب عدد الكشافات لأقرب رقم زوجي
+  if (recommendedSpots % 2 !== 0 && recommendedSpots > 1) {
+    recommendedSpots += 1;
+  }
 
+  // حساب أطوال الليد بروفايل والإنارة المخفية الموصى بها
+  let ledProfileRecommendation = '';
+  let ledLength = 0;
+
+  if (ceilingType === 'gypsum_full') {
+    ledLength = Math.round((length + width) * 0.9);
+    ledProfileRecommendation = `تأسيس خطوط ليد بروفايل في السقف بطول إجمالي ${ledLength} متر طولي، موزعة على شكل مسارات متوازية لتعطي إنارة عامة ناعمة.`;
+  } else if (ceilingType === 'gypsum_perimeter') {
+    ledLength = Math.round((length + width) * 2);
+    ledProfileRecommendation = `تأسيس شريط ليد مخفي (Cove Light) بطول ${ledLength} متر طولي، يلتف داخل الجيب الجبسي على أطراف الغرفة بالكامل لإنارة غير مباشرة غاية في الجمال.`;
+  } else {
+    ledProfileRecommendation = `السقف الخرساني المسطح لا يدعم تأسيس بروفايلات الليد الغاطسة. ننصحك باستخدام مسارات الإنارة المغناطيسية الظاهرة (Surface Magnetic Tracks) كبديل عصري سهل التركيب.`;
+  }
+
+  // حساب الحجم المقترح للثريا المركزية (قطر الثريا التقريبي بالسنتمتر)
+  const recommendedChandelierDiameter = Math.round((length + width) * 8);
+
+  // صياغة نص التقرير للنسخ والمشاركة بالواتساب
   const generateWhatsAppText = () => {
-    const tempText = temp === 'warm' ? '3000K دافئ' : temp === 'natural' ? '4000K شمسي' : '6000K أبيض';
-    const counts = [];
-    if (showSpotlights) counts.push(`- سبوت لايت: ${currentConfig.spotlightCount} قطع`);
-    if (showLedProfiles) counts.push(`- ليد بروفايل: ${currentConfig.ledCount} خطوط`);
-    if (showChandeliers) counts.push(`- ثريا معلقة: ${currentConfig.chandelierCount} قطع`);
+    const roomName = 
+      roomUse === 'living' ? 'صالة معيشة' : 
+      roomUse === 'kitchen' ? 'مطبخ' : 
+      roomUse === 'bedroom' ? 'غرفة نوم' : 
+      roomUse === 'salon' ? 'صالون / مجلس' : 'ممر / موزع';
+
+    const ceilingName = 
+      ceilingType === 'gypsum_full' ? 'جبس مستعار كامل' : 
+      ceilingType === 'gypsum_perimeter' ? 'جبس أطراف (ديكور كوف مخفي)' : 'سقف عادي مسطح';
+
+    const brightnessName = 
+      lightLevel === 'relax' ? 'هادئة ومريحة' : 
+      lightLevel === 'medium' ? 'طبيعية ومعتدلة' : 'قوية وممتازة للقراءة';
 
     const text = 
-      `أهلاً "الإنارة الحديثة"، لقد تصفحت توزيع الإضاءة الهندسي المقترح لـ (${currentConfig.title}) عبر موقعكم وأود الاستفسار عن المنتجات المطابقة:\n\n` +
-      `📊 الملخص الإجمالي والتوزيع المعتمد:\n` +
-      `${counts.join('\n') || '- لم يتم تحديد قطع.'}\n\n` +
-      `💡 درجة لون الإضاءة المطلوبة: ${tempText}\n` +
-      `⚡ شدة السطوع المطلوبة: ${brightness}%\n\n` +
-      `📸 (سأرفق لكم لقطة شاشة للغرفة بالواتساب لطلب مطابقة المنتجات والأسعار)`;
+      `أهلاً "الإنارة الحديثة"، قمت باستخدام الحاسبة الهندسية للإنارة وأود الاستفسار عن المنتجات المطابقة لغرفتي:\n\n` +
+      `📊 تفاصيل أبعاد الغرفة:\n` +
+      `- نوع الغرفة: ${roomName}\n` +
+      `- الأبعاد: ${length}م × ${width}م (المساحة: ${area} م²)\n` +
+      `- نوع السقف المعين: ${ceilingName}\n` +
+      `- شدة الإضاءة المطلوبة: ${brightnessName}\n\n` +
+      `💡 التوزيع الهندسي الموصى به:\n` +
+      `- كشافات سبوت لايت: ${recommendedSpots} قطع (بقوة 7 واط، درجة اللون الموصى بها: 3000K-4000K)\n` +
+      `- مسافة تركيب السبوتات: تبعد 1 متر عن الحائط، وتوزع بمسافة 1.2 متر إلى 1.5 متر بين الكشافات.\n` +
+      `- شريط الليد / البروفايل: ${ledLength > 0 ? `${ledLength} متر طولي` : 'غير مطبق'}\n` +
+      `  * التوصية: ${ledProfileRecommendation}\n` +
+      `- حجم الثريا المقترح: قطر ${recommendedChandelierDiameter} سم تقريباً تعلق في المنتصف.\n\n` +
+      `أرجو تزويدي بالأسعار والخيارات المتوفرة لديكم ومطابقتها هندسياً.`;
     
     return encodeURIComponent(text);
   };
 
-  const handleWhatsAppShare = () => {
+  const handleCopyAndWhatsApp = () => {
     const text = generateWhatsAppText();
     const cleanText = decodeURIComponent(text);
     navigator.clipboard.writeText(cleanText).then(() => {
@@ -277,10 +161,14 @@ export default function LightingDesigner() {
     });
   };
 
+  // معلومات الغرفة النشطة لسيناريو الصور
+  const activeRoomData = SCENARIO_ROOMS[activeRoom];
+  const activeScenario = activeRoomData.scenarios.find(s => s.id === activeScenarioId) || activeRoomData.scenarios[0];
+
   return (
     <div className="min-h-screen bg-[#06152b] py-20 px-4 sm:px-6 lg:px-8 relative text-white overflow-hidden font-sans" dir="rtl">
       
-      {/* شبكة النيون الخلفية */}
+      {/* خلفية النيون المضيئة */}
       <div className="absolute inset-0 z-0 bg-[size:30px_30px] opacity-15 pointer-events-none" 
         style={{ backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px)' }} 
       />
@@ -289,583 +177,309 @@ export default function LightingDesigner() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         
-        {/* العناوين والترويسة */}
-        <div className="text-center mb-8">
+        {/* الترويسة الرئيسية */}
+        <div className="text-center mb-10">
           <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4 group text-sm font-bold bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             العودة للرئيسية
           </Link>
           <h1 className="text-3xl md:text-5xl font-black mb-3 tracking-tight">
-            موزّع الإضاءة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.35)]">الذكي والهندسي</span>
+            مستشار وحاسبة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.35)]">الإنارة الذكية</span>
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-sm md:text-base">
-            اختر نوع غرفتك أو ارفع صورتك الشخصية، ليعرض لك النظام فوراً توزيع الإضاءة المنظوري والصحيح هندسياً مع شرح كامل وواضح لكل عنصر!
+            الأداة الهندسية الخفيفة والأسرع للهواتف. احسب عدد وحجم كشافات الإضاءة لغرفتك بدقة علمية، وقارن توزيع الإنارة الحقيقي بالصور الجاهزة فائقة السرعة!
           </p>
         </div>
 
-        {/* جسم المصمم */}
+        {/* جسم الأداة */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* الجانب الأيمن (8 أعمدة): مساحة العرض الرسومية خفيفة الوزن للغاية */}
-          <div className="lg:col-span-8 space-y-6">
-            
-            {/* خيارات تغيير الغرفة */}
-            <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
-              <div className="flex flex-wrap gap-2">
-                {(Object.keys(ROOM_CONFIGS) as Array<keyof typeof ROOM_CONFIGS>).map(key => {
-                  if (key === 'custom' && !customImage) return null;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setRoomType(key)}
-                      className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${
-                        roomType === key
-                          ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.4)] border border-blue-500/30'
-                          : 'bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
-                      }`}
-                    >
-                      {ROOM_CONFIGS[key].title}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* زر تحميل صورة مخصصة */}
-              <div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  ref={fileInputRef}
-                  className="hidden"
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 ${
-                    roomType === 'custom'
-                      ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-[0_0_12px_rgba(16,185,129,0.4)] border border-green-500/30'
-                      : 'bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  <Upload className="w-4.5 h-4.5 text-green-400" />
-                  <span>{customImage ? 'تغيير صورتك المرفوعة' : 'جرب توزيع إضاءة على صورتك'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* مساحة الرسم التفاعلية (Canvas) - لاصقة في الهواتف ومسرعة رسومياً بالكامل */}
-            <div className="sticky top-[56px] z-40 md:relative md:top-auto md:z-auto bg-[#0d2342]/95 border border-blue-500/20 rounded-t-none rounded-b-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-300">
+          {/* الجانب الأيمن (5 أعمدة): حاسبة الإنارة الهندسية */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-2xl text-right space-y-5">
               
-              {/* شريط الإجراءات السريعة على الصورة */}
-              <div className="absolute top-4 right-4 z-30 flex gap-2">
-                <button
-                  onClick={() => setShowLights(!showLights)}
-                  className="p-3 bg-black/60 hover:bg-black/80 text-white rounded-2xl transition-all border border-white/10 flex items-center gap-2 text-xs font-bold backdrop-blur-sm"
-                >
-                  {showLights ? <EyeOff className="w-4 h-4 text-red-400" /> : <Eye className="w-4 h-4 text-green-400" />}
-                  <span>{showLights ? 'إطفاء الإضاءة' : 'تشغيل الإضاءة'}</span>
-                </button>
+              <div className="flex items-center gap-2.5 pb-3 border-b border-white/5">
+                <Calculator className="w-5.5 h-5.5 text-blue-400" />
+                <h2 className="text-lg font-black text-white">حاسبة الإنارة والمقاسات</h2>
               </div>
 
-              {/* الحاوية الفعلية للصورة والسبوتات - ثابتة 100% بدون مستمعين للسحب */}
-              <div className="relative w-full aspect-[16/10] md:aspect-[16/9] min-h-[300px] md:min-h-[450px] bg-slate-950 flex items-center justify-center select-none" style={{ perspective: '1000px' }}>
-                
-                {/* الصورة الخلفية للغرفة */}
-                {getBgImage() ? (
-                  <img
-                    src={getBgImage()}
-                    alt="Room Canvas"
-                    className="w-full h-full object-cover pointer-events-none"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 p-6 text-center">
-                    <Upload className="w-12 h-12 mb-3 text-slate-600" />
-                    <span>يرجى رفع صورة للغرفة لتطبيق التوزيع الهندسي عليها</span>
-                  </div>
-                )}
-
-                {/* طبقة التعتيم المحاكية للظلام - تم تخفيفها لتظل تفاصيل وسقف الغرفة واضحة وحقيقية */}
-                <div 
-                  className="absolute inset-0 pointer-events-none transition-opacity duration-500 bg-black"
-                  style={{
-                    opacity: showLights 
-                      ? Math.max(0.06, 0.40 - (activeFixtures.length * (brightness / 100) * 0.02)) 
-                      : 0.60
-                  }}
-                />
-
-                {/* طبقة توهج السقف المباشر (Ceiling Halo Glows) حول الكشافات ومجاري الليد لإبقاء ملمس الجبس بورد واضحاً ومشعاً */}
-                {showLights && activeFixtures.map((f) => {
-                  if (brightness <= 0) return null;
-                  
-                  if (f.type === 'spotlight') {
-                    return (
-                      <div
-                        key={`ceiling_glow_${f.id}`}
-                        className="absolute pointer-events-none rounded-full transition-all duration-300"
-                        style={{
-                          top: `${f.y}%`,
-                          left: `${f.x}%`,
-                          transform: 'translate(-50%, -50%) rotateX(50deg)',
-                          width: `${(f.scale || 1.0) * 120}px`,
-                          height: `${(f.scale || 1.0) * 80}px`,
-                          background: `radial-gradient(circle, ${getTempColor(temp, 0.4)} 0%, ${getTempColor(temp, 0.06)} 60%, transparent 100%)`,
-                          opacity: brightness / 100,
-                          mixBlendMode: 'screen',
-                          willChange: 'transform'
-                        }}
-                      />
-                    );
-                  }
-
-                  if (f.type === 'led_profile' && !f.isCove) {
-                    return (
-                      <div
-                        key={`led_glow_${f.id}`}
-                        className="absolute pointer-events-none transition-all duration-300"
-                        style={{
-                          left: `${f.x}%`,
-                          top: `${f.y}%`,
-                          width: `${f.length || 150}px`,
-                          height: f.thickness === 'thin' ? '30px' : f.thickness === 'thick' ? '50px' : '40px',
-                          transform: `translate(-50%, -50%) rotate(${f.angle || 0}deg) rotateX(50deg)`,
-                          background: `radial-gradient(ellipse, ${getTempColor(temp, 0.45)} 0%, ${getTempColor(temp, 0.08)} 60%, transparent 100%)`,
-                          opacity: (brightness / 100) * 0.8,
-                          filter: 'blur(8px)',
-                          mixBlendMode: 'screen',
-                          willChange: 'transform'
-                        }}
-                      />
-                    );
-                  }
-
-                  return null;
-                })}
-
-                {/* طبقة تأثيرات سقوط الإضاءة (Beams, Radial Glows & Wall Cove Washes) */}
-                {showLights && activeFixtures.map((f) => {
-                  if (brightness <= 0) return null;
-                  
-                  if (f.type === 'spotlight') {
-                    return (
-                      <div
-                        key={`beam_${f.id}`}
-                        className="absolute pointer-events-none origin-top transition-all duration-300"
-                        style={{
-                          top: `${f.y}%`,
-                          left: `${f.x}%`,
-                          transform: `translateX(-50%) scale(${f.scale || 1.0})`,
-                          width: '140px',
-                          height: '320px',
-                          background: `linear-gradient(to bottom, ${getTempColor(temp, 0.65)} 0%, ${getTempColor(temp, 0.08)} 50%, transparent 100%)`,
-                          clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-                          opacity: brightness / 100,
-                          filter: 'blur(4px)',
-                          mixBlendMode: 'screen',
-                          willChange: 'transform'
-                        }}
-                      />
-                    );
-                  } else if (f.type === 'chandelier') {
-                    return (
-                      <div
-                        key={`glow_${f.id}`}
-                        className="absolute pointer-events-none rounded-full transition-all duration-300"
-                        style={{
-                          top: `${f.y}%`,
-                          left: `${f.x}%`,
-                          transform: 'translate(-50%, -50%)',
-                          width: `${(f.scale || 1.0) * 320}px`,
-                          height: `${(f.scale || 1.0) * 320}px`,
-                          background: `radial-gradient(circle, ${getTempColor(temp, 0.35)} 0%, ${getTempColor(temp, 0.06)} 50%, transparent 100%)`,
-                          opacity: brightness / 100,
-                          filter: 'blur(8px)',
-                          mixBlendMode: 'screen',
-                          willChange: 'transform'
-                        }}
-                      />
-                    );
-                  } else if (f.type === 'led_profile' && f.isCove) {
-                    return (
-                      <div
-                        key={`cove_wash_${f.id}`}
-                        className="absolute pointer-events-none transition-all duration-300"
-                        style={{
-                          left: `${f.x}%`,
-                          top: `${f.y}%`,
-                          width: `${f.length || 280}px`,
-                          height: f.id === 'led_cove' ? '185px' : '110px',
-                          transform: `translate(-50%, 0%) rotate(${f.angle || 0}deg)`,
-                          background: `linear-gradient(to bottom, ${getTempColor(temp, 0.75)} 0%, ${getTempColor(temp, 0.3)} 25%, ${getTempColor(temp, 0.05)} 65%, transparent 100%)`,
-                          opacity: brightness / 100,
-                          filter: 'blur(14px)',
-                          mixBlendMode: 'screen',
-                          transformOrigin: 'top center',
-                          willChange: 'transform'
-                        }}
-                      />
-                    );
-                  }
-                  return null;
-                })}
-
-                {/* طبقة الأيقونات الهندسية الثابتة والواقعية */}
-                {activeFixtures.map((f) => {
-                  if (f.type === 'led_profile') {
-                    if (f.isCove) return null; // hidden cove light
-                    return (
-                      <div
-                        key={f.id}
-                        className="absolute transition-all duration-300 flex items-center justify-center pointer-events-none"
-                        style={{
-                          left: `${f.x}%`,
-                          top: `${f.y}%`,
-                          width: `${f.length || 150}px`,
-                          height: f.thickness === 'thin' ? '7px' : f.thickness === 'thick' ? '15px' : '11px',
-                          transform: `translate(-50%, -50%) rotate(${f.angle || 0}deg) rotateX(50deg)`,
-                          // مجرى ألومنيوم ثلاثي الأبعاد مع ناشر (Diffuser) مستمر ومظهر حقيقي للمجرى والفلنجة
-                          background: showLights && brightness > 0 
-                            ? `linear-gradient(to bottom, #475569 0%, #0f172a 4%, ${getTempColor(temp, 1)} 15%, ${getTempColor(temp, 1)} 85%, #0f172a 96%, #475569 100%)`
-                            : 'linear-gradient(to bottom, #94a3b8 0%, #475569 8%, #e2e8f0 18%, #e2e8f0 82%, #475569 92%, #94a3b8 100%)',
-                          boxShadow: showLights && brightness > 0 
-                            ? `0 0 ${12 * (brightness/100)}px ${getTempColor(temp, 0.8)}, 0 0 ${25 * (brightness/100)}px ${getTempColor(temp, 0.4)}` 
-                            : '0 1px 2px rgba(0,0,0,0.15)',
-                          border: '1px solid rgba(0,0,0,0.45)',
-                          opacity: showLights && brightness > 0 ? 0.9 + (brightness / 100) * 0.1 : 0.75,
-                          willChange: 'transform'
-                        }}
-                      >
-                        {/* الناشر الأبيض المستمر على طول المجرى */}
-                        <div 
-                          className="w-full h-[70%] transition-all duration-300" 
-                          style={{
-                            background: showLights && brightness > 0 
-                              ? 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.2) 100%)' 
-                              : 'linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.3) 100%)'
-                          }}
-                        />
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={f.id}
-                      className="absolute select-none flex items-center justify-center transition-all duration-300 pointer-events-none"
-                      style={{
-                        left: `${f.x}%`,
-                        top: `${f.y}%`,
-                        transform: 'translate(-50%, -50%)',
-                        width: f.type === 'chandelier' ? `${(f.scale || 1.0) * 80}px` : `${(f.scale || 1.0) * 44}px`,
-                        height: f.type === 'chandelier' ? `${(f.scale || 1.0) * 80}px` : `${(f.scale || 1.0) * 44}px`,
-                        willChange: 'transform'
-                      }}
-                    >
-                      {f.type === 'spotlight' ? (
-                        <div className="relative w-full h-full flex items-center justify-center" style={{ transform: 'rotateX(50deg)' }}>
-                          {/* فتحة السقف الجبسية والظل الخارجي */}
-                          <div className="w-9 h-9 rounded-full bg-black/45 shadow-[0_2px_5px_rgba(0,0,0,0.5)] flex items-center justify-center">
-                            {/* إطار السبوت الأبيض المدمج (Trim/Bezel) */}
-                            <div className="w-8.5 h-8.5 rounded-full border border-slate-200 bg-slate-100 shadow-[inset_0_1px_2px_rgba(255,255,255,0.6),0_1px_2px_rgba(0,0,0,0.4)] flex items-center justify-center">
-                              {/* التجويف الداخلي العميق المضاد للوهج (Deep Black Baffle Cup) */}
-                              <div className="w-6 h-6 rounded-full bg-[#0a0a0c] flex items-center justify-center shadow-[inset_0_2px_5px_rgba(0,0,0,0.9)] relative overflow-hidden">
-                                {/* حلقات عاكسة داخلية خفيفة */}
-                                <div className="absolute inset-[1px] rounded-full border border-slate-900/40" />
-                                <div className="absolute inset-[3px] rounded-full border border-slate-900/60" />
-                                {/* عدسة الـ COB المضيئة */}
-                                <div 
-                                  className="w-3.2 h-3.2 rounded-full transition-all duration-300 relative"
-                                  style={{
-                                    backgroundColor: showLights && brightness > 0 ? getTempColor(temp, 1) : '#dbb35c', // لون الفسفور الأصفر للعدسة وهي مطفأة
-                                    boxShadow: showLights && brightness > 0 
-                                      ? `0 0 12px ${getTempColor(temp, 1)}, inset 0 0 3px rgba(255,255,255,0.9)` 
-                                      : 'inset 0 1px 2px rgba(0,0,0,0.4)',
-                                    opacity: showLights && brightness > 0 ? 1 : 0.8
-                                  }}
-                                >
-                                  {/* انعكاس الضوء على الزجاج */}
-                                  {showLights && brightness > 0 && (
-                                    <div className="absolute top-[1px] left-[1px] w-0.8 h-0.8 bg-white rounded-full opacity-75" />
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="relative w-full h-full flex items-center justify-center">
-                          
-                          {/* كوب معدني لتثبيت الثريا بالسقف في منظور ثلاثي الأبعاد (Ceiling Canopy) */}
-                          <div 
-                            className="absolute bg-slate-700 border border-white/20 rounded-full"
-                            style={{
-                              top: '0%',
-                              left: '50%',
-                              transform: 'translate(-50%, -50%) rotateX(55deg)',
-                              width: '18px',
-                              height: '8px',
-                              boxShadow: '0 2px 4px rgba(0,0,0,0.6)'
-                            }}
-                          />
-
-                          {/* رسمة الثريا الحقيقية عالية الدقة والوضوح (SVG) */}
-                          <AnimatePresence>
-                            {f.style === 'classic' ? (
-                              <svg className="w-full h-full text-yellow-100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <line x1="50" y1="0" x2="50" y2="30" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeDasharray="2 2" />
-                                <path d="M50 30 C35 30 25 45 25 55 C25 65 35 70 50 72 C65 70 75 65 75 55 C75 45 65 30 50 30 Z" stroke="rgba(217, 119, 6, 0.6)" strokeWidth="1" />
-                                <path d="M50 65 Q30 65 28 50" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
-                                <path d="M50 65 Q70 65 72 50" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
-                                <path d="M50 68 Q15 68 18 45" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
-                                <path d="M50 68 Q85 68 82 45" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
-                                <circle cx="28" cy="48" r="3.5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 6px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="72" cy="48" r="3.5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 6px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="18" cy="43" r="4" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 7px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="82" cy="43" r="4" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 7px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="50" cy="40" r="4.5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <line x1="28" y1="50" x2="28" y2="58" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
-                                <line x1="72" y1="50" x2="72" y2="58" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
-                                <line x1="18" y1="45" x2="18" y2="54" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
-                                <line x1="82" y1="45" x2="82" y2="54" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
-                              </svg>
-                            ) : f.style === 'minimalist' ? (
-                              <svg className="w-full h-full text-slate-300" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <line x1="30" y1="0" x2="30" y2="50" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                                <line x1="70" y1="0" x2="70" y2="50" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                                <line x1="15" y1="50" x2="85" y2="50" stroke="#1e293b" strokeWidth="2.5" />
-                                <circle cx="20" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="35" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="50" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="65" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                                <circle cx="80" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
-                              </svg>
-                            ) : (
-                              <svg className="w-full h-full text-amber-200" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <line x1="50" y1="0" x2="30" y2="40" stroke="rgba(255,255,255,0.4)" strokeWidth="0.7" />
-                                <line x1="50" y1="0" x2="70" y2="40" stroke="rgba(255,255,255,0.4)" strokeWidth="0.7" />
-                                <line x1="50" y1="0" x2="50" y2="50" stroke="rgba(255,255,255,0.4)" strokeWidth="0.7" />
-                                <ellipse cx="50" cy="45" rx="30" ry="8" stroke={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} strokeWidth="2.5" style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 5px ${getTempColor(temp, 0.8)})` : 'none' }} />
-                                <ellipse cx="50" cy="55" rx="20" ry="5.5" stroke={showLights && brightness > 0 ? getTempColor(temp, 1) : '#64748b'} strokeWidth="2" style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 4px ${getTempColor(temp, 0.8)})` : 'none' }} />
-                                <ellipse cx="50" cy="65" rx="12" ry="3.5" stroke={showLights && brightness > 0 ? getTempColor(temp, 1) : '#94a3b8'} strokeWidth="1.5" style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 3px ${getTempColor(temp, 0.8)})` : 'none' }} />
-                              </svg>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* الجانب الأيسر (4 أعمدة): أدوات التخصيص وقراءة التقارير الهندسية */}
-          <div className="lg:col-span-4 space-y-6">
-            
-            {/* بطاقة التحكم في مجموعات الإضاءة وخصائصها */}
-            <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-xl text-right space-y-6">
-              <div>
-                <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-                  <Sliders className="w-5 h-5 text-blue-400" />
-                  التحكم في عناصر التوزيع
-                </h3>
-                
-                {/* مفاتيح التبديل السريعة للمجموعات */}
-                <div className="grid grid-cols-1 gap-3">
-                  <button
-                    onClick={() => setShowSpotlights(!showSpotlights)}
-                    className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
-                      showSpotlights 
-                        ? 'bg-blue-600/10 border-blue-500/40 text-white shadow-[0_0_12px_rgba(59,130,246,0.15)]' 
-                        : 'bg-white/5 border-white/10 text-slate-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl transition-all ${showSpotlights ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500'}`}>
-                        <Lightbulb className="w-5 h-5" />
-                      </div>
-                      <span className="font-bold text-sm">كشافات سبوت لايت</span>
-                    </div>
-                    <span className="text-xs font-bold font-mono px-2.5 py-1 bg-white/5 rounded-lg border border-white/5">
-                      {currentConfig.spotlightCount} قطع
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setShowLedProfiles(!showLedProfiles)}
-                    className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
-                      showLedProfiles 
-                        ? 'bg-sky-600/10 border-sky-500/40 text-white shadow-[0_0_12px_rgba(14,165,233,0.15)]' 
-                        : 'bg-white/5 border-white/10 text-slate-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl transition-all ${showLedProfiles ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-500'}`}>
-                        <Zap className="w-5 h-5" />
-                      </div>
-                      <span className="font-bold text-sm">ليد بروفايل مخفي</span>
-                    </div>
-                    <span className="text-xs font-bold font-mono px-2.5 py-1 bg-white/5 rounded-lg border border-white/5">
-                      {currentConfig.ledCount} خطوط
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setShowChandeliers(!showChandeliers)}
-                    className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
-                      showChandeliers 
-                        ? 'bg-indigo-600/10 border-indigo-500/40 text-white shadow-[0_0_12px_rgba(99,102,241,0.15)]' 
-                        : 'bg-white/5 border-white/10 text-slate-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl transition-all ${showChandeliers ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500'}`}>
-                        <Sparkles className="w-5 h-5" />
-                      </div>
-                      <span className="font-bold text-sm">ثريا السقف الجمالية</span>
-                    </div>
-                    <span className="text-xs font-bold font-mono px-2.5 py-1 bg-white/5 rounded-lg border border-white/5">
-                      {currentConfig.chandelierCount} قطع
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* تحكم حرارة اللون العامة */}
-              <div className="pt-4 border-t border-white/5">
-                <span className="block text-xs font-bold text-slate-400 mb-2.5">لون وحرارة إضاءة المكان</span>
-                <div className="grid grid-cols-3 gap-2">
+              {/* اختيار نوع الغرفة */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-400 block">نوع الغرفة أو المساحة</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {[
-                    { id: 'warm', label: '3000K دافئ', bg: 'rgba(251, 191, 36, 0.15)', text: 'text-amber-400', border: 'border-amber-400/40' },
-                    { id: 'natural', label: '4000K طبيعي', bg: 'rgba(254, 240, 138, 0.15)', text: 'text-yellow-200', border: 'border-yellow-200/40' },
-                    { id: 'cool', label: '6000K بارد', bg: 'rgba(224, 242, 254, 0.15)', text: 'text-sky-300', border: 'border-sky-300/40' }
-                  ].map((opt) => (
+                    { id: 'living', label: 'صالة معيشة' },
+                    { id: 'kitchen', label: 'مطبخ' },
+                    { id: 'bedroom', label: 'غرفة نوم' },
+                    { id: 'salon', label: 'مجلس / صالون' },
+                    { id: 'hallway', label: 'ممر / موزع' }
+                  ].map((room) => (
                     <button
-                      key={opt.id}
-                      onClick={() => setTemp(opt.id as any)}
-                      className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border ${
-                        temp === opt.id
-                          ? `${opt.bg} ${opt.text} ${opt.border} shadow-inner scale-[1.02]`
-                          : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                      key={room.id}
+                      onClick={() => setRoomUse(room.id as any)}
+                      className={`py-2 px-3 rounded-xl font-bold text-xs transition-all border ${
+                        roomUse === room.id
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-lg'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
                       }`}
                     >
-                      {opt.label}
+                      {room.label}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* التحكم بشدة السطوع */}
-              <div className="pt-4 border-t border-white/5">
-                <div className="flex justify-between text-xs font-bold text-slate-400 mb-2">
-                  <span>شدة سطوع الإضاءة العامة</span>
-                  <span className="text-white">{brightness}%</span>
+              {/* أبعاد الغرفة */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-400 flex justify-between">
+                    <span>طول الغرفة (متر)</span>
+                    <span className="text-white font-mono">{length} م</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="2"
+                    max="12"
+                    step="0.5"
+                    value={length}
+                    onChange={(e) => setLength(parseFloat(e.target.value))}
+                    className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  />
                 </div>
-                <input
-                  type="range"
-                  min="10"
-                  max="100"
-                  value={brightness}
-                  onChange={(e) => setBrightness(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                />
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-400 flex justify-between">
+                    <span>عرض الغرفة (متر)</span>
+                    <span className="text-white font-mono">{width} م</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="2"
+                    max="10"
+                    step="0.5"
+                    value={width}
+                    onChange={(e) => setWidth(parseFloat(e.target.value))}
+                    className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  />
+                </div>
               </div>
+
+              {/* نوع السقف */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-400 block">نوع السقف وديكورات الجبس</label>
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { id: 'gypsum_full', title: 'سقف مستعار كامل (جبس بورد غاطس)', desc: 'يدعم الليد بروفايل والسبوتات الغاطسة' },
+                    { id: 'gypsum_perimeter', title: 'جبس أطراف فقط (ديكور كوف/ستارة)', desc: 'يدعم الإنارة المخفية وشريط الليد' },
+                    { id: 'flat', title: 'سقف خرساني مسطح (بدون جبس بورد)', desc: 'كشافات لطش ظاهرة وثريات فقط' }
+                  ].map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setCeilingType(type.id as any)}
+                      className={`p-3 rounded-xl font-bold text-right text-xs transition-all border flex flex-col gap-0.5 ${
+                        ceilingType === type.id
+                          ? 'bg-blue-600/10 border-blue-500 text-white shadow-inner'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="font-black text-sm">{type.title}</span>
+                      <span className="text-[10px] text-slate-400 font-normal">{type.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* شدة الإضاءة المطلوبة */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-400 block">شدة الإضاءة العامة المفضلة</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'relax', label: 'هادئة للاسترخاء' },
+                    { id: 'medium', label: 'معتدلة طبيعية' },
+                    { id: 'bright', label: 'قوية للعمل' }
+                  ].map((level) => (
+                    <button
+                      key={level.id}
+                      onClick={() => setLightLevel(level.id as any)}
+                      className={`py-2 px-1 rounded-xl font-bold text-[11px] transition-all border ${
+                        lightLevel === level.id
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-lg'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                      }`}
+                    >
+                      {level.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
             </div>
+          </div>
 
-            {/* تقرير التوزيع الهندسي المكتوب والتحليل الإرشادي */}
-            <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-xl text-right space-y-4">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-white/5">
-                <Award className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-base font-bold text-white">التقرير الهندسي والتحليل الفني للتصميم</h3>
+          {/* الجانب الأيسر (7 أعمدة): نتائج الحسابات ومقارن الصور الفوري */}
+          <div className="lg:col-span-7 space-y-6">
+            
+            {/* بطاقة النتائج الهندسية */}
+            <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-2xl text-right space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/5">
+                <div className="flex items-center gap-2.5">
+                  <Ruler className="w-5.5 h-5.5 text-emerald-400" />
+                  <h2 className="text-lg font-black text-white">نتائج التوزيع الهندسي الموصى به</h2>
+                </div>
+                <span className="text-xs font-bold text-slate-400 bg-white/5 border border-white/10 px-3 py-1 rounded-lg">
+                  مساحة الفراغ: {area} م²
+                </span>
               </div>
-              
-              <p className="text-xs text-slate-300 leading-relaxed font-sans mb-4">
-                {currentConfig.explanation}
-              </p>
 
-              <div className="space-y-3 pt-2">
-                <h4 className="text-xs font-bold text-slate-400">تحليل المكونات المختارة:</h4>
+              {/* خلاصة الأرقام */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 
-                {showSpotlights && (
-                  <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-3 text-xs flex gap-3 items-start">
-                    <span className="p-2 rounded-xl bg-blue-500/10 text-blue-400">💡</span>
-                    <div>
-                      <h5 className="font-bold text-white mb-0.5">كشافات سبوت لايت ({currentConfig.spotlightCount} قطع)</h5>
-                      <p className="text-slate-400 leading-relaxed text-[11px]">{currentConfig.spotlightReason}</p>
-                    </div>
+                {/* السبوتات */}
+                <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-4 space-y-1">
+                  <span className="text-[11px] text-slate-400 block font-bold">عدد السبوتات المطلوبة</span>
+                  <div className="flex items-baseline gap-1 text-emerald-400">
+                    <span className="text-2xl font-black">{recommendedSpots}</span>
+                    <span className="text-[11px] font-bold">قطع (7 واط)</span>
                   </div>
-                )}
+                  <span className="text-[10px] text-slate-400 block">بإضاءة 3000K دافئ / 4000K طبيعي</span>
+                </div>
 
-                {showLedProfiles && (
-                  <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-3 text-xs flex gap-3 items-start">
-                    <span className="p-2 rounded-xl bg-sky-500/10 text-sky-400">⚡</span>
-                    <div>
-                      <h5 className="font-bold text-white mb-0.5">خطوط ليد بروفايل ({currentConfig.ledCount} خطوط)</h5>
-                      <p className="text-slate-400 leading-relaxed text-[11px]">{currentConfig.ledReason}</p>
-                    </div>
+                {/* أطوال الليد بروفايل */}
+                <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-4 space-y-1">
+                  <span className="text-[11px] text-slate-400 block font-bold">الليد بروفايل / شريط مخفي</span>
+                  <div className="flex items-baseline gap-1 text-sky-400">
+                    <span className="text-2xl font-black">{ledLength > 0 ? ledLength : 'بدون'}</span>
+                    <span className="text-[11px] font-bold">{ledLength > 0 ? 'متر طولي' : 'غير موصى به'}</span>
                   </div>
-                )}
+                  <span className="text-[10px] text-slate-400 block">إنارة غير مباشرة ناعمة</span>
+                </div>
 
-                {showChandeliers && (
-                  <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-3 text-xs flex gap-3 items-start">
-                    <span className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">🌟</span>
-                    <div>
-                      <h5 className="font-bold text-white mb-0.5">ثريا السقف الجمالية ({currentConfig.chandelierCount} قطع)</h5>
-                      <p className="text-slate-400 leading-relaxed text-[11px]">{currentConfig.chandelierReason}</p>
-                    </div>
+                {/* مقاس الثريا المقترح */}
+                <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-4 space-y-1">
+                  <span className="text-[11px] text-slate-400 block font-bold">قطر الثريا المقترح</span>
+                  <div className="flex items-baseline gap-1 text-indigo-400">
+                    <span className="text-2xl font-black">{recommendedChandelierDiameter}</span>
+                    <span className="text-[11px] font-bold">سم تقريباً</span>
                   </div>
-                )}
+                  <span className="text-[10px] text-slate-400 block">لتناسب المساحة وتملأ الفراغ البصري</span>
+                </div>
+
               </div>
 
-              <div className="bg-blue-500/10 border border-blue-500/15 rounded-2xl p-3.5 text-[11px] text-blue-300 leading-relaxed mt-2">
-                💡 **نصيحة مهندسي الإنارة:** يفضل دمج مستويات الإضاءة الثلاثة (العامة، والجمالية، والعملية) للحصول على أفضل راحة بصرية وعمق جمالي للمكان.
+              {/* إرشادات التوزيع الهندسي للسبوتات */}
+              <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-4 space-y-3 text-xs leading-relaxed">
+                <h4 className="font-bold text-white flex items-center gap-2">
+                  <Compass className="w-4 h-4 text-emerald-400" />
+                  أبعاد مسافات التركيب (طريقة التوزيع):
+                </h4>
+                <ul className="list-disc pr-4 space-y-1.5 text-slate-300">
+                  <li>**مسافة الجدار:** اترك مسافة **1.0 متر إلى 1.2 متر** بين السبوت لايت والحائط لتفادي سقوط الضوء بشكل عمودي حاد وتشتيت الإنارة بنعومة على الجدران.</li>
+                  <li>**المسافة البينية:** اترك مسافة **1.2 متر إلى 1.5 متر** بين الكشافات لتداخل مخاريط الضوء وتفادي البقع المظلمة.</li>
+                  <li>**توزيع الليد بروفايل:** {ledProfileRecommendation}</li>
+                </ul>
               </div>
-            </div>
 
-            {/* بطاقة إرسال الطلب وحجز الاستشارة */}
-            <div className="bg-gradient-to-br from-[#0d2342] to-[#0a192f] border border-blue-500/25 rounded-3xl p-6 shadow-xl relative overflow-hidden text-right">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full blur-2xl pointer-events-none" />
-              
-              <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-green-400" />
-                طلب مطابقة منتجات التوزيع
-              </h3>
-              <p className="text-xs text-slate-400 mb-5 leading-relaxed">
-                اضغط على الزر بالأسفل لنسخ تقرير التوزيع المقترح والتواصل الفوري مع مهندسينا لتأكيد القطع والماركات المناسبة عبر الواتساب!
-              </p>
-
+              {/* مشاركة وحفظ التقرير للواتساب */}
               <button
-                onClick={handleWhatsAppShare}
-                className="w-full flex items-center justify-center gap-3 bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white py-4 rounded-2xl font-black text-base transition-all shadow-[0_0_20px_rgba(34,197,94,0.35)] hover:scale-[1.02] active:scale-[0.98]"
+                onClick={handleCopyAndWhatsApp}
+                className="w-full flex items-center justify-center gap-3 bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white py-4 rounded-2xl font-black text-sm md:text-base transition-all shadow-[0_0_20px_rgba(34,197,94,0.25)] hover:scale-[1.01] active:scale-[0.99]"
               >
                 <MessageCircle className="w-5 h-5 animate-pulse" />
-                <span>إرسال تقرير التوزيع للواتساب</span>
+                <span>إرسال التقرير ومطابقة المنتجات بالواتساب</span>
               </button>
 
               {copiedText && (
-                <div className="mt-3 p-3 bg-green-600/10 border border-green-500/20 rounded-xl text-green-400 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
+                <div className="p-3 bg-green-600/10 border border-green-500/20 rounded-xl text-green-400 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
                   <CheckCircle className="w-4 h-4 animate-bounce" />
-                  <span>تم نسخ تفاصيل التوزيع الهندسي! يرجى إرساله بالدردشة.</span>
+                  <span>تم نسخ التقرير الهندسي! يمكنك لصقه وإرساله بالواتساب فوراً.</span>
                 </div>
               )}
+
+            </div>
+
+            {/* مقارن وضعيات الإضاءة التفاعلي - خفيف جداً بالمتصفحات */}
+            <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-2xl text-right space-y-5">
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-5.5 h-5.5 text-blue-400" />
+                  <h2 className="text-lg font-black text-white">مقارن سيناريوهات التوزيع الحقيقي</h2>
+                </div>
+                {/* أزرار تغيير الغرفة النموذجية */}
+                <div className="flex gap-1.5 self-end">
+                  {(Object.keys(SCENARIO_ROOMS) as Array<keyof typeof SCENARIO_ROOMS>).map((roomKey) => (
+                    <button
+                      key={roomKey}
+                      onClick={() => setActiveRoom(roomKey)}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all border ${
+                        activeRoom === roomKey
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-md'
+                          : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {SCENARIO_ROOMS[roomKey].title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-400 -mt-2 leading-relaxed">
+                {activeRoomData.description} اختر أحد الأزرار بالأسفل لتبديل وضع الإنارة فوراً بلمح البصر على هاتفك.
+              </p>
+
+              {/* أزرار اختيار السيناريو */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {activeRoomData.scenarios.map((sc) => (
+                  <button
+                    key={sc.id}
+                    onClick={() => setActiveScenarioId(sc.id)}
+                    className={`py-2.5 px-2 rounded-xl text-center font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 ${
+                      activeScenarioId === sc.id
+                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg scale-[1.02]'
+                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                    }`}
+                  >
+                    <span>{sc.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* مساحة عرض الصورة الفائقة السرعة */}
+              <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-950 border border-white/5">
+                <img
+                  src={activeScenario.url}
+                  alt={activeScenario.label}
+                  className="w-full h-full object-cover transition-all duration-300"
+                />
+                
+                {/* بطاقة توضيحية للوضع الضوئي النشط */}
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-4 text-right">
+                  <h4 className="text-sm font-bold text-emerald-400 flex items-center gap-1.5 mb-1">
+                    <Sparkles className="w-4.5 h-4.5" />
+                    {activeScenario.label}
+                  </h4>
+                  <p className="text-[11px] text-slate-200 leading-relaxed max-w-xl">
+                    {activeScenario.desc}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* نصائح هندسية عامة */}
+            <div className="bg-[#0f213a]/50 border border-white/5 rounded-3xl p-6 text-sm text-slate-300 text-right space-y-3">
+              <h4 className="font-bold text-white flex items-center gap-2">
+                <Award className="w-4.5 h-4.5 text-blue-400 animate-pulse" />
+                نصائح هندسية لتأسيس وشراء الإنارة:
+              </h4>
+              <ul className="space-y-2 list-disc pr-5 leading-relaxed text-xs">
+                <li>**درجة حرارة اللون:** يفضل اللون **الدافئ (3000K)** في المجالس وغرف النوم لإشاعة الهدوء والدفء، بينما يفضل اللون **الشمسي (4000K)** في المطابخ والمكاتب لراحة العين عند العمل.</li>
+                <li>**مؤشر تجسيد الألوان (CRI):** احرص على شراء سبوتات ليد بمعامل تجسيد ألوان أعلى من **CRI 90** لتعكس ألوان الطعام والجدران والأثاث بشكلها الحقيقي دون بهتان.</li>
+                <li>**زاوية انتشار الضوء (Beam Angle):** استخدم زاوية **24 درجة** للسبوتات الموجهة لتسليط الضوء على العناصر الديكورية، وزاوية **36 إلى 60 درجة** للإضاءة العامة المريحة.</li>
+              </ul>
             </div>
 
           </div>
 
-        </div>
-
-        {/* إرشادات ونصائح التصميم التفاعلية - تظهر بشكل كامل وجميل أسفل المحتوى الرئيسي */}
-        <div className="mt-8 bg-[#0f213a]/50 border border-white/5 rounded-3xl p-6 text-sm text-slate-300 text-right">
-          <h4 className="font-bold text-white mb-3 flex items-center gap-2">
-            <Sparkles className="w-4.5 h-4.5 text-blue-400 animate-pulse" />
-            نصائح هندسية لتوزيع الإضاءة:
-          </h4>
-          <ul className="space-y-2 list-disc pr-5 leading-relaxed">
-            <li>**السبوتات** توضع على مسافة تتراوح بين 80 سم إلى 1.2 متر من الجدران لتسليط الضوء على الديكورات والصور بشكل مثالي وتجنب الظلال الحادة.</li>
-            <li>**الليد بروفايل** رائع في الزوايا وحواف الأسقف المستعارة لإعطاء إضاءة غير مباشرة (Indirect Light) تزيد من الارتفاع البصري للغرفة.</li>
-            <li>**الثريا المعلقة** يفضل أن تكون النقطة البصرية المركزية للغرفة (فوق طاولة الطعام أو في منتصف صالون الضيافة).</li>
-            <li>اختر حرارة اللون **الدافئ (3000K)** للاسترخاء في غرف النوم، و**الشمسي (4000K)** للمطابخ والممرات لراحة بصرية وألوان حقيقية.</li>
-          </ul>
         </div>
 
       </div>

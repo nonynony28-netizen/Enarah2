@@ -595,10 +595,10 @@ export default function Home() {
                   <span>ميزة ذكية ومبتكرة</span>
                 </div>
                 <h3 className="text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
-                  جرّب توزيع الإضاءة على <span className="text-blue-400">صورتك الشخصية!</span>
+                  احسب إنارة غرفتك <span className="text-blue-400">هندسياً وبثوانٍ!</span>
                 </h3>
                 <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-2xl font-medium">
-                  هل تريد رفع صورة غرفتك أو مجلسك أو مطبخك والبدء بتركيب السبوتات وتدوير الليد بروفايل وتوهج الثريات تفاعلياً؟ جرب المصمم الاحترافي الآن.
+                  أدخل أبعاد غرفتك ونوع السقف لتحصل فوراً على العدد والمقاسات الصحيحة للسبوتات والبروفايلات، وقارن سيناريوهات التوزيع الواقعية بسلاسة فائقة.
                 </p>
               </div>
               
@@ -608,7 +608,7 @@ export default function Home() {
                   className="group relative px-8 py-4 w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-base md:text-lg rounded-2xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] flex items-center justify-center gap-3 overflow-hidden"
                 >
                   <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmerSweep_1.5s_infinite_ease-in-out]" />
-                  <span>ابدأ تصميم غرفتك</span>
+                  <span>ابدأ حساب الإنارة</span>
                   <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform duration-300" />
                 </Link>
               </div>
