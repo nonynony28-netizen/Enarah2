@@ -49,7 +49,7 @@ const ROOM_CONFIGS = {
     description: 'مطبخ عصري (3م × 4م) يتطلب إضاءة عالية لسهولة العمل وتجهيز الطعام.',
     explanation: 'تتطلب المطابخ إضاءة عمل (Task Lighting) قوية وواضحة. تم توزيع 4 سبوتات فوق أسطح العمل والمجلى مباشرة بزاوية سقوط مستقيمة لتسهيل الرؤية وتفادي الظلال أثناء الطهي. يمتد الليد بروفايل أسفل الخزائن العلوية ليوفر إنارة ساطعة ومركزة لسطح العمل، وشريط سقف مستعار للإضاءة العامة. تم اعتماد إضاءة طبيعية (4000K) لألوان حقيقية للأطعمة، وتجنب الثريات الكلاسيكية لسهولة التنظيف والحفاظ على البساطة.',
     spotlightReason: 'وزعنا كشافين في الخلف للإضاءة العامة، وكشافين أماميين كبيرين مباشرة فوق منضدة العمل والمجلى لتسليط إضاءة مركزة وقوية تمنع تشكل الظلال أثناء إعداد الأطعمة.',
-    ledReason: 'شريط ليد علوي متناسق مع السقف مائل بـ (-14°) لإبراز الديكور الخشبي، وشريط آخر مائل بـ (8°) مثبت أسفل الخزائن العلوية لينير منطقة التحضير بكفاءة تامة كإضاءة عمل.',
+    ledReason: 'شريط ليد علوي متناسق مع السقف مائل بـ (-14°) لإبراز الديكور الخشبي، وشريط أخر مائل بـ (8°) مثبت أسفل الخزائن العلوية لينير منطقة التحضير بكفاءة تامة كإضاءة عمل.',
     chandelierReason: 'ثريا تعليق مودرن وبسيطة تتدلى فوق جزيرة المطبخ، لتعطي إنارة مركزة ومظهر عصري دون التسبب في تجميع الأتربة أو صعوبة التنظيف.',
     recommendedTemp: 'natural' as const,
     spotlightCount: 4,
@@ -384,15 +384,37 @@ export default function LightingDesigner() {
                   </div>
                 )}
 
-                {/* طبقة التعتيم المحاكية للظلام */}
+                {/* طبقة التعتيم المحاكية للظلام - تم تخفيفها لتظل تفاصيل وسقف الغرفة واضحة وحقيقية */}
                 <div 
                   className="absolute inset-0 pointer-events-none transition-opacity duration-500 bg-black"
                   style={{
                     opacity: showLights 
-                      ? Math.max(0.15, 0.75 - (activeFixtures.length * (brightness / 100) * 0.08)) 
-                      : 0.85
+                      ? Math.max(0.06, 0.40 - (activeFixtures.length * (brightness / 100) * 0.02)) 
+                      : 0.60
                   }}
                 />
+
+                {/* طبقة توهج السقف المباشر (Ceiling Halo Glows) حول الكشافات لإبقاء ملمس الجبس بورد واضحاً ومشعاً */}
+                {showLights && activeFixtures.map((f) => {
+                  if (brightness <= 0 || f.type !== 'spotlight') return null;
+                  return (
+                    <div
+                      key={`ceiling_glow_${f.id}`}
+                      className="absolute pointer-events-none rounded-full transition-all duration-300"
+                      style={{
+                        top: `${f.y}%`,
+                        left: `${f.x}%`,
+                        transform: 'translate(-50%, -50%)',
+                        width: `${(f.scale || 1.0) * 80}px`,
+                        height: `${(f.scale || 1.0) * 80}px`,
+                        background: `radial-gradient(circle, ${getTempColor(temp, 0.35)} 0%, ${getTempColor(temp, 0.05)} 60%, transparent 100%)`,
+                        opacity: brightness / 100,
+                        mixBlendMode: 'screen',
+                        willChange: 'transform'
+                      }}
+                    />
+                  );
+                })}
 
                 {/* طبقة تأثيرات سقوط الإضاءة (Beams & Radial Glows) */}
                 {showLights && activeFixtures.map((f) => {
@@ -441,7 +463,7 @@ export default function LightingDesigner() {
                   return null;
                 })}
 
-                {/* طبقة الأيقونات الهندسية الثابتة */}
+                {/* طبقة الأيقونات الهندسية الثابتة والواقعية */}
                 {activeFixtures.map((f) => {
                   if (f.type === 'led_profile') {
                     return (
@@ -452,17 +474,22 @@ export default function LightingDesigner() {
                           left: `${f.x}%`,
                           top: `${f.y}%`,
                           width: `${f.length || 150}px`,
-                          height: f.thickness === 'thin' ? '6px' : f.thickness === 'thick' ? '12px' : '9px',
+                          height: f.thickness === 'thin' ? '7px' : f.thickness === 'thick' ? '15px' : '11px',
                           transform: `translate(-50%, -50%) rotate(${f.angle || 0}deg)`,
-                          backgroundColor: getTempColor(temp, showLights ? 0.95 : 0.4),
+                          // محاكاة المجرى الألمونيوم والناشر الأبيض المتوهج
+                          background: showLights && brightness > 0 
+                            ? `linear-gradient(to bottom, #1e293b 0%, ${getTempColor(temp, 1)} 20%, ${getTempColor(temp, 1)} 80%, #1e293b 100%)`
+                            : `linear-gradient(to bottom, #0f172a 0%, #cbd5e1 30%, #cbd5e1 70%, #0f172a 100%)`,
                           boxShadow: showLights && brightness > 0 
-                            ? `0 0 ${15 * (brightness/100)}px ${getTempColor(temp, 0.95)}, 0 0 ${30 * (brightness/100)}px ${getTempColor(temp, 0.5)}` 
+                            ? `0 0 ${12 * (brightness/100)}px ${getTempColor(temp, 0.95)}, 0 0 ${25 * (brightness/100)}px ${getTempColor(temp, 0.5)}` 
                             : 'none',
-                          opacity: showLights && brightness > 0 ? 0.35 + (brightness / 100) * 0.65 : 0.4,
+                          border: '1px solid rgba(0,0,0,0.4)',
+                          opacity: showLights && brightness > 0 ? 0.8 + (brightness / 100) * 0.2 : 0.6,
                           willChange: 'transform'
                         }}
                       >
-                        <span className="w-2.5 h-2.5 rounded-full border border-white/50 bg-[#0a192f]" />
+                        {/* خط التشتيت الأبيض الداخلي */}
+                        <div className="w-full h-[60%] bg-white/40 rounded-full" />
                       </div>
                     );
                   }
@@ -470,37 +497,80 @@ export default function LightingDesigner() {
                   return (
                     <div
                       key={f.id}
-                      className="absolute select-none flex items-center justify-center rounded-full bg-[#0f213a]/80 text-white/90 border border-white/10 shadow-md transition-all duration-300 pointer-events-none"
+                      className="absolute select-none flex items-center justify-center rounded-full transition-all duration-300 pointer-events-none"
                       style={{
                         left: `${f.x}%`,
                         top: `${f.y}%`,
                         transform: 'translate(-50%, -50%)',
-                        width: f.type === 'chandelier' ? `${(f.scale || 1.0) * 60}px` : `${(f.scale || 1.0) * 44}px`,
-                        height: f.type === 'chandelier' ? `${(f.scale || 1.0) * 60}px` : `${(f.scale || 1.0) * 44}px`,
+                        width: f.type === 'chandelier' ? `${(f.scale || 1.0) * 80}px` : `${(f.scale || 1.0) * 44}px`,
+                        height: f.type === 'chandelier' ? `${(f.scale || 1.0) * 80}px` : `${(f.scale || 1.0) * 44}px`,
                         willChange: 'transform'
                       }}
                     >
                       {f.type === 'spotlight' ? (
                         <div className="relative w-full h-full flex items-center justify-center">
-                          <div className={`w-8 h-8 rounded-full border-2 transition-colors flex items-center justify-center ${
-                            showLights && brightness > 0 ? 'bg-white border-blue-400 shadow-[0_0_12px_rgba(255,255,255,0.8)]' : 'bg-slate-700 border-slate-600'
-                          }`}>
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getTempColor(temp, showLights && brightness > 0 ? 1 : 0.2) }} />
+                          {/* إطار السبوت الخارجي الألمونيوم ثلاثي الأبعاد */}
+                          <div className="w-8 h-8 rounded-full border border-white/20 bg-slate-900 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_4px_rgba(0,0,0,0.5)] flex items-center justify-center overflow-hidden">
+                            {/* تجويف الكوب الداخلي الأسود */}
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-b from-slate-950 to-slate-800 flex items-center justify-center shadow-inner">
+                              {/* عدسة الـ COB المضيئة المتوهجة بالداخل */}
+                              <div 
+                                className="w-4.5 h-4.5 rounded-full transition-all duration-300"
+                                style={{
+                                  backgroundColor: showLights && brightness > 0 ? getTempColor(temp, 1) : '#1e293b',
+                                  boxShadow: showLights && brightness > 0 
+                                    ? `0 0 10px ${getTempColor(temp, 1)}, inset 0 0 4px rgba(255,255,255,0.8)` 
+                                    : 'none',
+                                  opacity: showLights && brightness > 0 ? 0.4 + (brightness / 100) * 0.6 : 0.2
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
                       ) : (
                         <div className="relative w-full h-full flex items-center justify-center">
-                          <div className={`p-2 rounded-xl transition-all ${
-                            showLights && brightness > 0 ? 'text-amber-300 scale-105 animate-pulse' : 'text-slate-400'
-                          }`}>
+                          {/* رسمة الثريا الحقيقية عالية الدقة والوضوح (SVG) */}
+                          <AnimatePresence>
                             {f.style === 'classic' ? (
-                              <Award className="w-7 h-7" />
+                              <svg className="w-full h-full text-yellow-100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="50" y1="0" x2="50" y2="30" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeDasharray="2 2" />
+                                <path d="M50 30 C35 30 25 45 25 55 C25 65 35 70 50 72 C65 70 75 65 75 55 C75 45 65 30 50 30 Z" stroke="rgba(217, 119, 6, 0.6)" strokeWidth="1" />
+                                <path d="M50 65 Q30 65 28 50" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
+                                <path d="M50 65 Q70 65 72 50" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
+                                <path d="M50 68 Q15 68 18 45" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
+                                <path d="M50 68 Q85 68 82 45" stroke="rgba(217, 119, 6, 0.7)" strokeWidth="1.5" fill="none" />
+                                <circle cx="28" cy="48" r="3.5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 6px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="72" cy="48" r="3.5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 6px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="18" cy="43" r="4" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 7px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="82" cy="43" r="4" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 7px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="50" cy="40" r="4.5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <line x1="28" y1="50" x2="28" y2="58" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
+                                <line x1="72" y1="50" x2="72" y2="58" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
+                                <line x1="18" y1="45" x2="18" y2="54" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
+                                <line x1="82" y1="45" x2="82" y2="54" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
+                              </svg>
                             ) : f.style === 'minimalist' ? (
-                              <Sliders className="w-7 h-7 rotate-90" />
+                              <svg className="w-full h-full text-slate-300" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="30" y1="0" x2="30" y2="50" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
+                                <line x1="70" y1="0" x2="70" y2="50" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
+                                <line x1="15" y1="50" x2="85" y2="50" stroke="#1e293b" strokeWidth="2.5" />
+                                <circle cx="20" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="35" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="50" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="65" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                                <circle cx="80" cy="58" r="5" fill={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 8px ${getTempColor(temp, 0.9)})` : 'none' }} />
+                              </svg>
                             ) : (
-                              <Sparkles className="w-7 h-7" />
+                              <svg className="w-full h-full text-amber-200" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="50" y1="0" x2="30" y2="40" stroke="rgba(255,255,255,0.4)" strokeWidth="0.7" />
+                                <line x1="50" y1="0" x2="70" y2="40" stroke="rgba(255,255,255,0.4)" strokeWidth="0.7" />
+                                <line x1="50" y1="0" x2="50" y2="50" stroke="rgba(255,255,255,0.4)" strokeWidth="0.7" />
+                                <ellipse cx="50" cy="45" rx="30" ry="8" stroke={showLights && brightness > 0 ? getTempColor(temp, 1) : '#475569'} strokeWidth="2.5" style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 5px ${getTempColor(temp, 0.8)})` : 'none' }} />
+                                <ellipse cx="50" cy="55" rx="20" ry="5.5" stroke={showLights && brightness > 0 ? getTempColor(temp, 1) : '#64748b'} strokeWidth="2" style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 4px ${getTempColor(temp, 0.8)})` : 'none' }} />
+                                <ellipse cx="50" cy="65" rx="12" ry="3.5" stroke={showLights && brightness > 0 ? getTempColor(temp, 1) : '#94a3b8'} strokeWidth="1.5" style={{ filter: showLights && brightness > 0 ? `drop-shadow(0 0 3px ${getTempColor(temp, 0.8)})` : 'none' }} />
+                              </svg>
                             )}
-                          </div>
+                          </AnimatePresence>
                         </div>
                       )}
                     </div>
