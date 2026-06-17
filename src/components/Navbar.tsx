@@ -11,13 +11,12 @@ const glowingTitleStyle = { textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 4
 
 const servicesDropdown = {
   label: 'الأقسام والأسعار',
-  items: [
-    { path: '/products', label: 'معرض المنتجات', desc: 'تصفح أحدث حلول الإضاءة ومواد الكهرباء الذكية بجودة عالية.', icon: Lightbulb },
-    { path: '/designer', label: 'مستشار وحاسبة الإنارة', desc: 'احسب عدد وحجم الكشافات والبروفايلات لغرفتك هندسياً.', icon: Sliders },
-    { path: '/wire-prices', label: 'أسعار الأسلاك', desc: 'النشرة اليومية المحدثة لأسعار الأسلاك الإيطالية المعتمدة.', icon: Zap },
-    { path: '/brands', label: 'الشركات العالمية', desc: 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.', icon: Award },
-    { path: '/projects', label: 'المشاريع المنفذة', desc: 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.', icon: Sparkles },
-  ]
+    items: [
+      { path: '/products', label: 'معرض المنتجات', desc: 'تصفح أحدث حلول الإضاءة ومواد الكهرباء الذكية بجودة عالية.', icon: Lightbulb },
+      { path: '/wire-prices', label: 'أسعار الأسلاك', desc: 'النشرة اليومية المحدثة لأسعار الأسلاك الإيطالية المعتمدة.', icon: Zap },
+      { path: '/brands', label: 'الشركات العالمية', desc: 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.', icon: Award },
+      { path: '/projects', label: 'المشاريع المنفذة', desc: 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.', icon: Sparkles },
+    ]
 }
 
 const otherLinks = [

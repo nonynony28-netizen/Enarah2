@@ -16,7 +16,6 @@ import Branches from './pages/Branches'
 import Contact from './pages/Contact'
 import Blog from './pages/Blog'
 import WirePrices from './pages/WirePrices' // 👈 أضفنا صفحة الأسعار هنا
-import LightingDesigner from './pages/LightingDesigner' // 👈 أضفنا صفحة مصمم الإضاءة التفاعلي
 
 
 // ======================================
@@ -88,9 +87,6 @@ function App() {
           
           {/* 👈 مسار صفحة أسعار الأسلاك */}
           <Route path="/wire-prices" element={<PageTransition><WirePrices /></PageTransition>} /> 
-          
-          {/* 👈 مسار مصمم الإضاءة التفاعلي */}
-          <Route path="/designer" element={<PageTransition><LightingDesigner /></PageTransition>} /> 
 
 
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
