@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Calculator, Ruler, Lightbulb, Zap, Sparkles, Award,
-  ArrowLeft, Compass, Clipboard, CheckCircle
+  ArrowLeft, Compass, Clipboard, CheckCircle, Layers, Eye, EyeOff
 } from 'lucide-react'
 
 interface RoomTemplate {
