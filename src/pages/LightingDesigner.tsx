@@ -23,102 +23,120 @@ const ROOM_CONFIGS = {
     title: 'صالة معيشة حديثة',
     description: 'مساحة معيشة نموذجية (4م × 5م) تجمع بين الجلسات العائلية ومشاهدة التلفزيون.',
     explanation: 'توزيع الإضاءة في صالة المعيشة يعتمد على الدمج الذكي بين الإنارة العامة والجمالية؛ حيث تم توزيع 6 سبوتات دافئة (3000K) لتوفير تغطية متجانسة للغرفة دون تشكل ظلال حادة في زوايا الجلوس. الليد بروفايل المخفي يوفر إضاءة غير مباشرة (Indirect) مريحة أثناء مشاهدة التلفاز لحماية العين من الإجهاد. الثريا المودرن تمثل المركز البصري الجمالي للغرفة وتُعطي شعوراً بالفخامة والترحاب.',
+    spotlightReason: 'تم توزيع 6 سبوتات على أطراف السقف لتغطية المساحة بالتساوي وتفادي الظلال. المقاسات تختلف تدريجياً (من 0.6 للسبوتات الخلفية إلى 1.3 للأمامية) لتبدو متناسقة مع منظور وعمق السقف ثلاثي الأبعاد.',
+    ledReason: 'وزعنا شريطي ليد مائلين بزوايا (+18°/-18°) لتتبع انحناء الجبس المستعار بالصورة بدقة، وشريط أفقي بالخلف، مما يمنح تأثيراً ناعماً ومريحاً أثناء مشاهدة التلفزيون.',
+    chandelierReason: 'ثريا مودرن بحلقات معلقة بمركز السقف لتمثل اللمسة الفنية والجمالية العامة وتوحد توزيع الإضاءة المحيطية.',
     recommendedTemp: 'warm' as const,
     spotlightCount: 6,
-    ledCount: 2,
+    ledCount: 3,
     chandelierCount: 1,
     url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80',
     fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 25, y: 20, scale: 1.0 },
-      { id: 'spot_2', type: 'spotlight', x: 75, y: 20, scale: 1.0 },
-      { id: 'spot_3', type: 'spotlight', x: 25, y: 45, scale: 1.0 },
-      { id: 'spot_4', type: 'spotlight', x: 75, y: 45, scale: 1.0 },
-      { id: 'spot_5', type: 'spotlight', x: 15, y: 32, scale: 1.0 },
-      { id: 'spot_6', type: 'spotlight', x: 85, y: 32, scale: 1.0 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 12, length: 220, angle: 0, thickness: 'medium' },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 55, length: 220, angle: 0, thickness: 'medium' },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 30, scale: 1.2, style: 'modern' }
+      { id: 'spot_1', type: 'spotlight', x: 38, y: 18, scale: 0.6 },
+      { id: 'spot_2', type: 'spotlight', x: 62, y: 18, scale: 0.6 },
+      { id: 'spot_3', type: 'spotlight', x: 28, y: 26, scale: 0.9 },
+      { id: 'spot_4', type: 'spotlight', x: 72, y: 26, scale: 0.9 },
+      { id: 'spot_5', type: 'spotlight', x: 14, y: 38, scale: 1.3 },
+      { id: 'spot_6', type: 'spotlight', x: 86, y: 38, scale: 1.3 },
+      { id: 'led_1', type: 'led_profile', x: 30, y: 20, length: 170, angle: -18, thickness: 'thin' },
+      { id: 'led_2', type: 'led_profile', x: 70, y: 20, length: 170, angle: 18, thickness: 'thin' },
+      { id: 'led_3', type: 'led_profile', x: 50, y: 14, length: 110, angle: 0, thickness: 'thin' },
+      { id: 'ch_1', type: 'chandelier', x: 50, y: 28, scale: 1.3, style: 'modern' }
     ] as FixtureConfig[]
   },
   kitchen: {
     title: 'مطبخ مودرن عصري',
     description: 'مطبخ عصري (3م × 4م) يتطلب إضاءة عالية لسهولة العمل وتجهيز الطعام.',
     explanation: 'تتطلب المطابخ إضاءة عمل (Task Lighting) قوية وواضحة. تم توزيع 4 سبوتات فوق أسطح العمل والمجلى مباشرة بزاوية سقوط مستقيمة لتسهيل الرؤية وتفادي الظلال أثناء الطهي. يمتد الليد بروفايل أسفل الخزائن العلوية ليوفر إنارة ساطعة ومركزة لسطح العمل، وشريط سقف مستعار للإضاءة العامة. تم اعتماد إضاءة طبيعية (4000K) لألوان حقيقية للأطعمة، وتجنب الثريات الكلاسيكية لسهولة التنظيف والحفاظ على البساطة.',
+    spotlightReason: 'وزعنا كشافين في الخلف للإضاءة العامة، وكشافين أماميين كبيرين مباشرة فوق منضدة العمل والمجلى لتسليط إضاءة مركزة وقوية تمنع تشكل الظلال أثناء إعداد الأطعمة.',
+    ledReason: 'شريط ليد علوي متناسق مع السقف مائل بـ (-14°) لإبراز الديكور الخشبي، وشريط آخر مائل بـ (8°) مثبت أسفل الخزائن العلوية لينير منطقة التحضير بكفاءة تامة كإضاءة عمل.',
+    chandelierReason: 'ثريا تعليق مودرن وبسيطة تتدلى فوق جزيرة المطبخ، لتعطي إنارة مركزة ومظهر عصري دون التسبب في تجميع الأتربة أو صعوبة التنظيف.',
     recommendedTemp: 'natural' as const,
     spotlightCount: 4,
     ledCount: 2,
     chandelierCount: 1,
     url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
     fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 30, y: 25, scale: 1.0 },
-      { id: 'spot_2', type: 'spotlight', x: 70, y: 25, scale: 1.0 },
-      { id: 'spot_3', type: 'spotlight', x: 30, y: 55, scale: 1.0 },
-      { id: 'spot_4', type: 'spotlight', x: 70, y: 55, scale: 1.0 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 15, length: 180, angle: 0, thickness: 'thin' },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 65, length: 180, angle: 0, thickness: 'thin' },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 38, scale: 0.8, style: 'minimalist' }
+      { id: 'spot_1', type: 'spotlight', x: 42, y: 20, scale: 0.7 },
+      { id: 'spot_2', type: 'spotlight', x: 58, y: 20, scale: 0.7 },
+      { id: 'spot_3', type: 'spotlight', x: 25, y: 45, scale: 1.2 },
+      { id: 'spot_4', type: 'spotlight', x: 75, y: 45, scale: 1.2 },
+      { id: 'led_1', type: 'led_profile', x: 35, y: 14, length: 160, angle: -14, thickness: 'thin' },
+      { id: 'led_2', type: 'led_profile', x: 68, y: 48, length: 150, angle: 8, thickness: 'thin' },
+      { id: 'ch_1', type: 'chandelier', x: 50, y: 35, scale: 0.9, style: 'minimalist' }
     ] as FixtureConfig[]
   },
   bedroom: {
     title: 'غرفة نوم هادئة',
     description: 'غرفة نوم رئيسية (4م × 4م) مصممة للاسترخاء والراحة النفسية.',
     explanation: 'تم توزيع 4 سبوتات دافئة خافتة (3000K) في زوايا الغرفة وبعيداً عن منطقة سرير النوم تماماً، وذلك لتفادي سقوط الضوء مباشرة على العينين أثناء الاستلقاء. تم اعتماد إضاءة الليد بروفايل المخفي خلف السرير أو الستارة لإضفاء توهج ناعم يبعث على الهدوء والاسترخاء، مع ثريا مودرن ناعمة وقابلة للتحكم بشدتها لتوفير إضاءة محيطية جمالية.',
+    spotlightReason: 'توزيع 4 كشافات سبوت لايت في زوايا الغرفة بعيداً عن منطقة سرير النوم تماماً، وذلك لتجنب سقوط الضوء مباشرة على العينين وتفادي الوهج المزعج أثناء الاستلقاء.',
+    ledReason: 'شريط ليد بروفايل خلف خلفية السرير ليعطي إضاءة خافتة وناعمة ومريحة للنوم والاسترخاء، وشريط ليد آخر في الجيب الجبسي لتأثير ارتفاع السقف.',
+    chandelierReason: 'ثريا مركزية بتصميم ناعم وهادئ توزع الضوء بزاوية 360 درجة، وتعمل كإضاءة عامة للمكان قبل النوم.',
     recommendedTemp: 'warm' as const,
     spotlightCount: 4,
     ledCount: 2,
     chandelierCount: 1,
     url: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
     fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 20, y: 25, scale: 0.9 },
-      { id: 'spot_2', type: 'spotlight', x: 80, y: 25, scale: 0.9 },
-      { id: 'spot_3', type: 'spotlight', x: 20, y: 60, scale: 0.9 },
-      { id: 'spot_4', type: 'spotlight', x: 80, y: 60, scale: 0.9 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 15, length: 150, angle: 0, thickness: 'thin' },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 52, length: 150, angle: 0, thickness: 'thin' },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 32, scale: 1.0, style: 'modern' }
+      { id: 'spot_1', type: 'spotlight', x: 35, y: 20, scale: 0.75 },
+      { id: 'spot_2', type: 'spotlight', x: 65, y: 20, scale: 0.75 },
+      { id: 'spot_3', type: 'spotlight', x: 20, y: 38, scale: 1.1 },
+      { id: 'spot_4', type: 'spotlight', x: 80, y: 38, scale: 1.1 },
+      { id: 'led_1', type: 'led_profile', x: 50, y: 58, length: 240, angle: 0, thickness: 'medium' },
+      { id: 'led_2', type: 'led_profile', x: 50, y: 14, length: 180, angle: 0, thickness: 'thin' },
+      { id: 'ch_1', type: 'chandelier', x: 50, y: 26, scale: 1.1, style: 'modern' }
     ] as FixtureConfig[]
   },
   salon: {
     title: 'صالون / مجلس ضيوف',
     description: 'مجلس ضيوف فخم وواسع (5م × 6م) يحتاج لإبراز الفخامة والديكورات.',
     explanation: 'مجلس الضيوف يعبر عن الكرم والفخامة. وزعنا 8 سبوتات مركزة وموجهة بزوايا مدروسة لتسليط الضوء على الديكورات الجدارية واللوحات والممرات. تم وضع ثريتين كلاسيكيتين فخمتين لتعزيز الطابع الفخم وتأكيد فخامة المجلس ومركزيته. يحيط الليد بروفايل بأطراف السقف المستعار ليوفر إضاءة عامة ناعمة ودافئة (3000K) تناسب اللقاءات الطويلة وتمنح المكان اتساعاً بصرياً.',
+    spotlightReason: 'تم توزيع 8 سبوتات مركزة وموجهة بزوايا مدروسة ومقاسات تتدرج مع عمق الصورة (0.65 إلى 1.35)، لتسليط الضوء على الديكورات الجدارية واللوحات والممرات وإبراز الفخامة.',
+    ledReason: 'أربعة خطوط ليد بروفايل في السقف المستعار تتبع بدقة أبعاد المجلس المربع بزوايا ميل تناسب منظور الصورة، لتعطي إضاءة غير مباشرة دافئة ومريحة للجلسات الطويلة.',
+    chandelierReason: 'تم تعليق ثريتين كلاسيكيتين فخمتين بالكريستال بمستويين متدرجين في الحجم والارتفاع لملء الفراغ البصري لصالون الضيوف وتأكيد مركز الفخامة.',
     recommendedTemp: 'warm' as const,
     spotlightCount: 8,
-    ledCount: 2,
+    ledCount: 4,
     chandelierCount: 2,
     url: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1200&q=80',
     fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 20, y: 20, scale: 1.0 },
-      { id: 'spot_2', type: 'spotlight', x: 40, y: 20, scale: 1.0 },
-      { id: 'spot_3', type: 'spotlight', x: 60, y: 20, scale: 1.0 },
-      { id: 'spot_4', type: 'spotlight', x: 80, y: 20, scale: 1.0 },
-      { id: 'spot_5', type: 'spotlight', x: 20, y: 55, scale: 1.0 },
-      { id: 'spot_6', type: 'spotlight', x: 40, y: 55, scale: 1.0 },
-      { id: 'spot_7', type: 'spotlight', x: 60, y: 55, scale: 1.0 },
-      { id: 'spot_8', type: 'spotlight', x: 80, y: 55, scale: 1.0 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 10, length: 260, angle: 0, thickness: 'thick' },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 65, length: 260, angle: 0, thickness: 'thick' },
-      { id: 'ch_1', type: 'chandelier', x: 35, y: 35, scale: 1.1, style: 'classic' },
-      { id: 'ch_2', type: 'chandelier', x: 65, y: 35, scale: 1.1, style: 'classic' }
+      { id: 'spot_1', type: 'spotlight', x: 34, y: 18, scale: 0.65 },
+      { id: 'spot_2', type: 'spotlight', x: 66, y: 18, scale: 0.65 },
+      { id: 'spot_3', type: 'spotlight', x: 25, y: 28, scale: 0.9 },
+      { id: 'spot_4', type: 'spotlight', x: 75, y: 28, scale: 0.9 },
+      { id: 'spot_5', type: 'spotlight', x: 12, y: 42, scale: 1.35 },
+      { id: 'spot_6', type: 'spotlight', x: 88, y: 42, scale: 1.35 },
+      { id: 'spot_7', type: 'spotlight', x: 50, y: 16, scale: 0.7 },
+      { id: 'spot_8', type: 'spotlight', x: 50, y: 34, scale: 1.15 },
+      { id: 'led_1', type: 'led_profile', x: 26, y: 20, length: 180, angle: -22, thickness: 'medium' },
+      { id: 'led_2', type: 'led_profile', x: 74, y: 20, length: 180, angle: 22, thickness: 'medium' },
+      { id: 'led_3', type: 'led_profile', x: 50, y: 11, length: 120, angle: 0, thickness: 'medium' },
+      { id: 'led_4', type: 'led_profile', x: 50, y: 52, length: 260, angle: 0, thickness: 'medium' },
+      { id: 'ch_1', type: 'chandelier', x: 42, y: 24, scale: 0.95, style: 'classic' },
+      { id: 'ch_2', type: 'chandelier', x: 58, y: 36, scale: 1.35, style: 'classic' }
     ] as FixtureConfig[]
   },
   custom: {
     title: 'توزيع مخصص لصورتك المرفوعة',
     description: 'توزيع هندسي ذكي ومناسب لجميع الصالونات والغرف السكنية.',
     explanation: 'لهذه الصورة قمنا بتطبيق توزيع هندسي متوازن ومناسب لأغلب الغرف: شبكة متوزعة من 4 سبوتات لتوزيع الضوء بالتساوي وبطريقة هندسية صحيحة، شريطي ليد بروفايل في السقف المستعار لمنح الغرفة إضاءة غير مباشرة (Indirect) تزيد من الارتفاع البصري، وثريا مركزية فخمة لتمثل القطعة الجمالية المضيئة في المنتصف.',
+    spotlightReason: 'شبكة متوزعة من 4 سبوتات لتوزيع الضوء بالتساوي وبطريقة هندسية صحيحة تمنع تشكل الظلام في أركان الغرفة المرفوعة.',
+    ledReason: 'شريطي ليد بروفايل في السقف لخلق إضاءة غير مباشرة (Indirect) تزيد من الارتفاع البصري وتضفي لمسة عصرية على الصورة.',
+    chandelierReason: 'ثريا مركزية فخمة لتمثل القطعة الجمالية المضيئة في المنتصف لتوزيع الضوء في مركز المساحة.',
     recommendedTemp: 'warm' as const,
     spotlightCount: 4,
     ledCount: 2,
     chandelierCount: 1,
     url: '',
     fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 30, y: 25, scale: 1.0 },
-      { id: 'spot_2', type: 'spotlight', x: 70, y: 25, scale: 1.0 },
-      { id: 'spot_3', type: 'spotlight', x: 30, y: 55, scale: 1.0 },
-      { id: 'spot_4', type: 'spotlight', x: 70, y: 55, scale: 1.0 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 15, length: 200, angle: 0, thickness: 'medium' },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 60, length: 200, angle: 0, thickness: 'medium' },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 35, scale: 1.0, style: 'modern' }
+      { id: 'spot_1', type: 'spotlight', x: 30, y: 25, scale: 0.8 },
+      { id: 'spot_2', type: 'spotlight', x: 70, y: 25, scale: 0.8 },
+      { id: 'spot_3', type: 'spotlight', x: 20, y: 55, scale: 1.2 },
+      { id: 'spot_4', type: 'spotlight', x: 80, y: 55, scale: 1.2 },
+      { id: 'led_1', type: 'led_profile', x: 50, y: 15, length: 220, angle: 0, thickness: 'medium' },
+      { id: 'led_2', type: 'led_profile', x: 50, y: 65, length: 220, angle: 0, thickness: 'medium' },
+      { id: 'ch_1', type: 'chandelier', x: 50, y: 35, scale: 1.1, style: 'modern' }
     ] as FixtureConfig[]
   }
 };
@@ -281,7 +299,7 @@ export default function LightingDesigner() {
             موزّع الإضاءة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.35)]">الذكي والهندسي</span>
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-sm md:text-base">
-            اختر نوع غرفتك أو ارفع صورتك الشخصية، ليعرض لك النظام فوراً توزيع الإضاءة النموذجي والصحيح هندسياً مع شرح كامل وواضح لكل عنصر!
+            اختر نوع غرفتك أو ارفع صورتك الشخصية، ليعرض لك النظام فوراً توزيع الإضاءة المنظوري والصحيح هندسياً مع شرح كامل وواضح لكل عنصر!
           </p>
         </div>
 
@@ -609,13 +627,49 @@ export default function LightingDesigner() {
             <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-xl text-right space-y-4">
               <div className="flex items-center gap-2.5 pb-3 border-b border-white/5">
                 <Award className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-base font-bold text-white">التقرير الهندسي لتوزيع الإضاءة</h3>
+                <h3 className="text-base font-bold text-white">التقرير الهندسي والتحليل الفني للتصميم</h3>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">
+              
+              <p className="text-xs text-slate-300 leading-relaxed font-sans mb-4">
                 {currentConfig.explanation}
               </p>
-              <div className="bg-blue-500/10 border border-blue-500/15 rounded-2xl p-3.5 text-[11px] text-blue-300 leading-relaxed">
-                💡 **نصيحة المصمم:** يُنصح دائماً بالدمج بين الإضاءة المحيطية (الليد بروفايل) لتجنب الإجهاد البصري، وإضاءة العمل البؤرية (السبوتات) الموزعة على مسافات 1م إلى 1.2م من الجدران لتوفير بيئة مريحة وجمالية.
+
+              <div className="space-y-3 pt-2">
+                <h4 className="text-xs font-bold text-slate-400">تحليل المكونات المختارة:</h4>
+                
+                {showSpotlights && (
+                  <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-3 text-xs flex gap-3 items-start">
+                    <span className="p-2 rounded-xl bg-blue-500/10 text-blue-400">💡</span>
+                    <div>
+                      <h5 className="font-bold text-white mb-0.5">كشافات سبوت لايت ({currentConfig.spotlightCount} قطع)</h5>
+                      <p className="text-slate-400 leading-relaxed text-[11px]">{currentConfig.spotlightReason}</p>
+                    </div>
+                  </div>
+                )}
+
+                {showLedProfiles && (
+                  <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-3 text-xs flex gap-3 items-start">
+                    <span className="p-2 rounded-xl bg-sky-500/10 text-sky-400">⚡</span>
+                    <div>
+                      <h5 className="font-bold text-white mb-0.5">خطوط ليد بروفايل ({currentConfig.ledCount} خطوط)</h5>
+                      <p className="text-slate-400 leading-relaxed text-[11px]">{currentConfig.ledReason}</p>
+                    </div>
+                  </div>
+                )}
+
+                {showChandeliers && (
+                  <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-3 text-xs flex gap-3 items-start">
+                    <span className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">🌟</span>
+                    <div>
+                      <h5 className="font-bold text-white mb-0.5">ثريا السقف الجمالية ({currentConfig.chandelierCount} قطع)</h5>
+                      <p className="text-slate-400 leading-relaxed text-[11px]">{currentConfig.chandelierReason}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-blue-500/10 border border-blue-500/15 rounded-2xl p-3.5 text-[11px] text-blue-300 leading-relaxed mt-2">
+                💡 **نصيحة مهندسي الإنارة:** يفضل دمج مستويات الإضاءة الثلاثة (العامة، والجمالية، والعملية) للحصول على أفضل راحة بصرية وعمق جمالي للمكان.
               </div>
             </div>
 
