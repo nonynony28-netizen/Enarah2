@@ -516,27 +516,34 @@ export default function LightingDesigner() {
                     return (
                       <div
                         key={f.id}
-                        className="absolute rounded-full transition-all duration-300 flex items-center justify-center pointer-events-none"
+                        className="absolute transition-all duration-300 flex items-center justify-center pointer-events-none"
                         style={{
                           left: `${f.x}%`,
                           top: `${f.y}%`,
                           width: `${f.length || 150}px`,
                           height: f.thickness === 'thin' ? '7px' : f.thickness === 'thick' ? '15px' : '11px',
                           transform: `translate(-50%, -50%) rotate(${f.angle || 0}deg) rotateX(50deg)`,
-                          // محاكاة المجرى الألمونيوم والناشر الأبيض المتوهج
+                          // مجرى ألومنيوم ثلاثي الأبعاد مع ناشر (Diffuser) مستمر ومظهر حقيقي للمجرى والفلنجة
                           background: showLights && brightness > 0 
-                            ? `linear-gradient(to bottom, #0f172a 0%, ${getTempColor(temp, 1)} 15%, ${getTempColor(temp, 1)} 85%, #0f172a 100%)`
-                            : 'linear-gradient(to bottom, #020617 0%, #cbd5e1 20%, #cbd5e1 80%, #020617 100%)',
+                            ? `linear-gradient(to bottom, #475569 0%, #0f172a 4%, ${getTempColor(temp, 1)} 15%, ${getTempColor(temp, 1)} 85%, #0f172a 96%, #475569 100%)`
+                            : 'linear-gradient(to bottom, #94a3b8 0%, #475569 8%, #e2e8f0 18%, #e2e8f0 82%, #475569 92%, #94a3b8 100%)',
                           boxShadow: showLights && brightness > 0 
-                            ? `0 0 ${15 * (brightness/100)}px ${getTempColor(temp, 0.9)}, 0 0 ${30 * (brightness/100)}px ${getTempColor(temp, 0.5)}` 
-                            : 'none',
-                          border: '1px solid rgba(0,0,0,0.5)',
-                          opacity: showLights && brightness > 0 ? 0.85 + (brightness / 100) * 0.15 : 0.6,
+                            ? `0 0 ${12 * (brightness/100)}px ${getTempColor(temp, 0.8)}, 0 0 ${25 * (brightness/100)}px ${getTempColor(temp, 0.4)}` 
+                            : '0 1px 2px rgba(0,0,0,0.15)',
+                          border: '1px solid rgba(0,0,0,0.45)',
+                          opacity: showLights && brightness > 0 ? 0.9 + (brightness / 100) * 0.1 : 0.75,
                           willChange: 'transform'
                         }}
                       >
-                        {/* خط التشتيت الأبيض الداخلي */}
-                        <div className="w-[98%] h-[60%] bg-white/40 rounded-full" />
+                        {/* الناشر الأبيض المستمر على طول المجرى */}
+                        <div 
+                          className="w-full h-[70%] transition-all duration-300" 
+                          style={{
+                            background: showLights && brightness > 0 
+                              ? 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.2) 100%)' 
+                              : 'linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.3) 100%)'
+                          }}
+                        />
                       </div>
                     );
                   }
@@ -556,23 +563,31 @@ export default function LightingDesigner() {
                     >
                       {f.type === 'spotlight' ? (
                         <div className="relative w-full h-full flex items-center justify-center" style={{ transform: 'rotateX(50deg)' }}>
-                          {/* فتحة السقف الجبسية (Drywall Cutout Shadow) */}
-                          <div className="w-8 h-8 rounded-full bg-black/55 shadow-[0_2px_4px_rgba(0,0,0,0.6)] flex items-center justify-center">
-                            {/* إطار السبوت الخارجي الألمونيوم ثلاثي الأبعاد (Bezel) */}
-                            <div className="w-7.5 h-7.5 rounded-full border border-white/20 bg-slate-800 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.8)] flex items-center justify-center">
-                              {/* تجويف الكوب الداخلي الأسود (Anti-Glare Baffle) */}
-                              <div className="w-5.5 h-5.5 rounded-full bg-slate-950 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,1)]">
-                                {/* عدسة الـ COB المضيئة المتوهجة بالداخل */}
+                          {/* فتحة السقف الجبسية والظل الخارجي */}
+                          <div className="w-9 h-9 rounded-full bg-black/45 shadow-[0_2px_5px_rgba(0,0,0,0.5)] flex items-center justify-center">
+                            {/* إطار السبوت الأبيض المدمج (Trim/Bezel) */}
+                            <div className="w-8.5 h-8.5 rounded-full border border-slate-200 bg-slate-100 shadow-[inset_0_1px_2px_rgba(255,255,255,0.6),0_1px_2px_rgba(0,0,0,0.4)] flex items-center justify-center">
+                              {/* التجويف الداخلي العميق المضاد للوهج (Deep Black Baffle Cup) */}
+                              <div className="w-6 h-6 rounded-full bg-[#0a0a0c] flex items-center justify-center shadow-[inset_0_2px_5px_rgba(0,0,0,0.9)] relative overflow-hidden">
+                                {/* حلقات عاكسة داخلية خفيفة */}
+                                <div className="absolute inset-[1px] rounded-full border border-slate-900/40" />
+                                <div className="absolute inset-[3px] rounded-full border border-slate-900/60" />
+                                {/* عدسة الـ COB المضيئة */}
                                 <div 
-                                  className="w-3.5 h-3.5 rounded-full transition-all duration-300"
+                                  className="w-3.2 h-3.2 rounded-full transition-all duration-300 relative"
                                   style={{
-                                    backgroundColor: showLights && brightness > 0 ? getTempColor(temp, 1) : '#1e293b',
+                                    backgroundColor: showLights && brightness > 0 ? getTempColor(temp, 1) : '#dbb35c', // لون الفسفور الأصفر للعدسة وهي مطفأة
                                     boxShadow: showLights && brightness > 0 
-                                      ? `0 0 10px ${getTempColor(temp, 1)}, inset 0 0 3px rgba(255,255,255,0.8)` 
-                                      : 'none',
-                                    opacity: showLights && brightness > 0 ? 0.5 + (brightness / 100) * 0.5 : 0.2
+                                      ? `0 0 12px ${getTempColor(temp, 1)}, inset 0 0 3px rgba(255,255,255,0.9)` 
+                                      : 'inset 0 1px 2px rgba(0,0,0,0.4)',
+                                    opacity: showLights && brightness > 0 ? 1 : 0.8
                                   }}
-                                />
+                                >
+                                  {/* انعكاس الضوء على الزجاج */}
+                                  {showLights && brightness > 0 && (
+                                    <div className="absolute top-[1px] left-[1px] w-0.8 h-0.8 bg-white rounded-full opacity-75" />
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
