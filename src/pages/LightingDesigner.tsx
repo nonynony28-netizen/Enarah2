@@ -368,7 +368,7 @@ export default function LightingDesigner() {
               </div>
 
               {/* الحاوية الفعلية للصورة والسبوتات - ثابتة 100% بدون مستمعين للسحب */}
-              <div className="relative w-full aspect-[16/10] md:aspect-[16/9] min-h-[300px] md:min-h-[450px] bg-slate-950 flex items-center justify-center select-none">
+              <div className="relative w-full aspect-[16/10] md:aspect-[16/9] min-h-[300px] md:min-h-[450px] bg-slate-950 flex items-center justify-center select-none" style={{ perspective: '1000px' }}>
                 
                 {/* الصورة الخلفية للغرفة */}
                 {getBgImage() ? (
@@ -404,10 +404,10 @@ export default function LightingDesigner() {
                       style={{
                         top: `${f.y}%`,
                         left: `${f.x}%`,
-                        transform: 'translate(-50%, -50%)',
-                        width: `${(f.scale || 1.0) * 80}px`,
+                        transform: 'translate(-50%, -50%) rotateX(50deg)',
+                        width: `${(f.scale || 1.0) * 120}px`,
                         height: `${(f.scale || 1.0) * 80}px`,
-                        background: `radial-gradient(circle, ${getTempColor(temp, 0.35)} 0%, ${getTempColor(temp, 0.05)} 60%, transparent 100%)`,
+                        background: `radial-gradient(circle, ${getTempColor(temp, 0.4)} 0%, ${getTempColor(temp, 0.06)} 60%, transparent 100%)`,
                         opacity: brightness / 100,
                         mixBlendMode: 'screen',
                         willChange: 'transform'
@@ -431,7 +431,7 @@ export default function LightingDesigner() {
                           transform: `translateX(-50%) scale(${f.scale || 1.0})`,
                           width: '140px',
                           height: '320px',
-                          background: `linear-gradient(to bottom, ${getTempColor(temp, 0.6)} 0%, ${getTempColor(temp, 0.08)} 50%, transparent 100%)`,
+                          background: `linear-gradient(to bottom, ${getTempColor(temp, 0.65)} 0%, ${getTempColor(temp, 0.08)} 50%, transparent 100%)`,
                           clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
                           opacity: brightness / 100,
                           filter: 'blur(4px)',
@@ -475,21 +475,21 @@ export default function LightingDesigner() {
                           top: `${f.y}%`,
                           width: `${f.length || 150}px`,
                           height: f.thickness === 'thin' ? '7px' : f.thickness === 'thick' ? '15px' : '11px',
-                          transform: `translate(-50%, -50%) rotate(${f.angle || 0}deg)`,
+                          transform: `translate(-50%, -50%) rotate(${f.angle || 0}deg) rotateX(50deg)`,
                           // محاكاة المجرى الألمونيوم والناشر الأبيض المتوهج
                           background: showLights && brightness > 0 
-                            ? `linear-gradient(to bottom, #1e293b 0%, ${getTempColor(temp, 1)} 20%, ${getTempColor(temp, 1)} 80%, #1e293b 100%)`
-                            : `linear-gradient(to bottom, #0f172a 0%, #cbd5e1 30%, #cbd5e1 70%, #0f172a 100%)`,
+                            ? `linear-gradient(to bottom, #0f172a 0%, ${getTempColor(temp, 1)} 15%, ${getTempColor(temp, 1)} 85%, #0f172a 100%)`
+                            : 'linear-gradient(to bottom, #020617 0%, #cbd5e1 20%, #cbd5e1 80%, #020617 100%)',
                           boxShadow: showLights && brightness > 0 
-                            ? `0 0 ${12 * (brightness/100)}px ${getTempColor(temp, 0.95)}, 0 0 ${25 * (brightness/100)}px ${getTempColor(temp, 0.5)}` 
+                            ? `0 0 ${15 * (brightness/100)}px ${getTempColor(temp, 0.9)}, 0 0 ${30 * (brightness/100)}px ${getTempColor(temp, 0.5)}` 
                             : 'none',
-                          border: '1px solid rgba(0,0,0,0.4)',
-                          opacity: showLights && brightness > 0 ? 0.8 + (brightness / 100) * 0.2 : 0.6,
+                          border: '1px solid rgba(0,0,0,0.5)',
+                          opacity: showLights && brightness > 0 ? 0.85 + (brightness / 100) * 0.15 : 0.6,
                           willChange: 'transform'
                         }}
                       >
                         {/* خط التشتيت الأبيض الداخلي */}
-                        <div className="w-full h-[60%] bg-white/40 rounded-full" />
+                        <div className="w-[98%] h-[60%] bg-white/40 rounded-full" />
                       </div>
                     );
                   }
@@ -497,7 +497,7 @@ export default function LightingDesigner() {
                   return (
                     <div
                       key={f.id}
-                      className="absolute select-none flex items-center justify-center rounded-full transition-all duration-300 pointer-events-none"
+                      className="absolute select-none flex items-center justify-center transition-all duration-300 pointer-events-none"
                       style={{
                         left: `${f.x}%`,
                         top: `${f.y}%`,
@@ -508,27 +508,44 @@ export default function LightingDesigner() {
                       }}
                     >
                       {f.type === 'spotlight' ? (
-                        <div className="relative w-full h-full flex items-center justify-center">
-                          {/* إطار السبوت الخارجي الألمونيوم ثلاثي الأبعاد */}
-                          <div className="w-8 h-8 rounded-full border border-white/20 bg-slate-900 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_4px_rgba(0,0,0,0.5)] flex items-center justify-center overflow-hidden">
-                            {/* تجويف الكوب الداخلي الأسود */}
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-b from-slate-950 to-slate-800 flex items-center justify-center shadow-inner">
-                              {/* عدسة الـ COB المضيئة المتوهجة بالداخل */}
-                              <div 
-                                className="w-4.5 h-4.5 rounded-full transition-all duration-300"
-                                style={{
-                                  backgroundColor: showLights && brightness > 0 ? getTempColor(temp, 1) : '#1e293b',
-                                  boxShadow: showLights && brightness > 0 
-                                    ? `0 0 10px ${getTempColor(temp, 1)}, inset 0 0 4px rgba(255,255,255,0.8)` 
-                                    : 'none',
-                                  opacity: showLights && brightness > 0 ? 0.4 + (brightness / 100) * 0.6 : 0.2
-                                }}
-                              />
+                        <div className="relative w-full h-full flex items-center justify-center" style={{ transform: 'rotateX(50deg)' }}>
+                          {/* فتحة السقف الجبسية (Drywall Cutout Shadow) */}
+                          <div className="w-8 h-8 rounded-full bg-black/55 shadow-[0_2px_4px_rgba(0,0,0,0.6)] flex items-center justify-center">
+                            {/* إطار السبوت الخارجي الألمونيوم ثلاثي الأبعاد (Bezel) */}
+                            <div className="w-7.5 h-7.5 rounded-full border border-white/20 bg-slate-800 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                              {/* تجويف الكوب الداخلي الأسود (Anti-Glare Baffle) */}
+                              <div className="w-5.5 h-5.5 rounded-full bg-slate-950 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,1)]">
+                                {/* عدسة الـ COB المضيئة المتوهجة بالداخل */}
+                                <div 
+                                  className="w-3.5 h-3.5 rounded-full transition-all duration-300"
+                                  style={{
+                                    backgroundColor: showLights && brightness > 0 ? getTempColor(temp, 1) : '#1e293b',
+                                    boxShadow: showLights && brightness > 0 
+                                      ? `0 0 10px ${getTempColor(temp, 1)}, inset 0 0 3px rgba(255,255,255,0.8)` 
+                                      : 'none',
+                                    opacity: showLights && brightness > 0 ? 0.5 + (brightness / 100) * 0.5 : 0.2
+                                  }}
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
                       ) : (
                         <div className="relative w-full h-full flex items-center justify-center">
+                          
+                          {/* كوب معدني لتثبيت الثريا بالسقف في منظور ثلاثي الأبعاد (Ceiling Canopy) */}
+                          <div 
+                            className="absolute bg-slate-700 border border-white/20 rounded-full"
+                            style={{
+                              top: '0%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%) rotateX(55deg)',
+                              width: '18px',
+                              height: '8px',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.6)'
+                            }}
+                          />
+
                           {/* رسمة الثريا الحقيقية عالية الدقة والوضوح (SVG) */}
                           <AnimatePresence>
                             {f.style === 'classic' ? (
