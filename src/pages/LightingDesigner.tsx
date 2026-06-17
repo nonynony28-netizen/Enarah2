@@ -224,39 +224,57 @@ export default function LightingDesigner() {
 
     // العثور على الإحداثيات الحالية للمحافظة عليها في حالة عدم سحب العنصر
     const currentFixture = fixtures.find(f => f.id === id);
-    let lastX = currentFixture ? currentFixture.x : 50;
-    let lastY = currentFixture ? currentFixture.y : 30;
+    if (!currentFixture) return;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const initialX_pct = currentFixture.x;
+    const initialY_pct = currentFixture.y;
+    const scale = currentFixture.scale || 1.0;
+    const angle = currentFixture.angle || 0;
+    const type = currentFixture.type;
+
+    let lastX = initialX_pct;
+    let lastY = initialY_pct;
 
     let rafId: number | null = null;
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const newX = ((moveEvent.clientX - rect.left) / rect.width) * 100;
+        const dx = moveEvent.clientX - startX;
         // نطبق إزاحة طفيفة للأعلى بمقدار 40 بكسل أثناء السحب على الهواتف لرفع العنصر فوق الأصبع وتجنب حجب النتيجة
         const isMobile = window.innerWidth < 768;
-        const touchOffsetY = isMobile ? 40 : 0;
-        const newY = ((moveEvent.clientY - touchOffsetY - rect.top) / rect.height) * 100;
+        const touchOffsetY = isMobile ? -40 : 0;
+        const dy = moveEvent.clientY - startY + touchOffsetY;
 
-        // تقييد الإحداثيات داخل فضاء الصورة (2% إلى 98%)
-        const clampedX = Math.max(2, Math.min(98, newX));
-        const clampedY = Math.max(2, Math.min(98, newY));
+        // حساب الإحداثيات الجديدة بالنسبة المئوية للمحافظة على القيود (2% إلى 98%)
+        const deltaX_pct = (dx / rect.width) * 100;
+        const deltaY_pct = (dy / rect.height) * 100;
 
-        lastX = clampedX;
-        lastY = clampedY;
+        const newX_pct = Math.max(2, Math.min(98, initialX_pct + deltaX_pct));
+        const newY_pct = Math.max(2, Math.min(98, initialY_pct + deltaY_pct));
 
-        // تحديث عناصر الـ DOM مباشرة وبشكل فوري بسرعة 60 إطاراً بالثانية
+        // حساب الدلتا الفعلي المحدود بالقيود لتحريك العنصر بدقة بالبيكسل
+        const clampedDx = ((newX_pct - initialX_pct) / 100) * rect.width;
+        const clampedDy = ((newY_pct - initialY_pct) / 100) * rect.height;
+
+        lastX = newX_pct;
+        lastY = newY_pct;
+
+        // تحديث الـ transform مباشرة (GPU Accelerated) لسرعة 120fps وبدون إعادة حساب التخطيط (Reflow/Repaint)
         if (fixtureEl) {
-          fixtureEl.style.left = `${clampedX}%`;
-          fixtureEl.style.top = `${clampedY}%`;
+          if (type === 'led_profile') {
+            fixtureEl.style.transform = `translate3d(calc(-50% + ${clampedDx}px), calc(-50% + ${clampedDy}px), 0) rotate(${angle}deg)`;
+          } else {
+            fixtureEl.style.transform = `translate3d(calc(-50% + ${clampedDx}px), calc(-50% + ${clampedDy}px), 0)`;
+          }
         }
         if (beamEl) {
-          beamEl.style.left = `${clampedX}%`;
-          beamEl.style.top = `${clampedY}%`;
+          beamEl.style.transform = `translate3d(calc(-50% + ${clampedDx}px), ${clampedDy}px, 0) scale(${scale})`;
         }
         if (glowEl) {
-          glowEl.style.left = `${clampedX}%`;
-          glowEl.style.top = `${clampedY}%`;
+          glowEl.style.transform = `translate3d(calc(-50% + ${clampedDx}px), calc(-50% + ${clampedDy}px), 0)`;
         }
       });
     };
@@ -265,6 +283,11 @@ export default function LightingDesigner() {
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
+
+      // تنظيف التنسيقات المباشرة ليعود التحكم لـ React بسلاسة
+      if (fixtureEl) fixtureEl.style.transform = '';
+      if (beamEl) beamEl.style.transform = '';
+      if (glowEl) glowEl.style.transform = '';
 
       // حفظ الإحداثيات النهائية في حالة React مرة واحدة فقط عند إفلات الماوس/الأصبع
       setFixtures(prev =>
@@ -517,6 +540,7 @@ export default function LightingDesigner() {
                           opacity: f.brightness / 100,
                           filter: 'blur(3.5px)',
                           mixBlendMode: 'screen',
+                          willChange: 'transform'
                         }}
                       />
                     );
@@ -537,6 +561,7 @@ export default function LightingDesigner() {
                           opacity: f.brightness / 100,
                           filter: 'blur(10px)',
                           mixBlendMode: 'screen',
+                          willChange: 'transform'
                         }}
                       />
                     );
@@ -571,7 +596,7 @@ export default function LightingDesigner() {
                           opacity: showLights && f.brightness > 0 ? 0.35 + (f.brightness / 100) * 0.65 : 0.4,
                           cursor: 'move',
                           touchAction: 'none',
-                          willChange: 'left, top'
+                          willChange: 'transform'
                         }}
                       >
                         {/* مقبض تحديد الليد بروفايل في المنتصف */}
@@ -599,7 +624,7 @@ export default function LightingDesigner() {
                         height: f.type === 'chandelier' ? `${f.scale * 60}px` : `${f.scale * 44}px`,
                         cursor: 'move',
                         touchAction: 'none',
-                        willChange: 'left, top'
+                        willChange: 'transform'
                       }}
                     >
                       {f.type === 'spotlight' ? (
