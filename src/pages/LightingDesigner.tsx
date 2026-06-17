@@ -54,6 +54,45 @@ export default function LightingDesigner() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // استرجاع الصورة من الجلسة الآمنة عند التحميل والتأكد من عدم انتهاء الصلاحية (ساعة واحدة)
+  useEffect(() => {
+    const savedImage = sessionStorage.getItem('enarah_custom_image');
+    const savedTime = sessionStorage.getItem('enarah_custom_image_time');
+    
+    if (savedImage && savedTime) {
+      const elapsed = Date.now() - parseInt(savedTime);
+      if (elapsed < 3600000) { // أقل من ساعة
+        setCustomImage(savedImage);
+        setRoomType('custom');
+      } else {
+        sessionStorage.removeItem('enarah_custom_image');
+        sessionStorage.removeItem('enarah_custom_image_time');
+      }
+    }
+  }, []);
+
+  // مؤقت لمسح الصورة تلقائياً بعد مرور ساعة من الرفع إذا بقيت الصفحة مفتوحة
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedTime = sessionStorage.getItem('enarah_custom_image_time');
+      if (savedTime) {
+        const elapsed = Date.now() - parseInt(savedTime);
+        if (elapsed >= 3600000) { // ساعة واحدة
+          setCustomImage(null);
+          if (roomType === 'custom') {
+            setRoomType('living');
+          }
+          sessionStorage.removeItem('enarah_custom_image');
+          sessionStorage.removeItem('enarah_custom_image_time');
+          setFixtures([]);
+          setSelectedFixtureId(null);
+          alert("تنبيه أمني: انتهت صلاحية الجلسة الآمنة (ساعة واحدة) وتم إزالة صورتك المرفوعة تلقائياً لحماية خصوصيتك ولتسريع أداء متصفح الهاتف.");
+        }
+      }
+    }, 15000); // الفحص كل 15 ثانية
+    return () => clearInterval(interval);
+  }, [roomType]);
+
   // اختيار الصورة الخلفية الحالية
   const getBgImage = () => {
     if (roomType === 'custom' && customImage) {
@@ -63,15 +102,28 @@ export default function LightingDesigner() {
     return preset ? preset.url : presetRooms[0].url;
   };
 
-  // معالجة رفع صورة مخصصة
+  // معالجة رفع صورة مخصصة مع تقييد الحجم
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // تقييد الحجم إلى 2.5 ميجابايت كحد أقصى لسرعة الأداء ومنع استهلاك الذاكرة
+      if (file.size > 2.5 * 1024 * 1024) {
+        alert("تنبيه: حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 2.5 ميجابايت لضمان سرعة واستجابة اللوحة على الهواتف.");
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          setCustomImage(event.target.result as string);
+          const base64 = event.target.result as string;
+          setCustomImage(base64);
           setRoomType('custom');
+          try {
+            sessionStorage.setItem('enarah_custom_image', base64);
+            sessionStorage.setItem('enarah_custom_image_time', Date.now().toString());
+          } catch (err) {
+            console.warn("فشل حفظ الصورة في sessionStorage (قد تكون المساحة ممتلئة)، سيتم الاحتفاظ بها في ذاكرة الصفحة المؤقتة فقط.", err);
+          }
         }
       };
       reader.readAsDataURL(file);
@@ -385,7 +437,8 @@ export default function LightingDesigner() {
                             : 'none',
                           opacity: showLights && f.brightness > 0 ? 0.35 + (f.brightness / 100) * 0.65 : 0.4,
                           cursor: 'move',
-                          touchAction: 'none'
+                          touchAction: 'none',
+                          willChange: 'left, top'
                         }}
                       >
                         {/* مقبض تحديد الليد بروفايل في المنتصف */}
@@ -408,10 +461,11 @@ export default function LightingDesigner() {
                         left: `${f.x}%`,
                         top: `${f.y}%`,
                         transform: 'translate(-50%, -50%)',
-                        width: f.type === 'chandelier' ? `${f.scale * 60}px` : `${f.scale * 44px}`,
-                        height: f.type === 'chandelier' ? `${f.scale * 60}px` : `${f.scale * 44px}`,
+                        width: f.type === 'chandelier' ? `${f.scale * 60}px` : `${f.scale * 44}px`,
+                        height: f.type === 'chandelier' ? `${f.scale * 60}px` : `${f.scale * 44}px`,
                         cursor: 'move',
-                        touchAction: 'none'
+                        touchAction: 'none',
+                        willChange: 'left, top'
                       }}
                     >
                       {f.type === 'spotlight' ? (
