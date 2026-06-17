@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
-  Home, BookOpen, Info, MapPin, PhoneCall, Phone 
+  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders
 } from 'lucide-react'
 
 // نمط الوهج للعناوين والشعارات المضيئة
@@ -13,6 +13,7 @@ const servicesDropdown = {
   label: 'الأقسام والأسعار',
   items: [
     { path: '/products', label: 'معرض المنتجات', desc: 'تصفح أحدث حلول الإضاءة ومواد الكهرباء الذكية بجودة عالية.', icon: Lightbulb },
+    { path: '/designer', label: 'مصمم الإضاءة التفاعلي', desc: 'وزّع السبوتات والثريات وليد البروفايل على صورة غرفتك.', icon: Sliders },
     { path: '/wire-prices', label: 'أسعار الأسلاك', desc: 'النشرة اليومية المحدثة لأسعار الأسلاك الإيطالية المعتمدة.', icon: Zap },
     { path: '/brands', label: 'الشركات العالمية', desc: 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.', icon: Award },
     { path: '/projects', label: 'المشاريع المنفذة', desc: 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.', icon: Sparkles },

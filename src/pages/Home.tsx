@@ -583,6 +583,37 @@ export default function Home() {
 
             </div>
 
+            {/* بطاقة دعوة لتجربة مصمم الإضاءة الاحترافي */}
+            <div className="mt-12 bg-gradient-to-r from-blue-950/80 via-[#0d2342]/90 to-indigo-950/80 border border-blue-500/20 rounded-[2rem] p-6 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-md">
+              <div className="absolute inset-0 bg-animated-grid opacity-10 pointer-events-none" />
+              <div className="absolute -top-12 -right-12 w-36 h-36 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="text-right flex-1 z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-300 text-xs font-bold mb-3 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                  <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                  <span>ميزة ذكية ومبتكرة</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
+                  جرّب توزيع الإضاءة على <span className="text-blue-400">صورتك الشخصية!</span>
+                </h3>
+                <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-2xl font-medium">
+                  هل تريد رفع صورة غرفتك أو مجلسك أو مطبخك والبدء بتركيب السبوتات وتدوير الليد بروفايل وتوهج الثريات تفاعلياً؟ جرب المصمم الاحترافي الآن.
+                </p>
+              </div>
+              
+              <div className="z-10 w-full md:w-auto">
+                <Link
+                  to="/designer"
+                  className="group relative px-8 py-4 w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-base md:text-lg rounded-2xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] flex items-center justify-center gap-3 overflow-hidden"
+                >
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmerSweep_1.5s_infinite_ease-in-out]" />
+                  <span>ابدأ تصميم غرفتك</span>
+                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform duration-300" />
+                </Link>
+              </div>
+            </div>
+
           </div>
         </section>
 
