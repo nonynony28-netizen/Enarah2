@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   Calculator, Ruler, Lightbulb, Zap, Sparkles, Award,
   ArrowLeft, Compass, Clipboard, CheckCircle, Eye, EyeOff, Info,
-  RotateCcw, RotateCw, Trash2, Plus, Sliders, Cpu
+  Trash2, Plus, Sliders
 } from 'lucide-react'
 
 // ألوان درجات حرارة الضوء الفنية والنيون للمحاكاة ثلاثية الأبعاد
@@ -12,24 +12,24 @@ const TEMP_OPTIONS = {
     id: 'warm',
     label: 'شمسي دافئ (3000K)',
     color: '#fbbf24', // ذهبي دافئ
-    glow: 'rgba(251, 191, 36, 0.7)',
-    radial: 'radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.08) 50%, transparent 100%)',
+    glow: 'rgba(251, 191, 36, 0.6)',
+    radial: 'radial-gradient(circle, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.05) 50%, transparent 100%)',
     description: 'إضاءة دافئة مريحة تعزز الهدوء والاسترخاء، مثالية لغرف النوم والمجالس.'
   },
   natural: {
     id: 'natural',
     label: 'أبيض طبيعي (4000K)',
     color: '#fef08a', // كريمي ناصع
-    glow: 'rgba(254, 240, 138, 0.75)',
-    radial: 'radial-gradient(circle, rgba(254, 240, 138, 0.5) 0%, rgba(254, 240, 138, 0.1) 50%, transparent 100%)',
+    glow: 'rgba(254, 240, 138, 0.65)',
+    radial: 'radial-gradient(circle, rgba(254, 240, 138, 0.45) 0%, rgba(254, 240, 138, 0.06) 50%, transparent 100%)',
     description: 'إضاءة نهارية معتدلة ومريحة للعين، ممتازة للصالات، الممرات والمذاكرة.'
   },
   cool: {
     id: 'cool',
     label: 'أبيض ثلجي (6500K)',
     color: '#e0f2fe', // أزرق ثلجي
-    glow: 'rgba(224, 242, 254, 0.7)',
-    radial: 'radial-gradient(circle, rgba(224, 242, 254, 0.45) 0%, rgba(224, 242, 254, 0.08) 50%, transparent 100%)',
+    glow: 'rgba(224, 242, 254, 0.55)',
+    radial: 'radial-gradient(circle, rgba(224, 242, 254, 0.4) 0%, rgba(224, 242, 254, 0.05) 50%, transparent 100%)',
     description: 'إضاءة بيضاء ناصعة وباردة توفر أعلى درجات الوضوح والنشاط، مثالية للمطابخ ومناطق العمل.'
   }
 };
@@ -84,15 +84,12 @@ export default function LightingDesigner() {
   const [ceilingType, setCeilingType] = useState<'gypsum_full' | 'gypsum_perimeter' | 'flat'>('gypsum_full');
   const [lightLevel, setLightLevel] = useState<'relax' | 'medium' | 'bright'>('medium');
 
-  // خيارات وضع المحاكاة ثلاثي الأبعاد
+  // خيارات وضع المحاكاة ثلاثي الأبعاد المبسط
   const [mode, setMode] = useState<'auto' | 'sandbox'>('auto');
   const [showLights, setShowLights] = useState(true);
   const [showBeams, setShowBeams] = useState(true);
   const [temp, setTemp] = useState<'warm' | 'natural' | 'cool'>('warm');
   const [brightness, setBrightness] = useState(80);
-  
-  // وضع الأداء العالي لمنع التعليق على الهواتف
-  const [performanceMode, setPerformanceMode] = useState(false);
 
   // قائمة القطع المخصصة لوضع التصميم الحر (Sandbox)
   const [sandboxFixtures, setSandboxFixtures] = useState<Fixture[]>([]);
@@ -100,16 +97,7 @@ export default function LightingDesigner() {
   const [activeTool, setActiveTool] = useState<Fixture['type']>('spot');
   const [ledToolOrientation, setLedToolOrientation] = useState<'h' | 'v'>('h');
 
-  // زوايا دوران الغرفة ثلاثية الأبعاد
-  const [rotateX, setRotateX] = useState<number>(60);
-  const [rotateZ, setRotateZ] = useState<number>(-45);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0, rx: 0, ry: 0 });
-
-  // مؤشرات إحداثيات الكاد الحية
-  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
   const ceilingRef = useRef<HTMLDivElement>(null);
-
   const [copiedText, setCopiedText] = useState(false);
 
   // تحديث درجة لون الإضاءة الافتراضية مع نوع الغرفة
@@ -140,7 +128,6 @@ export default function LightingDesigner() {
       autoSpotCount += 1;
     }
   } else {
-    // الممرات تناسبها خط سبوتات فردي أو ليد بروفايل في المنتصف
     autoSpotCount = Math.max(2, Math.ceil(length / 1.5));
   }
 
@@ -158,7 +145,6 @@ export default function LightingDesigner() {
   const getAutoFixtures = (): Fixture[] => {
     const list: Fixture[] = [];
     
-    // 1. حساب الأعمدة والصفوف لتوزيع الشبكة
     let cols = 2;
     let rows = 2;
     
@@ -182,7 +168,6 @@ export default function LightingDesigner() {
       }
     }
 
-    // حساب المسافات بالتناسب الهندسي المتساوي (AutoCAD uniform spacing logic)
     const spacingX = 100 / cols;
     const spacingY = 100 / rows;
 
@@ -199,7 +184,6 @@ export default function LightingDesigner() {
       }
     }
 
-    // 2. إضافة الثريا التلقائية في المنتصف
     if (hasAutoChandelier) {
       list.push({
         id: 'auto_chandelier_center',
@@ -210,10 +194,8 @@ export default function LightingDesigner() {
       });
     }
 
-    // 3. إضافة الليد بروفايل التلقائي
     if (autoLedLength > 0) {
       if (ceilingType === 'gypsum_full') {
-        // خطان ليد بروفايل متوازيان
         list.push({
           id: 'auto_led_h1',
           type: 'led_h',
@@ -234,33 +216,27 @@ export default function LightingDesigner() {
     return list;
   };
 
-  // نسخ التوزيع التلقائي إلى الوضع الحر عند الرغبة بالتعديل
   const handleCopyAutoToSandbox = () => {
     setSandboxFixtures(getAutoFixtures());
     setMode('sandbox');
     setSelectedFixtureId(null);
   };
 
-  // تحديد قائمة الكشافات النشطة بناءً على الطور المختار
   const activeFixtures = mode === 'auto' ? getAutoFixtures() : sandboxFixtures;
 
-  // إحصائيات الغرفة الفعلية للـ HUD
   const totalSpotsCount = activeFixtures.filter(f => f.type === 'spot').length;
   const totalChandelierCount = activeFixtures.filter(f => f.type === 'chandelier').length;
   const totalLedCount = activeFixtures.filter(f => f.type === 'led_h' || f.type === 'led_v').length;
   const totalSconceCount = activeFixtures.filter(f => f.type === 'sconce').length;
 
-  // تقدير إجمالي لومين الإنارة الحالي
   const calculatedLumens = 
     (totalSpotsCount * spotLumens) + 
     (totalChandelierCount * 3200) + 
     (totalLedCount * 2000) +
     (totalSconceCount * 450);
 
-  // تقدير شدة الإنارة الفعلية الحالية بالمتر المربع (Lux)
   const currentLux = Math.round(calculatedLumens / area);
 
-  // تقدير إجمالي القدرة بالوات الكهربائي (Watts)
   const totalWatts = 
     (totalSpotsCount * 7) + 
     (totalChandelierCount * 40) + 
@@ -269,7 +245,6 @@ export default function LightingDesigner() {
 
   const wattsPerSqm = totalWatts / area;
 
-  // تقييم توفير الكهرباء وفقاً للمقاييس السعودية (SASO Energy Class rating)
   const getEnergyClass = () => {
     if (wattsPerSqm < 4) return { label: 'A+++', color: 'bg-emerald-500 text-black', text: 'ممتاز جداً - استهلاك منخفض للغاية' };
     if (wattsPerSqm < 6) return { label: 'A+', color: 'bg-green-400 text-black', text: 'ممتاز - موفر فائق للطاقة' };
@@ -280,7 +255,6 @@ export default function LightingDesigner() {
 
   const energyRating = getEnergyClass();
 
-  // تحليل جودة ومستوى الإنارة الكلي مقارنة بالمستوى المطلوب
   const getLuxEvaluation = () => {
     const pct = (currentLux / reqLux) * 100;
     if (pct < 75) return { status: 'under', label: 'إنارة خافتة (تحتاج كشافات إضافية) ⚠️', color: 'text-amber-400 border-amber-500/20 bg-amber-500/5' };
@@ -290,62 +264,13 @@ export default function LightingDesigner() {
 
   const luxEval = getLuxEvaluation();
 
-  // مسافات التوزيع للأبعاد (AutoCAD)
   const spacingRatioX = activeFixtures.filter(f => f.type === 'spot').length > 0 ? (length / Math.ceil(Math.sqrt(totalSpotsCount || 4))).toFixed(2) : '1.50';
   const idealWallDist = (parseFloat(spacingRatioX) / 2).toFixed(2);
 
-  // دوران ثلاثي الأبعاد باللمس أو الماوس (Draggable viewport logic)
-  const handlePointerDown = (e: React.PointerEvent) => {
-    setIsDragging(true);
-    dragStart.current = {
-      x: e.clientX,
-      y: e.clientY,
-      rx: rotateZ,
-      ry: rotateX
-    };
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    const dx = e.clientX - dragStart.current.x;
-    const dy = e.clientY - dragStart.current.y;
-    
-    // تحديث الدوران بناءً على حركة السحب
-    setRotateZ(dragStart.current.rx - dx * 0.5);
-    setRotateX(Math.min(85, Math.max(15, dragStart.current.ry + dy * 0.5))); // الحدود بين 15 و 85 درجة لرؤية 3D مريحة
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    setIsDragging(false);
-    e.currentTarget.releasePointerCapture(e.pointerId);
-  };
-
-  // تتبع حركة الفأرة/الإصبع على السقف لحساب إحداثيات الكاد بالمتر
-  const handleCeilingPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (mode !== 'sandbox') return;
-    if (!ceilingRef.current) return;
-
-    const rect = ceilingRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const xPct = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    const yPct = Math.max(0, Math.min(100, (y / rect.height) * 100));
-
-    setHoverPos({ x: xPct, y: yPct });
-  };
-
-  const handleCeilingPointerLeave = () => {
-    setHoverPos(null);
-  };
-
-  // النقر على السقف في الوضع الحر لإضافة أو اختيار القطع
   const handleCeilingClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (mode !== 'sandbox') return;
     if (!ceilingRef.current) return;
 
-    // التحقق من النقر المباشر على عنصر السقف وليس قطعة موجودة
     const target = e.target as HTMLElement;
     if (target.closest('.fixture-node')) return;
 
@@ -356,7 +281,6 @@ export default function LightingDesigner() {
     const xPct = Math.max(0, Math.min(100, (x / rect.width) * 100));
     const yPct = Math.max(0, Math.min(100, (y / rect.height) * 100));
 
-    // إضافة القطعة المختارة حالياً
     const newFixture: Fixture = {
       id: `sandbox_${activeTool}_${Date.now()}`,
       type: activeTool === 'led_h' || activeTool === 'led_v' ? (ledToolOrientation === 'h' ? 'led_h' : 'led_v') : activeTool,
@@ -370,7 +294,6 @@ export default function LightingDesigner() {
     setSelectedFixtureId(newFixture.id);
   };
 
-  // مسح قطعة محددة
   const handleDeleteFixture = (id: string) => {
     setSandboxFixtures(sandboxFixtures.filter(f => f.id !== id));
     if (selectedFixtureId === id) {
@@ -378,28 +301,23 @@ export default function LightingDesigner() {
     }
   };
 
-  // تحديث خصائص قطعة محددة (السطوع أو زاوية الشعاع)
   const handleUpdateFixture = (id: string, updates: Partial<Fixture>) => {
     setSandboxFixtures(sandboxFixtures.map(f => f.id === id ? { ...f, ...updates } : f));
   };
 
-  // مسح المخطط بالكامل بالوضع الحر
   const handleClearSandbox = () => {
     setSandboxFixtures([]);
     setSelectedFixtureId(null);
   };
 
-  // أبعاد الغرفة الممثلة بالبكسل للمحاكي ثلاثي الأبعاد
   const maxDim = Math.max(length, width);
-  const scale = 250 / maxDim; // تحويل الأبعاد إلى نطاق أقصى 250 بكسل
-  const boxWidth = width * scale;   // محور X
-  const boxLength = length * scale; // محور Y
-  const boxHeight = 150;            // محور Z (ارتفاع السقف الافتراضي ثلاثي الأبعاد)
+  const scale = 250 / maxDim;
+  const boxWidth = width * scale;
+  const boxLength = length * scale;
+  const boxHeight = 150;
 
-  // درجة حرارة اللون النشطة
   const activeGlow = TEMP_OPTIONS[temp];
 
-  // توليد التقرير الفني الهندسي
   const generateReportText = () => {
     const roomName = ROOM_TEMPLATES[roomType].title;
     const ceilingName = 
@@ -473,7 +391,7 @@ export default function LightingDesigner() {
           </Link>
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full mb-3 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
             <Sparkles className="w-4 h-4 text-blue-400" />
-            <span className="text-xs font-bold text-blue-300">أداة محاكاة تفاعلية خفيفة 100%</span>
+            <span className="text-xs font-bold text-blue-300">أداة محاكاة تفاعلية خفيفة وسريعة</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black mb-3 tracking-tight leading-tight">
             🎮 هولوجرام الإنارة 3D:{' '}
@@ -500,18 +418,6 @@ export default function LightingDesigner() {
                   <Calculator className="w-5.5 h-5.5 text-blue-400" />
                   <h2 className="text-md font-black text-white">إعدادات الديكور والمساحة</h2>
                 </div>
-                <button
-                  onClick={() => setPerformanceMode(!performanceMode)}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1.5 ${
-                    performanceMode 
-                      ? 'bg-rose-500/20 border-rose-500/40 text-rose-400 animate-pulse' 
-                      : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
-                  }`}
-                  title="تعطيل المؤثرات البصرية الثقيلة لزيادة سرعة التصفح على الهواتف القديمة"
-                >
-                  <Cpu className="w-3.5 h-3.5" />
-                  <span>{performanceMode ? 'وضع الأداء الفائق نشط ⚡' : 'وضع الأداء'}</span>
-                </button>
               </div>
 
               {/* اختيار الغرفة */}
@@ -675,7 +581,7 @@ export default function LightingDesigner() {
                     className={`py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex items-center justify-center gap-1.5 ${
                       mode === 'auto'
                         ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                     }`}
                   >
                     <Sliders className="w-4 h-4" />
@@ -686,7 +592,7 @@ export default function LightingDesigner() {
                     className={`py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex items-center justify-center gap-1.5 ${
                       mode === 'sandbox'
                         ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                     }`}
                   >
                     <Plus className="w-4 h-4" />
@@ -716,7 +622,7 @@ export default function LightingDesigner() {
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => setShowLights(!showLights)}
-                    className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
                       showLights ? 'bg-emerald-600/10 border-emerald-500/30 text-emerald-400 font-bold' : 'bg-white/5 border-white/10 text-slate-400'
                     }`}
                   >
@@ -724,7 +630,7 @@ export default function LightingDesigner() {
                   </button>
                   <button
                     onClick={() => setShowBeams(!showBeams)}
-                    className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
                       showBeams ? 'bg-indigo-600/10 border-indigo-500/30 text-indigo-400 font-bold' : 'bg-white/5 border-white/10 text-slate-400'
                     }`}
                   >
@@ -780,73 +686,18 @@ export default function LightingDesigner() {
                 </div>
               )}
 
-              {/* مشهد المحاكي ثلاثي الأبعاد المسرع (3D Viewport) */}
+              {/* مشهد المحاكي ثلاثي الأبعاد المسرع (3D Viewport) - ثابت بدون تحريك */}
               <div 
-                className="relative w-full aspect-[16/10] sm:aspect-[16/9] bg-[#020712] border border-blue-500/20 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center p-6 cursor-grab active:cursor-grabbing select-none"
+                className="relative w-full aspect-[16/10] sm:aspect-[16/9] bg-[#020712] border border-blue-500/20 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center p-6 select-none"
                 style={{ perspective: '900px' }}
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
               >
                 
-                {/* نظام محاور الكاد وإحداثيات الفأرة الحية */}
-                {hoverPos && mode === 'sandbox' && (
-                  <div className="absolute top-3 right-3 bg-black/60 border border-red-500/30 px-3 py-1.5 rounded-lg text-[9px] text-red-400 font-bold font-mono z-30 pointer-events-none flex flex-col gap-0.5">
-                    <span>X: {((hoverPos.x / 100) * length).toFixed(2)}م ({hoverPos.x.toFixed(0)}%)</span>
-                    <span>Y: {((hoverPos.y / 100) * width).toFixed(2)}م ({hoverPos.y.toFixed(0)}%)</span>
-                  </div>
-                )}
-
-                {/* تدوير وتوجيه فوري عبر أزرار مساعدة */}
-                <div className="absolute bottom-3 right-3 flex items-center gap-1 z-30">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setRotateZ(prev => prev - 15); }}
-                    className="p-1.5 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-slate-300 border border-white/5"
-                    title="دوران لليسار"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setRotateX(prev => Math.min(85, prev + 10)); }}
-                    className="p-1.5 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-slate-300 border border-white/5"
-                    title="إمالة للأعلى"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setRotateX(prev => Math.max(10, prev - 10)); }}
-                    className="p-1.5 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-slate-300 border border-white/5"
-                    title="إمالة للأسفل"
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setRotateZ(prev => prev + 15); }}
-                    className="p-1.5 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-slate-300 border border-white/5"
-                    title="دوران لليمين"
-                  >
-                    <RotateCw className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setRotateX(60); setRotateZ(-45); }}
-                    className="p-1.5 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-slate-300 border border-white/5 text-[9px] font-bold"
-                    title="إعادة ضبط"
-                  >
-                    إعادة ضبط
-                  </button>
-                </div>
-
-                {/* مؤشرات التدوير الميكانيكية بالـ HUD */}
-                <div className="absolute top-3 left-3 bg-black/40 border border-white/10 px-2 py-1 rounded text-[9px] text-slate-400 pointer-events-none z-30 font-mono">
-                  YAW: {rotateZ}° | PITCH: {rotateX}°
-                </div>
-
-                {/* الغرفة ثلاثية الأبعاد (3D Wireframe Room Box) */}
+                {/* الغرفة ثلاثية الأبعاد الثابتة (Static 3D Wireframe Room Box) */}
                 <div 
-                  className="relative origin-center transition-transform duration-75"
+                  className="relative origin-center"
                   style={{
                     transformStyle: 'preserve-3d',
-                    transform: `rotateX(${rotateX}deg) rotateZ(${rotateZ}deg)`,
+                    transform: 'rotateX(55deg) rotateZ(-35deg)', // زاوية ثابتة مريحة جداً وهندسية
                     width: `${boxWidth}px`,
                     height: `${boxLength}px`,
                   }}
@@ -854,26 +705,25 @@ export default function LightingDesigner() {
                   
                   {/* 1. المستوى الأرضي للغرفة (Floor plane) */}
                   <div 
-                    className="absolute inset-0 bg-[#061124] border-2 border-blue-500/40 rounded transition-colors duration-300"
+                    className="absolute inset-0 bg-[#061124] border-2 border-blue-500/40 rounded"
                     style={{
                       transform: 'translateZ(0px)',
                       backgroundImage: 'radial-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px)',
                       backgroundSize: '16px 16px',
-                      boxShadow: performanceMode ? 'none' : '0 0 30px rgba(59, 130, 246, 0.2) inset'
+                      boxShadow: '0 0 30px rgba(59, 130, 246, 0.2) inset'
                     }}
                   >
                     
-                    {/* إسقاط بقع الإضاءة على الأرض (Light Footprints / Washes) */}
+                    {/* إسقاط بقع الإضاءة على الأرض */}
                     {showLights && brightness > 0 && activeFixtures.map((fix) => {
                       const showBeamColor = activeGlow.color;
                       const showBeamRadial = activeGlow.radial;
 
                       if (fix.type === 'spot') {
-                        // بقعة ضوء السبوت لايت
                         return (
                           <div 
                             key={`wash_${fix.id}`}
-                            className="absolute rounded-full pointer-events-none mix-blend-screen transition-all duration-300"
+                            className="absolute rounded-full pointer-events-none mix-blend-screen"
                             style={{
                               left: `${fix.x}%`,
                               top: `${fix.y}%`,
@@ -881,7 +731,7 @@ export default function LightingDesigner() {
                               width: `${(fix.beamAngle === 30 ? 50 : 90) * (brightness / 100)}px`,
                               height: `${(fix.beamAngle === 30 ? 50 : 90) * (brightness / 100)}px`,
                               background: showBeamRadial,
-                              filter: performanceMode ? 'none' : 'blur(4px)',
+                              filter: 'blur(4px)',
                               opacity: (fix.brightness / 100) * 0.85
                             }}
                           />
@@ -889,11 +739,10 @@ export default function LightingDesigner() {
                       }
 
                       if (fix.type === 'chandelier') {
-                        // بقعة ضوء الثريا المركزية العريضة
                         return (
                           <div 
                             key={`wash_${fix.id}`}
-                            className="absolute rounded-full pointer-events-none mix-blend-screen transition-all duration-300"
+                            className="absolute rounded-full pointer-events-none mix-blend-screen"
                             style={{
                               left: `${fix.x}%`,
                               top: `${fix.y}%`,
@@ -901,7 +750,7 @@ export default function LightingDesigner() {
                               width: '180px',
                               height: '180px',
                               background: showBeamRadial,
-                              filter: performanceMode ? 'none' : 'blur(6px)',
+                              filter: 'blur(6px)',
                               opacity: 0.9
                             }}
                           />
@@ -909,11 +758,10 @@ export default function LightingDesigner() {
                       }
 
                       if (fix.type === 'led_h') {
-                        // بقعة ضوء الليد بروفايل الأفقي
                         return (
                           <div 
                             key={`wash_${fix.id}`}
-                            className="absolute pointer-events-none mix-blend-screen transition-all duration-300 rounded-full"
+                            className="absolute pointer-events-none mix-blend-screen rounded-full"
                             style={{
                               left: `${fix.x}%`,
                               top: `${fix.y}%`,
@@ -921,7 +769,7 @@ export default function LightingDesigner() {
                               width: '80%',
                               height: '35px',
                               background: `radial-gradient(ellipse at center, ${showBeamColor}33 0%, transparent 70%)`,
-                              filter: performanceMode ? 'none' : 'blur(8px)',
+                              filter: 'blur(8px)',
                               opacity: 0.7
                             }}
                           />
@@ -929,11 +777,10 @@ export default function LightingDesigner() {
                       }
 
                       if (fix.type === 'led_v') {
-                        // بقعة ضوء الليد بروفايل العمودي
                         return (
                           <div 
                             key={`wash_${fix.id}`}
-                            className="absolute pointer-events-none mix-blend-screen transition-all duration-300 rounded-full"
+                            className="absolute pointer-events-none mix-blend-screen rounded-full"
                             style={{
                               left: `${fix.x}%`,
                               top: `${fix.y}%`,
@@ -941,7 +788,7 @@ export default function LightingDesigner() {
                               width: '35px',
                               height: '80%',
                               background: `radial-gradient(ellipse at center, ${showBeamColor}33 0%, transparent 70%)`,
-                              filter: performanceMode ? 'none' : 'blur(8px)',
+                              filter: 'blur(8px)',
                               opacity: 0.7
                             }}
                           />
@@ -953,13 +800,13 @@ export default function LightingDesigner() {
 
                   </div>
 
-                  {/* 2. الأعمدة الركنية السلكية (4 Pillars connecting Floor and Ceiling) */}
+                  {/* 2. الأعمدة الركنية السلكية */}
                   <div className="absolute w-[1px] bg-blue-500/30" style={{ left: 0, top: 0, height: `${boxHeight}px`, transform: 'rotateX(-90deg)', transformOrigin: 'top center' }} />
                   <div className="absolute w-[1px] bg-blue-500/30" style={{ right: 0, top: 0, height: `${boxHeight}px`, transform: 'rotateX(-90deg)', transformOrigin: 'top center' }} />
                   <div className="absolute w-[1px] bg-blue-500/30" style={{ left: 0, bottom: 0, height: `${boxHeight}px`, transform: 'rotateX(-90deg)', transformOrigin: 'top center' }} />
                   <div className="absolute w-[1px] bg-blue-500/30" style={{ right: 0, bottom: 0, height: `${boxHeight}px`, transform: 'rotateX(-90deg)', transformOrigin: 'top center' }} />
 
-                  {/* 3. مخاريط الإضاءة ثلاثية الأبعاد المتقاطعة (Volumetric 3D Light Cones) */}
+                  {/* 3. مخاريط الإضاءة ثلاثية الأبعاد المتقاطعة */}
                   {showLights && showBeams && brightness > 0 && activeFixtures.map((fix) => {
                     if (fix.type === 'spot') {
                       const is30Deg = fix.beamAngle === 30;
@@ -967,7 +814,7 @@ export default function LightingDesigner() {
                       return (
                         <div 
                           key={`cone_${fix.id}`}
-                          className="absolute pointer-events-none transition-all duration-300"
+                          className="absolute pointer-events-none"
                           style={{
                             left: `${fix.x}%`,
                             top: `${fix.y}%`,
@@ -977,7 +824,7 @@ export default function LightingDesigner() {
                         >
                           {/* لوح 1: مستوي YZ */}
                           <div 
-                            className="absolute pointer-events-none transition-all duration-300"
+                            className="absolute pointer-events-none"
                             style={{
                               width: `${beamDiameter}px`,
                               height: `${boxHeight}px`,
@@ -1003,7 +850,7 @@ export default function LightingDesigner() {
                           
                           {/* لوح 2: XZ */}
                           <div 
-                            className="absolute pointer-events-none transition-all duration-300"
+                            className="absolute pointer-events-none"
                             style={{
                               width: `${beamDiameter}px`,
                               height: `${boxHeight}px`,
@@ -1028,7 +875,7 @@ export default function LightingDesigner() {
                       return (
                         <div 
                           key={`cone_${fix.id}`}
-                          className="absolute pointer-events-none transition-all duration-300"
+                          className="absolute pointer-events-none"
                           style={{
                             left: `${fix.x}%`,
                             top: `${fix.y}%`,
@@ -1062,9 +909,7 @@ export default function LightingDesigner() {
                   <div 
                     ref={ceilingRef}
                     onClick={handleCeilingClick}
-                    onPointerMove={handleCeilingPointerMove}
-                    onPointerLeave={handleCeilingPointerLeave}
-                    className="absolute inset-0 bg-[#0f213a]/15 border-2 border-blue-500/50 rounded transition-all duration-300"
+                    className="absolute inset-0 bg-[#0f213a]/15 border-2 border-blue-500/50 rounded"
                     style={{
                       transform: `translateZ(${boxHeight}px)`,
                       backgroundImage: 'linear-gradient(to right, rgba(59,130,246,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(59,130,246,0.1) 1px, transparent 1px)',
@@ -1073,14 +918,6 @@ export default function LightingDesigner() {
                     }}
                   >
                     
-                    {/* مؤشر محاور الكاد المتقاطعة */}
-                    {hoverPos && mode === 'sandbox' && (
-                      <>
-                        <div className="absolute top-0 bottom-0 w-[1px] border-l border-dashed border-red-500/50 pointer-events-none" style={{ left: `${hoverPos.x}%` }} />
-                        <div className="absolute left-0 right-0 h-[1px] border-t border-dashed border-red-500/50 pointer-events-none" style={{ top: `${hoverPos.y}%` }} />
-                      </>
-                    )}
-
                     {/* رندرة خطوط ليد بروفايل في السقف */}
                     {activeFixtures.filter(f => f.type === 'led_h' || f.type === 'led_v').map((led) => {
                       const isHorizontal = led.type === 'led_h';
@@ -1092,8 +929,8 @@ export default function LightingDesigner() {
                             e.stopPropagation();
                             setSelectedFixtureId(led.id);
                           }}
-                          className={`absolute fixture-node transition-all duration-300 ${
-                            selectedFixtureId === led.id ? 'ring-2 ring-red-500 animate-pulse' : ''
+                          className={`absolute fixture-node rounded-full ${
+                            selectedFixtureId === led.id ? 'ring-2 ring-red-500' : ''
                           }`}
                           style={{
                             left: `${led.x}%`,
@@ -1120,8 +957,8 @@ export default function LightingDesigner() {
                             e.stopPropagation();
                             setSelectedFixtureId(spot.id);
                           }}
-                          className={`absolute fixture-node rounded-full flex items-center justify-center transition-all duration-300 ${
-                            selectedFixtureId === spot.id ? 'ring-2 ring-red-500 scale-125' : ''
+                          className={`absolute fixture-node rounded-full flex items-center justify-center ${
+                            selectedFixtureId === spot.id ? 'ring-2 ring-red-500 scale-110' : ''
                           }`}
                           style={{
                             left: `${spot.x}%`,
@@ -1136,7 +973,7 @@ export default function LightingDesigner() {
                           }}
                         >
                           <div 
-                            className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                            className="w-1.5 h-1.5 rounded-full"
                             style={{
                               backgroundColor: showLights ? showBeamColor : '#475569',
                               boxShadow: showLights ? `0 0 4px ${showBeamColor}` : 'none',
@@ -1156,8 +993,8 @@ export default function LightingDesigner() {
                             e.stopPropagation();
                             setSelectedFixtureId(ch.id);
                           }}
-                          className={`absolute fixture-node transition-all duration-300 flex flex-col items-center pointer-events-auto ${
-                            selectedFixtureId === ch.id ? 'scale-110' : ''
+                          className={`absolute fixture-node flex flex-col items-center pointer-events-auto ${
+                            selectedFixtureId === ch.id ? 'scale-105' : ''
                           }`}
                           style={{
                             left: `${ch.x}%`,
@@ -1178,7 +1015,7 @@ export default function LightingDesigner() {
                             }}
                           >
                             <svg 
-                              className="w-5 h-5 transition-all duration-300"
+                              className="w-5 h-5"
                               style={{
                                 color: showLights ? showBeamColor : '#475569',
                               }}
@@ -1201,8 +1038,8 @@ export default function LightingDesigner() {
                             e.stopPropagation();
                             setSelectedFixtureId(sc.id);
                           }}
-                          className={`absolute fixture-node transition-all duration-300 flex items-center justify-center ${
-                            selectedFixtureId === sc.id ? 'ring-2 ring-red-500 scale-125' : ''
+                          className={`absolute fixture-node flex items-center justify-center ${
+                            selectedFixtureId === sc.id ? 'ring-2 ring-red-500 scale-110' : ''
                           }`}
                           style={{
                             left: `${sc.x}%`,
@@ -1224,6 +1061,56 @@ export default function LightingDesigner() {
                 </div>
 
               </div>
+
+              {/* خيارات التحكم بالقطعة المحددة */}
+              {mode === 'sandbox' && selectedFixture && (
+                <div className="bg-[#050e1f] border border-red-500/25 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-right">
+                  <div className="space-y-1 w-full sm:w-auto">
+                    <span className="text-xs font-bold text-red-400 block">العنصر المحدد: {
+                      selectedFixture.type === 'spot' ? '🎯 سبوت لايت' :
+                      selectedFixture.type === 'chandelier' ? '⚜️ ثريا معلقة' :
+                      selectedFixture.type === 'sconce' ? '💡 كشاف جداري' : '⚡ ليد بروفايل'
+                    }</span>
+                    <span className="text-[10px] text-slate-400 font-mono">الإحداثيات الحالية: X={selectedFixture.x}% | Y={selectedFixture.y}%</span>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+                    {selectedFixture.type === 'spot' && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-slate-400">زاوية الشعاع:</span>
+                        <button
+                          onClick={() => handleUpdateFixture(selectedFixture.id, { beamAngle: selectedFixture.beamAngle === 30 ? 60 : 30 })}
+                          className="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[10px] text-white hover:bg-white/10"
+                        >
+                          {selectedFixture.beamAngle === 30 ? '30° ضيق 🎯' : '60° عريض 🌊'}
+                        </button>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400">السطوع:</span>
+                      <input 
+                        type="range" 
+                        min="20" 
+                        max="100" 
+                        step="20"
+                        value={selectedFixture.brightness}
+                        onChange={(e) => handleUpdateFixture(selectedFixture.id, { brightness: parseInt(e.target.value) })}
+                        className="w-20 accent-blue-500 hover:accent-blue-400"
+                      />
+                      <span className="text-[10px] text-white font-mono">{selectedFixture.brightness}%</span>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeleteFixture(selectedFixture.id)}
+                      className="p-1.5 bg-rose-600/10 border border-rose-500/20 text-rose-400 hover:bg-rose-600/20 rounded-xl transition-all"
+                      title="حذف القطعة"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* لوحة تحليلات الـ HUD والتشخيصات الهندسية */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-white/5 text-right">
@@ -1296,7 +1183,7 @@ export default function LightingDesigner() {
 
               </div>
 
-              {/* إرشادات المسافات */}
+              {/* إرشادات المسافات وتوزيع الكاد الهندسي */}
               <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-4 text-xs leading-relaxed text-slate-300 space-y-1">
                 <h4 className="font-bold text-white flex items-center gap-1.5">
                   <Info className="w-4 h-4 text-blue-400" />
@@ -1317,7 +1204,7 @@ export default function LightingDesigner() {
 
             </div>
 
-            {/* بطاقة نسخ التقرير */}
+            {/* بطاقة نسخ التقرير الفني ومشاركة النتائج */}
             <div className="bg-[#0b1930]/90 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-2xl space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-white/5">
                 <div className="flex items-center gap-2">
@@ -1336,7 +1223,7 @@ export default function LightingDesigner() {
 
               {copiedText && (
                 <div className="p-3 bg-emerald-600/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
-                  <CheckCircle className="w-4 h-4 animate-bounce" />
+                  <CheckCircle className="w-4 h-4" />
                   <span>تم نسخ التقرير بنجاح! يمكنك مشاركته مع الكهربائي أو مهندس الديكور مباشرة.</span>
                 </div>
               )}
