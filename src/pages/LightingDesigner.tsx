@@ -51,8 +51,43 @@ export default function LightingDesigner() {
   const [selectedFixtureId, setSelectedFixtureId] = useState<string | null>(null);
   const [showLights, setShowLights] = useState(true);
   const [copiedText, setCopiedText] = useState(false);
+  const [activeTool, setActiveTool] = useState<'select' | 'spotlight' | 'chandelier' | 'led_profile'>('select');
   const canvasRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // معالجة النقر على مساحة العمل لتركيب الإضاءة مباشرة
+  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('.draggable-fixture')) {
+      return; // تجاهل النقرة إذا كانت على عنصر إضاءة موجود
+    }
+
+    if (activeTool !== 'select') {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const newX = ((e.clientX - rect.left) / rect.width) * 100;
+      const newY = ((e.clientY - rect.top) / rect.height) * 100;
+
+      const clampedX = Math.max(2, Math.min(98, newX));
+      const clampedY = Math.max(2, Math.min(98, newY));
+
+      const newFixture: Fixture = {
+        id: `${activeTool}_${Date.now()}`,
+        type: activeTool,
+        x: clampedX,
+        y: clampedY,
+        brightness: 80,
+        temp: 'warm',
+        scale: 1.0,
+        ...(activeTool === 'chandelier' && { style: 'modern' }),
+        ...(activeTool === 'led_profile' && { angle: 0, length: 150, thickness: 'medium' }),
+      };
+
+      setFixtures(prev => [...prev, newFixture]);
+      setSelectedFixtureId(newFixture.id);
+      setActiveTool('select'); // إعادة تعيين الأداة لوضع التحديد تلقائياً لراحة المستخدم
+    }
+  };
 
   // استرجاع الصورة من الجلسة الآمنة عند التحميل والتأكد من عدم انتهاء الصلاحية (ساعة واحدة)
   useEffect(() => {
@@ -175,29 +210,66 @@ export default function LightingDesigner() {
     }
   };
 
-  // معالجة السحب (Pointer Dragging) المتجاوب مع اللمس والماوس
+  // معالجة السحب (Pointer Dragging) المتجاوب ذو الأداء الفائق (Direct DOM Mutation)
   const handlePointerDown = (e: React.PointerEvent, id: string) => {
     e.preventDefault();
     setSelectedFixtureId(id);
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
+    // جلب عناصر الـ DOM مباشرة لتحديثها بدون إعادة رندرة React
+    const fixtureEl = document.getElementById(id);
+    const beamEl = document.getElementById(`beam_${id}`);
+    const glowEl = document.getElementById(`glow_${id}`);
+
+    // العثور على الإحداثيات الحالية للمحافظة عليها في حالة عدم سحب العنصر
+    const currentFixture = fixtures.find(f => f.id === id);
+    let lastX = currentFixture ? currentFixture.x : 50;
+    let lastY = currentFixture ? currentFixture.y : 30;
+
+    let rafId: number | null = null;
+
     const handlePointerMove = (moveEvent: PointerEvent) => {
-      const newX = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-      const newY = ((moveEvent.clientY - rect.top) / rect.height) * 100;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const newX = ((moveEvent.clientX - rect.left) / rect.width) * 100;
+        // نطبق إزاحة طفيفة للأعلى بمقدار 40 بكسل أثناء السحب على الهواتف لرفع العنصر فوق الأصبع وتجنب حجب النتيجة
+        const isMobile = window.innerWidth < 768;
+        const touchOffsetY = isMobile ? 40 : 0;
+        const newY = ((moveEvent.clientY - touchOffsetY - rect.top) / rect.height) * 100;
 
-      // تقييد الإحداثيات داخل فضاء الصورة (0% إلى 100%)
-      const clampedX = Math.max(2, Math.min(98, newX));
-      const clampedY = Math.max(2, Math.min(98, newY));
+        // تقييد الإحداثيات داخل فضاء الصورة (2% إلى 98%)
+        const clampedX = Math.max(2, Math.min(98, newX));
+        const clampedY = Math.max(2, Math.min(98, newY));
 
-      setFixtures(prev =>
-        prev.map(f => (f.id === id ? { ...f, x: clampedX, y: clampedY } : f))
-      );
+        lastX = clampedX;
+        lastY = clampedY;
+
+        // تحديث عناصر الـ DOM مباشرة وبشكل فوري بسرعة 60 إطاراً بالثانية
+        if (fixtureEl) {
+          fixtureEl.style.left = `${clampedX}%`;
+          fixtureEl.style.top = `${clampedY}%`;
+        }
+        if (beamEl) {
+          beamEl.style.left = `${clampedX}%`;
+          beamEl.style.top = `${clampedY}%`;
+        }
+        if (glowEl) {
+          glowEl.style.left = `${clampedX}%`;
+          glowEl.style.top = `${clampedY}%`;
+        }
+      });
     };
 
     const handlePointerUp = () => {
+      if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
+
+      // حفظ الإحداثيات النهائية في حالة React مرة واحدة فقط عند إفلات الماوس/الأصبع
+      setFixtures(prev =>
+        prev.map(f => (f.id === id ? { ...f, x: lastX, y: lastY } : f))
+      );
     };
 
     window.addEventListener('pointermove', handlePointerMove);
@@ -319,8 +391,63 @@ export default function LightingDesigner() {
               </div>
             </div>
 
-            {/* مساحة الرسم التفاعلية (Canvas) */}
-            <div className="relative bg-[#0d2342]/90 border border-blue-500/20 rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-300">
+            {/* شريط تحديد الأداة النشطة للتركيب بالنقرة المباشرة */}
+            <div className="bg-[#0f213a]/90 backdrop-blur-md border border-white/5 rounded-3xl p-4 flex flex-col gap-3 shadow-xl text-right">
+              <span className="text-xs font-bold text-slate-400">أداة النقر المباشر (اضغط لتفعيل الأداة ثم انقر على أي مكان في الصورة لتركيب الإضاءة مباشرة):</span>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  onClick={() => setActiveTool('select')}
+                  className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border ${
+                    activeTool === 'select'
+                      ? 'bg-blue-600 text-white border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]'
+                      : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  تحديد/سحب
+                </button>
+                <button
+                  onClick={() => setActiveTool('spotlight')}
+                  className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border ${
+                    activeTool === 'spotlight'
+                      ? 'bg-amber-600 text-white border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
+                      : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  تركيب سبوت
+                </button>
+                <button
+                  onClick={() => setActiveTool('chandelier')}
+                  className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border ${
+                    activeTool === 'chandelier'
+                      ? 'bg-indigo-600 text-white border-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.3)]'
+                      : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  تركيب ثريا
+                </button>
+                <button
+                  onClick={() => setActiveTool('led_profile')}
+                  className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border ${
+                    activeTool === 'led_profile'
+                      ? 'bg-sky-600 text-white border-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.3)]'
+                      : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  تركيب ليد
+                </button>
+              </div>
+              
+              {activeTool !== 'select' && (
+                <div className="text-center py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-300 text-xs font-bold animate-pulse">
+                  {activeTool === 'spotlight' && '💡 وضع السبوت لايت نشط: انقر على أي مكان بالسقف لتركيبه مباشرة.'}
+                  {activeTool === 'chandelier' && '🌟 وضع الثريا نشط: انقر على الصورة لتعليق الثريا مباشرة.'}
+                  {activeTool === 'led_profile' && '⚡ وضع الليد بروفايل نشط: انقر لتركيب شريط الليد، ثم حركه ودوره.'}
+                </div>
+              )}
+            </div>
+
+            {/* مساحة الرسم التفاعلية (Canvas) - جعلها لاصقة في الهواتف بالاعتماد على الهاردوير لسرعة 60fps */}
+            <div className="sticky top-[56px] z-40 md:relative md:top-auto md:z-auto bg-[#0d2342]/95 border border-blue-500/20 rounded-t-none rounded-b-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-300">
               
               {/* شريط الإجراءات السريعة على الصورة */}
               <div className="absolute top-4 right-4 z-30 flex gap-2">
@@ -345,7 +472,10 @@ export default function LightingDesigner() {
               {/* الحاوية الفعلية للصورة والسبوتات */}
               <div 
                 ref={canvasRef}
-                className="relative w-full aspect-[16/10] md:aspect-[16/9] min-h-[300px] md:min-h-[450px] bg-slate-950 flex items-center justify-center select-none"
+                onClick={handleCanvasClick}
+                className={`relative w-full aspect-[16/10] md:aspect-[16/9] min-h-[300px] md:min-h-[450px] bg-slate-950 flex items-center justify-center select-none ${
+                  activeTool !== 'select' ? 'cursor-crosshair border-2 border-dashed border-blue-500/40' : ''
+                }`}
               >
                 {/* الصورة الخلفية للغرفة */}
                 <img
@@ -374,7 +504,8 @@ export default function LightingDesigner() {
                     return (
                       <div
                         key={`beam_${f.id}`}
-                        className="absolute pointer-events-none origin-top transition-all duration-300"
+                        id={`beam_${f.id}`}
+                        className="absolute pointer-events-none origin-top transition-[opacity] duration-300"
                         style={{
                           top: `${f.y}%`,
                           left: `${f.x}%`,
@@ -394,7 +525,8 @@ export default function LightingDesigner() {
                     return (
                       <div
                         key={`glow_${f.id}`}
-                        className="absolute pointer-events-none rounded-full transition-all duration-300"
+                        id={`glow_${f.id}`}
+                        className="absolute pointer-events-none rounded-full transition-[opacity] duration-300"
                         style={{
                           top: `${f.y}%`,
                           left: `${f.x}%`,
@@ -421,6 +553,7 @@ export default function LightingDesigner() {
                     return (
                       <div
                         key={f.id}
+                        id={f.id}
                         onPointerDown={(e) => handlePointerDown(e, f.id)}
                         className={`absolute rounded-full transition-shadow duration-300 flex items-center justify-center ${
                           isSelected ? 'ring-2 ring-emerald-400 shadow-[0_0_15px_#10b981] z-30' : 'z-20 hover:scale-105'
@@ -451,8 +584,9 @@ export default function LightingDesigner() {
                   return (
                     <div
                       key={f.id}
+                      id={f.id}
                       onPointerDown={(e) => handlePointerDown(e, f.id)}
-                      className={`absolute select-none flex items-center justify-center rounded-full transition-all duration-300 ${
+                      className={`absolute select-none flex items-center justify-center rounded-full transition-[box-shadow,background-color,transform] duration-300 ${
                         isSelected 
                           ? 'ring-2 ring-emerald-400 bg-[#0a192f]/90 shadow-[0_0_20px_#10b981] scale-110 z-30' 
                           : 'bg-[#0f213a]/80 hover:bg-[#0f213a]/100 text-white/90 z-20 hover:scale-105 active:scale-95 shadow-md border border-white/10'
@@ -512,19 +646,7 @@ export default function LightingDesigner() {
               </div>
             </div>
 
-            {/* إرشادات ونصائح التصميم التفاعلية */}
-            <div className="bg-[#0f213a]/50 border border-white/5 rounded-3xl p-5 text-sm text-slate-300">
-              <h4 className="font-bold text-white mb-3 flex items-center gap-2">
-                <Sparkles className="w-4.5 h-4.5 text-blue-400" />
-                نصائح هندسية لتوزيع الإضاءة:
-              </h4>
-              <ul className="space-y-2 list-disc pr-5 leading-relaxed">
-                <li>**السبوتات** توضع على مسافة تتراوح بين 80 سم إلى 1.2 متر من الجدران لتسليط الضوء على الديكورات والصور بشكل مثالي وتجنب الظلال الحادة.</li>
-                <li>**الليد بروفايل** رائع في الزوايا وحواف الأسقف المستعارة لإعطاء إضاءة غير مباشرة (Indirect Light) تزيد من الارتفاع البصري للغرفة.</li>
-                <li>**الثريا المعلقة** يفضل أن تكون النقطة البصرية المركزية للغرفة (فوق طاولة الطعام أو في منتصف صالون الضيافة).</li>
-                <li>اختر حرارة اللون **الدافئ (3000K)** للاسترخاء في غرف النوم، و**الشمسي (4000K)** للمطابخ والممرات لراحة بصرية وألوان حقيقية.</li>
-              </ul>
-            </div>
+            {/* تم نقل بطاقة النصائح البرمجية إلى أسفل الصفحة لمظهر أكثر شمولاً وتجنب تشتيت العميل على الجوال */}
           </div>
 
           {/* الجانب الأيسر (4 أعمدة): لوحة التحكم وإضافة القطع */}
@@ -586,11 +708,14 @@ export default function LightingDesigner() {
               {selectedFixture ? (
                 <motion.div
                   key={selectedFixture.id}
-                  initial={{ opacity: 0, y: 15 }}
+                  initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="bg-[#0f213a]/90 backdrop-blur-md border border-emerald-500/20 rounded-3xl p-6 shadow-xl relative"
+                  exit={{ opacity: 0, y: 50 }}
+                  className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto bg-[#0d2342]/95 md:bg-[#0f213a]/90 backdrop-blur-xl border-t md:border border-emerald-500/30 md:border-emerald-500/20 rounded-t-[2.5rem] md:rounded-3xl p-6 shadow-[0_-15px_30px_rgba(0,0,0,0.5)] md:shadow-xl max-h-[60vh] overflow-y-auto"
                 >
+                  {/* مقبض سحب وإشارة للجوال في أعلى لوحة التحكم */}
+                  <div className="w-12 h-1.5 bg-slate-600/50 rounded-full mx-auto mb-4 md:hidden" />
+                  
                   {/* زر إغلاق لوحة التعديل */}
                   <button 
                     onClick={() => setSelectedFixtureId(null)}
@@ -854,6 +979,20 @@ export default function LightingDesigner() {
 
           </div>
 
+        </div>
+
+        {/* إرشادات ونصائح التصميم التفاعلية - تظهر بشكل كامل وجميل أسفل المحتوى الرئيسي */}
+        <div className="mt-8 bg-[#0f213a]/50 border border-white/5 rounded-3xl p-6 text-sm text-slate-300 text-right">
+          <h4 className="font-bold text-white mb-3 flex items-center gap-2">
+            <Sparkles className="w-4.5 h-4.5 text-blue-400 animate-pulse" />
+            نصائح هندسية لتوزيع الإضاءة:
+          </h4>
+          <ul className="space-y-2 list-disc pr-5 leading-relaxed">
+            <li>**السبوتات** توضع على مسافة تتراوح بين 80 سم إلى 1.2 متر من الجدران لتسليط الضوء على الديكورات والصور بشكل مثالي وتجنب الظلال الحادة.</li>
+            <li>**الليد بروفايل** رائع في الزوايا وحواف الأسقف المستعارة لإعطاء إضاءة غير مباشرة (Indirect Light) تزيد من الارتفاع البصري للغرفة.</li>
+            <li>**الثريا المعلقة** يفضل أن تكون النقطة البصرية المركزية للغرفة (فوق طاولة الطعام أو في منتصف صالون الضيافة).</li>
+            <li>اختر حرارة اللون **الدافئ (3000K)** للاسترخاء في غرف النوم، و**الشمسي (4000K)** للمطابخ والممرات لراحة بصرية وألوان حقيقية.</li>
+          </ul>
         </div>
 
       </div>
