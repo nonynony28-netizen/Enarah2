@@ -16,32 +16,32 @@ interface FixtureConfig {
   angle?: number;
   length?: number;
   thickness?: 'thin' | 'medium' | 'thick';
+  isCove?: boolean;
 }
 
 const ROOM_CONFIGS = {
   living: {
     title: 'صالة معيشة حديثة',
     description: 'مساحة معيشة نموذجية (4م × 5م) تجمع بين الجلسات العائلية ومشاهدة التلفزيون.',
-    explanation: 'توزيع الإضاءة في صالة المعيشة يعتمد على الدمج الذكي بين الإنارة العامة والجمالية؛ حيث تم توزيع 6 سبوتات دافئة (3000K) لتوفير تغطية متجانسة للغرفة دون تشكل ظلال حادة في زوايا الجلوس. الليد بروفايل المخفي يوفر إضاءة غير مباشرة (Indirect) مريحة أثناء مشاهدة التلفاز لحماية العين من الإجهاد. الثريا المودرن تمثل المركز البصري الجمالي للغرفة وتُعطي شعوراً بالفخامة والترحاب.',
-    spotlightReason: 'تم توزيع 6 سبوتات على أطراف السقف لتغطية المساحة بالتساوي وتفادي الظلال. المقاسات تختلف تدريجياً (من 0.6 للسبوتات الخلفية إلى 1.3 للأمامية) لتبدو متناسقة مع منظور وعمق السقف ثلاثي الأبعاد.',
-    ledReason: 'وزعنا شريطي ليد مائلين بزوايا (+18°/-18°) لتتبع انحناء الجبس المستعار بالصورة بدقة، وشريط أفقي بالخلف، مما يمنح تأثيراً ناعماً ومريحاً أثناء مشاهدة التلفزيون.',
-    chandelierReason: 'ثريا مودرن بحلقات معلقة بمركز السقف لتمثل اللمسة الفنية والجمالية العامة وتوحد توزيع الإضاءة المحيطية.',
+    explanation: 'توزيع الإضاءة في هذه الصالة يعتمد على أسلوب الحد الأدنى (Minimalist) الفاخر. قمنا بدمج 3 خطوط ليد بروفايل ممتدة في السقف المستعار لتعطي إنارة عامة ناعمة تتبع خط المنظور بدقة، مع شريط ليد جداري مخفي (Cove Light) خلف الأريكة يوجه الضوء للأسفل لينير الجدار بنعومة. كما تم توفير 4 سبوتات خافتة في الزوايا للإنارة الإضافية، وثريا مودرن معلقة لتكتمل فخامة المكان.',
+    spotlightReason: '4 سبوتات خافتة موزعة في الزوايا المفتوحة لتوفير إضاءة محيطية داعمة عند الحاجة دون الإخلال بالمظهر البسيط والهادئ للسقف. المقاسات تختلف تدريجياً لتتوافق مع عمق السقف ثلاثي الأبعاد.',
+    ledReason: '4 خطوط ليد بروفايل: 3 منها تسير بالتوازي في السقف لتتبع خطوط منظور الغرفة، وخط جداري (Cove Light) يتدفق بنعومة خلف الأريكة ليوفر إضاءة دافئة وجمالية للغاية.',
+    chandelierReason: 'ثريا مودرن بحلقات دائرية تتوسط منطقة الجلوس لتعمل كقطعة ديكور مضيئة ومنسجمة مع أسلوب الصالة العصري.',
     recommendedTemp: 'warm' as const,
-    spotlightCount: 6,
-    ledCount: 3,
+    spotlightCount: 4,
+    ledCount: 4,
     chandelierCount: 1,
-    url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80',
+    url: '/images/living-preset.jpg',
     fixtures: [
-      { id: 'spot_1', type: 'spotlight', x: 38, y: 18, scale: 0.6 },
-      { id: 'spot_2', type: 'spotlight', x: 62, y: 18, scale: 0.6 },
-      { id: 'spot_3', type: 'spotlight', x: 28, y: 26, scale: 0.9 },
-      { id: 'spot_4', type: 'spotlight', x: 72, y: 26, scale: 0.9 },
-      { id: 'spot_5', type: 'spotlight', x: 14, y: 38, scale: 1.3 },
-      { id: 'spot_6', type: 'spotlight', x: 86, y: 38, scale: 1.3 },
-      { id: 'led_1', type: 'led_profile', x: 30, y: 20, length: 170, angle: -18, thickness: 'thin' },
-      { id: 'led_2', type: 'led_profile', x: 70, y: 20, length: 170, angle: 18, thickness: 'thin' },
-      { id: 'led_3', type: 'led_profile', x: 50, y: 14, length: 110, angle: 0, thickness: 'thin' },
-      { id: 'ch_1', type: 'chandelier', x: 50, y: 28, scale: 1.3, style: 'modern' }
+      { id: 'spot_1', type: 'spotlight', x: 35, y: 11, scale: 0.6 },
+      { id: 'spot_2', type: 'spotlight', x: 82, y: 16, scale: 0.75 },
+      { id: 'spot_3', type: 'spotlight', x: 18, y: 23, scale: 1.0 },
+      { id: 'spot_4', type: 'spotlight', x: 72, y: 28, scale: 1.2 },
+      { id: 'led_1', type: 'led_profile', x: 62.5, y: 14, length: 500, angle: 9.5, thickness: 'thin' },
+      { id: 'led_2', type: 'led_profile', x: 38, y: 25, length: 540, angle: 7, thickness: 'thin' },
+      { id: 'led_3', type: 'led_profile', x: 30, y: 32, length: 420, angle: 6, thickness: 'thin' },
+      { id: 'led_cove', type: 'led_profile', x: 30.5, y: 33.5, length: 420, angle: 6.5, thickness: 'medium', isCove: true },
+      { id: 'ch_1', type: 'chandelier', x: 52, y: 23, scale: 1.3, style: 'modern' }
     ] as FixtureConfig[]
   },
   kitchen: {
@@ -62,7 +62,7 @@ const ROOM_CONFIGS = {
       { id: 'spot_3', type: 'spotlight', x: 25, y: 45, scale: 1.2 },
       { id: 'spot_4', type: 'spotlight', x: 75, y: 45, scale: 1.2 },
       { id: 'led_1', type: 'led_profile', x: 35, y: 14, length: 160, angle: -14, thickness: 'thin' },
-      { id: 'led_2', type: 'led_profile', x: 68, y: 48, length: 150, angle: 8, thickness: 'thin' },
+      { id: 'led_2', type: 'led_profile', x: 68, y: 48, length: 150, angle: 8, thickness: 'thin', isCove: true },
       { id: 'ch_1', type: 'chandelier', x: 50, y: 35, scale: 0.9, style: 'minimalist' }
     ] as FixtureConfig[]
   },
@@ -83,8 +83,8 @@ const ROOM_CONFIGS = {
       { id: 'spot_2', type: 'spotlight', x: 65, y: 20, scale: 0.75 },
       { id: 'spot_3', type: 'spotlight', x: 20, y: 38, scale: 1.1 },
       { id: 'spot_4', type: 'spotlight', x: 80, y: 38, scale: 1.1 },
-      { id: 'led_1', type: 'led_profile', x: 50, y: 58, length: 240, angle: 0, thickness: 'medium' },
-      { id: 'led_2', type: 'led_profile', x: 50, y: 14, length: 180, angle: 0, thickness: 'thin' },
+      { id: 'led_1', type: 'led_profile', x: 50, y: 58, length: 240, angle: 0, thickness: 'medium', isCove: true },
+      { id: 'led_2', type: 'led_profile', x: 50, y: 14, length: 180, angle: 0, thickness: 'thin', isCove: true },
       { id: 'ch_1', type: 'chandelier', x: 50, y: 26, scale: 1.1, style: 'modern' }
     ] as FixtureConfig[]
   },
@@ -394,29 +394,55 @@ export default function LightingDesigner() {
                   }}
                 />
 
-                {/* طبقة توهج السقف المباشر (Ceiling Halo Glows) حول الكشافات لإبقاء ملمس الجبس بورد واضحاً ومشعاً */}
+                {/* طبقة توهج السقف المباشر (Ceiling Halo Glows) حول الكشافات ومجاري الليد لإبقاء ملمس الجبس بورد واضحاً ومشعاً */}
                 {showLights && activeFixtures.map((f) => {
-                  if (brightness <= 0 || f.type !== 'spotlight') return null;
-                  return (
-                    <div
-                      key={`ceiling_glow_${f.id}`}
-                      className="absolute pointer-events-none rounded-full transition-all duration-300"
-                      style={{
-                        top: `${f.y}%`,
-                        left: `${f.x}%`,
-                        transform: 'translate(-50%, -50%) rotateX(50deg)',
-                        width: `${(f.scale || 1.0) * 120}px`,
-                        height: `${(f.scale || 1.0) * 80}px`,
-                        background: `radial-gradient(circle, ${getTempColor(temp, 0.4)} 0%, ${getTempColor(temp, 0.06)} 60%, transparent 100%)`,
-                        opacity: brightness / 100,
-                        mixBlendMode: 'screen',
-                        willChange: 'transform'
-                      }}
-                    />
-                  );
+                  if (brightness <= 0) return null;
+                  
+                  if (f.type === 'spotlight') {
+                    return (
+                      <div
+                        key={`ceiling_glow_${f.id}`}
+                        className="absolute pointer-events-none rounded-full transition-all duration-300"
+                        style={{
+                          top: `${f.y}%`,
+                          left: `${f.x}%`,
+                          transform: 'translate(-50%, -50%) rotateX(50deg)',
+                          width: `${(f.scale || 1.0) * 120}px`,
+                          height: `${(f.scale || 1.0) * 80}px`,
+                          background: `radial-gradient(circle, ${getTempColor(temp, 0.4)} 0%, ${getTempColor(temp, 0.06)} 60%, transparent 100%)`,
+                          opacity: brightness / 100,
+                          mixBlendMode: 'screen',
+                          willChange: 'transform'
+                        }}
+                      />
+                    );
+                  }
+
+                  if (f.type === 'led_profile' && !f.isCove) {
+                    return (
+                      <div
+                        key={`led_glow_${f.id}`}
+                        className="absolute pointer-events-none transition-all duration-300"
+                        style={{
+                          left: `${f.x}%`,
+                          top: `${f.y}%`,
+                          width: `${f.length || 150}px`,
+                          height: f.thickness === 'thin' ? '30px' : f.thickness === 'thick' ? '50px' : '40px',
+                          transform: `translate(-50%, -50%) rotate(${f.angle || 0}deg) rotateX(50deg)`,
+                          background: `radial-gradient(ellipse, ${getTempColor(temp, 0.45)} 0%, ${getTempColor(temp, 0.08)} 60%, transparent 100%)`,
+                          opacity: (brightness / 100) * 0.8,
+                          filter: 'blur(8px)',
+                          mixBlendMode: 'screen',
+                          willChange: 'transform'
+                        }}
+                      />
+                    );
+                  }
+
+                  return null;
                 })}
 
-                {/* طبقة تأثيرات سقوط الإضاءة (Beams & Radial Glows) */}
+                {/* طبقة تأثيرات سقوط الإضاءة (Beams, Radial Glows & Wall Cove Washes) */}
                 {showLights && activeFixtures.map((f) => {
                   if (brightness <= 0) return null;
                   
@@ -459,6 +485,26 @@ export default function LightingDesigner() {
                         }}
                       />
                     );
+                  } else if (f.type === 'led_profile' && f.isCove) {
+                    return (
+                      <div
+                        key={`cove_wash_${f.id}`}
+                        className="absolute pointer-events-none transition-all duration-300"
+                        style={{
+                          left: `${f.x}%`,
+                          top: `${f.y}%`,
+                          width: `${f.length || 280}px`,
+                          height: f.id === 'led_cove' ? '185px' : '110px',
+                          transform: `translate(-50%, 0%) rotate(${f.angle || 0}deg)`,
+                          background: `linear-gradient(to bottom, ${getTempColor(temp, 0.75)} 0%, ${getTempColor(temp, 0.3)} 25%, ${getTempColor(temp, 0.05)} 65%, transparent 100%)`,
+                          opacity: brightness / 100,
+                          filter: 'blur(14px)',
+                          mixBlendMode: 'screen',
+                          transformOrigin: 'top center',
+                          willChange: 'transform'
+                        }}
+                      />
+                    );
                   }
                   return null;
                 })}
@@ -466,6 +512,7 @@ export default function LightingDesigner() {
                 {/* طبقة الأيقونات الهندسية الثابتة والواقعية */}
                 {activeFixtures.map((f) => {
                   if (f.type === 'led_profile') {
+                    if (f.isCove) return null; // hidden cove light
                     return (
                       <div
                         key={f.id}
