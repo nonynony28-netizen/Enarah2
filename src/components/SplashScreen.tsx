@@ -46,7 +46,7 @@ export default function SplashScreen() {
   return (
     <div className="fixed inset-0 bg-[#02050c] flex flex-col items-center justify-start overflow-hidden z-[9999] pt-0">
       
-      {/* 1. هيكل المصباح المتدلي والفتيل الهابط من السقف */}
+      {/* 1. هيكل المصباح المتدلي والفتيل الهابط من السقف - متناسق الأبعاد مع الهواتف */}
       <motion.div
         initial={{ y: -350 }}
         animate={{ y: 0 }}
@@ -54,14 +54,17 @@ export default function SplashScreen() {
         className="relative flex flex-col items-center z-20 pointer-events-none"
       >
         {/* قاعدة التثبيت في السقف (البورتو) */}
-        <div className="w-10 h-3.5 bg-slate-800 rounded-b-lg border-b border-slate-700 shadow-md" />
+        <div className="w-8 h-3 md:w-10 md:h-3.5 bg-slate-800 rounded-b-lg border-b border-slate-700 shadow-md" />
         
-        {/* سلك التعليق النحيف */}
-        <div className="w-[1.5px] h-[180px] bg-slate-600 shadow-[0_0_5px_rgba(59,130,246,0.2)]" />
+        {/* سلك التعليق النحيف - طول أقصر على الهواتف لمنع الاقتصاص */}
+        <div className="w-[1.5px] h-[120px] md:h-[180px] bg-slate-600 shadow-[0_0_5px_rgba(59,130,246,0.2)]" />
         
-        {/* جسم المصباح العصري */}
+        {/* جسم المصباح العصري - متدرج الحجم */}
         <div className="relative flex flex-col items-center">
-          <svg width="64" height="42" viewBox="0 0 64 42" fill="none" className="drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+          <svg 
+            className="w-[54px] h-[36px] md:w-[64px] md:h-[42px] drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]" 
+            viewBox="0 0 64 42" fill="none"
+          >
             {/* حلقة التثبيت العلوية */}
             <rect x="28" y="0" width="8" height="5" rx="1.5" fill="#475569" />
             {/* قبعة المصباح */}
@@ -77,21 +80,20 @@ export default function SplashScreen() {
             variants={bulbVariants}
             initial="off"
             animate="on"
-            className="absolute bottom-[-10px] w-6 h-6 rounded-full bg-sky-100 border border-sky-300"
+            className="absolute bottom-[-8px] md:bottom-[-10px] w-5 h-5 md:w-6 md:h-6 rounded-full bg-sky-100 border border-sky-300"
             style={{
-              boxShadow: "0 0 20px #3b82f6, 0 0 40px #3b82f6, inset 0 0 8px #ffffff"
+              boxShadow: "0 0 15px #3b82f6, 0 0 35px #3b82f6, inset 0 0 6px #ffffff"
             }}
           />
         </div>
       </motion.div>
 
-      {/* 2. مخروط الضوء الأزرق المتوهج (Volumetric SVG Light Beam) */}
-      {/* تم استخدام left-0 right-0 mx-auto لضمان المحاذاة التامة أسفل المصباح في جميع اللغات والاتجاهات */}
+      {/* 2. مخروط الضوء الأزرق المتوهج (Volumetric SVG Light Beam) - متناسق الأبعاد مع الهواتف */}
       <motion.div
         variants={beamVariants}
         initial="off"
         animate="on"
-        className="absolute top-[220px] left-0 right-0 mx-auto w-[500px] h-[340px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible"
+        className="absolute top-[156px] md:top-[220px] left-0 right-0 mx-auto w-[320px] md:w-[500px] h-[260px] md:h-[340px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible"
       >
         <svg width="100%" height="100%" viewBox="0 0 500 340" preserveAspectRatio="none">
           <defs>
@@ -107,18 +109,17 @@ export default function SplashScreen() {
         </svg>
       </motion.div>
 
-      {/* 3. الشعار الترحيبي المضاء باللمبة والجملة الترحيبية المنسقة */}
-      {/* تم استخدام left-0 right-0 mx-auto لضمان التوسط المثالي */}
-      <div className="absolute top-[380px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full select-none text-center">
+      {/* 3. الشعار الترحيبي المضاء باللمبة والجملة الترحيبية المنسقة - إحداثيات متجاوبة مع الهواتف */}
+      <div className="absolute top-[290px] md:top-[380px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full select-none text-center px-4">
         <motion.div
           variants={textVariants}
           initial="off"
           animate="on"
           className="flex flex-col items-center"
         >
-          {/* اسم الشعار أزرق بالكامل ويتوهج بلون الهوية */}
+          {/* اسم الشعار أزرق بالكامل - حجم خط متجاوب */}
           <h1
-            className="text-5xl md:text-7xl font-black tracking-widest font-cairo text-blue-500 select-none"
+            className="text-4xl md:text-7xl font-black tracking-widest font-cairo text-blue-500 select-none"
             style={{
               textShadow: "0 0 20px rgba(59,130,246,0.85)"
             }}
@@ -127,16 +128,33 @@ export default function SplashScreen() {
           </h1>
 
           {/* خط الفاصل المتوهج المتناسق باللون الأزرق */}
-          <div className="h-0.5 w-[180px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-4 opacity-80" />
+          <div className="h-0.5 w-[140px] md:w-[180px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-3 md:mt-4 opacity-80" />
 
-          {/* الجملة الصغيرة بالأسفل (نضيء عالمك) منسقة بشكل ممتاز وليس لاصقة بالاسم */}
+          {/* الجملة الصغيرة بالأسفل (نضيء عالمك) مع لمعة انعكاسية تمر من الحرف الأول للأخير */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.9, duration: 0.8 }}
-            className="text-sky-300 text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-6"
+            initial={{ opacity: 0, y: 10, backgroundPosition: "200% center" }}
+            animate={{ 
+              opacity: 1, 
+              y: 0,
+              backgroundPosition: ["200% center", "-200% center"] // حركة اللمعة الانعكاسية من اليمين لليسار (RTL أول حرف لآخر حرف)
+            }}
+            transition={{ 
+              opacity: { delay: 1.8, duration: 0.6 },
+              y: { delay: 1.8, duration: 0.6 },
+              backgroundPosition: {
+                delay: 2.4, // تبدأ اللمعة مباشرة بعد ظهور الكلمة بالكامل واستقرارها
+                duration: 1.8, 
+                ease: "easeInOut",
+                repeat: 0 // تظهر وتختفي مرة واحدة بإبداع
+              }
+            }}
+            className="text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-5 md:mt-6 select-none"
             style={{
-              textShadow: "0 0 10px rgba(56,189,248,0.5)"
+              backgroundImage: "linear-gradient(120deg, #38bdf8 35%, #ffffff 50%, #38bdf8 65%)",
+              backgroundSize: "200% auto",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "0 0 10px rgba(56,189,248,0.25)"
             }}
           >
             نضيء عالمك
