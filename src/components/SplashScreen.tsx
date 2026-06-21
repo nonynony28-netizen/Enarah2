@@ -28,15 +28,16 @@ export default function SplashScreen() {
     }
   };
 
-  // حركة ظهور وتوهج الشعار باللون الأزرق (لون الهوية) بالتزامن مع الضوء
+  // حركة ظهور وتوهج الشعار باللون الأزرق الكامل (يظهر بعد تسليط الضوء بـ 0.2 ثانية)
   const textVariants = {
-    off: { opacity: 0.1, filter: "drop-shadow(0 0 0px rgba(59,130,246,0))" },
+    off: { opacity: 0, scale: 0.96, filter: "drop-shadow(0 0 0px rgba(59,130,246,0))" },
     on: {
       opacity: 1,
-      filter: "drop-shadow(0 0 25px rgba(59,130,246,0.95))",
+      scale: 1,
+      filter: "drop-shadow(0 0 25px rgba(59,130,246,0.85))",
       transition: {
-        duration: 0.7,
-        delay: 1.1,
+        duration: 0.8,
+        delay: 1.3, // يبدأ الظهور بعد تسليط الضوء مباشرة
         ease: "easeOut"
       }
     }
@@ -63,7 +64,7 @@ export default function SplashScreen() {
           <svg width="64" height="42" viewBox="0 0 64 42" fill="none" className="drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
             {/* حلقة التثبيت العلوية */}
             <rect x="28" y="0" width="8" height="5" rx="1.5" fill="#475569" />
-            {/* قبعة المصباح النحاسية/المعدنية */}
+            {/* قبعة المصباح */}
             <path d="M22 5H42V10H22V5Z" fill="#3b82f6" />
             {/* المظلة أو الغطاء القبة الرئيسي */}
             <path d="M8 34C8 20 18 10 32 10C46 10 56 20 56 34H8Z" fill="#111827" stroke="#374151" strokeWidth="2" />
@@ -85,11 +86,12 @@ export default function SplashScreen() {
       </motion.div>
 
       {/* 2. مخروط الضوء الأزرق المتوهج (Volumetric SVG Light Beam) */}
+      {/* تم استخدام left-0 right-0 mx-auto لضمان المحاذاة التامة أسفل المصباح في جميع اللغات والاتجاهات */}
       <motion.div
         variants={beamVariants}
         initial="off"
         animate="on"
-        className="absolute top-[220px] left-1/2 -translate-x-1/2 w-[500px] h-[340px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible"
+        className="absolute top-[220px] left-0 right-0 mx-auto w-[500px] h-[340px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible"
       >
         <svg width="100%" height="100%" viewBox="0 0 500 340" preserveAspectRatio="none">
           <defs>
@@ -106,17 +108,19 @@ export default function SplashScreen() {
       </motion.div>
 
       {/* 3. الشعار الترحيبي المضاء باللمبة والجملة الترحيبية المنسقة */}
-      <div className="absolute top-[380px] flex flex-col items-center z-20 w-full select-none text-center">
+      {/* تم استخدام left-0 right-0 mx-auto لضمان التوسط المثالي */}
+      <div className="absolute top-[380px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full select-none text-center">
         <motion.div
           variants={textVariants}
           initial="off"
           animate="on"
           className="flex flex-col items-center"
         >
+          {/* اسم الشعار أزرق بالكامل ويتوهج بلون الهوية */}
           <h1
-            className="text-5xl md:text-7xl font-black tracking-widest font-cairo text-white select-none"
+            className="text-5xl md:text-7xl font-black tracking-widest font-cairo text-blue-500 select-none"
             style={{
-              WebkitTextStroke: "0.5px rgba(255,255,255,0.15)"
+              textShadow: "0 0 20px rgba(59,130,246,0.85)"
             }}
           >
             الإنارة الحديثة
@@ -129,7 +133,7 @@ export default function SplashScreen() {
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.7, duration: 0.8 }}
+            transition={{ delay: 1.9, duration: 0.8 }}
             className="text-sky-300 text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-6"
             style={{
               textShadow: "0 0 10px rgba(56,189,248,0.5)"
@@ -143,4 +147,3 @@ export default function SplashScreen() {
     </div>
   );
 }
-
