@@ -145,7 +145,7 @@
           return;
         }
 
-        const res = await fetch("/api/get-users", {
+        const res = await fetch("https://enarah2.vercel.app/api/get-users", {
           headers: {
             "x-admin-password": pwd
           }
@@ -257,7 +257,7 @@
     async function deleteItem(id) {
       if (!confirm("هل أنت متأكد من الحذف؟")) return;
       const pwd = getAdminPassword();
-      const res = await fetch("/api/delete-user", { 
+      const res = await fetch("https://enarah2.vercel.app/api/delete-user", { 
         method: "DELETE", 
         headers: { 
           "Content-Type": "application/json",
@@ -318,7 +318,7 @@
       };
       
       const pwd = getAdminPassword();
-      const res = await fetch("/api/save-user", {
+      const res = await fetch("https://enarah2.vercel.app/api/save-user", {
         method: "POST", 
         headers: { 
           "Content-Type": "application/json",
@@ -416,7 +416,7 @@
         }
 
         const pwd = getAdminPassword();
-        const res = await fetch("/api/update-user", {
+        const res = await fetch("https://enarah2.vercel.app/api/update-user", {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
