@@ -6,6 +6,7 @@ module.exports = {
     extend: {
       fontFamily: {
         cairo: ['Cairo', 'sans-serif'],
+        alexandria: ['Alexandria', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

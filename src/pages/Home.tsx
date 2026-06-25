@@ -348,37 +348,41 @@ export default function Home() {
               </div>
 
               {/* روابط التواصل الاجتماعي للفيسبوك وتيك توك وإنستغرام */}
-              <div className="flex flex-wrap items-center justify-center gap-4 mt-12">
-                <span className="text-slate-400 text-sm font-semibold">تابعنا على:</span>
-                <a 
-                  href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-blue-400 hover:text-white hover:bg-blue-600 hover:border-blue-500 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm font-bold shadow-[0_0_15px_rgba(59,130,246,0.05)]"
-                >
-                  <Facebook className="w-4.5 h-4.5" />
-                  فيسبوك
-                </a>
-                <a 
-                  href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:border-pink-500 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm font-bold shadow-[0_0_15px_rgba(236,72,153,0.05)]"
-                >
-                  <Instagram className="w-4.5 h-4.5" />
-                  إنستغرام
-                </a>
-                <a 
-                  href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 hover:text-white hover:bg-black hover:border-slate-800 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm font-bold shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-                >
-                  <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
-                  </svg>
-                  تيك توك
-                </a>
+              <div className="flex justify-center mt-12 animate-fade-in">
+                <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a192f]/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+                  <span className="text-slate-400 text-xs font-bold font-sans pl-3 border-l border-white/10">تابع صفحاتنا:</span>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 hover:text-white hover:bg-blue-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                      title="فيسبوك"
+                    >
+                      <Facebook className="w-5 h-5" />
+                    </a>
+                    <a 
+                      href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-pink-600/10 border border-pink-500/20 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(236,72,153,0.1)]"
+                      title="إنستغرام"
+                    >
+                      <Instagram className="w-5 h-5" />
+                    </a>
+                    <a 
+                      href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-slate-200/10 border border-white/10 text-slate-200 hover:text-white hover:bg-black hover:border-slate-800 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                      title="تيك توك"
+                    >
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
         </section>
@@ -945,36 +949,37 @@ export default function Home() {
                 {/* Desktop Grid Layout */}
                 <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                   {featuredProjects.map((project) => (
-                    <div 
+                    <motion.div 
                       key={project.id} 
                       onClick={() => openGallery(project)}
-                      className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
+                      whileHover={{ y: -6, scale: 1.01 }}
+                      className="group relative bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/50 hover:shadow-[0_10px_35px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
                     >
-                      <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
-                        <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
+                      <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f] border-b border-white/5">
+                        <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/95 via-[#0a192f]/40 to-transparent opacity-95 z-10" />
                         
-                        <div className="absolute top-4 right-4 z-20">
-                          <span className="px-4 py-1.5 bg-[#0a192f]/80 border border-blue-500/30 text-blue-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                        <div className="absolute top-3 right-3 z-20">
+                          <span className="px-3.5 py-1 bg-[#0a192f]/90 border border-blue-500/30 text-blue-300 text-[10px] font-bold rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
                             {project.category}
                           </span>
                         </div>
                         
                         {project.video && (
-                          <div className="absolute top-4 left-4 z-20 bg-[#0a192f]/80 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-                            <PlayCircle className="w-4 h-4 text-blue-400" />
-                            <span className="text-white text-xs font-bold">فيديو</span>
+                          <div className="absolute top-3 left-3 z-20 bg-[#0a192f]/90 border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                            <PlayCircle className="w-3.5 h-3.5 text-blue-400" />
+                            <span className="text-white text-[10px] font-bold">فيديو</span>
                           </div>
                         )}
                       </div>
                       
-                      <div className="p-6 relative z-20 flex-grow flex flex-col justify-between">
+                      <div className="p-5 relative z-20 flex-grow flex flex-col justify-between">
                         <div>
-                          <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors mb-3 line-clamp-1">{project.name}</h3>
-                          <p className="text-slate-400 text-sm leading-relaxed line-clamp-2 mb-4">{project.description}</p>
+                          <h3 className="text-base font-extrabold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-1">{project.name}</h3>
+                          <p className="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">{project.description}</p>
                         </div>
                         
-                        <div className="flex items-center justify-between text-xs text-blue-400 font-bold border-t border-white/5 pt-3">
+                        <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-3">
                           <span>عرض تفاصيل المعرض ←</span>
                           {project.image.includes(',') && (
                             <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
@@ -983,7 +988,7 @@ export default function Home() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </>
