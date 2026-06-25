@@ -404,20 +404,111 @@ export default function Home() {
                 <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
-              {[
-                { icon: Award, title: 'جودة عالية', desc: 'نختار منتجاتنا بعناية فائقة من أفضل المصادر العالمية لضمان أعلى معايير الجودة والاستدامة.' },
-                { icon: Shield, title: 'حلول متكاملة', desc: 'نقدم لك جميع احتياجاتك من الإضاءة والمواد الكهربائية الذكية في مكان واحد.' },
-                { icon: Sparkles, title: 'احترافية بالعمل', desc: 'فريقنا الهندسي متخصص في مساعدتك لاختيار الحلول المثالية والتصاميم لمشروعك.' },
-              ].map((item, i) => (
-                <FadeIn key={item.title} delay={i * 0.1}>
-                  <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-6 md:p-8 h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300">
-                    <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mb-6"><item.icon className="w-8 h-8 text-blue-400" /></div>
-                    <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
-                    <p className="text-slate-400 text-base leading-relaxed">{item.desc}</p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              
+              {/* Left Column: Visual High-Tech Neon Bulb Composition */}
+              <div className="lg:col-span-5 relative w-full flex items-center justify-center min-h-[300px]">
+                {/* Background lighting waves */}
+                <div className="absolute w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] animate-pulse" />
+                <div className="absolute w-48 h-48 bg-amber-500/5 rounded-full blur-[70px] animate-pulse [animation-delay:2s]" />
+
+                {/* 3D Glassmorphic Console with Glowing Lightbulb */}
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="relative p-8 rounded-[2.5rem] bg-[#0f213a]/50 backdrop-blur-xl border border-white/10 w-full max-w-[360px] aspect-square flex flex-col justify-between overflow-hidden shadow-2xl"
+                >
+                  {/* Subtle Grid backdrop */}
+                  <div className="absolute inset-0 bg-animated-grid opacity-10 pointer-events-none" />
+
+                  {/* Rotating decorative halo rings */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] rounded-full border border-dashed border-blue-500/25 animate-spin [animation-duration:40s]" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full border border-blue-500/10 animate-spin [animation-direction:reverse] [animation-duration:20s]" />
+
+                  {/* Glowing light bulb icon in the center */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10">
+                    <div className="relative w-28 h-28 rounded-full bg-blue-600/10 border border-blue-500/35 flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.25)]">
+                      <Lightbulb className="w-14 h-14 text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.85)] animate-pulse" />
+                      {/* Decorative glowing dots */}
+                      <span className="absolute top-2 left-2 w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+                      <span className="absolute bottom-4 right-2 w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    </div>
                   </div>
-                </FadeIn>
-              ))}
+
+                  {/* Top Badge */}
+                  <div className="relative z-20 flex justify-between items-center w-full">
+                    <span className="text-[10px] font-bold px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 rounded-full font-sans uppercase tracking-wider">
+                      Enarah Smart UI
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]" />
+                  </div>
+
+                  {/* Bottom Stats Badge */}
+                  <div className="relative z-20 w-full flex items-end justify-between">
+                    <div>
+                      <span className="text-3xl font-black text-white block leading-none">100%</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1">ضمان وجودة التأسيس</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="text-3xl font-black text-blue-300 block leading-none">+10</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1">سنوات من الخبرة</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Right Column: Dynamic Stacked Glass Cards */}
+              <div className="lg:col-span-7 flex flex-col gap-5">
+                {[
+                  { 
+                    icon: Award, 
+                    title: 'جودة عالمية معتمدة', 
+                    desc: 'نختار منتجاتنا بعناية فائقة من أفضل المصادر والمصانع الإيطالية والأوروبية لنضمن لك أعلى معايير الأمان والاستدامة الطويلة.',
+                    badge: 'مواد أصلية 🛡️',
+                    color: 'from-blue-500/10 hover:border-blue-500/40 text-blue-400 border-blue-500/20'
+                  },
+                  { 
+                    icon: Shield, 
+                    title: 'حلول كهربائية وإنارة متكاملة', 
+                    desc: 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك، مفاتيح ذكية، وسبوتات إنارة في مكان واحد دون عناء البحث.',
+                    badge: 'شامل ومتكامل 📦',
+                    color: 'from-amber-500/10 hover:border-amber-500/40 text-amber-400 border-amber-500/20'
+                  },
+                  { 
+                    icon: Sparkles, 
+                    title: 'استشارات هندسية مجانية واحترافية', 
+                    desc: 'فريقنا الهندسي المتخصص متواجد لمساعدتك في تخطيط توزيع الإضاءة المناسبة وتحديد مقاسات الأسلاك المثالية لحجم الأحمال مجاناً.',
+                    badge: 'دعم هندسي 📐',
+                    color: 'from-indigo-500/10 hover:border-indigo-500/40 text-indigo-400 border-indigo-500/20'
+                  },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.title}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.15, duration: 0.6 }}
+                    whileHover={{ scale: 1.01, x: -4 }}
+                    className={`relative p-5 md:p-6 rounded-[1.8rem] bg-gradient-to-l ${item.color} border bg-[#0f213a]/30 backdrop-blur-md transition-all duration-300 flex flex-col md:flex-row items-start gap-4 md:gap-5 cursor-default group shadow-[0_4px_25px_rgba(0,0,0,0.1)]`}
+                  >
+                    {/* Icon container */}
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-600/10 group-hover:border-blue-500/30 transition-all duration-300 shrink-0">
+                      <item.icon className="w-7 h-7" />
+                    </div>
+
+                    {/* Text Details */}
+                    <div className="flex-grow">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <h3 className="text-lg md:text-xl font-extrabold text-white group-hover:text-blue-300 transition-colors">{item.title}</h3>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">{item.badge}</span>
+                      </div>
+                      <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

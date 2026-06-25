@@ -41,7 +41,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Alexandria', 'Cairo', sans-serif;
+    font-family: 'Tajawal', 'Cairo', sans-serif;
   }
 }
 html {
