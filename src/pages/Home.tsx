@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { useShake } from '../hooks/use-shake'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
@@ -81,6 +82,22 @@ export default function Home() {
   const [selectedPaintId, setSelectedPaintId] = useState('white')
   const [paintColorTemp, setPaintColorTemp] = useState<'warm' | 'natural' | 'cool'>('warm')
   const [paintFlicker, setPaintFlicker] = useState(false)
+  const [stackIdx, setStackIdx] = useState(0)
+
+  const { requestPermission } = useShake({
+    onShake: () => {
+      setPaintColorTemp((current) => {
+        if (current === 'warm') return 'natural'
+        if (current === 'natural') return 'cool'
+        return 'warm'
+      })
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(100)
+      }
+      setPaintFlicker(true)
+      setTimeout(() => setPaintFlicker(false), 120)
+    }
+  })
 
 
   useEffect(() => {
@@ -609,7 +626,16 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
+            <motion.div 
+              initial={{ borderColor: "rgba(255,255,255,0.05)", boxShadow: "none" }}
+              whileInView={{ 
+                borderColor: "rgba(59,130,246,0.2)", 
+                boxShadow: "0 0 40px rgba(59, 130, 246, 0.12)" 
+              }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.7 }}
+              className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border p-6 md:p-8 rounded-[2.5rem] relative"
+            >
               {/* شاشة العرض - زاوية ثلاثية الأبعاد 3D Room Corner */}
               <div className="w-full lg:w-[38%] max-w-[360px] flex flex-col gap-4">
                 <div className="w-full aspect-[4/3] rounded-2xl relative overflow-hidden bg-[#080d1a] shadow-2xl border border-white/10 transition-all duration-500">
@@ -722,6 +748,21 @@ export default function Home() {
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                     <span className="text-[9px] text-white/60 font-bold font-sans">عرض ثلاثي الأبعاد 3D</span>
                   </div>
+
+                  {/* Shake Toggle Permission Button on Mobile */}
+                  <button 
+                    onClick={async () => {
+                      const granted = await requestPermission();
+                      if (granted) {
+                        alert("تم تفعيل ميزة هز الهاتف لتغيير الإضاءة! جرب هز هاتفك الآن. 📱");
+                      } else {
+                        alert("لم نتمكن من تفعيل مستشعرات الحركة بجهازك أو تصفحك عبر جهاز لا يدعمها.");
+                      }
+                    }}
+                    className="absolute bottom-4 right-4 z-20 flex md:hidden items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-600/80 hover:bg-blue-600 border border-blue-500 text-[9px] text-white font-bold transition-all shadow-[0_0_10px_rgba(59,130,246,0.3)] active:scale-95 cursor-pointer"
+                  >
+                    <span>تفعيل هز الهاتف 📱</span>
+                  </button>
                 </div>
 
                 {/* مؤشر اللون الحالي */}
@@ -795,7 +836,7 @@ export default function Home() {
 
               </div>
 
-            </div>
+            </motion.div>
 
           </div>
         </section>
@@ -825,49 +866,127 @@ export default function Home() {
                  <p className="text-blue-200 mt-4">جاري جلب المشاريع...</p>
                </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-                {featuredProjects.map((project) => (
-                  <div 
-                    key={project.id} 
-                    onClick={() => openGallery(project)}
-                    className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
-                      <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
-                      
-                      <div className="absolute top-4 right-4 z-20">
-                        <span className="px-4 py-1.5 bg-[#0a192f]/80 border border-blue-500/30 text-blue-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                          {project.category}
-                        </span>
-                      </div>
-                      
-                      {project.video && (
-                        <div className="absolute top-4 left-4 z-20 bg-[#0a192f]/80 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-                          <PlayCircle className="w-4 h-4 text-blue-400" />
-                          <span className="text-white text-xs font-bold">فيديو</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="p-6 relative z-20 flex-grow flex flex-col justify-between">
-                      <div>
-                        <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors mb-3 line-clamp-1">{project.name}</h3>
-                        <p className="text-slate-400 text-sm leading-relaxed line-clamp-2 mb-4">{project.description}</p>
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs text-blue-400 font-bold border-t border-white/5 pt-3">
-                        <span>عرض تفاصيل المعرض ←</span>
-                        {project.image.includes(',') && (
-                          <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
-                            +{project.image.split(',').length - 1} صور
+              <>
+                {/* Mobile Swipeable Stack */}
+                <div className="flex md:hidden relative w-full h-[460px] items-center justify-center overflow-hidden">
+                  <div className="relative w-full max-w-[290px] h-[390px]">
+                    <AnimatePresence>
+                      {featuredProjects.slice(stackIdx, stackIdx + 3).map((project, index) => {
+                        const isTop = index === 0
+                        
+                        return (
+                          <motion.div
+                            key={project.id}
+                            style={{
+                              zIndex: 30 - index,
+                              scale: 1 - index * 0.05,
+                              y: index * 14,
+                            }}
+                            drag={isTop ? "x" : false}
+                            dragConstraints={{ left: 0, right: 0 }}
+                            onDragEnd={(_, info) => {
+                              if (isTop) {
+                                if (info.offset.x > 80 || info.offset.x < -80) {
+                                  // Move to next card
+                                  setStackIdx((prev) => (prev + 1) % featuredProjects.length)
+                                }
+                              }
+                            }}
+                            className="absolute inset-0 bg-[#0f213a] border border-white/10 rounded-[2.5rem] p-4 shadow-2xl flex flex-col justify-between cursor-grab active:cursor-grabbing select-none"
+                            exit={{ x: 260, opacity: 0, scale: 0.85, transition: { duration: 0.25 } }}
+                          >
+                            <div className="relative h-[180px] w-full rounded-2xl overflow-hidden bg-[#0a192f] pointer-events-none">
+                              <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-80" />
+                              <div className="absolute top-3 right-3">
+                                <span className="px-3 py-1 bg-[#0a192f]/95 border border-blue-500/30 text-blue-300 text-[10px] font-bold rounded-full">
+                                  {project.category}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex-grow pt-4 flex flex-col justify-between pointer-events-none">
+                              <div>
+                                <h3 className="text-lg font-bold text-white mb-2 line-clamp-1">{project.name}</h3>
+                                <p className="text-slate-400 text-xs leading-relaxed line-clamp-2">{project.description}</p>
+                              </div>
+
+                              <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-2.5">
+                                <span>انقر لفتح المعرض التفصيلي ←</span>
+                              </div>
+                            </div>
+                            
+                            {/* Overlay trigger click to open gallery */}
+                            {isTop && (
+                              <div 
+                                onClick={() => openGallery(project)}
+                                className="absolute inset-0 z-20 cursor-pointer"
+                              />
+                            )}
+                          </motion.div>
+                        )
+                      })}
+                    </AnimatePresence>
+                  </div>
+                  
+                  {/* Stack guide indicator dot swipe help */}
+                  <div className="absolute bottom-1.5 left-0 right-0 flex items-center justify-center gap-1.5 z-10 pointer-events-none">
+                    {featuredProjects.map((_, idx) => (
+                      <span 
+                        key={idx} 
+                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                          (stackIdx % featuredProjects.length) === idx ? 'w-4 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'bg-white/15'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop Grid Layout */}
+                <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                  {featuredProjects.map((project) => (
+                    <div 
+                      key={project.id} 
+                      onClick={() => openGallery(project)}
+                      className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/40 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
+                    >
+                      <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
+                        <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90 z-10" />
+                        
+                        <div className="absolute top-4 right-4 z-20">
+                          <span className="px-4 py-1.5 bg-[#0a192f]/80 border border-blue-500/30 text-blue-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                            {project.category}
                           </span>
+                        </div>
+                        
+                        {project.video && (
+                          <div className="absolute top-4 left-4 z-20 bg-[#0a192f]/80 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                            <PlayCircle className="w-4 h-4 text-blue-400" />
+                            <span className="text-white text-xs font-bold">فيديو</span>
+                          </div>
                         )}
                       </div>
+                      
+                      <div className="p-6 relative z-20 flex-grow flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors mb-3 line-clamp-1">{project.name}</h3>
+                          <p className="text-slate-400 text-sm leading-relaxed line-clamp-2 mb-4">{project.description}</p>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs text-blue-400 font-bold border-t border-white/5 pt-3">
+                          <span>عرض تفاصيل المعرض ←</span>
+                          {project.image.includes(',') && (
+                            <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
+                              +{project.image.split(',').length - 1} صور
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </section>
@@ -890,11 +1009,21 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden">
-              <div className="bg-white/5 p-5 border-b border-white/5 flex items-center justify-between">
+            <motion.div
+              initial={{ borderColor: 'rgba(255, 255, 255, 0.05)', boxShadow: '0 0 0px rgba(59, 130, 246, 0)' }}
+              whileInView={{
+                borderColor: 'rgba(59, 130, 246, 0.3)',
+                boxShadow: '0 0 30px rgba(59, 130, 246, 0.15)',
+              }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.8 }}
+              className="bg-[#0f213a] border rounded-[2rem] overflow-hidden relative"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.1),transparent_70%)] pointer-events-none" />
+              <div className="bg-white/5 p-5 border-b border-white/5 flex items-center justify-between relative z-10">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-green-400" /> الأسعار التقريبية المعتمدة</h3>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-white/5 relative z-10">
                 {wirePrices.map((wire, idx) => (
                   <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] border-r-2 border-transparent hover:border-blue-500 transition-all duration-300">
                     <div className="flex items-center gap-4">
@@ -913,20 +1042,31 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* 5. ابدأ مشروعك */}
         <section id="start" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="relative bg-[#0f213a] border border-blue-500/20 rounded-[2rem] p-8 md:p-16 text-center overflow-hidden">
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span></h2>
-              <p className="text-blue-100/80 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
+            <motion.div
+              initial={{ scale: 0.98, borderColor: 'rgba(59, 130, 246, 0.2)', boxShadow: '0 0 0px rgba(59, 130, 246, 0)' }}
+              whileInView={{
+                scale: 1,
+                borderColor: 'rgba(59, 130, 246, 0.45)',
+                boxShadow: '0 0 35px rgba(59, 130, 246, 0.2)',
+              }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.8 }}
+              className="relative bg-[#0f213a] border rounded-[2rem] p-8 md:p-16 text-center overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_60%)] pointer-events-none animate-pulse [animation-duration:8s]" />
+              <h2 className="relative z-10 text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span></h2>
+              <p className="relative z-10 text-blue-100/80 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
                 نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك، أو لطلب فواتير المواد وعروض الأسعار المتكاملة لمشروعك الكهربائي.
               </p>
-              <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-slate-100 transition-colors"><Zap className="w-6 h-6" /> تواصل معنا الآن</Link>
-            </div>
+              <Link to="/contact" className="relative z-10 inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-slate-100 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.15)]"><Zap className="w-6 h-6" /> تواصل معنا الآن</Link>
+            </motion.div>
           </div>
         </section>
         

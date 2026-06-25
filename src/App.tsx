@@ -18,6 +18,8 @@ import Blog from './pages/Blog'
 import WirePrices from './pages/WirePrices' // 👈 أضفنا صفحة الأسعار هنا
 
 
+import BottomNavBar from './components/BottomNavBar'
+
 // ======================================
 // مكون تأثير الانتقال بين الصفحات
 // ======================================
@@ -97,6 +99,7 @@ function App() {
 
       <WhatsAppButton />
       <AIChatWidget />
+      <BottomNavBar />
     </>
   )
 }
