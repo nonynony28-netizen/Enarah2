@@ -446,15 +446,21 @@ export default function Home() {
                   </div>
 
                   {/* Bottom Stats Badge */}
-                  <div className="relative z-20 w-full flex items-end justify-between">
-                    <div>
-                      <span className="text-3xl font-black text-white block leading-none">100%</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1">مواد معتمدة</span>
-                    </div>
-                    <div className="text-left">
-                      <span className="text-3xl font-black text-blue-300 block leading-none">توصيل</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1">سريع وآمن لكافة المدن</span>
-                    </div>
+                  <div className="relative z-20 w-full flex items-center justify-between gap-4">
+                    <motion.div 
+                      whileHover={{ scale: 1.03 }}
+                      className="cursor-default bg-white/5 border border-white/10 rounded-2xl p-3 flex-1 text-center transition-all duration-300 hover:border-blue-500/30 hover:bg-blue-600/5"
+                    >
+                      <span className="text-2xl font-black text-white block leading-none">100%</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">منتجات أصلية</span>
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ scale: 1.03 }}
+                      className="cursor-default bg-white/5 border border-white/10 rounded-2xl p-3 flex-1 text-center transition-all duration-300 hover:border-blue-500/30 hover:bg-blue-600/5"
+                    >
+                      <span className="text-2xl font-black text-blue-300 block leading-none">100%</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">ضمان وموثوقية</span>
+                    </motion.div>
                   </div>
                 </motion.div>
               </div>
