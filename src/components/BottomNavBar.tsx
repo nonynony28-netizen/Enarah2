@@ -14,7 +14,7 @@ export default function BottomNavBar() {
   const location = useLocation()
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] bg-[#0a192f]/70 backdrop-blur-xl border border-blue-500/20 rounded-[2rem] py-2 px-3 shadow-[0_10px_35px_rgba(0,0,0,0.5)] md:hidden z-50 flex items-center justify-around select-none">
+    <div className="fixed top-[72px] left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] bg-[#0a192f]/70 backdrop-blur-xl border border-blue-500/20 rounded-[2rem] py-2 px-3 shadow-[0_10px_35px_rgba(0,0,0,0.5)] md:hidden z-50 flex items-center justify-around select-none">
       {navItems.map((item) => {
         const isActive = location.pathname === item.path
         const Icon = item.icon

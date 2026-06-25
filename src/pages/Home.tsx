@@ -449,11 +449,11 @@ export default function Home() {
                   <div className="relative z-20 w-full flex items-end justify-between">
                     <div>
                       <span className="text-3xl font-black text-white block leading-none">100%</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1">ضمان وجودة التأسيس</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1">مواد معتمدة</span>
                     </div>
                     <div className="text-left">
-                      <span className="text-3xl font-black text-blue-300 block leading-none">+10</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1">سنوات من الخبرة</span>
+                      <span className="text-3xl font-black text-blue-300 block leading-none">توصيل</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1">سريع وآمن لكافة المدن</span>
                     </div>
                   </div>
                 </motion.div>
@@ -464,8 +464,8 @@ export default function Home() {
                 {[
                   { 
                     icon: Award, 
-                    title: 'جودة عالمية معتمدة', 
-                    desc: 'نختار منتجاتنا بعناية فائقة من أفضل المصادر والمصانع الإيطالية والأوروبية لنضمن لك أعلى معايير الأمان والاستدامة الطويلة.',
+                    title: 'جودة عالية ومعتمدة', 
+                    desc: 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والأمان لتدوم طويلاً.',
                     badge: 'مواد أصلية 🛡️',
                     color: 'from-blue-500/10 hover:border-blue-500/40 text-blue-400 border-blue-500/20'
                   },
@@ -478,9 +478,9 @@ export default function Home() {
                   },
                   { 
                     icon: Sparkles, 
-                    title: 'استشارات هندسية مجانية واحترافية', 
-                    desc: 'فريقنا الهندسي المتخصص متواجد لمساعدتك في تخطيط توزيع الإضاءة المناسبة وتحديد مقاسات الأسلاك المثالية لحجم الأحمال مجاناً.',
-                    badge: 'دعم هندسي 📐',
+                    title: 'خدمة عملاء ودعم سريع', 
+                    desc: 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وتسهيل توصيلها بأمان.',
+                    badge: 'دعم مبيعات 📞',
                     color: 'from-indigo-500/10 hover:border-indigo-500/40 text-indigo-400 border-indigo-500/20'
                   },
                 ].map((item, i) => (
