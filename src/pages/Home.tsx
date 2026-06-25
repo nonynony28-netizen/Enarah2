@@ -323,9 +323,9 @@ export default function Home() {
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight tracking-tight text-white">
-                <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-200 drop-shadow-[0_2px_8px_rgba(255,255,255,0.15)]">الإنارة</span>{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_20px_rgba(59,130,246,0.45)]">الحديثة</span>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-normal tracking-tight text-white py-2">
+                <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">الإنارة</span>{' '}
+                <span className="text-blue-400 drop-shadow-[0_4px_20px_rgba(59,130,246,0.65)]">الحديثة</span>
               </h1>
               <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
@@ -964,6 +964,12 @@ export default function Home() {
               <>
                 {/* Mobile Swipeable Stack */}
                 <div className="flex md:hidden relative w-full h-[460px] items-center justify-center overflow-hidden">
+                  
+                  {/* Left bouncing hint arrow */}
+                  <div className="absolute left-2 z-10 p-1.5 rounded-full bg-[#0a192f]/60 border border-white/5 text-blue-400 animate-pulse pointer-events-none">
+                    <ChevronLeft className="w-5 h-5" />
+                  </div>
+
                   <div className="relative w-full max-w-[290px] h-[390px]">
                     <AnimatePresence>
                       {featuredProjects.slice(stackIdx, stackIdx + 3).map((project, index) => {
@@ -1006,8 +1012,9 @@ export default function Home() {
                                 <p className="text-slate-400 text-xs leading-relaxed line-clamp-2">{project.description}</p>
                               </div>
 
-                              <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-2.5">
-                                <span>انقر لفتح المعرض التفصيلي ←</span>
+                              <div className="flex items-center justify-between text-[10px] text-blue-400 font-bold border-t border-white/5 pt-2">
+                                <span>انقر للتفاصيل 🔍</span>
+                                <span className="text-blue-300 animate-pulse flex items-center gap-0.5">اسحب للتنقل ↔</span>
                               </div>
                             </div>
                             
@@ -1023,7 +1030,12 @@ export default function Home() {
                       })}
                     </AnimatePresence>
                   </div>
-                  
+
+                  {/* Right bouncing hint arrow */}
+                  <div className="absolute right-2 z-10 p-1.5 rounded-full bg-[#0a192f]/60 border border-white/5 text-blue-400 animate-pulse pointer-events-none">
+                    <ChevronRight className="w-5 h-5" />
+                  </div>
+
                   {/* Stack guide indicator dot swipe help */}
                   <div className="absolute bottom-1.5 left-0 right-0 flex items-center justify-center gap-1.5 z-10 pointer-events-none">
                     {featuredProjects.map((_, idx) => (
