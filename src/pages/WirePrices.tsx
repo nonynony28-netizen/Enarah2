@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck, ArrowRight, MessageCircle, Loader2, CheckCircle, ShoppingCart, X } from 'lucide-react'
-import { Link } from 'react-router-dom' // استدعاء الرابط
+import { Link } from 'react-router-dom'
+import { useLanguage } from '../hooks/useLanguage'
 
 // نمط الوهج الأزرق للعناوين
 const glowingTitleStyle = {
@@ -38,7 +39,16 @@ const defaultWireData = [
   { id: '25.0', size: '25.0 ملي', type: 'مفرد (لفة 100 متر)', price: '680.00', trend: 'same' as TrendType },
 ]
 
+const getLocalizedSize = (id: string, isAr: boolean) => {
+  return isAr ? `${id} ملي` : `${id} mm`
+}
+
+const getLocalizedType = (isAr: boolean) => {
+  return isAr ? 'مفرد (لفة 100 متر)' : 'Single (100m Roll)'
+}
+
 export default function WirePrices() {
+  const { t, isAr } = useLanguage()
   const [currentDate, setCurrentDate] = useState('')
   const [wirePrices, setWirePrices] = useState(defaultWireData)
   
@@ -53,8 +63,9 @@ export default function WirePrices() {
     const options: Intl.DateTimeFormatOptions = { 
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     }
-    setCurrentDate(new Date().toLocaleDateString('ar-EG', options))
-  }, [])
+    const locale = isAr ? 'ar-EG' : 'en-US'
+    setCurrentDate(new Date().toLocaleDateString(locale, options))
+  }, [isAr])
 
   useEffect(() => {
     const fetchWirePrices = async () => {
@@ -93,20 +104,25 @@ export default function WirePrices() {
     setOrderStatus('loading')
     try {
       const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
+      
+      // إرسال الطلبية لقاعدة البيانات
       await fetch('https://enarah2.vercel.app/api/save-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: `🛒 طلبية أسلاك: مقاس ${selectedWire.size}`,
+          name: `🛒 طلبية أسلاك: مقاس ${selectedWire.id} مم`,
           phone: orderForm.phone,
-          email: `المدينة: ${orderForm.city} | العدد: ${orderForm.quantity} لفة | الإجمالي: ${totalPrice} د.ل`,
+          email: `المدينة: ${orderForm.city} | العدد: ${orderForm.quantity} لفة | الإجمالي: ${totalPrice} ${isAr ? 'د.ل' : 'LYD'}`,
           type: 'contact' 
         })
       })
 
       const telegramBotToken = "8951369127:AAFxThF562Xt9LxsQZMibNOxrFTeJtuScOM" 
       const telegramChatId = "8372746727"
-      const telegramMessage = `🚨 *طلب أسلاك جديد!*\n\n🛒 *المقاس:* ${selectedWire.size}\n📦 *الكمية:* ${orderForm.quantity} لفة\n💰 *الإجمالي:* ${totalPrice} د.ل\n📍 *المدينة:* ${orderForm.city}\n📞 *الهاتف:* ${orderForm.phone}`;
+      
+      const telegramMessage = !isAr
+        ? `🚨 *New Wire Order!*\n\n🛒 *Size:* ${selectedWire.id} mm\n📦 *Quantity:* ${orderForm.quantity} Rolls\n💰 *Total:* ${totalPrice} LYD\n📍 *City:* ${orderForm.city}\n📞 *Phone:* ${orderForm.phone}`
+        : `🚨 *طلب أسلاك جديد!*\n\n🛒 *المقاس:* ${selectedWire.size}\n📦 *الكمية:* ${orderForm.quantity} لفة\n💰 *الإجمالي:* ${totalPrice} د.ل\n📍 *المدينة:* ${orderForm.city}\n📞 *الهاتف:* ${orderForm.phone}`;
 
       if (telegramBotToken) {
         fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
@@ -116,7 +132,10 @@ export default function WirePrices() {
       }
 
       // تحويل المستخدم إلى الواتس اب للتأكيد الفوري
-      const whatsappMsg = `السلام عليكم، أريد تأكيد طلب شراء سلك إيطالي:\n\n*المقاس:* ${selectedWire.size}\n*الكمية:* ${orderForm.quantity} لفة\n*الإجمالي:* ${totalPrice} د.ل\n*المدينة:* ${orderForm.city}\n*الهاتف:* ${orderForm.phone}`;
+      const whatsappMsg = !isAr
+        ? `Hello, I want to confirm an Italian wire order:\n\n*Size:* ${selectedWire.id} mm\n*Quantity:* ${orderForm.quantity} Rolls\n*Total:* ${totalPrice} LYD\n*City:* ${orderForm.city}\n*Phone:* ${orderForm.phone}`
+        : `السلام عليكم، أريد تأكيد طلب شراء سلك إيطالي:\n\n*المقاس:* ${selectedWire.size}\n*الكمية:* ${orderForm.quantity} لفة\n*الإجمالي:* ${totalPrice} د.ل\n*المدينة:* ${orderForm.city}\n*الهاتف:* ${orderForm.phone}`;
+      
       const whatsappUrl = `https://wa.me/218916580068?text=${encodeURIComponent(whatsappMsg)}`;
       window.location.href = whatsappUrl;
 
@@ -146,7 +165,7 @@ export default function WirePrices() {
         } catch {}
         const price = parseFloat(pricesObj[selectedChartWireId] || defaultWire?.price || "0")
         const dateObj = new Date(item.createdAt)
-        const dateStr = dateObj.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })
+        const dateStr = dateObj.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })
         return { date: dateStr, price }
       })
     }
@@ -159,7 +178,7 @@ export default function WirePrices() {
       for (let i = 0; i < 5; i++) {
         const dateObj = new Date()
         dateObj.setDate(dateObj.getDate() - (4 - i))
-        const dateStr = dateObj.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })
+        const dateStr = dateObj.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })
         const price = parseFloat((basePrice * (1 + mockFluctuations[i])).toFixed(2))
         simulatedHistory.push({ date: dateStr, price })
       }
@@ -201,9 +220,11 @@ export default function WirePrices() {
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className="mb-6 flex justify-start">
-            <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-              <ArrowRight className="w-5 h-5" />
-              العودة للرئيسية
+            <Link to="/" className={`inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] ${
+              isAr ? 'flex-row' : 'flex-row-reverse'
+            }`}>
+              <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
           </div>
         </FadeIn>
@@ -216,17 +237,25 @@ export default function WirePrices() {
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
-              أسعار الأسلاك <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">الإيطالية</span>
+              {isAr ? 'أسعار الأسلاك' : 'Wire Prices'}{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
+                {isAr ? 'الإيطالية' : 'Italian'}
+              </span>
             </h1>
             
             <p className="text-slate-400 max-w-2xl mx-auto text-lg mb-8 shadow-sm">
-              نقدم لكم التحديث اليومي لأسعار الأسلاك الكهربائية الإيطالية المعتمدة، لضمان أعلى معايير الجودة لمشاريعكم.
+              {isAr 
+                ? 'نقدم لكم التحديث اليومي لأسعار الأسلاك الكهربائية الإيطالية المعتمدة، لضمان أعلى معايير الجودة لمشاريعكم.'
+                : 'Providing you with the daily certified Italian electrical wire price updates, ensuring the highest standards of safety and quality for your projects.'
+              }
             </p>
 
             {/* شريط التاريخ */}
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#0d2342] border border-blue-500/30 rounded-2xl text-blue-300 font-bold text-lg shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+            <div className={`inline-flex items-center gap-3 px-6 py-3 bg-[#0d2342] border border-blue-500/30 rounded-2xl text-blue-300 font-bold text-lg shadow-[0_0_15px_rgba(59,130,246,0.2)] ${
+              isAr ? 'flex-row' : 'flex-row-reverse'
+            }`}>
               <Calendar className="w-5 h-5" />
-              تحديث اليوم: {currentDate}
+              <span>{isAr ? 'تحديث اليوم:' : 'Today\'s Update:'} {currentDate}</span>
             </div>
           </div>
         </FadeIn>
@@ -235,39 +264,50 @@ export default function WirePrices() {
         <FadeIn delay={0.2}>
           <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
             
-            <div className="bg-white/5 p-6 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <div className={`bg-white/5 p-6 border-b border-white/5 flex items-center justify-between ${
+              isAr ? 'flex-row' : 'flex-row-reverse'
+            }`}>
+              <h3 className={`text-xl font-bold text-white flex items-center gap-2 ${
+                isAr ? 'flex-row' : 'flex-row-reverse'
+              }`}>
                 <ShieldCheck className="w-6 h-6 text-green-400" />
-                قائمة الأسعار المعتمدة
+                <span>{isAr ? 'قائمة الأسعار المعتمدة' : 'Certified Price List'}</span>
               </h3>
               <span className="text-xs font-bold bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
-                محدث الآن
+                {isAr ? 'محدث الآن' : 'Updated Now'}
               </span>
             </div>
 
             <div className="divide-y divide-white/5">
               {wirePrices.map((wire, idx) => (
-                <div key={wire.id} className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/5 transition-colors duration-300">
+                <div key={wire.id} className={`p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/5 transition-colors duration-300 ${
+                  isAr ? 'text-right' : 'text-left'
+                }`}>
                   
-                  <div className="flex items-center gap-4">
+                  <div className={`flex items-center gap-4 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
                     <div className="w-12 h-12 rounded-xl bg-[#0a192f] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-lg shadow-[0_0_10px_rgba(59,130,246,0.1)]">
                       {idx + 1}
                     </div>
                     <div>
-                      <h4 className="text-xl font-bold text-white mb-1">{wire.size}</h4>
-                      <p className="text-sm text-slate-400">{wire.type}</p>
+                      <h4 className="text-xl font-bold text-white mb-1">{getLocalizedSize(wire.id, isAr)}</h4>
+                      <p className="text-sm text-slate-400">{getLocalizedType(isAr)}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
-                    <div className="text-right">
-                      <span className="text-sm text-slate-400 block mb-1">السعر التقريبي</span>
-                      <div className="text-2xl font-extrabold text-blue-300">
-                        {wire.price} <span className="text-sm font-normal text-slate-400">د.ل</span>
+                  <div className={`flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-white/5 pt-4 md:pt-0 ${
+                    isAr ? 'flex-row' : 'flex-row-reverse'
+                  }`}>
+                    <div className={isAr ? 'text-right' : 'text-left'}>
+                      <span className="text-sm text-slate-400 block mb-1">{isAr ? 'السعر التقريبي' : 'Approx. Price'}</span>
+                      <div className={`text-2xl font-extrabold text-blue-300 flex items-baseline gap-1 ${
+                        isAr ? 'flex-row' : 'flex-row-reverse'
+                      }`}>
+                        <span>{wire.price}</span>
+                        <span className="text-sm font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className={`flex items-center gap-3 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
                       <div className={`flex items-center justify-center w-10 h-10 rounded-full border ${
                         wire.trend === 'up' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
                         wire.trend === 'down' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
@@ -280,10 +320,12 @@ export default function WirePrices() {
 
                       <button 
                         onClick={() => setSelectedWire(wire)}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97] whitespace-nowrap"
+                        className={`flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97] whitespace-nowrap ${
+                          isAr ? 'flex-row' : 'flex-row-reverse'
+                        }`}
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        اطلب الآن
+                        <span>{isAr ? 'اطلب الآن' : 'Order Now'}</span>
                       </button>
                     </div>
                   </div>
@@ -292,7 +334,10 @@ export default function WirePrices() {
             </div>
             
             <div className="bg-[#0a192f]/50 p-4 text-center text-sm text-slate-500 border-t border-white/5">
-              * الأسعار تقريبية وقابلة للتغيير الطفيف حسب تقلبات السوق وكمية الطلب.
+              {isAr 
+                ? '* الأسعار تقريبية وقابلة للتغيير الطفيف حسب تقلبات السوق وكمية الطلب.'
+                : '* Prices are approximate and subject to slight changes based on market fluctuations and order volume.'
+              }
             </div>
 
           </div>
@@ -304,14 +349,21 @@ export default function WirePrices() {
             {/* بقعة نيون متوهجة بالخلفية */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 relative z-10">
+            <div className={`flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 relative z-10 ${
+              isAr ? 'text-right' : 'text-left'
+            }`}>
               <div>
-                <h3 className="text-2xl font-bold text-white flex items-center gap-2 font-sans">
+                <h3 className={`text-2xl font-bold text-white flex items-center gap-2 font-sans ${
+                  isAr ? 'flex-row' : 'flex-row-reverse'
+                }`}>
                   <TrendingUp className="w-7 h-7 text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                  مؤشر حركة الأسعار التفاعلي (البورصة اليومية)
+                  <span>{isAr ? 'مؤشر حركة الأسعار التفاعلي (البورصة اليومية)' : 'Interactive Price Index (Daily Market)'}</span>
                 </h3>
                 <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">
-                  تتبع حركة تغير أسعار الأسلاك الكهربائية صعوداً وهبوطاً. اختر مقاس السلك بالأسفل لعرض المخطط البياني الخاص به:
+                  {isAr 
+                    ? 'تتبع حركة تغير أسعار الأسلاك الكهربائية صعوداً وهبوطاً. اختر مقاس السلك بالأسفل لعرض المخطط البياني الخاص به:'
+                    : 'Track the price movements of electrical wires up and down. Choose the wire size below to display its price history chart:'
+                  }
                 </p>
               </div>
 
@@ -327,13 +379,13 @@ export default function WirePrices() {
                         : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
                     }`}
                   >
-                    {wire.size}
+                    {getLocalizedSize(wire.id, isAr)}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* محاكاة وتصميم مخطط بياني خطي فخم SVG */}
+            {/* مخطط بياني خطي SVG */}
             <div className="bg-[#0a192f]/60 rounded-2xl p-4 md:p-6 border border-white/5 relative z-10">
               <div className="w-full overflow-x-auto">
                 <div className="min-w-[480px]">
@@ -355,9 +407,9 @@ export default function WirePrices() {
                     <line x1="50" y1="170" x2="450" y2="170" stroke="rgba(255,255,255,0.06)" strokeDasharray="3,3" />
 
                     {/* علامات وقيم المحور الرأسي */}
-                    <text x="40" y="44" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{maxPrice.toFixed(2)} د.ل</text>
-                    <text x="40" y="109" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{((maxPrice + minPrice) / 2).toFixed(2)} د.ل</text>
-                    <text x="40" y="174" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{minPrice.toFixed(2)} د.ل</text>
+                    <text x="40" y="44" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{maxPrice.toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
+                    <text x="40" y="109" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{((maxPrice + minPrice) / 2).toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
+                    <text x="40" y="174" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{minPrice.toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
 
                     {/* المساحة الملونة المعبأة */}
                     {areaD && <path d={areaD} fill="url(#chartGradient)" className="transition-all duration-500" />}
@@ -436,7 +488,9 @@ export default function WirePrices() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
               <div className="absolute inset-0 bg-[#06152b]/95" onClick={() => setSelectedWire(null)} />
               <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="relative w-full max-w-md bg-[#0d2342] border border-blue-500/20 rounded-[2rem] overflow-hidden shadow-2xl">
-                <button onClick={() => setSelectedWire(null)} className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10"><X className="w-5 h-5" /></button>
+                <button onClick={() => setSelectedWire(null)} className={`absolute top-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10 ${
+                  isAr ? 'left-4' : 'right-4'
+                }`}><X className="w-5 h-5" /></button>
                 <div className="p-6 md:p-8">
                   {orderStatus === 'loading' || orderStatus === 'success' ? (
                     <div className="text-center py-10 px-4 flex flex-col items-center justify-center relative min-h-[360px]">
@@ -454,9 +508,14 @@ export default function WirePrices() {
                           </div>
                           
                           <div>
-                            <h3 className="text-2xl font-bold text-white mb-2 animate-pulse font-sans">تجهيز طلبك الرقمي</h3>
+                            <h3 className="text-2xl font-bold text-white mb-2 animate-pulse font-sans">
+                              {isAr ? 'تجهيز طلبك الرقمي' : 'Preparing your digital order'}
+                            </h3>
                             <p className="text-blue-300 text-sm max-w-xs mx-auto leading-relaxed">
-                              نقوم بإنشاء اتصال آمن ونقل بياناتك إلى سجل المبيعات والواتساب...
+                              {isAr 
+                                ? 'نقوم بإنشاء اتصال آمن ونقل بياناتك إلى سجل المبيعات والواتساب...'
+                                : 'Establishing a secure connection and transferring your details to our sales ledger...'
+                              }
                             </p>
                           </div>
 
@@ -481,14 +540,17 @@ export default function WirePrices() {
                             {/* جزيئات نيون تتلاشى للخارج */}
                             <span className="absolute w-2.5 h-2.5 rounded-full bg-green-400 animate-[particleTop_1.2s_ease-out_infinite] top-0 left-1/2" />
                             <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-400 animate-[particleBottom_1.2s_ease-out_infinite] bottom-0 left-1/2" />
-                            <span className="absolute w-2 h-2 rounded-full bg-green-300 animate-[particleLeft_1.2s_ease-out_infinite] left-0 top-1/2" />
-                            <span className="absolute w-2 h-2 rounded-full bg-emerald-300 animate-[particleRight_1.2s_ease-out_infinite] right-0 top-1/2" />
+                            <span className="absolute w-2.5 h-2.5 rounded-full bg-green-300 animate-[particleLeft_1.2s_ease-out_infinite] left-0 top-1/2" />
+                            <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-300 animate-[particleRight_1.2s_ease-out_infinite] right-0 top-1/2" />
                           </div>
                           
                           <div>
-                            <h3 className="text-2xl font-bold text-white mb-2">تم تسجيل طلبك بنجاح!</h3>
+                            <h3 className="text-2xl font-bold text-white mb-2">{isAr ? 'تم تسجيل طلبك بنجاح!' : 'Order Placed Successfully!'}</h3>
                             <p className="text-emerald-200 text-sm max-w-xs mx-auto leading-relaxed">
-                              تم التوثيق الرقمي. جاري تحويلك الآن للواتساب للتأكيد الفوري والمتابعة...
+                              {isAr 
+                                ? 'تم التوثيق الرقمي. جاري تحويلك الآن للواتساب للتأكيد الفوري والمتابعة...'
+                                : 'Digital confirmation documented. Redirecting you to WhatsApp for instant verification...'
+                              }
                             </p>
                           </div>
 
@@ -501,27 +563,70 @@ export default function WirePrices() {
                     </div>
                   ) : (
                     <>
-                      <h3 className="text-2xl font-bold text-white mb-2 pr-6">طلب سريع</h3>
-                      <p className="text-blue-300 mb-6 font-medium">سلك إيطالي مقاس {selectedWire.size}</p>
+                      <h3 className={`text-2xl font-bold text-white mb-2 ${isAr ? 'pr-6 text-right' : 'pl-6 text-left'}`}>
+                        {isAr ? 'طلب سريع' : 'Quick Order'}
+                      </h3>
+                      <p className={`text-blue-300 mb-6 font-medium ${isAr ? 'text-right' : 'text-left'}`}>
+                        {isAr ? `سلك إيطالي مقاس ${getLocalizedSize(selectedWire.id, isAr)}` : `Italian Wire Size: ${getLocalizedSize(selectedWire.id, isAr)}`}
+                      </p>
+                      
                       <form onSubmit={submitOrder} className="space-y-4 md:space-y-5">
-                        <div><label className="block text-slate-300 text-sm font-bold mb-2">رقم الهاتف للتواصل</label><input required type="tel" value={orderForm.phone} onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="09X XXX XXXX" /></div>
-                        <div><label className="block text-slate-300 text-sm font-bold mb-2">المدينة</label><input required type="text" value={orderForm.city} onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="اسم مدينتك" /></div>
-                        <div>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">الكمية (عدد اللفات)</label>
-                          <div className="flex items-center bg-[#0a192f] border border-white/10 rounded-xl overflow-hidden">
+                        <div className={isAr ? 'text-right' : 'text-left'}>
+                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'رقم الهاتف للتواصل' : 'Contact Phone Number'}</label>
+                          <input 
+                            required 
+                            type="tel" 
+                            value={orderForm.phone} 
+                            onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} 
+                            className={`w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all ${
+                              isAr ? 'text-right' : 'text-left'
+                            }`}
+                            placeholder="09X XXX XXXX" 
+                          />
+                        </div>
+                        
+                        <div className={isAr ? 'text-right' : 'text-left'}>
+                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'المدينة' : 'City'}</label>
+                          <input 
+                            required 
+                            type="text" 
+                            value={orderForm.city} 
+                            onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} 
+                            className={`w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all ${
+                              isAr ? 'text-right' : 'text-left'
+                            }`}
+                            placeholder={isAr ? 'اسم مدينتك' : 'Your city name'} 
+                          />
+                        </div>
+                        
+                        <div className={isAr ? 'text-right' : 'text-left'}>
+                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'الكمية (عدد اللفات)' : 'Quantity (Number of Rolls)'}</label>
+                          <div className={`flex items-center bg-[#0a192f] border border-white/10 rounded-xl overflow-hidden ${
+                            isAr ? 'flex-row' : 'flex-row-reverse'
+                          }`}>
                             <button type="button" onClick={() => setOrderForm({...orderForm, quantity: Math.max(1, orderForm.quantity - 1)})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">-</button>
                             <input type="number" min="1" value={orderForm.quantity} onChange={(e) => setOrderForm({...orderForm, quantity: parseInt(e.target.value) || 1})} className="w-full bg-transparent text-white text-center font-bold outline-none" />
                             <button type="button" onClick={() => setOrderForm({...orderForm, quantity: orderForm.quantity + 1})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">+</button>
                           </div>
                         </div>
-                        <div className="p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6"><span className="text-slate-300 font-bold">الإجمالي:</span><span className="text-2xl font-extrabold text-white">{(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span></span></div>
+                        
+                        <div className={`p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6 ${
+                          isAr ? 'flex-row' : 'flex-row-reverse'
+                        }`}>
+                          <span className="text-slate-300 font-bold">{isAr ? 'الإجمالي:' : 'Total:'}</span>
+                          <span className="text-2xl font-extrabold text-white">
+                            {(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)}{' '}
+                            <span className="text-sm font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                          </span>
+                        </div>
+                        
                         <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)]">
                           {orderStatus === 'loading' ? (
                             <Loader2 className="w-6 h-6 animate-spin" />
                           ) : (
                             <>
                               <MessageCircle className="w-6 h-6 animate-pulse" />
-                              تأكيد الطلب وإرساله بالواتساب
+                              <span>{isAr ? 'تأكيد الطلب وإرساله بالواتساب' : 'Confirm & Send via WhatsApp'}</span>
                             </>
                           )}
                         </button>

@@ -5,28 +5,29 @@ import {
   Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
   Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders
 } from 'lucide-react'
+import { useLanguage } from '../hooks/useLanguage'
 
 // نمط الوهج للعناوين والشعارات المضيئة
 const glowingTitleStyle = { textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)' }
 
-const servicesDropdown = {
-  label: 'الأقسام والأسعار',
-    items: [
-      { path: '/products', label: 'معرض المنتجات', desc: 'تصفح أحدث حلول الإضاءة ومواد الكهرباء الذكية بجودة عالية.', icon: Lightbulb },
-      { path: '/wire-prices', label: 'أسعار الأسلاك', desc: 'النشرة اليومية المحدثة لأسعار الأسلاك الإيطالية المعتمدة.', icon: Zap },
-      { path: '/brands', label: 'الشركات العالمية', desc: 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.', icon: Award },
-      { path: '/projects', label: 'المشاريع المنفذة', desc: 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.', icon: Sparkles },
-    ]
-}
-
-const otherLinks = [
-  { path: '/blog', label: 'المدونة', icon: BookOpen },
-  { path: '/about', label: 'من نحن', icon: Info },
-  { path: '/branches', label: 'الفروع', icon: MapPin },
-  { path: '/contact', label: 'تواصل معنا', icon: PhoneCall },
-]
-
 export default function Navbar() {
+  const { toggleLanguage, t, isAr } = useLanguage()
+
+  const servicesDropdownLabel = t('nav.servicesDropdown') || 'الأقسام والأسعار';
+  const servicesDropdownItems = [
+    { path: '/products', label: t('nav.products'), desc: isAr ? 'تصفح أحدث حلول الإضاءة ومواد الكهرباء الذكية بجودة عالية.' : 'Browse the latest lighting solutions and smart electrical materials.', icon: Lightbulb },
+    { path: '/wire-prices', label: t('nav.wirePrices'), desc: isAr ? 'النشرة اليومية المحدثة لأسعار الأسلاك الإيطالية المعتمدة.' : 'Daily updated price list for certified Italian wires.', icon: Zap },
+    { path: '/brands', label: t('nav.brands'), desc: isAr ? 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.' : 'Our partners and top certified global brands.', icon: Award },
+    { path: '/projects', label: t('nav.projects'), desc: isAr ? 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.' : 'Explore some of our executed electrical and engineering projects.', icon: Sparkles },
+  ];
+
+  const localizedOtherLinks = [
+    { path: '/blog', label: t('nav.blog'), icon: BookOpen },
+    { path: '/about', label: t('nav.about'), icon: Info },
+    { path: '/branches', label: t('nav.branches'), icon: MapPin },
+    { path: '/contact', label: t('nav.contact'), icon: PhoneCall },
+  ];
+
   const [isOpen, setIsOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false)
@@ -120,7 +121,7 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-row-reverse items-center justify-between h-14 md:h-16">
+          <div className={`flex items-center justify-between h-14 md:h-16 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
 
             {/* Logo الشعار */}
             <Link to="/" className="flex items-center gap-3 group">
@@ -131,13 +132,13 @@ export default function Navbar() {
                 <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
               </motion.div>
               <span className="font-extrabold text-xl md:text-2xl tracking-wide">
-                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">الإنارة</span>{' '}
-                <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">الحديثة</span>
+                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">{t('hero.title.part1')}</span>{' '}
+                <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">{t('hero.title.part2')}</span>
               </span>
             </Link>
 
             {/* Desktop Nav قائمة الكمبيوتر */}
-            <div className="hidden md:flex items-center gap-1.5 relative">
+            <div className={`hidden md:flex items-center gap-1.5 relative ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
               {/* الرئيسية */}
               <Link
                 to="/"
@@ -152,7 +153,7 @@ export default function Navbar() {
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                الرئيسية
+                {t('nav.home')}
               </Link>
 
               {/* القائمة المنسدلة التفاعلية (أقسامنا وأسعارنا) */}
@@ -163,12 +164,12 @@ export default function Navbar() {
               >
                 <button
                   className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 z-10 outline-none hover:scale-[1.02] ${
-                    servicesDropdown.items.some(item => location.pathname === item.path)
+                    servicesDropdownItems.some(item => location.pathname === item.path)
                       ? 'text-white bg-blue-500/20 border border-blue-400/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
                       : 'text-slate-300 hover:text-white'
                   }`}
                 >
-                  {servicesDropdown.label}
+                  {servicesDropdownLabel}
                   <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
                 </button>
 
@@ -179,9 +180,11 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: 'easeOut' }}
-                      className="absolute right-0 top-full mt-2 w-[480px] bg-[#0a192f]/95 backdrop-blur-xl border border-blue-500/20 rounded-[1.5rem] p-4 shadow-2xl z-50 grid grid-cols-2 gap-3"
+                      className={`absolute top-full mt-2 w-[480px] bg-[#0a192f]/95 backdrop-blur-xl border border-blue-500/20 rounded-[1.5rem] p-4 shadow-2xl z-50 grid grid-cols-2 gap-3 ${
+                        isAr ? 'right-0' : 'left-0'
+                      }`}
                     >
-                      {servicesDropdown.items.map((item) => {
+                      {servicesDropdownItems.map((item) => {
                         const isSubActive = location.pathname === item.path;
                         return (
                           <Link
@@ -194,7 +197,7 @@ export default function Navbar() {
                             <div className={`p-2.5 rounded-xl ${isSubActive ? 'bg-blue-500/20 text-blue-300' : 'bg-white/5 text-blue-400'}`}>
                               <item.icon className="w-5 h-5" />
                             </div>
-                            <div className="text-right flex-grow">
+                            <div className={`flex-grow ${isAr ? 'text-right' : 'text-left'}`}>
                               <h4 className="text-sm font-bold text-white mb-0.5">{item.label}</h4>
                               <p className="text-xs text-slate-400 leading-relaxed font-normal">{item.desc}</p>
                             </div>
@@ -207,7 +210,7 @@ export default function Navbar() {
               </div>
 
               {/* باقي الروابط */}
-              {otherLinks.map((link) => {
+              {localizedOtherLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
                   <Link
@@ -228,6 +231,18 @@ export default function Navbar() {
                   </Link>
                 )
               })}
+
+              {/* Language Switcher */}
+              <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
+                <button
+                  onClick={toggleLanguage}
+                  className="relative p-1 px-2.5 h-9 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 flex items-center justify-center gap-1 cursor-pointer transition-all duration-300 active:scale-95 shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] text-[11px] font-extrabold text-slate-300 hover:text-white"
+                  title={isAr ? 'Switch to English' : 'التغيير للعربية'}
+                >
+                  <span>{isAr ? 'EN' : 'AR'}</span>
+                </button>
+              </div>
+
               {/* Smart Switch Button */}
               <div className="ml-3 pl-3 border-l border-white/10 flex items-center justify-center">
                 <button
@@ -268,6 +283,14 @@ export default function Navbar() {
 
             {/* Mobile Actions & Menu Button زر الجوال مع مفتاح الإنارة */}
             <div className="flex md:hidden items-center gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="relative p-1 px-2 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] text-[10px] font-black text-slate-300"
+                title={isAr ? 'Switch to English' : 'التغيير للعربية'}
+              >
+                {isAr ? 'EN' : 'AR'}
+              </button>
+
               <button
                 onClick={toggleTheme}
                 className="relative p-1 w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] overflow-hidden"
@@ -310,9 +333,13 @@ export default function Navbar() {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
             
             <motion.div
-              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              initial={{ x: isAr ? '100%' : '-100%' }} 
+              animate={{ x: 0 }} 
+              exit={{ x: isAr ? '100%' : '-100%' }}
               transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
-              className="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] border-l border-blue-500/20 shadow-2xl overflow-y-auto flex flex-col justify-between"
+              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] shadow-2xl overflow-y-auto flex flex-col justify-between ${
+                isAr ? 'right-0 border-l border-blue-500/20' : 'left-0 border-r border-blue-500/20'
+              }`}
             >
               {/* نقوش الخلفية الثابتة للأداء العالي */}
               <div className="absolute inset-0 z-0 bg-animated-grid opacity-20 pointer-events-none" />
@@ -323,7 +350,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-2">
                     <Lightbulb className="w-6 h-6 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse" />
                     <span className="font-black text-lg text-white">
-                      الإنارة <span className="text-blue-400">الحديثة</span>
+                      {t('hero.title.part1')} <span className="text-blue-400">{t('hero.title.part2')}</span>
                     </span>
                   </div>
                   <button 
@@ -348,7 +375,7 @@ export default function Navbar() {
                       }`}
                     >
                       <Home className="w-5 h-5 text-blue-400" />
-                      <span>الرئيسية</span>
+                      <span>{t('nav.home')}</span>
                     </Link>
                   </motion.div>
 
@@ -361,7 +388,7 @@ export default function Navbar() {
                       >
                         <div className="flex items-center gap-3">
                           <Award className="w-5 h-5 text-blue-400" />
-                          <span>{servicesDropdown.label}</span>
+                          <span>{servicesDropdownLabel}</span>
                         </div>
                         <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isMobileDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
                       </button>
@@ -373,7 +400,7 @@ export default function Navbar() {
                             : 'max-h-0 opacity-0 pointer-events-none border-transparent pt-0 mt-0'
                         }`}
                       >
-                        {servicesDropdown.items.map((item) => {
+                        {servicesDropdownItems.map((item) => {
                           const isSubActive = location.pathname === item.path;
                           return (
                             <Link
@@ -394,7 +421,7 @@ export default function Navbar() {
                   </motion.div>
 
                   {/* باقي الروابط للجوال */}
-                  {otherLinks.map((link, index) => {
+                  {localizedOtherLinks.map((link, index) => {
                     const isActive = location.pathname === link.path;
                     return (
                       <motion.div
@@ -422,9 +449,16 @@ export default function Navbar() {
 
               {/* ذيل القائمة الجانبية (بيانات التواصل والروابط الاجتماعية) */}
               <div className="relative z-10 p-6 border-t border-white/5 bg-white/[0.01] flex flex-col gap-4">
-                <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1">مركز الاتصال</span>
-                  <a href="tel:0916580068" className="text-sm font-bold text-white flex items-center justify-end gap-2 hover:text-blue-400 transition-colors">
+                <div className={isAr ? 'text-right' : 'text-left'}>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1">
+                    {isAr ? 'مركز الاتصال' : 'Call Center'}
+                  </span>
+                  <a 
+                    href="tel:0916580068" 
+                    className={`text-sm font-bold text-white flex items-center gap-2 hover:text-blue-400 transition-colors ${
+                      isAr ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
                     <span>0916580068</span>
                     <Phone className="w-4 h-4 text-blue-400" />
                   </a>

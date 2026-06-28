@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
+import { useLanguage } from '../hooks/useLanguage'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
@@ -63,6 +64,7 @@ const paintColors = [
 ]
 
 export default function Home() {
+  const { t, isAr } = useLanguage()
   const { scrollYProgress } = useScroll()
 
   // Map scroll progress to filament brightness, light cone opacity, and spotlight scale
@@ -412,33 +414,41 @@ export default function Home() {
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-normal tracking-tight text-white py-2">
-                <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">الإنارة</span>{' '}
-                <span className="text-blue-400 drop-shadow-[0_4px_20px_rgba(59,130,246,0.65)]">الحديثة</span>
+                <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">{t('hero.title.part1')}</span>{' '}
+                <span className="text-blue-400 drop-shadow-[0_4px_20px_rgba(59,130,246,0.65)]">{t('hero.title.part2')}</span>
               </h1>
-              <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">كل ما تحتاجه من الإضاءة والتأسيس الكهربائي بجودة عالمية وحلول متكاملة تلبي تطلعاتك</p>
+              <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
                 <Link 
                   to="/products" 
-                  className="group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 bg-[length:200%_auto] text-white font-black text-base md:text-lg rounded-2xl transition-all duration-500 hover:bg-[right_center] flex items-center justify-center gap-3 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_20px_rgba(59,130,246,0.45)] hover:shadow-[0_0_35px_rgba(59,130,246,0.65)] ring-2 ring-blue-500/10 hover:ring-blue-400/30"
+                  className={`group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 bg-[length:200%_auto] text-white font-black text-base md:text-lg rounded-2xl transition-all duration-500 hover:bg-[right_center] flex items-center justify-center gap-3 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_20px_rgba(59,130,246,0.45)] hover:shadow-[0_0_35px_rgba(59,130,246,0.65)] ring-2 ring-blue-500/10 hover:ring-blue-400/30 ${
+                    isAr ? 'flex-row' : 'flex-row-reverse'
+                  }`}
                 >
                   {/* تأثير لمعة نيون متحركة */}
                   <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmerSweep_1.8s_infinite_ease-in-out]" />
-                  <span>استعرض المنتجات</span>
-                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-2 transition-transform duration-300" />
+                  <span>{t('hero.btn.products')}</span>
+                  <ArrowLeft className={`w-5 h-5 transition-transform duration-300 ${isAr ? 'group-hover:-translate-x-2' : 'group-hover:translate-x-2 rotate-180'}`} />
                 </Link>
                 <Link 
                   to="/contact" 
-                  className="group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-[#0d2342]/60 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:bg-blue-600/10 text-white hover:text-blue-300 font-extrabold text-base md:text-lg rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_15px_rgba(255,255,255,0.02)] hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] ring-2 ring-white/5 hover:ring-blue-500/15"
+                  className={`group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-[#0d2342]/60 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:bg-blue-600/10 text-white hover:text-blue-300 font-extrabold text-base md:text-lg rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_15px_rgba(255,255,255,0.02)] hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] ring-2 ring-white/5 hover:ring-blue-500/15 ${
+                    isAr ? 'flex-row' : 'flex-row-reverse'
+                  }`}
                 >
                   <MessageCircle className="w-5 h-5 text-slate-400 group-hover:text-blue-400 group-hover:rotate-12 transition-all duration-300" />
-                  <span>تواصل معنا</span>
+                  <span>{t('hero.btn.contact')}</span>
                 </Link>
               </div>
 
               {/* روابط التواصل الاجتماعي للفيسبوك وتيك توك وإنستغرام */}
               <div className="flex justify-center mt-12 animate-fade-in">
-                <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a192f]/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-                  <span className="text-slate-400 text-xs font-bold font-sans pl-3 border-l border-white/10">تابع صفحاتنا:</span>
+                <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a192f]/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
+                  isAr ? 'flex-row' : 'flex-row-reverse'
+                }`}>
+                  <span className={`text-slate-400 text-xs font-bold font-sans ${isAr ? 'pl-3 border-l' : 'pr-3 border-r'} border-white/10`}>
+                    {isAr ? 'تابع صفحاتنا:' : 'Follow us:'}
+                  </span>
                   <div className="flex items-center gap-3">
                     <a 
                       href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
@@ -484,7 +494,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12 md:mb-16">
               <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-white">
-                لماذا <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">نحن؟</span>
+                {isAr ? 'لماذا' : 'Why'}{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">
+                  {isAr ? 'نحن؟' : 'Choose Us?'}
+                </span>
               </h2>
               <div className="flex items-center justify-center gap-1.5 mt-4">
                 <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
@@ -540,14 +553,14 @@ export default function Home() {
                       className="cursor-default bg-white/5 border border-white/10 rounded-2xl p-3 flex-1 text-center transition-all duration-300 hover:border-blue-500/30 hover:bg-blue-600/5"
                     >
                       <span className="text-2xl font-black text-white block leading-none">100%</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">منتجات أصلية</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">{isAr ? 'منتجات أصلية' : 'Original Products'}</span>
                     </motion.div>
                     <motion.div 
                       whileHover={{ scale: 1.03 }}
                       className="cursor-default bg-white/5 border border-white/10 rounded-2xl p-3 flex-1 text-center transition-all duration-300 hover:border-blue-500/30 hover:bg-blue-600/5"
                     >
                       <span className="text-2xl font-black text-blue-300 block leading-none">100%</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">ضمان وموثوقية</span>
+                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">{isAr ? 'ضمان وموثوقية' : 'Guaranteed Quality'}</span>
                     </motion.div>
                   </div>
                 </motion.div>
@@ -558,23 +571,23 @@ export default function Home() {
                 {[
                   { 
                     icon: Award, 
-                    title: 'جودة عالية ومعتمدة', 
-                    desc: 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والأمان لتدوم طويلاً.',
-                    badge: 'مواد أصلية 🛡️',
+                    title: isAr ? 'جودة عالية ومعتمدة' : 'High & Certified Quality', 
+                    desc: isAr ? 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والأمان لتدوم طويلاً.' : 'We select all installation and lighting materials with extreme care to match the highest quality and safety standards.',
+                    badge: isAr ? 'مواد أصلية 🛡️' : 'Original Materials 🛡️',
                     color: 'from-blue-500/10 hover:border-blue-500/40 text-blue-400 border-blue-500/20'
                   },
                   { 
                     icon: Shield, 
-                    title: 'حلول كهربائية وإنارة متكاملة', 
-                    desc: 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك، مفاتيح ذكية، وسبوتات إنارة في مكان واحد دون عناء البحث.',
-                    badge: 'شامل ومتكامل 📦',
+                    title: isAr ? 'حلول كهربائية وإنارة متكاملة' : 'Complete Electrical Solutions', 
+                    desc: isAr ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك، مفاتيح ذكية، وسبوتات إنارة في مكان واحد دون عناء البحث.' : 'We provide everything you need to establish your home or project from cables, wires, smart switches, and spotlights in one place.',
+                    badge: isAr ? 'شامل ومتكامل 📦' : 'All-in-One 📦',
                     color: 'from-amber-500/10 hover:border-amber-500/40 text-amber-400 border-amber-500/20'
                   },
                   { 
                     icon: Sparkles, 
-                    title: 'خدمة عملاء ودعم سريع', 
-                    desc: 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وتسهيل توصيلها بأمان.',
-                    badge: 'دعم مبيعات 📞',
+                    title: isAr ? 'خدمة عملاء ودعم سريع' : 'Fast Sales Support', 
+                    desc: isAr ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وتسهيل توصيلها بأمان.' : 'Our dedicated sales support team is always available to help you select products, request custom volumes, and ensure safe deliveries.',
+                    badge: isAr ? 'دعم مبيعات 📞' : 'Sales Support 📞',
                     color: 'from-indigo-500/10 hover:border-indigo-500/40 text-indigo-400 border-indigo-500/20'
                   },
                 ].map((item, i) => (
@@ -584,8 +597,10 @@ export default function Home() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.15, duration: 0.6 }}
-                    whileHover={{ scale: 1.01, x: -4 }}
-                    className={`relative p-5 md:p-6 rounded-[1.8rem] bg-gradient-to-l ${item.color} border bg-[#0f213a]/30 backdrop-blur-md transition-all duration-300 flex flex-col md:flex-row items-start gap-4 md:gap-5 cursor-default group shadow-[0_4px_25px_rgba(0,0,0,0.1)]`}
+                    whileHover={{ scale: 1.01, x: isAr ? -4 : 4 }}
+                    className={`relative p-5 md:p-6 rounded-[1.8rem] bg-[#0f213a]/30 backdrop-blur-md transition-all duration-300 flex flex-col md:flex-row items-start gap-4 md:gap-5 cursor-default group shadow-[0_4px_25px_rgba(0,0,0,0.1)] border ${
+                      isAr ? 'bg-gradient-to-l' : 'bg-gradient-to-r'
+                    } ${item.color}`}
                   >
                     {/* Icon container */}
                     <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-600/10 group-hover:border-blue-500/30 transition-all duration-300 shrink-0">
@@ -594,7 +609,7 @@ export default function Home() {
 
                     {/* Text Details */}
                     <div className="flex-grow">
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <div className={`flex flex-wrap items-center justify-between gap-2 mb-2 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
                         <h3 className="text-lg md:text-xl font-extrabold text-white group-hover:text-blue-300 transition-colors">{item.title}</h3>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">{item.badge}</span>
                       </div>
@@ -613,10 +628,10 @@ export default function Home() {
             
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
-                مُحاكي الإضاءة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">التفاعلي</span>
+                {t('sim.title.part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">{t('sim.title.part2')}</span>
               </h2>
               <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
-                جرب توزيع ألوان ومقاسات الإضاءة بنفسك في صالة افتراضية، واختر ما يناسب ذوقك وبيتك
+                {t('sim.desc')}
               </p>
               <div className="flex items-center justify-center gap-1.5 mt-4">
                 <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
@@ -625,7 +640,9 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
+            <div className={`flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl ${
+              isAr ? 'flex-col lg:flex-row' : 'flex-col lg:flex-row-reverse'
+            }`}>
               
               {/* شاشة العرض - الصالة الافتراضية بمقاس صغير ملموم */}
               <div className="w-full lg:w-[38%] max-w-[360px] aspect-[4/3] rounded-2xl overflow-hidden relative bg-black shadow-2xl border border-white/10 group">
@@ -705,12 +722,14 @@ export default function Home() {
                 )}
 
                 {/* نص توضيحي داخلي */}
-                <div className="absolute bottom-4 right-4 z-20 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/5">
+                <div className={`absolute bottom-4 z-20 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/5 ${
+                  isAr ? 'right-4' : 'left-4'
+                }`}>
                   <span className="text-[11px] font-bold text-blue-200">
-                    {!simSpot && !simLed ? 'الإنارة مطفأة 🌑' : `حرارة اللون: ${
-                      simColor === 'warm' ? 'أصفر دافئ (3000K)' : 
-                      simColor === 'natural' ? 'شمسي طبيعي (4000K)' : 
-                      'أبيض بارد (6000K)'
+                    {!simSpot && !simLed ? (isAr ? 'الإنارة مطفأة 🌑' : 'Lights Off 🌑') : `${isAr ? 'حرارة اللون:' : 'Color Temp:'} ${
+                      simColor === 'warm' ? (isAr ? 'أصفر دافئ (3000K)' : 'Warm Yellow (3000K)') : 
+                      simColor === 'natural' ? (isAr ? 'شمسي طبيعي (4000K)' : 'Natural Sun (4000K)') : 
+                      (isAr ? 'أبيض بارد (6000K)' : 'Cool White (6000K)')
                     }`}
                   </span>
                 </div>
@@ -721,12 +740,12 @@ export default function Home() {
                 
                 {/* 1. اختيار حرارة ولون الضوء */}
                 <div>
-                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">1. اختر حرارة لون الإضاءة:</h4>
+                  <h4 className={`text-base font-bold text-slate-300 mb-3 font-sans ${isAr ? 'text-right' : 'text-left'}`}>{t('sim.opt1')}</h4>
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { key: 'warm', name: 'أصفر 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
-                      { key: 'natural', name: 'شمسي 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
-                      { key: 'cool', name: 'أبيض 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
+                      { key: 'warm', name: isAr ? 'أصفر 3000K' : 'Warm 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
+                      { key: 'natural', name: isAr ? 'شمسي 4000K' : 'Natural 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
+                      { key: 'cool', name: isAr ? 'أبيض 6000K' : 'White 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
                     ].map((btn) => (
                       <button
                         key={btn.key}
@@ -745,8 +764,8 @@ export default function Home() {
 
                 {/* 2. تشغيل مصادر الإضاءة المختلفة */}
                 <div>
-                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">2. مصادر الإضاءة المتوفرة:</h4>
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <h4 className={`text-base font-bold text-slate-300 mb-3 font-sans ${isAr ? 'text-right' : 'text-left'}`}>{t('sim.opt2')}</h4>
+                  <div className={`flex flex-col sm:flex-row gap-4 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
                     {/* زر السبوت لايت */}
                     <button
                       onClick={() => setSimSpot(!simSpot)}
@@ -756,7 +775,7 @@ export default function Home() {
                           : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                       }`}
                     >
-                      <span className="text-sm">السبوت لايت (Spotlight)</span>
+                      <span className="text-sm">{isAr ? 'السبوت لايت (Spotlight)' : 'Spotlight'}</span>
                       <span className={`w-3.5 h-3.5 rounded-full border ${simSpot ? 'bg-blue-500 border-blue-400 animate-pulse' : 'border-slate-500'}`} />
                     </button>
                     
@@ -769,20 +788,22 @@ export default function Home() {
                           : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                       }`}
                     >
-                      <span className="text-sm">الإنارة المخفية (LED Strip)</span>
+                      <span className="text-sm">{isAr ? 'الإنارة المخفية (LED Strip)' : 'Cove Light (LED Strip)'}</span>
                       <span className={`w-3.5 h-3.5 rounded-full border ${simLed ? 'bg-blue-500 border-blue-400 animate-pulse' : 'border-slate-500'}`} />
                     </button>
                   </div>
                 </div>
 
                 {/* نصيحة الخبراء الهندسية */}
-                <div className="bg-[#0a192f] border border-blue-500/15 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300">
+                <div className={`bg-[#0a192f] border border-blue-500/15 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300 ${
+                  isAr ? 'text-right flex-row' : 'text-left flex-row-reverse'
+                }`}>
                   <div className="text-xl">💡</div>
-                  <div>
-                    <span className="font-bold text-blue-300 block mb-0.5">نصيحة مهندسي الإنارة الحديثة:</span>
-                    {simColor === 'warm' && 'الإنارة الصفراء (3000K) تضفي حميمية ودفئاً، وهي مثالية لغرف النوم والمجالس لتعزز الشعور بالاسترخاء.'}
-                    {simColor === 'natural' && 'الإنارة الشمسية (4000K) هي الأقرب لضوء النهار، وهي مناسبة جداً للمطابخ، الممرات، والمنطقة التي تحتاج لألوان حقيقية.'}
-                    {simColor === 'cool' && 'الإنارة البيضاء (6000K) تمنح نشاطاً ووضوحاً عالياً، وهي خيار رائع للمكاتب، أماكن القراءة والدراسة.'}
+                  <div className="flex-grow">
+                    <span className="font-bold text-blue-300 block mb-0.5">{t('sim.tip')}</span>
+                    {simColor === 'warm' && (isAr ? 'الإنارة الصفراء (3000K) تضفي حميمية ودفئاً، وهي مثالية لغرف النوم والمجالس لتعزز الشعور بالاسترخاء.' : 'Yellow lighting (3000K) adds intimacy and warmth, ideal for bedrooms and living rooms to promote relaxation.')}
+                    {simColor === 'natural' && (isAr ? 'الإنارة الشمسية (4000K) هي الأقرب لضوء النهار، وهي مناسبة جداً للمطابخ، الممرات، والمنطقة التي تحتاج لألوان حقيقية.' : 'Natural lighting (4000K) is closest to daylight, perfect for kitchens, corridors, and areas needing true colors.')}
+                    {simColor === 'cool' && (isAr ? 'الإنارة البيضاء (6000K) تمنح نشاطاً ووضوحاً عالياً، وهي خيار رائع للمكاتب، أماكن القراءة والدراسة.' : 'White lighting (6000K) provides high activity and clarity, an excellent choice for offices, reading, and study areas.')}
                   </div>
                 </div>
 
