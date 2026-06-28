@@ -76,7 +76,7 @@ export default function AIChatWidget() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/nour', {
+      const response = await fetch('https://enarah2.vercel.app/api/nour', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

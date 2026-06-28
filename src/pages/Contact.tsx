@@ -56,7 +56,7 @@ export default function Contact() {
 
     try {
       setLoading(true)
-      const res = await fetch('/api/save-user', { // تأكد من الرابط الصحيح
+      const res = await fetch('https://enarah2.vercel.app/api/save-user', { // تأكد من الرابط الصحيح
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

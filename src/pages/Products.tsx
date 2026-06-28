@@ -22,7 +22,7 @@ export default function Products() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/api/get-users')
+        const res = await fetch('https://enarah2.vercel.app/api/get-users')
         const data = await res.json()
 
         if (res.ok && data.success && Array.isArray(data.data)) {
