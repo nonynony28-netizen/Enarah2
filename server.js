@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 
 // استيراد معالجات الـ API الخاصة بالمشروع
 import contactHandler from './api/contact.js';
@@ -10,8 +10,6 @@ import getUsersHandler from './api/get-users.js';
 import nourHandler from './api/nour.js';
 import saveUserHandler from './api/save-user.js';
 import updateUserHandler from './api/update-user.js';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +32,7 @@ app.all('/api/update-user', updateUserHandler);
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // دعم التوجيه الداخلي لـ React Router لجميع المسارات الأخرى
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 

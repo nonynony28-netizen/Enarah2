@@ -1,7 +1,10 @@
 import mongoose from 'mongoose'
 
-const MONGO_URI =
-  'ضع رابط MongoDB الحالي نفسه هنا'
+const MONGO_URI = process.env.MONGODB_URI
+
+if (!MONGO_URI) {
+  throw new Error("MONGODB_URI environment variable is missing")
+}
 
 if (!mongoose.connections[0].readyState) {
   mongoose.connect(MONGO_URI)
