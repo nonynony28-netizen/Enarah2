@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import { useLanguage } from "../hooks/useLanguage";
 
 export default function SplashScreen() {
+  const { isAr } = useLanguage();
   // متغيرات حركة إضاءة اللمبة (إضاءة واحدة ناعمة ومتصلة)
   const bulbVariants = {
     off: { opacity: 0 },
@@ -124,7 +126,7 @@ export default function SplashScreen() {
               textShadow: "0 0 20px rgba(59,130,246,0.85)"
             }}
           >
-            ENARAHMODERN
+            {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
           </h1>
 
           {/* خط الفاصل المتوهج المتناسق باللون الأزرق */}

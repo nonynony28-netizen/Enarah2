@@ -302,7 +302,11 @@ export default function Home() {
                 className="text-3xl font-black text-white mb-2 tracking-wider" 
                 style={glowingTitleStyle}
               >
-                ENARAH <span className="text-blue-300">MODERN</span>
+                {isAr ? (
+                  <>الإنارة <span className="text-blue-300">الحديثة</span></>
+                ) : (
+                  <>ENARAH <span className="text-blue-300">MODERN</span></>
+                )}
               </motion.h2>
               <div className="flex items-center gap-1.5 mt-2">
                 <span className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
