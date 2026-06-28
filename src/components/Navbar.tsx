@@ -132,8 +132,8 @@ export default function Navbar() {
                 <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
               </motion.div>
               <span className="font-extrabold text-xl md:text-2xl tracking-wide">
-                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">{t('hero.title.part1')}</span>{' '}
-                <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">{t('hero.title.part2')}</span>
+                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">ENARAH</span>{' '}
+                <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">MODERN</span>
               </span>
             </Link>
 
@@ -350,7 +350,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-2">
                     <Lightbulb className="w-6 h-6 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse" />
                     <span className="font-black text-lg text-white">
-                      {t('hero.title.part1')} <span className="text-blue-400">{t('hero.title.part2')}</span>
+                      ENARAH <span className="text-blue-400">MODERN</span>
                     </span>
                   </div>
                   <button 

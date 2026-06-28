@@ -124,7 +124,7 @@ export default function SplashScreen() {
               textShadow: "0 0 20px rgba(59,130,246,0.85)"
             }}
           >
-            الإنارة الحديثة
+            ENARAHMODERN
           </h1>
 
           {/* خط الفاصل المتوهج المتناسق باللون الأزرق */}
