@@ -218,13 +218,19 @@ html {
 }
 
 /* التجاوزات العامة للعناصر الداكنة */
-.light .fixed.inset-0.bg-\[\#050b14\] {
+.light .fixed.-z-50,
+.light [class*="bg-[#050b14]"] {
   background-color: #f5f4f0 !important;
 }
 
-.light .fixed.inset-0.pointer-events-none [class*="bg-gradient-to-"] {
+.light .fixed.-z-50 [class*="bg-gradient-to-"] {
   background-image: none !important;
-  opacity: 0.15 !important;
+  display: none !important;
+}
+
+/* إخفاء كشاف الخلفية الداكن الممتد عند التمرير في الوضع المضيء */
+.light .fixed.top-0.right-0.w-\[140vw\] {
+  display: none !important;
 }
 
 .light .absolute.inset-0.bg-gradient-to-b.from-\[\#0a192f\]\/40 {
@@ -343,5 +349,50 @@ html {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+/* تحسين مقاطع الفيديو وتوهج النص والمدخلات في الوضع المضيء */
+.light video {
+  mix-blend-mode: normal !important;
+  opacity: 0.22 !important;
+}
+
+.light .text-transparent.bg-clip-text {
+  color: #2563eb !important;
+  -webkit-text-fill-color: #2563eb !important;
+  background-image: none !important;
+}
+
+.light .text-blue-50\/90,
+.light .text-blue-100,
+.light .text-blue-200,
+.light .text-blue-300,
+.light .text-slate-200 {
+  color: #1e3a8a !important;
+}
+
+.light ::placeholder,
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #64748b !important;
+  opacity: 0.8 !important;
+}
+
+/* مصباح الإنارة التفاعلي في الخلفية */
+.light-bulb-glass {
+  stroke: rgba(255, 255, 255, 0.15);
+  fill: rgba(255, 255, 255, 0.02);
+}
+.light .light-bulb-glass {
+  stroke: rgba(15, 23, 42, 0.15) !important;
+  fill: rgba(15, 23, 42, 0.02) !important;
+}
+
+.light-bulb-gleam {
+  stroke: rgba(255, 255, 255, 0.3);
+}
+.light .light-bulb-gleam {
+  stroke: rgba(15, 23, 42, 0.25) !important;
+}
+
 
 

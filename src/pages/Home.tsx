@@ -373,8 +373,7 @@ export default function Home() {
               {/* الانتفاخ الزجاجي الخارجي للمصباح */}
               <path 
                 d="M32 100 C20 88 15 72 15 55 C15 25 30.5 8 50 8 C69.5 8 85 25 85 55 C85 72 80 88 68 100 Z" 
-                fill="rgba(255,255,255,0.02)" 
-                stroke="rgba(255,255,255,0.15)" 
+                className="light-bulb-glass"
                 strokeWidth="1.25"
               />
               
@@ -382,7 +381,7 @@ export default function Home() {
               <path 
                 d="M22 50 C22 34 30 16 45 11" 
                 fill="none" 
-                stroke="rgba(255,255,255,0.3)" 
+                className="light-bulb-gleam"
                 strokeWidth="1.5" 
                 strokeLinecap="round"
               />
