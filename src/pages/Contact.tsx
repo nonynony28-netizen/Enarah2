@@ -253,13 +253,13 @@ export default function Contact() {
                   </a>
 
                   {/* Email */}
-                  <a href="mailto:enarahmodern@gmail.com" className="flex items-center gap-5 p-4 rounded-2xl hover:bg-[#0a192f] border border-transparent hover:border-white/5 transition-all duration-300 group cursor-pointer shadow-inner">
+                  <a href="mailto:info@enarahmodern.com" className="flex items-center gap-5 p-4 rounded-2xl hover:bg-[#0a192f] border border-transparent hover:border-white/5 transition-all duration-300 group cursor-pointer shadow-inner">
                     <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.1)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]">
                       <Mail className="w-6 h-6 text-blue-400" />
                     </div>
                     <div>
                       <p className="text-slate-400 text-sm mb-1">البريد الإلكتروني</p>
-                      <p className="text-white font-bold group-hover:text-blue-300 transition-colors break-all">enarahmodern@gmail.com</p>
+                      <p className="text-white font-bold group-hover:text-blue-300 transition-colors break-all">info@enarahmodern.com</p>
                     </div>
                   </a>
 
