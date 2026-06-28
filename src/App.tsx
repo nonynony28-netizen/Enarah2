@@ -55,7 +55,7 @@ function App() {
     const recordVisit = async () => {
       if (!localStorage.getItem('enarah_visited')) {
         try {
-          await fetch('https://enarah2.vercel.app/api/save-user', {
+          await fetch('/api/save-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

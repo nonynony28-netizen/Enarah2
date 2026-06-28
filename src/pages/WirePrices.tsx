@@ -59,7 +59,7 @@ export default function WirePrices() {
   useEffect(() => {
     const fetchWirePrices = async () => {
       try {
-        const res = await fetch('https://enarah2.vercel.app/api/get-users')
+        const res = await fetch('/api/get-users')
         const data = await res.json()
         if (res.ok && data.success && Array.isArray(data.data)) {
           const updates = data.data.filter((item: any) => item.email === 'admin_wire_prices@app.local')
@@ -93,7 +93,7 @@ export default function WirePrices() {
     setOrderStatus('loading')
     try {
       const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
-      await fetch('https://enarah2.vercel.app/api/save-user', {
+      await fetch('/api/save-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

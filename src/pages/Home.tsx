@@ -162,7 +162,7 @@ export default function Home() {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const res = await fetch('https://enarah2.vercel.app/api/get-users')
+        const res = await fetch('/api/get-users')
         const data = await res.json()
         if (res.ok && data.success && Array.isArray(data.data)) {
           
@@ -219,7 +219,7 @@ export default function Home() {
     setOrderStatus('loading')
     try {
       const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
-      await fetch('https://enarah2.vercel.app/api/save-user', {
+      await fetch('/api/save-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
