@@ -3,16 +3,30 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useLanguage } from "./hooks/useLanguage";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 export default function Layout() {
   const { isAr } = useLanguage()
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [isDragging, setIsDragging] = useState(false)
   const [scrollPercent, setScrollPercent] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
 
   const y = useMotionValue(0)
-  const cordHeight = useTransform(y, [0, 150], [120, 270])
+  
+  // ضبط مقاييس الحبل بناءً على نوع الجهاز ليكون ملائماً للهواتف
+  const defaultHeight = isMobile ? 80 : 120
+  const maxDrag = isMobile ? 80 : 150
+  const cordHeight = useTransform(y, [0, maxDrag], [defaultHeight, defaultHeight + 120])
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -46,10 +60,10 @@ export default function Layout() {
   useEffect(() => {
     return y.onChange((latest) => {
       // Dynamic analog dimming: adjust dimming layer opacity based on pull distance
-      const opacity = Math.min(0.7, (latest / 150) * 0.7)
+      const opacity = Math.min(0.7, (latest / maxDrag) * 0.7)
       document.documentElement.style.setProperty('--pull-dim-opacity', String(opacity))
     })
-  }, [y])
+  }, [y, maxDrag])
 
   const playClickSound = (isTurningOn: boolean) => {
     try {
@@ -99,7 +113,15 @@ export default function Layout() {
     setIsDragging(false)
     const currentY = y.get()
     
-    if (currentY >= 90) {
+    // إرجاع الحبل لمكانه الطبيعي بمرونة فيزيائية مضمونة تمنع التعليق عند إعادة بناء الصفحة
+    animate(y, 0, {
+      type: "spring",
+      stiffness: 380,
+      damping: 24
+    })
+
+    const threshold = isMobile ? 55 : 90
+    if (currentY >= threshold) {
       const isLight = document.documentElement.classList.contains('light')
       playClickSound(!isLight)
       toggleThemeGlobal()
@@ -145,31 +167,31 @@ export default function Layout() {
       />
 
       {/* 2. حبل السحب العائم التفاعلي لتعديل وتعتيم الضوء وسحب المفتاح */}
-      <div className="hidden lg:flex fixed top-0 left-[70px] z-[2000] flex-col items-center pointer-events-none select-none">
+      <div className="fixed top-0 left-6 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
         <motion.div 
-          className="w-[2px] bg-gradient-to-b from-[#111] via-[#444] to-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
+          className="w-[1.5px] md:w-[2px] bg-gradient-to-b from-[#111] via-[#444] to-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
           style={{ height: cordHeight }}
         />
         <motion.div 
           drag="y"
-          dragConstraints={{ top: 0, bottom: 150 }}
-          dragElastic={0.15}
+          dragConstraints={{ top: 0, bottom: maxDrag }}
+          dragElastic={isMobile ? 0.75 : 0.25}
           style={{ y }}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={handleDragEnd}
-          className="w-5 h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-2 border-white cursor-grab active:cursor-grabbing pointer-events-auto shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300"
+          className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-[1.5px] md:border-2 border-white cursor-grab active:cursor-grabbing pointer-events-auto shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300"
         >
-          <div className="w-[6px] h-[6px] bg-white rounded-full opacity-90" />
+          <div className="w-1 h-1 md:w-[6px] md:h-[6px] bg-white rounded-full opacity-90" />
         </motion.div>
 
         {/* مؤشر الإرشاد العائم */}
-        <div className={`absolute top-full mt-4 text-[10px] font-black tracking-tight px-3 py-1.5 rounded-full border transition-all duration-300 whitespace-nowrap shadow-md pointer-events-none ${
+        <div className={`absolute top-full mt-3 text-[9px] md:text-[10px] font-black tracking-tight px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border transition-all duration-300 whitespace-nowrap shadow-md pointer-events-none ${
           theme === 'light'
             ? 'bg-white/90 text-slate-800 border-slate-200/50 shadow-slate-200/20'
             : 'bg-slate-900/90 text-blue-400 border-white/10 shadow-black/40'
         }`}>
           {isDragging 
-            ? (isAr ? 'شد الحبل للتعتيم والتبديل...' : 'Pull cord to dim & switch...') 
+            ? (isAr ? 'شد الحبل للتعتيم والتبديل...' : 'Pull to switch...') 
             : (isAr ? 'اسحب خيط الإنارة 💡' : 'Pull Light Cord 💡')}
         </div>
       </div>
