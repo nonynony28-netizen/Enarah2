@@ -35,36 +35,72 @@ const defaultWireData = [
   { id: '25.0', size: '25.0 ملي', type: 'مفرد (لفة 100 متر)', price: '680.00', trend: 'same' as TrendType },
 ]
 
-const paintColors = [
-  { id: 'white', name: 'أبيض ناصع', hex: '#ffffff', advice: {
-    warm: 'يعطي دفئاً ومظهراً كلاسيكياً مريحاً للعين، مناسب لغرف النوم والمجالس.',
-    natural: 'الخيار الأمثل للأبيض! يظهر البياض الطبيعي والنقاء دون اصفرار أو برودة.',
-    cool: 'يعطي إضاءة قوية ونشيطة تشبه المكاتب، قد يكون ساطعاً جداً للمنازل.'
+const getPaintColors = (isAr: boolean) => [
+  { id: 'white', name: isAr ? 'أبيض ناصع' : 'Pure White', hex: '#ffffff', advice: {
+    warm: isAr 
+      ? 'يعطي دفئاً ومظهراً كلاسيكياً مريحاً للعين، مناسب لغرف النوم والمجالس.' 
+      : 'Provides warmth and a classic look comfortable to the eye, suitable for bedrooms and salons.',
+    natural: isAr 
+      ? 'الخيار الأمثل للأبيض! يظهر البياض الطبيعي والنقاء دون اصفرار أو برودة.' 
+      : 'The best choice for white! Shows natural whiteness and purity without turning yellow or cold.',
+    cool: isAr 
+      ? 'يعطي إضاءة قوية ونشيطة تشبه المكاتب، قد يكون ساطعاً جداً للمنازل.' 
+      : 'Provides strong and active lighting similar to offices, but might be too bright for homes.'
   }},
-  { id: 'beige', name: 'بيج دافئ', hex: '#f5ebe0', advice: {
-    warm: 'تطابق رائع! يعزز دفء البيج ويخلق أجواء حميمية وغنية جداً ومثالية للمجالس.',
-    natural: 'خيار ممتاز ومتوازن يظهر نعومة لون البيج بشكل طبيعي دون تزييف.',
-    cool: 'غير محبذ كثيراً، حيث يجعل لون البيج الدافئ يبدو شاحباً أو رمادياً ميتًا.'
+  { id: 'beige', name: isAr ? 'بيج دافئ' : 'Warm Beige', hex: '#f5ebe0', advice: {
+    warm: isAr 
+      ? 'تطابق رائع! يعزز دفء البيج ويخلق أجواء حميمية وغنية جداً ومثالية للمجالس.' 
+      : 'Great match! Enhances the warmth of beige and creates a very cozy and rich atmosphere, ideal for salons.',
+    natural: isAr 
+      ? 'خيار ممتاز ومتوازن يظهر نعومة لون البيج بشكل طبيعي دون تزييف.' 
+      : 'Excellent balanced choice that shows the softness of beige color naturally without falsifying it.',
+    cool: isAr 
+      ? 'غير محبذ كثيراً، حيث يجعل لون البيج الدافئ يبدو شاحباً أو رمادياً ميتًا.' 
+      : 'Not highly recommended, as it makes the warm beige color look pale or dull grey.'
   }},
-  { id: 'grey', name: 'رمادي عصري', hex: '#e5e5e5', advice: {
-    warm: 'تحذير: الإضاءة الصفراء قد تحول الرمادي إلى مظهر مائل للاخضرار أو الاتساخ.',
-    natural: 'تطابق رائع! يحافظ على برودة الرمادي وجماله العصري دون تغيير لونه الأصلي.',
-    cool: 'يعزز جمال الرمادي البارد ويعطي شعوراً بنظافة ومستقبلية المكان.'
+  { id: 'grey', name: isAr ? 'رمادي عصري' : 'Modern Grey', hex: '#e5e5e5', advice: {
+    warm: isAr 
+      ? 'تحذير: الإضاءة الصفراء قد تحول الرمادي إلى مظهر مائل للاخضرار أو الاتساخ.' 
+      : 'Warning: Yellow lighting may turn grey into a greenish or dirty look.',
+    natural: isAr 
+      ? 'تطابق رائع! يحافظ على برودة الرمادي وجماله العصري دون تغيير لونه الأصلي.' 
+      : 'Great match! Keeps the grey cool and modern without altering its original color.',
+    cool: isAr 
+      ? 'يعزز جمال الرمادي البارد ويعطي شعوراً بنظافة ومستقبلية المكان.' 
+      : 'Enhances the beauty of cool grey and gives a clean, futuristic feel to the space.'
   }},
-  { id: 'navy', name: 'أزرق كحلي', hex: '#1e293b', advice: {
-    warm: 'يخلق تبايناً درامياً فخماً، مناسب للجدران المميزة (Accent Walls) لتبدو فخمة.',
-    natural: 'خيار ممتاز يظهر جمال اللون الكحلي وعمقه بوضوح تحت الضوء الطبيعي.',
-    cool: 'يبرز درجات الأزرق الحقيقية ويجعل الجدار يبدو بارداً وحديثاً للغاية.'
+  { id: 'navy', name: isAr ? 'أزرق كحلي' : 'Navy Blue', hex: '#1e293b', advice: {
+    warm: isAr 
+      ? 'يخلق تبايناً درامياً فخماً، مناسب للجدران المميزة (Accent Walls) لتبدو فخمة.' 
+      : 'Creates a luxurious dramatic contrast, suitable for Accent Walls to look rich.',
+    natural: isAr 
+      ? 'خيار ممتاز يظهر جمال اللون الكحلي وعمقه بوضوح تحت الضوء الطبيعي.' 
+      : 'Excellent choice that clearly displays the beauty and depth of navy under natural light.',
+    cool: isAr 
+      ? 'يبرز درجات الأزرق الحقيقية ويجعل الجدار يبدو بارداً وحديثاً للغاية.' 
+      : 'Highlights true blue undertones and makes the wall look very cool and modern.'
   }},
-  { id: 'green', name: 'أخضر زيتي', hex: '#3f4e3f', advice: {
-    warm: 'يزيد من حميمية اللون الأخضر ويجعله يبدو ترابياً ودافئاً جداً ومريحاً.',
-    natural: 'يظهر درجات الأخضر الطبيعية بشكل مذهل ويحافظ على حيوية ونضارة اللون.',
-    cool: 'يجعل الأخضر يبدو بارداً وأقل دفئاً، يفضل استخدامه في المكاتب وأماكن العمل.'
+  { id: 'green', name: isAr ? 'أخضر زيتي' : 'Olive Green', hex: '#3f4e3f', advice: {
+    warm: isAr 
+      ? 'يزيد من حميمية اللون الأخضر ويجعله يبدو ترابياً ودافئاً جداً ومريحاً.' 
+      : 'Increases the coziness of the green, making it look earthy, very warm, and comfortable.',
+    natural: isAr 
+      ? 'يظهر درجات الأخضر الطبيعية بشكل مذهل ويحافظ على حيوية ونضارة اللون.' 
+      : 'Displays natural green tones beautifully and maintains the vibrancy and freshness of the color.',
+    cool: isAr 
+      ? 'يجعل الأخضر يبدو بارداً وأقل دفئاً، يفضل استخدامه في المكاتب وأماكن العمل.' 
+      : 'Makes the green look cool and less warm, preferred for offices and workspaces.'
   }},
 ]
 
+const getLocalizedSize = (size: string, isAr: boolean) => {
+  const numeric = size.replace(' ملي', '').replace(' مم', '').replace(' ملي', '').replace(' مم', '').trim()
+  return isAr ? `${numeric} مم` : `${numeric} mm`
+}
+
 export default function Home() {
   const { t, isAr } = useLanguage()
+  const paintColors = getPaintColors(isAr)
   const { scrollYProgress } = useScroll()
 
   // Map scroll progress to filament brightness, light cone opacity, and spotlight scale
@@ -828,10 +864,17 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight font-sans text-white">
-                دليل تطابق <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">الطلاء والإضاءة</span>
+                {isAr ? (
+                  <>دليل تطابق <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">الطلاء والإضاءة</span></>
+                ) : (
+                  <>Paint & Lighting <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">Matching Guide</span></>
+                )}
               </h2>
               <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
-                اكتشف كيف يتأثر لون طلاء جدران بيتك بحرارة لون الإضاءة المختلفة لتتجنب الأخطاء الشائعة في التصميم الداخلي
+                {isAr 
+                  ? 'اكتشف كيف يتأثر لون طلاء جدران بيتك بحرارة لون الإضاءة المختلفة لتتجنب الأخطاء الشائعة في التصميم الداخلي'
+                  : 'Discover how your home wall paint color is affected by different lighting color temperatures to avoid common interior design mistakes'
+                }
               </p>
               <div className="flex items-center justify-center gap-1.5 mt-4">
                 <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
@@ -960,7 +1003,7 @@ export default function Home() {
                   {/* 3D Indicator Badge */}
                   <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-md border border-white/5 pointer-events-none">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                    <span className="text-[9px] text-white/60 font-bold font-sans">عرض ثلاثي الأبعاد 3D</span>
+                    <span className="text-[9px] text-white/60 font-bold font-sans">{isAr ? 'عرض ثلاثي الأبعاد 3D' : '3D View'}</span>
                   </div>
 
                   {/* Shake Toggle Permission Button on Mobile */}
@@ -968,22 +1011,24 @@ export default function Home() {
                     onClick={async () => {
                       const granted = await requestPermission();
                       if (granted) {
-                        alert("تم تفعيل ميزة هز الهاتف لتغيير الإضاءة! جرب هز هاتفك الآن. 📱");
+                        alert(isAr ? "تم تفعيل ميزة هز الهاتف لتغيير الإضاءة! جرب هز هاتفك الآن. 📱" : "Phone shake feature enabled! Try shaking your phone now. 📱");
                       } else {
-                        alert("لم نتمكن من تفعيل مستشعرات الحركة بجهازك أو تصفحك عبر جهاز لا يدعمها.");
+                        alert(isAr ? "لم نتمكن من تفعيل مستشعرات الحركة بجهازك أو تصفحك عبر جهاز لا يدعمها." : "Could not activate motion sensors on your device or your device does not support them.");
                       }
                     }}
                     className="absolute bottom-4 right-4 z-20 flex md:hidden items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-600/80 hover:bg-blue-600 border border-blue-500 text-[9px] text-white font-bold transition-all shadow-[0_0_10px_rgba(59,130,246,0.3)] active:scale-95 cursor-pointer"
                   >
-                    <span>تفعيل هز الهاتف 📱</span>
+                    <span>{isAr ? 'تفعيل هز الهاتف 📱' : 'Enable Phone Shake 📱'}</span>
                   </button>
                 </div>
 
                 {/* مؤشر اللون الحالي */}
                 <div className="flex items-center justify-between bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/5 text-xs text-slate-300">
-                  <span>الطلاء: <strong className="text-white">{(paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).name}</strong></span>
-                  <span>الضوء: <strong className="text-blue-300">
-                    {paintColorTemp === 'warm' ? 'أصفر (3000K)' : paintColorTemp === 'natural' ? 'شمسي (4000K)' : 'أبيض (6000K)'}
+                  <span>{isAr ? 'الطلاء:' : 'Paint:'} <strong className="text-white">{(paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).name}</strong></span>
+                  <span>{isAr ? 'الضوء:' : 'Light:'} <strong className="text-blue-300">
+                    {paintColorTemp === 'warm' ? (isAr ? 'أصفر (3000K)' : 'Yellow (3000K)') : 
+                     paintColorTemp === 'natural' ? (isAr ? 'شمسي (4000K)' : 'Natural (4000K)') : 
+                     (isAr ? 'أبيض (6000K)' : 'White (6000K)')}
                   </strong></span>
                 </div>
               </div>
@@ -993,7 +1038,9 @@ export default function Home() {
                 
                 {/* 1. اختيار لون صبغ الجدار */}
                 <div>
-                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">1. اختر لون طلاء الجدار:</h4>
+                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">
+                    {isAr ? '1. اختر لون طلاء الجدار:' : '1. Choose Wall Paint Color:'}
+                  </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                     {paintColors.map((color) => (
                       <button
@@ -1017,12 +1064,14 @@ export default function Home() {
 
                 {/* 2. اختيار لون الإضاءة */}
                 <div>
-                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">2. اختر حرارة لون الإضاءة:</h4>
+                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">
+                    {isAr ? '2. اختر حرارة لون الإضاءة:' : '2. Choose Light Color Temp:'}
+                  </h4>
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { key: 'warm', name: 'أصفر 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
-                      { key: 'natural', name: 'شمسي 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
-                      { key: 'cool', name: 'أبيض 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
+                      { key: 'warm', name: isAr ? 'أصفر 3000K' : 'Yellow 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
+                      { key: 'natural', name: isAr ? 'شمسي 4000K' : 'Natural 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
+                      { key: 'cool', name: isAr ? 'أبيض 6000K' : 'White 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
                     ].map((btn) => (
                       <button
                         key={btn.key}
@@ -1043,7 +1092,9 @@ export default function Home() {
                 <div className="bg-[#0a192f] border border-blue-500/15 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300">
                   <div className="text-xl">📐</div>
                   <div>
-                    <span className="font-bold text-blue-300 block mb-1">رأي مهندس الديكور والتصميم الداخلي:</span>
+                    <span className="font-bold text-blue-300 block mb-1">
+                      {isAr ? 'رأي مهندس الديكور والتصميم الداخلي:' : 'Interior Designer & Decorator Advice:'}
+                    </span>
                     {(paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).advice[paintColorTemp]}
                   </div>
                 </div>
@@ -1224,7 +1275,11 @@ export default function Home() {
             <div className="text-center mb-10 md:mb-12">
               <div className="inline-flex items-center justify-center p-3 bg-white/5 border border-white/10 rounded-full mb-4"><Zap className="w-6 h-6 text-yellow-400" /></div>
               <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-white">
-                نشرة الأسلاك <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">الإيطالية</span>
+                {isAr ? (
+                  <>نشرة الأسلاك <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">الإيطالية</span></>
+                ) : (
+                  <>Italian Wires <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">Newsletter</span></>
+                )}
               </h2>
               <div className="flex items-center justify-center gap-1.5 mt-4 mb-6">
                 <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
@@ -1232,7 +1287,7 @@ export default function Home() {
                 <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
               </div>
               <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-200 font-bold text-sm">
-                <Calendar className="w-4 h-4" /> تحديث اليوم: {currentDate}
+                <Calendar className="w-4 h-4" /> {isAr ? `تحديث اليوم: ${currentDate}` : `Today's Update: ${currentDate}`}
               </div>
             </div>
 
@@ -1248,22 +1303,31 @@ export default function Home() {
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.1),transparent_70%)] pointer-events-none" />
               <div className="bg-white/5 p-5 border-b border-white/5 flex items-center justify-between relative z-10">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-green-400" /> الأسعار التقريبية المعتمدة</h3>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-green-400" /> {isAr ? 'الأسعار التقريبية المعتمدة' : 'Approved Estimated Prices'}</h3>
               </div>
               <div className="divide-y divide-white/5 relative z-10">
                 {wirePrices.map((wire, idx) => (
                   <div key={wire.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] border-r-2 border-transparent hover:border-blue-500 transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-[#0a192f] border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">{idx + 1}</div>
-                      <div><h4 className="text-lg font-bold text-white mb-0.5">{wire.size}</h4><p className="text-xs text-slate-400">{wire.type}</p></div>
+                      <div>
+                        <h4 className="text-lg font-bold text-white mb-0.5">{getLocalizedSize(wire.size, isAr)}</h4>
+                        <p className="text-xs text-slate-400">{isAr ? wire.type : 'Single (100m Roll)'}</p>
+                      </div>
                     </div>
                     <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-white/5 pt-3 md:pt-0">
-                      <div className="text-right"><div className="text-xl font-extrabold text-blue-300">{wire.price} <span className="text-xs font-normal text-slate-400">د.ل</span></div></div>
+                      <div className="text-right">
+                        <div className="text-xl font-extrabold text-blue-300">
+                          {wire.price} <span className="text-xs font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                        </div>
+                      </div>
                       <div className="flex items-center gap-3">
                         <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${wire.trend === 'up' ? 'bg-green-500/10 border-green-500/30 text-green-400' : wire.trend === 'down' ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-slate-500/10 border-slate-500/30 text-slate-400'}`}>
                           {wire.trend === 'up' && <TrendingUp className="w-4 h-4" />}{wire.trend === 'down' && <TrendingDown className="w-4 h-4" />}{wire.trend === 'same' && <Minus className="w-4 h-4" />}
                         </div>
-                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97]"><ShoppingCart className="w-4 h-4" /> اطلب الآن</button>
+                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97]">
+                          <ShoppingCart className="w-4 h-4" /> {isAr ? 'اطلب الآن' : 'Order Now'}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1323,9 +1387,13 @@ export default function Home() {
                           </div>
                           
                           <div>
-                            <h3 className="text-2xl font-bold text-white mb-2 animate-pulse font-sans">تجهيز طلبك الرقمي</h3>
+                            <h3 className="text-2xl font-bold text-white mb-2 animate-pulse font-sans">
+                              {isAr ? 'تجهيز طلبك الرقمي' : 'Preparing Your Digital Order'}
+                            </h3>
                             <p className="text-blue-300 text-sm max-w-xs mx-auto leading-relaxed">
-                              نقوم بإنشاء اتصال آمن ونقل بياناتك إلى سجل المبيعات والواتساب...
+                              {isAr 
+                                ? 'نقوم بإنشاء اتصال آمن ونقل بياناتك إلى سجل المبيعات والواتساب...'
+                                : 'Creating a secure connection and forwarding your order details to WhatsApp...'}
                             </p>
                           </div>
 
@@ -1350,14 +1418,18 @@ export default function Home() {
                             {/* جزيئات نيون تتلاشى للخارج */}
                             <span className="absolute w-2.5 h-2.5 rounded-full bg-green-400 animate-[particleTop_1.2s_ease-out_infinite] top-0 left-1/2" />
                             <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-400 animate-[particleBottom_1.2s_ease-out_infinite] bottom-0 left-1/2" />
-                            <span className="absolute w-2 h-2 rounded-full bg-green-300 animate-[particleLeft_1.2s_ease-out_infinite] left-0 top-1/2" />
-                            <span className="absolute w-2 h-2 rounded-full bg-emerald-300 animate-[particleRight_1.2s_ease-out_infinite] right-0 top-1/2" />
+                            <span className="absolute w-2.5. h-2.5 rounded-full bg-green-300 animate-[particleLeft_1.2s_ease-out_infinite] left-0 top-1/2" />
+                            <span className="absolute w-2.5. h-2.5 rounded-full bg-emerald-300 animate-[particleRight_1.2s_ease-out_infinite] right-0 top-1/2" />
                           </div>
                           
                           <div>
-                            <h3 className="text-2xl font-bold text-white mb-2">تم تسجيل طلبك بنجاح!</h3>
+                            <h3 className="text-2xl font-bold text-white mb-2">
+                              {isAr ? 'تم تسجيل طلبك بنجاح!' : 'Order Placed Successfully!'}
+                            </h3>
                             <p className="text-emerald-200 text-sm max-w-xs mx-auto leading-relaxed">
-                              تم التوثيق الرقمي. جاري تحويلك الآن للواتساب للتأكيد الفوري والمتابعة...
+                              {isAr
+                                ? 'تم التوثيق الرقمي. جاري تحويلك الآن للواتساب للتأكيد الفوري والمتابعة...'
+                                : 'Digital verification complete. Redirecting you to WhatsApp for final confirmation...'}
                             </p>
                           </div>
 
@@ -1370,27 +1442,40 @@ export default function Home() {
                     </div>
                   ) : (
                     <>
-                      <h3 className="text-2xl font-bold text-white mb-2 pr-6">طلب سريع</h3>
-                      <p className="text-blue-300 mb-6 font-medium">سلك إيطالي مقاس {selectedWire.size}</p>
+                      <h3 className="text-2xl font-bold text-white mb-2 pr-6">{isAr ? 'طلب سريع' : 'Quick Order'}</h3>
+                      <p className="text-blue-300 mb-6 font-medium">
+                        {isAr ? `سلك إيطالي مقاس ${getLocalizedSize(selectedWire.size, isAr)}` : `Italian Wire Size: ${getLocalizedSize(selectedWire.size, isAr)}`}
+                      </p>
                       <form onSubmit={submitOrder} className="space-y-4 md:space-y-5">
-                        <div><label className="block text-slate-300 text-sm font-bold mb-2">رقم الهاتف للتواصل</label><input required type="tel" value={orderForm.phone} onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="09X XXX XXXX" /></div>
-                        <div><label className="block text-slate-300 text-sm font-bold mb-2">المدينة</label><input required type="text" value={orderForm.city} onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="اسم مدينتك" /></div>
                         <div>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">الكمية (عدد اللفات)</label>
+                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'رقم الهاتف للتواصل' : 'Contact Phone Number'}</label>
+                          <input required type="tel" value={orderForm.phone} onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="09X XXX XXXX" />
+                        </div>
+                        <div>
+                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'المدينة' : 'City'}</label>
+                          <input required type="text" value={orderForm.city} onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder={isAr ? 'اسم مدينتك' : 'Your city name'} />
+                        </div>
+                        <div>
+                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'الكمية (عدد اللفات)' : 'Quantity (Number of Rolls)'}</label>
                           <div className="flex items-center bg-[#0a192f] border border-white/10 rounded-xl overflow-hidden">
                             <button type="button" onClick={() => setOrderForm({...orderForm, quantity: Math.max(1, orderForm.quantity - 1)})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">-</button>
                             <input type="number" min="1" value={orderForm.quantity} onChange={(e) => setOrderForm({...orderForm, quantity: parseInt(e.target.value) || 1})} className="w-full bg-transparent text-white text-center font-bold outline-none" />
                             <button type="button" onClick={() => setOrderForm({...orderForm, quantity: orderForm.quantity + 1})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">+</button>
                           </div>
                         </div>
-                        <div className="p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6"><span className="text-slate-300 font-bold">الإجمالي:</span><span className="text-2xl font-extrabold text-white">{(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">د.ل</span></span></div>
+                        <div className="p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6">
+                          <span className="text-slate-300 font-bold">{isAr ? 'الإجمالي:' : 'Total:'}</span>
+                          <span className="text-2xl font-extrabold text-white">
+                            {(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                          </span>
+                        </div>
                         <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)]">
                           {orderStatus === 'loading' ? (
                             <Loader2 className="w-6 h-6 animate-spin" />
                           ) : (
                             <>
                               <MessageCircle className="w-6 h-6 animate-pulse" />
-                              تأكيد الطلب وإرساله بالواتساب
+                              {isAr ? 'تأكيد الطلب وإرساله بالواتساب' : 'Confirm Order & Send via WhatsApp'}
                             </>
                           )}
                         </button>
