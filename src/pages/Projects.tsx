@@ -37,6 +37,43 @@ type ProjectItem = {
   category: string
 }
 
+const getLocalizedProject = (project: { name: string; category: string; description: string }, isAr: boolean) => {
+  if (isAr) return project
+
+  let name = project.name
+  let category = project.category
+  let description = project.description
+
+  const nameTrim = project.name.trim()
+  if (nameTrim === 'مول الماسة') name = 'Al-Masa Mall'
+  else if (nameTrim === 'معرض كواترو موتورز') name = 'Quattro Motors Showroom'
+  else if (nameTrim === 'مصحة الحياة الطبية') name = 'Al-Hayat Medical Clinic'
+  else if (nameTrim === 'قاعة جمانة للمناسبات') name = 'Jumana Events Hall'
+  else if (nameTrim === 'panyoti cafe') name = 'Panyoti Cafe'
+
+  const catTrim = project.category.trim()
+  if (catTrim === 'مقهي') category = 'Cafe'
+  else if (catTrim === 'مول تجاري') category = 'Commercial Mall'
+  else if (catTrim === 'معرض سيارات') category = 'Car Showroom'
+  else if (catTrim === 'طبي') category = 'Medical'
+  else if (catTrim === 'اجتماعي') category = 'Social'
+
+  const descTrim = project.description.trim()
+  if (descTrim.includes('الاضاءات الداخلية والخارجية وعمدان الانارة')) {
+    description = 'Execution of indoor & outdoor lighting and lighting poles for Al-Masa Mall.'
+  } else if (descTrim.includes('توريد كافه الاضاءات والاعمده والسكك')) {
+    description = 'Supply of all lighting, poles, and tracks to showcase the showroom in the best way.'
+  } else if (descTrim.includes('تنفيذ وتسليم كامل من بريزات والاضاءات')) {
+    description = 'Execution and complete handover of outlets, lighting, voltage regulators, and wiring to ensure smooth operation under all conditions.'
+  } else if (descTrim.includes('توريد الثريات والإضاءات المختلفة لصالة جمانة')) {
+    description = 'Supply of chandeliers and various custom lighting for Jumana Hall to complete your wedding luxury and live the most beautiful moments.'
+  } else if (descTrim.includes('تجهيز الثريات والاضاءات في المقهي')) {
+    description = 'Supplying chandeliers and custom lighting for the cafe, which all customers agreed was stunning.'
+  }
+
+  return { name, category, description }
+}
+
 export default function Projects() {
   const { t, isAr } = useLanguage()
   const [projects, setProjects] = useState<ProjectItem[]>([])
@@ -48,7 +85,7 @@ export default function Projects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch('https://enarah2.vercel.app/api/get-users')
+        const res = await fetch('/api/get-users')
         const data = await res.json()
 
         if (res.ok && data.success && Array.isArray(data.data)) {
@@ -70,14 +107,20 @@ export default function Projects() {
               const imageUrls = rawImage.split(',').map((url: string) => url.trim()).filter(Boolean)
               const coverImage = imageUrls[0] || '/images/default-product.jpg'
 
+              const rawName = item.name || 'مشروع مميز'
+              const rawCategory = mediaData.category || 'مشاريعنا'
+              const rawDesc = mediaData.description || ''
+
+              const localized = getLocalizedProject({ name: rawName, category: rawCategory, description: rawDesc }, isAr)
+
               return {
                 id: item._id || String(index),
-                name: item.name || (isAr ? 'مشروع مميز' : 'Featured Project'),
-                description: mediaData.description || '',
+                name: localized.name,
+                description: localized.description,
                 image: rawImage,
                 coverImage: coverImage,
                 video: mediaData.videoUrl || '',
-                category: mediaData.category || (isAr ? 'مشاريعنا' : 'Our Projects'),
+                category: localized.category,
               }
             })
           

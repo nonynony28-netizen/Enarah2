@@ -98,6 +98,43 @@ const getLocalizedSize = (size: string, isAr: boolean) => {
   return isAr ? `${numeric} مم` : `${numeric} mm`
 }
 
+const getLocalizedProject = (project: { name: string; category: string; description: string }, isAr: boolean) => {
+  if (isAr) return project
+
+  let name = project.name
+  let category = project.category
+  let description = project.description
+
+  const nameTrim = project.name.trim()
+  if (nameTrim === 'مول الماسة') name = 'Al-Masa Mall'
+  else if (nameTrim === 'معرض كواترو موتورز') name = 'Quattro Motors Showroom'
+  else if (nameTrim === 'مصحة الحياة الطبية') name = 'Al-Hayat Medical Clinic'
+  else if (nameTrim === 'قاعة جمانة للمناسبات') name = 'Jumana Events Hall'
+  else if (nameTrim === 'panyoti cafe') name = 'Panyoti Cafe'
+
+  const catTrim = project.category.trim()
+  if (catTrim === 'مقهي') category = 'Cafe'
+  else if (catTrim === 'مول تجاري') category = 'Commercial Mall'
+  else if (catTrim === 'معرض سيارات') category = 'Car Showroom'
+  else if (catTrim === 'طبي') category = 'Medical'
+  else if (catTrim === 'اجتماعي') category = 'Social'
+
+  const descTrim = project.description.trim()
+  if (descTrim.includes('الاضاءات الداخلية والخارجية وعمدان الانارة')) {
+    description = 'Execution of indoor & outdoor lighting and lighting poles for Al-Masa Mall.'
+  } else if (descTrim.includes('توريد كافه الاضاءات والاعمده والسكك')) {
+    description = 'Supply of all lighting, poles, and tracks to showcase the showroom in the best way.'
+  } else if (descTrim.includes('تنفيذ وتسليم كامل من بريزات والاضاءات')) {
+    description = 'Execution and complete handover of outlets, lighting, voltage regulators, and wiring to ensure smooth operation under all conditions.'
+  } else if (descTrim.includes('توريد الثريات والإضاءات المختلفة لصالة جمانة')) {
+    description = 'Supply of chandeliers and various custom lighting for Jumana Hall to complete your wedding luxury and live the most beautiful moments.'
+  } else if (descTrim.includes('تجهيز الثريات والاضاءات في المقهي')) {
+    description = 'Supplying chandeliers and custom lighting for the cafe, which all customers agreed was stunning.'
+  }
+
+  return { name, category, description }
+}
+
 export default function Home() {
   const { t, isAr } = useLanguage()
   const paintColors = getPaintColors(isAr)
@@ -200,7 +237,7 @@ export default function Home() {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const res = await fetch('https://enarah2.vercel.app/api/get-users')
+        const res = await fetch('/api/get-users')
         const data = await res.json()
         if (res.ok && data.success && Array.isArray(data.data)) {
           
@@ -217,14 +254,20 @@ export default function Home() {
               const imageUrls = rawImage.split(',').map((url: string) => url.trim()).filter(Boolean)
               const coverImage = imageUrls[0] || '/images/default-product.jpg'
 
+              const rawName = item.name || 'مشروع مميز'
+              const rawCategory = mediaData.category || 'مشاريعنا'
+              const rawDesc = mediaData.description || ''
+
+              const localized = getLocalizedProject({ name: rawName, category: rawCategory, description: rawDesc }, isAr)
+
               return {
                 id: item._id || String(index),
-                name: item.name || 'مشروع مميز',
-                description: mediaData.description || '',
+                name: localized.name,
+                description: localized.description,
                 image: rawImage,
                 coverImage: coverImage,
                 video: mediaData.videoUrl || '',
-                category: mediaData.category || 'مشاريعنا',
+                category: localized.category,
               }
             })
           setFeaturedProjects(projectsOnly.reverse().slice(0, 4))
@@ -249,7 +292,7 @@ export default function Home() {
       } catch { setFeaturedProjects([]) } finally { setLoadingProjects(false) }
     }
     fetchHomeData()
-  }, [])
+  }, [isAr])
 
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -257,7 +300,7 @@ export default function Home() {
     setOrderStatus('loading')
     try {
       const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
-      await fetch('https://enarah2.vercel.app/api/save-user', {
+      await fetch('/api/save-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1116,19 +1159,23 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
               <div>
                 <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
-                  جزء من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">مشاريعنا</span>
+                  {isAr ? (
+                    <>جزء من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">مشاريعنا</span></>
+                  ) : (
+                    <>Part of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">Our Projects</span></>
+                  )}
                 </h2>
                 <div className="w-20 h-[3px] bg-gradient-to-l from-blue-500 to-indigo-500 rounded-full mt-3 shadow-[0_1px_5px_rgba(59,130,246,0.3)]" />
               </div>
               <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
-                شاهد كل المشاريع <ArrowLeft className="w-5 h-5" />
+                {isAr ? 'شاهد كل المشاريع' : 'View All Projects'} <ArrowLeft className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
               </Link>
             </div>
 
             {loadingProjects ? (
                <div className="flex flex-col items-center justify-center py-20">
                  <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
-                 <p className="text-blue-200 mt-4">جاري جلب المشاريع...</p>
+                 <p className="text-blue-200 mt-4">{isAr ? 'جاري جلب المشاريع...' : 'Fetching projects...'}</p>
                </div>
             ) : (
               <>
@@ -1183,8 +1230,8 @@ export default function Home() {
                               </div>
 
                               <div className="flex items-center justify-between text-[10px] text-blue-400 font-bold border-t border-white/5 pt-2">
-                                <span>انقر للتفاصيل 🔍</span>
-                                <span className="text-blue-300 animate-pulse flex items-center gap-0.5">اسحب للتنقل ↔</span>
+                                <span>{isAr ? 'انقر للتفاصيل 🔍' : 'Click for Details 🔍'}</span>
+                                <span className="text-blue-300 animate-pulse flex items-center gap-0.5">{isAr ? 'اسحب للتنقل ↔' : 'Swipe to Navigate ↔'}</span>
                               </div>
                             </div>
                             
@@ -1241,7 +1288,7 @@ export default function Home() {
                         {project.video && (
                           <div className="absolute top-3 left-3 z-20 bg-[#0a192f]/90 border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
                             <PlayCircle className="w-3.5 h-3.5 text-blue-400" />
-                            <span className="text-white text-[10px] font-bold">فيديو</span>
+                            <span className="text-white text-[10px] font-bold">{isAr ? 'فيديو' : 'Video'}</span>
                           </div>
                         )}
                       </div>
@@ -1253,10 +1300,10 @@ export default function Home() {
                         </div>
                         
                         <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-3">
-                          <span>عرض تفاصيل المعرض ←</span>
+                          <span>{isAr ? 'عرض تفاصيل المعرض ←' : 'View Gallery Details ←'}</span>
                           {project.image.includes(',') && (
                             <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
-                              +{project.image.split(',').length - 1} صور
+                              +{project.image.split(',').length - 1} {isAr ? 'صور' : 'Photos'}
                             </span>
                           )}
                         </div>
