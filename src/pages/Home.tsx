@@ -1352,11 +1352,23 @@ export default function Home() {
               className="relative bg-[#0f213a] border rounded-[2rem] p-8 md:p-16 text-center overflow-hidden"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_60%)] pointer-events-none animate-pulse [animation-duration:8s]" />
-              <h2 className="relative z-10 text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span></h2>
+              <h2 className="relative z-10 text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>
+                {isAr ? (
+                  <>ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span></>
+                ) : (
+                  <>Start Your Project With Us <span className="text-blue-300">Today</span></>
+                )}
+              </h2>
               <p className="relative z-10 text-blue-100/80 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
-                نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك، أو لطلب فواتير المواد وعروض الأسعار المتكاملة لمشروعك الكهربائي.
+                {isAr 
+                  ? 'نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك، أو لطلب فواتير المواد وعروض الأسعار المتكاملة لمشروعك الكهربائي.'
+                  : 'We are here to help you transform your vision into a stunning reality. Contact our experts for engineering and technical consultations, or to request material invoices and comprehensive quotes for your electrical project.'
+                }
               </p>
-              <Link to="/contact" className="relative z-10 inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-slate-100 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.15)]"><Zap className="w-6 h-6" /> تواصل معنا الآن</Link>
+              <Link to="/contact" className="relative z-10 inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-slate-100 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+                <Zap className="w-6 h-6" />
+                {isAr ? 'تواصل معنا الآن' : 'Contact Us Now'}
+              </Link>
             </motion.div>
           </div>
         </section>
