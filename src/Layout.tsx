@@ -11,6 +11,10 @@ export default function Layout() {
   const [isDragging, setIsDragging] = useState(false)
   const [scrollPercent, setScrollPercent] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  
+  // حالات لتفعيل مفتاح الإنارة التفاعلي عند أول تمرير للموقع
+  const [isScrollActivated, setIsScrollActivated] = useState(false)
+  const [hasPlayedSwitchSound, setHasPlayedSwitchSound] = useState(false)
 
   const y = useMotionValue(0)
   
@@ -52,10 +56,22 @@ export default function Layout() {
       } else {
         setScrollPercent(0)
       }
+
+      // تفعيل مفتاح الضوء وتشغيل الصوت تلقائياً عند التمرير لأسفل الصفحة (أول 30 بكسل)
+      if (scrollTop > 30) {
+        setIsScrollActivated(true)
+        if (!hasPlayedSwitchSound) {
+          playClickSound(true)
+          setHasPlayedSwitchSound(true)
+        }
+      } else {
+        setIsScrollActivated(false)
+        setHasPlayedSwitchSound(false)
+      }
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [hasPlayedSwitchSound])
 
   useEffect(() => {
     return y.onChange((latest) => {
@@ -142,27 +158,50 @@ export default function Layout() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#050b14]/30 via-transparent to-[#050b14]/60"></div>
       </div>
 
-      {/* 1. عمود النور النيوني الأوسط الممتد في الخلفية للتفاعل مع التمرير */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[8px] h-full bg-white/[0.01] border-l border-white/[0.02] border-r border-white/[0.02] -z-40 pointer-events-none">
+      {/* مفتاح/مصباح بدء التشغيل التلقائي المضيء في أعلى وسط الصفحة */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center select-none">
+        {/* قاعدة التثبيت السقفية */}
+        <div className="w-12 h-1.5 bg-slate-800 rounded-b-md border-b border-white/10" />
+        {/* المفتاح/المصباح التفاعلي الذي ينكبس عند التمرير */}
         <motion.div 
-          className={`absolute top-0 left-1/2 -translate-x-1/2 w-[4px] bg-gradient-to-b ${
-            theme === 'light'
-              ? 'from-amber-500 via-yellow-400 to-transparent shadow-[0_0_15px_rgba(245,158,11,0.8),0_0_30px_rgba(245,158,11,0.4)]'
-              : 'from-blue-500 via-sky-400 to-transparent shadow-[0_0_15px_rgba(59,130,246,0.8),0_0_30px_rgba(59,130,246,0.4)]'
+          animate={{ 
+            y: isScrollActivated ? 3 : 0,
+            scale: isScrollActivated ? 0.95 : 1,
+            boxShadow: isScrollActivated 
+              ? "0 0 20px rgba(59, 130, 246, 0.8), inset 0 0 8px rgba(59, 130, 246, 0.5)" 
+              : "0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 5px rgba(239, 68, 68, 0.2)"
+          }}
+          transition={{ type: "spring", stiffness: 450, damping: 14 }}
+          className={`w-5.5 h-5.5 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
+            isScrollActivated 
+              ? 'border-blue-400 bg-blue-500/20' 
+              : 'border-red-500/60 bg-red-500/10'
           }`}
-          style={{ height: `${scrollPercent * 100}%` }}
+        >
+          {/* لمبة ليد صغيرة داخل المفتاح */}
+          <div className={`w-1.5 h-1.5 rounded-full ${
+            isScrollActivated ? 'bg-blue-400 animate-ping' : 'bg-red-500'
+          }`} />
+        </motion.div>
+      </div>
+
+      {/* 1. عمود النور الشمسي بالجل الأزرق الممتد في الخلفية للتفاعل مع التمرير (6px Core with Blue Gel Glow) */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[12px] h-full bg-white/[0.01] border-l border-white/[0.02] border-r border-white/[0.02] -z-40 pointer-events-none">
+        <motion.div 
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[6px] bg-gradient-to-b from-amber-400 via-yellow-300 to-transparent shadow-[0_0_20px_rgba(37,99,235,0.9),0_0_35px_rgba(37,99,235,0.6),0_0_50px_rgba(37,99,235,0.3)]"
+          style={{ height: isScrollActivated ? `${scrollPercent * 100}%` : '0%' }}
         />
       </div>
 
-      {/* هالة الضوء النيونية العائمة في منتصف الخلفية التي تتبع موقع التمرير */}
+      {/* هالة الضوء النيونية الشمسية الزرقاء التفاعلية التي تتحرك مع التمرير */}
       <div 
-        className="fixed left-1/2 w-[600px] h-[600px] rounded-full pointer-events-none -z-30 transition-all duration-500 ease-out"
+        className="fixed left-1/2 w-[550px] h-[550px] rounded-full pointer-events-none -z-30 transition-all duration-300 ease-out"
         style={{ 
           top: `${window.innerHeight * 0.15 + (scrollPercent * (window.innerHeight * 0.7))}px`,
           transform: 'translate(-50%, -50%)',
-          background: theme === 'light'
-            ? 'radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.02) 50%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.02) 50%, transparent 70%)',
+          background: isScrollActivated
+            ? 'radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, rgba(245, 158, 11, 0.03) 45%, transparent 70%)'
+            : 'none',
         }}
       />
 
