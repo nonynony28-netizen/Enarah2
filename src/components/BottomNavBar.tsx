@@ -1,17 +1,19 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Home, Lightbulb, Zap, Sparkles, MapPin } from 'lucide-react'
-
-const navItems = [
-  { path: '/', label: 'الرئيسية', icon: Home },
-  { path: '/products', label: 'المنتجات', icon: Lightbulb },
-  { path: '/wire-prices', label: 'الأسعار', icon: Zap },
-  { path: '/projects', label: 'المشاريع', icon: Sparkles },
-  { path: '/branches', label: 'الفروع', icon: MapPin },
-]
+import { useLanguage } from '../hooks/useLanguage'
 
 export default function BottomNavBar() {
   const location = useLocation()
+  const { isAr } = useLanguage()
+
+  const navItems = [
+    { path: '/', label: isAr ? 'الرئيسية' : 'Home', icon: Home },
+    { path: '/products', label: isAr ? 'المنتجات' : 'Products', icon: Lightbulb },
+    { path: '/wire-prices', label: isAr ? 'الأسعار' : 'Prices', icon: Zap },
+    { path: '/projects', label: isAr ? 'المشاريع' : 'Projects', icon: Sparkles },
+    { path: '/branches', label: isAr ? 'الفروع' : 'Branches', icon: MapPin },
+  ]
 
   return (
     <div className="fixed top-[72px] left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] bg-[#0a192f]/70 backdrop-blur-xl border border-blue-500/20 rounded-[2rem] py-2 px-3 shadow-[0_10px_35px_rgba(0,0,0,0.5)] md:hidden z-50 flex items-center justify-around select-none">
