@@ -51,6 +51,15 @@ export default function Navbar() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    const handleThemeChange = () => {
+      const isLight = window.document.documentElement.classList.contains('light');
+      setTheme(isLight ? 'light' : 'dark');
+    };
+    window.addEventListener('themechange', handleThemeChange);
+    return () => window.removeEventListener('themechange', handleThemeChange);
+  }, []);
+
   const playClickSound = () => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
