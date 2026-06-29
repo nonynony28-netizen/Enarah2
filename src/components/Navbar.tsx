@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
-  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders
+  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders, Globe
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 
@@ -245,10 +245,11 @@ export default function Navbar() {
               <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
                 <button
                   onClick={toggleLanguage}
-                  className="relative p-1 px-2.5 h-9 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 flex items-center justify-center gap-1 cursor-pointer transition-all duration-300 active:scale-95 shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] text-[11px] font-extrabold text-slate-300 hover:text-white"
+                  className="relative px-3.5 py-1.5 h-9 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.4)] border border-blue-400/30 text-xs font-black"
                   title={isAr ? 'Switch to English' : 'التغيير للعربية'}
                 >
-                  <span>{isAr ? 'EN' : 'AR'}</span>
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>{isAr ? 'English' : 'العربية'}</span>
                 </button>
               </div>
 
@@ -294,10 +295,11 @@ export default function Navbar() {
             <div className="flex md:hidden items-center gap-2">
               <button
                 onClick={toggleLanguage}
-                className="relative p-1 px-2 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] text-[10px] font-black text-slate-300"
+                className="relative px-3.5 py-1.5 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_12px_rgba(59,130,246,0.4)] border border-blue-400/20 text-xs font-black"
                 title={isAr ? 'Switch to English' : 'التغيير للعربية'}
               >
-                {isAr ? 'EN' : 'AR'}
+                <Globe className="w-3.5 h-3.5" />
+                <span>{isAr ? 'EN' : 'AR'}</span>
               </button>
 
               <button

@@ -1178,140 +1178,50 @@ export default function Home() {
                  <p className="text-blue-200 mt-4">{isAr ? 'جاري جلب المشاريع...' : 'Fetching projects...'}</p>
                </div>
             ) : (
-              <>
-                {/* Mobile Swipeable Stack */}
-                <div className="flex md:hidden relative w-full h-[460px] items-center justify-center overflow-hidden">
-                  
-                  {/* Left bouncing hint arrow */}
-                  <div className="absolute left-2 z-10 p-1.5 rounded-full bg-[#0a192f]/60 border border-white/5 text-blue-400 animate-pulse pointer-events-none">
-                    <ChevronLeft className="w-5 h-5" />
-                  </div>
-
-                  <div className="relative w-full max-w-[290px] h-[390px]">
-                    <AnimatePresence>
-                      {featuredProjects.slice(stackIdx, stackIdx + 3).map((project, index) => {
-                        const isTop = index === 0
-                        
-                        return (
-                          <motion.div
-                            key={project.id}
-                            style={{
-                              zIndex: 30 - index,
-                              scale: 1 - index * 0.05,
-                              y: index * 14,
-                            }}
-                            drag={isTop ? "x" : false}
-                            dragConstraints={{ left: 0, right: 0 }}
-                            onDragEnd={(_, info) => {
-                              if (isTop) {
-                                if (info.offset.x > 80 || info.offset.x < -80) {
-                                  // Move to next card
-                                  setStackIdx((prev) => (prev + 1) % featuredProjects.length)
-                                }
-                              }
-                            }}
-                            className="absolute inset-0 bg-[#0f213a] border border-white/10 rounded-[2.5rem] p-4 shadow-2xl flex flex-col justify-between cursor-grab active:cursor-grabbing select-none"
-                            exit={{ x: 260, opacity: 0, scale: 0.85, transition: { duration: 0.25 } }}
-                          >
-                            <div className="relative h-[180px] w-full rounded-2xl overflow-hidden bg-[#0a192f] pointer-events-none">
-                              <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                              <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-80" />
-                              <div className="absolute top-3 right-3">
-                                <span className="px-3 py-1 bg-[#0a192f]/95 border border-blue-500/30 text-blue-300 text-[10px] font-bold rounded-full">
-                                  {project.category}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="flex-grow pt-4 flex flex-col justify-between pointer-events-none">
-                              <div>
-                                <h3 className="text-lg font-bold text-white mb-2 line-clamp-1">{project.name}</h3>
-                                <p className="text-slate-400 text-xs leading-relaxed line-clamp-2">{project.description}</p>
-                              </div>
-
-                              <div className="flex items-center justify-between text-[10px] text-blue-400 font-bold border-t border-white/5 pt-2">
-                                <span>{isAr ? 'انقر للتفاصيل 🔍' : 'Click for Details 🔍'}</span>
-                                <span className="text-blue-300 animate-pulse flex items-center gap-0.5">{isAr ? 'اسحب للتنقل ↔' : 'Swipe to Navigate ↔'}</span>
-                              </div>
-                            </div>
-                            
-                            {/* Overlay trigger click to open gallery */}
-                            {isTop && (
-                              <div 
-                                onClick={() => openGallery(project)}
-                                className="absolute inset-0 z-20 cursor-pointer"
-                              />
-                            )}
-                          </motion.div>
-                        )
-                      })}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Right bouncing hint arrow */}
-                  <div className="absolute right-2 z-10 p-1.5 rounded-full bg-[#0a192f]/60 border border-white/5 text-blue-400 animate-pulse pointer-events-none">
-                    <ChevronRight className="w-5 h-5" />
-                  </div>
-
-                  {/* Stack guide indicator dot swipe help */}
-                  <div className="absolute bottom-1.5 left-0 right-0 flex items-center justify-center gap-1.5 z-10 pointer-events-none">
-                    {featuredProjects.map((_, idx) => (
-                      <span 
-                        key={idx} 
-                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                          (stackIdx % featuredProjects.length) === idx ? 'w-4 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'bg-white/15'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Desktop Grid Layout */}
-                <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-                  {featuredProjects.map((project) => (
-                    <motion.div 
-                      key={project.id} 
-                      onClick={() => openGallery(project)}
-                      whileHover={{ y: -6, scale: 1.01 }}
-                      className="group relative bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/50 hover:shadow-[0_10px_35px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
-                    >
-                      <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f] border-b border-white/5">
-                        <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/95 via-[#0a192f]/40 to-transparent opacity-95 z-10" />
-                        
-                        <div className="absolute top-3 right-3 z-20">
-                          <span className="px-3.5 py-1 bg-[#0a192f]/90 border border-blue-500/30 text-blue-300 text-[10px] font-bold rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
-                            {project.category}
-                          </span>
-                        </div>
-                        
-                        {project.video && (
-                          <div className="absolute top-3 left-3 z-20 bg-[#0a192f]/90 border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
-                            <PlayCircle className="w-3.5 h-3.5 text-blue-400" />
-                            <span className="text-white text-[10px] font-bold">{isAr ? 'فيديو' : 'Video'}</span>
-                          </div>
-                        )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                {featuredProjects.map((project) => (
+                  <motion.div 
+                    key={project.id} 
+                    onClick={() => openGallery(project)}
+                    whileHover={{ y: -6, scale: 1.01 }}
+                    className="group relative bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/50 hover:shadow-[0_10px_35px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f] border-b border-white/5">
+                      <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/95 via-[#0a192f]/40 to-transparent opacity-95 z-10" />
+                      
+                      <div className="absolute top-3 right-3 z-20">
+                        <span className="px-3.5 py-1 bg-[#0a192f]/90 border border-blue-500/30 text-blue-300 text-[10px] font-bold rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                          {project.category}
+                        </span>
                       </div>
                       
-                      <div className="p-5 relative z-20 flex-grow flex flex-col justify-between">
-                        <div>
-                          <h3 className="text-base font-extrabold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-1">{project.name}</h3>
-                          <p className="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">{project.description}</p>
+                      {project.video && (
+                        <div className="absolute top-3 left-3 z-20 bg-[#0a192f]/90 border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                          <PlayCircle className="w-3.5 h-3.5 text-blue-400" />
+                          <span className="text-white text-[10px] font-bold">{isAr ? 'فيديو' : 'Video'}</span>
                         </div>
-                        
-                        <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-3">
-                          <span>{isAr ? 'عرض تفاصيل المعرض ←' : 'View Gallery Details ←'}</span>
-                          {project.image.includes(',') && (
-                            <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
-                              +{project.image.split(',').length - 1} {isAr ? 'صور' : 'Photos'}
-                            </span>
-                          )}
-                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="p-5 relative z-20 flex-grow flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-base font-extrabold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-1">{project.name}</h3>
+                        <p className="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">{project.description}</p>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </>
+                      
+                      <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-3">
+                        <span>{isAr ? 'عرض تفاصيل المعرض ←' : 'View Gallery Details ←'}</span>
+                        {project.image.includes(',') && (
+                          <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
+                            +{project.image.split(',').length - 1} {isAr ? 'صور' : 'Photos'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             )}
           </div>
         </section>
