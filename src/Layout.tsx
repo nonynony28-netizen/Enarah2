@@ -120,21 +120,27 @@ export default function Layout() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#050b14]/30 via-transparent to-[#050b14]/60"></div>
       </div>
 
-      {/* 1. عمود النور النيوني الأيسر الممتد للتفاعل مع التمرير */}
-      <div className="hidden lg:block fixed top-0 left-[35px] w-[5px] h-full bg-white/[0.02] border-l border-white/[0.04] border-r border-white/[0.04] z-50 pointer-events-none">
+      {/* 1. عمود النور النيوني الأوسط الممتد في الخلفية للتفاعل مع التمرير */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[8px] h-full bg-white/[0.01] border-l border-white/[0.02] border-r border-white/[0.02] -z-40 pointer-events-none">
         <motion.div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] bg-gradient-to-b from-blue-500 via-sky-400 to-transparent shadow-[0_0_12px_rgba(59,130,246,0.8),0_0_24px_rgba(59,130,246,0.4)]"
+          className={`absolute top-0 left-1/2 -translate-x-1/2 w-[4px] bg-gradient-to-b ${
+            theme === 'light'
+              ? 'from-amber-500 via-yellow-400 to-transparent shadow-[0_0_15px_rgba(245,158,11,0.8),0_0_30px_rgba(245,158,11,0.4)]'
+              : 'from-blue-500 via-sky-400 to-transparent shadow-[0_0_15px_rgba(59,130,246,0.8),0_0_30px_rgba(59,130,246,0.4)]'
+          }`}
           style={{ height: `${scrollPercent * 100}%` }}
         />
       </div>
 
-      {/* بقعة الضوء النيونية العائمة التي تتبع موقع التمرير */}
+      {/* هالة الضوء النيونية العائمة في منتصف الخلفية التي تتبع موقع التمرير */}
       <div 
-        className="hidden lg:block fixed left-[38px] w-[350px] h-[350px] rounded-full bg-radial-spotlight pointer-events-none z-40 transition-opacity duration-300"
+        className="fixed left-1/2 w-[600px] h-[600px] rounded-full pointer-events-none -z-30 transition-all duration-500 ease-out"
         style={{ 
           top: `${window.innerHeight * 0.15 + (scrollPercent * (window.innerHeight * 0.7))}px`,
           transform: 'translate(-50%, -50%)',
-          opacity: theme === 'dark' ? 0.8 : 0.2
+          background: theme === 'light'
+            ? 'radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.02) 50%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.02) 50%, transparent 70%)',
         }}
       />
 

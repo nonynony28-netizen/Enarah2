@@ -262,42 +262,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              {/* Smart Switch Button */}
-              <div className="ml-3 pl-3 border-l border-white/10 flex items-center justify-center">
-                <button
-                  onClick={toggleTheme}
-                  className="relative p-1 w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 flex items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] overflow-hidden group select-none"
-                  title={theme === 'dark' ? 'تشغيل الإضاءة النهارية' : 'إطفاء الإضاءة النهارية'}
-                >
-                  <div className={`w-6.5 h-6.5 rounded-full border flex items-center justify-center transition-all duration-500 ${
-                    theme === 'light' 
-                      ? 'border-amber-400 bg-amber-400/10 text-amber-500' 
-                      : 'border-blue-500/50 bg-blue-500/5 text-blue-400'
-                  }`}>
-                    {theme === 'light' ? (
-                      <motion.div
-                        key="sun"
-                        initial={{ rotate: -90, scale: 0.7, opacity: 0 }}
-                        animate={{ rotate: 0, scale: 1, opacity: 1 }}
-                        exit={{ rotate: 90, scale: 0.7, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Lightbulb className="w-4 h-4 fill-amber-400/20" />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="moon"
-                        initial={{ rotate: 90, scale: 0.7, opacity: 0 }}
-                        animate={{ rotate: 0, scale: 1, opacity: 1 }}
-                        exit={{ rotate: -90, scale: 0.7, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Lightbulb className="w-4 h-4 opacity-50" />
-                      </motion.div>
-                    )}
-                  </div>
-                </button>
-              </div>
+
             </div>
 
             {/* Mobile Actions & Menu Button زر الجوال مع مفتاح الإنارة */}
@@ -311,23 +276,6 @@ export default function Navbar() {
                 <span>{isAr ? 'EN' : 'AR'}</span>
               </button>
 
-              <button
-                onClick={toggleTheme}
-                className="relative p-1 w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] overflow-hidden"
-                title={theme === 'dark' ? 'تشغيل الإضاءة' : 'إطفاء الإضاءة'}
-              >
-                <div className={`w-6.5 h-6.5 rounded-full border flex items-center justify-center transition-all duration-500 ${
-                  theme === 'light' 
-                    ? 'border-amber-400 bg-amber-400/10 text-amber-500' 
-                    : 'border-blue-500/50 bg-blue-500/5 text-blue-400'
-                }`}>
-                  {theme === 'light' ? (
-                    <Lightbulb className="w-3.5 h-3.5 fill-amber-400/20" />
-                  ) : (
-                    <Lightbulb className="w-3.5 h-3.5 opacity-50" />
-                  )}
-                </div>
-              </button>
 
               <button
                 onClick={() => setIsOpen(!isOpen)}
