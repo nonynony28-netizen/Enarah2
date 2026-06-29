@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../hooks/useLanguage'
 
 const glowingTitleStyle = {
   textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
@@ -16,13 +17,14 @@ type ProductItem = {
 }
 
 export default function Products() {
+  const { isAr } = useLanguage()
   const [products, setProducts] = useState<ProductItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('https://enarah2.vercel.app/api/get-users')
+        const res = await fetch('/api/get-users') // استخدام مسار نسبي
         const data = await res.json()
 
         if (res.ok && data.success && Array.isArray(data.data)) {
@@ -52,16 +54,34 @@ export default function Products() {
                return true; // إذا نجح في الهروب من الفلاتر، فهو منتج
             })
             .map((item: any, index: number) => {
-              let mediaData: any = {}
-              try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
+               let mediaData: any = {}
+               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
 
-              return {
-                id: item._id || String(index),
-                name: item.name || 'بدون اسم',
-                description: mediaData.description || (item.email && !item.email.includes('@upload.local') ? item.email : ''),
-                image: mediaData.imageUrl || '/images/default-product.jpg',
-                video: mediaData.videoUrl || '',
-              }
+               // جلب الوصف حسب لغة المستخدم إذا كان بصيغة JSON، أو عرضه مباشرة
+               let descText = mediaData.description || (item.email && !item.email.includes('@upload.local') ? item.email : '')
+               try {
+                 const descObj = JSON.parse(descText)
+                 descText = isAr ? (descObj.ar || descObj.en || descText) : (descObj.en || descObj.ar || descText)
+               } catch {
+                 // ليس JSON، اتركه كما هو
+               }
+
+               // جلب الاسم حسب لغة المستخدم إذا كان بصيغة JSON، أو عرضه مباشرة
+               let nameText = item.name || 'بدون اسم'
+               try {
+                 const nameObj = JSON.parse(nameText)
+                 nameText = isAr ? (nameObj.ar || nameObj.en || nameText) : (nameObj.en || nameObj.ar || nameText)
+               } catch {
+                 // ليس JSON، اتركه كما هو
+               }
+
+               return {
+                 id: item._id || String(index),
+                 name: nameText,
+                 description: descText,
+                 image: mediaData.imageUrl || '/images/default-product.jpg',
+                 video: mediaData.videoUrl || '',
+               }
             })
           
           setProducts(formattedProducts.reverse())
@@ -77,7 +97,7 @@ export default function Products() {
     }
 
     fetchProducts()
-  }, [])
+  }, [isAr])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -96,15 +116,25 @@ export default function Products() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-6 flex justify-start">
           <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-            <ArrowRight className="w-5 h-5" /> العودة للرئيسية
+            <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+            {isAr ? 'العودة للرئيسية' : 'Back to Home'}
           </Link>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-16 md:mb-20">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
-            معرض <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">المنتجات</span>
+            {isAr ? (
+              <>معرض <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">المنتجات</span></>
+            ) : (
+              <>Products <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">Gallery</span></>
+            )}
           </h1>
-          <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm">اكتشف أحدث وأرقى منتجات الإنارة والتأسيس الكهربائي التي اخترناها بعناية لتناسب ذوقك واحتياجاتك</p>
+          <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm">
+            {isAr 
+              ? 'اكتشف أحدث وأرقى منتجات الإنارة والتأسيس الكهربائي التي اخترناها بعناية لتناسب ذوقك واحتياجاتك'
+              : 'Discover the latest and finest lighting and electrical installation products, carefully selected to fit your taste and needs'
+            }
+          </p>
           <div className="flex items-center justify-center gap-1.5 mt-6">
             <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
             <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
@@ -115,7 +145,9 @@ export default function Products() {
         {loading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-16 h-16 text-blue-400 animate-spin relative z-10 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-            <p className="text-blue-100 mt-6 font-medium text-lg animate-pulse">جاري جلب أحدث المنتجات...</p>
+            <p className="text-blue-100 mt-6 font-medium text-lg animate-pulse">
+              {isAr ? 'جاري جلب أحدث المنتجات...' : 'Fetching latest products...'}
+            </p>
           </motion.div>
         )}
 
@@ -124,8 +156,15 @@ export default function Products() {
             <div className="w-24 h-24 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
               <PackageSearch className="w-12 h-12 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">المعرض قيد التحديث</h3>
-            <p className="text-slate-400 text-base leading-relaxed">نحن نقوم بتحديث المعرض بأحدث المنتجات، يرجى العودة قريباً للاطلاع على تشكيلتنا الجديدة.</p>
+            <h3 className="text-2xl font-bold text-white mb-3">
+              {isAr ? 'المعرض قيد التحديث' : 'Gallery Under Update'}
+            </h3>
+            <p className="text-slate-400 text-base leading-relaxed">
+              {isAr
+                ? 'نحن نقوم بتحديث المعرض بأحدث المنتجات، يرجى العودة قريباً للاطلاع على تشكيلتنا الجديدة.'
+                : 'We are currently updating our gallery with the newest products. Please check back soon to view our new collection.'
+              }
+            </p>
           </motion.div>
         )}
 
@@ -140,16 +179,21 @@ export default function Products() {
                   {product.video && (
                     <div className="absolute top-4 right-4 z-20 bg-[#0a192f]/80 border border-blue-500/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                       <PlayCircle className="w-4 h-4 text-blue-400" />
-                      <span className="text-blue-200 text-xs font-bold">فيديو متاح</span>
+                      <span className="text-blue-200 text-xs font-bold">
+                        {isAr ? 'فيديو متاح' : 'Video Available'}
+                      </span>
                     </div>
                   )}
                 </div>
                 <div className="p-6 md:p-8 flex flex-col flex-grow relative z-20">
                   <h2 className="text-white font-bold text-xl md:text-2xl mb-3 group-hover:text-blue-400 transition-colors duration-300 line-clamp-1">{product.name}</h2>
-                  <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-8">{product.description || 'لا يوجد وصف متاح لهذا المنتج حالياً.'}</p>
+                  <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-8">
+                    {product.description || (isAr ? 'لا يوجد وصف متاح لهذا المنتج حالياً.' : 'No description available for this product currently.')}
+                  </p>
                   {product.video && (
                     <a href={product.video} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all duration-300 font-bold text-sm shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                      <PlayCircle className="w-5 h-5" /> شاهد فيديو للمنتج
+                      <PlayCircle className="w-5 h-5" /> 
+                      {isAr ? 'شاهد فيديو للمنتج' : 'Watch Product Video'}
                     </a>
                   )}
                 </div>

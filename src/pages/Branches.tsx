@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { MapPin, Phone, Clock, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom' // استدعاء الرابط
+import { Link } from 'react-router-dom'
+import { useLanguage } from '../hooks/useLanguage'
 
 // نمط الوهج الأزرق للعناوين الفخمة
 const glowingTitleStyle = {
@@ -32,28 +33,30 @@ function FadeIn({
   )
 }
 
-const branches = [
-  {
-    name: 'فرع بنغازي - الليثي',
-    address: 'مقابل مدرسة العيد الفضي',
-    phones: ['0916580068', '0926580068'],
-    hours: 'من الساعة 8 صباحاً حتى الساعة 10 مساءً',
-  },
-  {
-    name: 'فرع البيضاء الأول',
-    address: 'مفترق رويفع الأنصاري',
-    phones: ['0911910600', '0921910600'],
-    hours: 'من الساعة 8 صباحاً حتى الساعة 10 مساءً',
-  },
-  {
-    name: 'فرع البيضاء الثاني',
-    address: 'مقابل مول البكوش',
-    phones: ['0919219100', '0929219100'],
-    hours: 'من الساعة 8 صباحاً حتى الساعة 10 مساءً',
-  },
-]
-
 export default function Branches() {
+  const { isAr } = useLanguage()
+
+  const branches = [
+    {
+      name: isAr ? 'فرع بنغازي - الليثي' : 'Benghazi Branch - Al-Laythi',
+      address: isAr ? 'مقابل مدرسة العيد الفضي' : 'Opposite Silver Feast School',
+      phones: ['0916580068', '0926580068'],
+      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+    },
+    {
+      name: isAr ? 'فرع البيضاء الأول' : 'First Al-Bayda Branch',
+      address: isAr ? 'مفترق رويفع الأنصاري' : 'Ruwaifa Al-Ansari Intersection',
+      phones: ['0911910600', '0921910600'],
+      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+    },
+    {
+      name: isAr ? 'فرع البيضاء الثاني' : 'Second Al-Bayda Branch',
+      address: isAr ? 'مقابل مول البكوش' : 'Opposite Al-Bakoosh Mall',
+      phones: ['0919219100', '0929219100'],
+      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+    },
+  ]
+
   return (
     <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-white">
       
@@ -66,8 +69,8 @@ export default function Branches() {
         <FadeIn>
           <div className="mb-6 flex justify-start">
             <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-              <ArrowRight className="w-5 h-5" />
-              العودة للرئيسية
+              <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
           </div>
         </FadeIn>
@@ -76,11 +79,18 @@ export default function Branches() {
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
-              فرو<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">عنا</span>
+              {isAr ? (
+                <>فرو<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">عنا</span></>
+              ) : (
+                <>Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">Branches</span></>
+              )}
             </h1>
 
             <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm mb-6">
-              نخدمكم عبر فروعنا داخل ليبيا لتوفير أفضل حلول الإضاءة والمواد الكهربائية
+              {isAr 
+                ? 'نخدمكم عبر فروعنا داخل ليبيا لتوفير أفضل حلول الإضاءة والمواد الكهربائية'
+                : 'We serve you through our branches in Libya to provide the best lighting and electrical solutions'
+              }
             </p>
 
             <div className="flex items-center justify-center gap-1.5 mt-6">

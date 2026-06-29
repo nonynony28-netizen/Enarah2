@@ -98,8 +98,8 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.servicesDropdown': 'Sections & Prices',
 
     // Hero
-    'hero.title.part1': 'Modern',
-    'hero.title.part2': 'Lighting',
+    'hero.title.part1': 'ENARAH',
+    'hero.title.part2': 'MODERN',
     'hero.subtitle': 'Everything you need for premium lighting and electrical installations with international quality and integrated solutions.',
     'hero.btn.products': 'Explore Products',
     'hero.btn.contact': 'Contact Us',
@@ -147,12 +147,12 @@ const translations: Record<Language, Record<string, string>> = {
     // Chatbot
     'chat.title': 'Smart Assistant',
     'chat.placeholder': 'Type your message...',
-    'chat.welcome': 'Welcome! I am your AI assistant from Modern Lighting. How can I help you today with our products and prices?',
+    'chat.welcome': 'Welcome! I am your AI assistant from ENARAHMODERN. How can I help you today with our products and prices?',
 
     // Footer
     'footer.slogan': 'Your trusted partner in establishing electricity and high-end smart lighting.',
     'footer.links': 'Quick Links',
-    'footer.rights': 'All rights reserved © 2026 Modern Lighting Company',
+    'footer.rights': 'All rights reserved © 2026 ENARAHMODERN Company',
     'footer.email': 'Email:'
   }
 };

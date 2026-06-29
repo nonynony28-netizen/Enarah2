@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom' // استدعاء الرابط
+import { Link } from 'react-router-dom'
+import { useLanguage } from '../hooks/useLanguage'
 
 // نمط الوهج الأزرق للعناوين الفخمة
 const glowingTitleStyle = {
@@ -32,16 +33,19 @@ function FadeIn({
   )
 }
 
-// 👈 البيانات أصبحت مباشرة هنا في كود الصفحة بدلاً من الملف الخارجي
-const brands = [
-  {
-    name: "الوكالات العالمية",
-    description: "نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية",
-    image: "https://i.postimg.cc/9XqR1x8c/IMG-3397.webp" // 👈 رابط صورتك الجديد المباشر
-  }
-]
-
 export default function Brands() {
+  const { isAr } = useLanguage()
+
+  const brands = [
+    {
+      name: isAr ? 'الوكالات العالمية' : 'Global Agencies',
+      description: isAr 
+        ? 'نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية'
+        : 'A selection of the most prominent global brands and companies specialized in lighting, installations, and electrical materials.',
+      image: "https://i.postimg.cc/9XqR1x8c/IMG-3397.webp"
+    }
+  ]
+
   return (
     <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-white">
       
@@ -54,8 +58,8 @@ export default function Brands() {
         <FadeIn>
           <div className="mb-6 flex justify-start">
             <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-              <ArrowRight className="w-5 h-5" />
-              العودة للرئيسية
+              <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
           </div>
         </FadeIn>
@@ -64,11 +68,18 @@ export default function Brands() {
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
-              شركاؤنا من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">العلامات العالمية</span>
+              {isAr ? (
+                <>شركاؤنا من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">العلامات العالمية</span></>
+              ) : (
+                <>Our Partners of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">Global Brands</span></>
+              )}
             </h1>
 
             <p className="text-slate-300 max-w-3xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm mb-6">
-              نتعاون مع نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية
+              {isAr 
+                ? 'نتعاون مع نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية'
+                : 'We collaborate with a group of the most prominent international brands and companies specialized in lighting and electrical equipment'
+              }
             </p>
 
             <div className="flex items-center justify-center gap-1.5 mt-6">

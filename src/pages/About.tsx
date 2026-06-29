@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Target, Eye, Heart, Lightbulb, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom' // استدعاء الرابط
+import { Link } from 'react-router-dom'
+import { useLanguage } from '../hooks/useLanguage'
 
 // نمط الوهج الأزرق للعناوين الفخمة
 const glowingTitleStyle = {
@@ -33,6 +34,8 @@ function FadeIn({
 }
 
 export default function About() {
+  const { isAr } = useLanguage()
+
   return (
     <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-white">
       
@@ -43,10 +46,10 @@ export default function About() {
 
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
-          <div className="mb-6 flex justify-start">
+          <div className={`mb-6 flex ${isAr ? 'justify-start' : 'justify-start'}`}>
             <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-              <ArrowRight className="w-5 h-5" />
-              العودة للرئيسية
+              <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
           </div>
         </FadeIn>
@@ -55,7 +58,11 @@ export default function About() {
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
-              من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">نحن</span>
+              {isAr ? (
+                <>من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">نحن</span></>
+              ) : (
+                <>About <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">Us</span></>
+              )}
             </h1>
 
             <div className="flex items-center justify-center gap-1.5 mt-6">
@@ -75,20 +82,22 @@ export default function About() {
               </div>
 
               <h2 className="text-3xl font-bold text-white">
-                الإنارة الحديثة
+                {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
               </h2>
             </div>
 
             <p className="text-slate-300 text-lg md:text-xl leading-relaxed mb-6">
-              نحن وجهتك الأولى والموثوقة لجميع احتياجات الإضاءة والمواد الكهربائية في ليبيا.
-              منذ تأسيسنا، نسعى دائماً لتقديم أجود المنتجات العالمية بأسعار تنافسية،
-              مع التركيز على تقديم تجربة عملاء استثنائية وحلول احترافية متكاملة.
+              {isAr 
+                ? 'نحن وجهتك الأولى والموثوقة لجميع احتياجات الإضاءة والمواد الكهربائية في ليبيا. منذ تأسيسنا، نسعى دائماً لتقديم أجود المنتجات العالمية بأسعار تنافسية، مع التركيز على تقديم تجربة عملاء استثنائية وحلول احترافية متكاملة.'
+                : 'We are your primary and trusted destination for all lighting and electrical needs in Libya. Since our establishment, we have always strived to offer the highest quality global products at competitive prices, with a focus on providing an exceptional customer experience and integrated professional solutions.'
+              }
             </p>
 
             <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
-              نختار منتجاتنا بعناية فائقة من أفضل المصادر والماركات العالمية،
-              ونحرص على توفير حلول متكاملة تناسب كافة المشاريع السكنية والتجارية
-              داخل ليبيا بأعلى معايير الجودة والموثوقية.
+              {isAr
+                ? 'نختار منتجاتنا بعناية فائقة من أفضل المصادر والماركات العالمية، ونحرص على توفير حلول متكاملة تناسب كافة المشاريع السكنية والتجارية داخل ليبيا بأعلى معايير الجودة والموثوقية.'
+                : 'We select our products with extreme care from the best global sources and brands, ensuring the provision of integrated solutions suitable for all residential and commercial projects in Libya with the highest quality and reliability standards.'
+              }
             </p>
           </div>
         </FadeIn>
@@ -98,18 +107,24 @@ export default function About() {
           {[
             {
               icon: Target,
-              title: 'رسالتنا',
-              desc: 'توفير حلول إضاءة وكهرباء عالية الجودة تلبي احتياجات عملائنا وتتجاوز توقعاتهم.',
+              title: isAr ? 'رسالتنا' : 'Our Mission',
+              desc: isAr 
+                ? 'توفير حلول إضاءة وكهرباء عالية الجودة تلبي احتياجات عملائنا وتتجاوز توقعاتهم.'
+                : 'Providing high-quality lighting and electrical solutions that meet our clients\' needs and exceed their expectations.',
             },
             {
               icon: Eye,
-              title: 'رؤيتنا',
-              desc: 'أن نكون الشريك الأول في ليبيا لتقديم حلول الإضاءة والكهرباء المتكاملة.',
+              title: isAr ? 'رؤيتنا' : 'Our Vision',
+              desc: isAr
+                ? 'أن نكون الشريك الأول في ليبيا لتقديم حلول الإضاءة والكهرباء المتكاملة.'
+                : 'To be the premier partner in Libya for providing integrated lighting and electrical solutions.',
             },
             {
               icon: Heart,
-              title: 'قيمنا',
-              desc: 'الجودة، الأمانة، الابتكار، والالتزام بأعلى معايير الخدمة والاحترافية.',
+              title: isAr ? 'قيمنا' : 'Our Values',
+              desc: isAr
+                ? 'الجودة، الأمانة، الابتكار، والالتزام بأعلى معايير الخدمة والاحترافية.'
+                : 'Quality, honesty, innovation, and commitment to the highest standards of service and professionalism.',
             },
           ].map((item, i) => (
             <FadeIn key={item.title} delay={0.3 + (i * 0.1)}>
@@ -135,17 +150,26 @@ export default function About() {
           <div className="bg-gradient-to-br from-[#0f213a] to-[#0a192f] border border-blue-500/20 rounded-[2rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
             <h3 className="text-3xl font-bold text-white mb-8 relative z-10 flex items-center gap-3">
               <span className="w-1.5 h-8 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-              لماذا نحن الخيار الأمثل؟
+              {isAr ? 'لماذا نحن الخيار الأمثل؟' : 'Why Choose Us?'}
             </h3>
 
             <ul className="space-y-5 relative z-10">
-              {[
-                'منتجات أصلية 100% من ماركات عالمية موثوقة',
-                'فريق فني متخصص في التركيب والاستشارات',
-                'ضمان شامل على منتجات شركة "wellmax"',
-                'توفير حلول متكاملة للمشاريع السكنية والتجارية',
-                'أسعار تنافسية مع جودة استثنائية',
-              ].map((point) => (
+              {(isAr 
+                ? [
+                    'منتجات أصلية 100% من ماركات عالمية موثوقة',
+                    'فريق فني متخصص في التركيب والاستشارات',
+                    'ضمان شامل على منتجات شركة "wellmax"',
+                    'توفير حلول متكاملة للمشاريع السكنية والتجارية',
+                    'أسعار تنافسية مع جودة استثنائية',
+                  ]
+                : [
+                    '100% original products from trusted global brands',
+                    'Specialized technical team for installation and consultation',
+                    'Comprehensive warranty on "wellmax" products',
+                    'Integrated solutions for residential and commercial projects',
+                    'Competitive prices with exceptional quality',
+                  ]
+              ).map((point) => (
                 <li
                   key={point}
                   className="flex items-center gap-4 text-slate-300 text-lg"
