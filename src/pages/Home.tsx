@@ -152,10 +152,26 @@ export default function Home() {
   const bulbAuraOpacity = useTransform(scrollYProgress, [0, 0.45], [0.1, 0.85])
 
   const [pageLoading, setPageLoading] = useState(true)
-  const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>([])
+  const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('enarah_cached_featured_projects')
+      if (cached) {
+        try { return JSON.parse(cached) } catch {}
+      }
+    }
+    return []
+  })
   const [loadingProjects, setLoadingProjects] = useState(true)
   const [currentDate, setCurrentDate] = useState('')
-  const [wirePrices, setWirePrices] = useState(defaultWireData)
+  const [wirePrices, setWirePrices] = useState<typeof defaultWireData>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('enarah_cached_wire_prices')
+      if (cached) {
+        try { return JSON.parse(cached) } catch {}
+      }
+    }
+    return defaultWireData
+  })
   
   const [selectedWire, setSelectedWire] = useState<typeof wirePrices[0] | null>(null)
   const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
@@ -270,7 +286,9 @@ export default function Home() {
                 category: localized.category,
               }
             })
-          setFeaturedProjects(projectsOnly.reverse().slice(0, 4))
+          const loadedProjects = projectsOnly.reverse().slice(0, 4)
+          setFeaturedProjects(loadedProjects)
+          localStorage.setItem('enarah_cached_featured_projects', JSON.stringify(loadedProjects))
 
           const wireUpdates = data.data.filter((item: any) => item.email === 'admin_wire_prices@app.local')
           if (wireUpdates.length > 0) {
@@ -287,9 +305,14 @@ export default function Home() {
                 return { ...wire, price: newPrice.toFixed(2), trend }
              })
              setWirePrices(updatedWires)
+             localStorage.setItem('enarah_cached_wire_prices', JSON.stringify(updatedWires))
           }
-        } else setFeaturedProjects([])
-      } catch { setFeaturedProjects([]) } finally { setLoadingProjects(false) }
+        }
+      } catch (err) {
+        console.error('Fetch Home Data Error:', err)
+      } finally {
+        setLoadingProjects(false)
+      }
     }
     fetchHomeData()
   }, [isAr])

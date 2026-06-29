@@ -50,7 +50,15 @@ const getLocalizedType = (isAr: boolean) => {
 export default function WirePrices() {
   const { t, isAr } = useLanguage()
   const [currentDate, setCurrentDate] = useState('')
-  const [wirePrices, setWirePrices] = useState(defaultWireData)
+  const [wirePrices, setWirePrices] = useState<typeof defaultWireData>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('enarah_cached_wire_prices')
+      if (cached) {
+        try { return JSON.parse(cached) } catch {}
+      }
+    }
+    return defaultWireData
+  })
   
   const [selectedWire, setSelectedWire] = useState<typeof defaultWireData[0] | null>(null)
   const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
@@ -89,6 +97,7 @@ export default function WirePrices() {
                 return { ...wire, price: newPrice.toFixed(2), trend }
              })
              setWirePrices(updatedWires)
+             localStorage.setItem('enarah_cached_wire_prices', JSON.stringify(updatedWires))
           }
         }
       } catch (err) {

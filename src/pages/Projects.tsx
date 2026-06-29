@@ -76,7 +76,15 @@ const getLocalizedProject = (project: { name: string; category: string; descript
 
 export default function Projects() {
   const { t, isAr } = useLanguage()
-  const [projects, setProjects] = useState<ProjectItem[]>([])
+  const [projects, setProjects] = useState<ProjectItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('enarah_cached_projects')
+      if (cached) {
+        try { return JSON.parse(cached) } catch {}
+      }
+    }
+    return []
+  })
   const [loading, setLoading] = useState(true)
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -124,13 +132,12 @@ export default function Projects() {
               }
             })
           
-          setProjects(formattedProjects.reverse())
-        } else {
-          setProjects([])
+          const loadedProjects = formattedProjects.reverse()
+          setProjects(loadedProjects)
+          localStorage.setItem('enarah_cached_projects', JSON.stringify(loadedProjects))
         }
       } catch (error) {
         console.error('Fetch Error:', error)
-        setProjects([])
       } finally {
         setLoading(false)
       }

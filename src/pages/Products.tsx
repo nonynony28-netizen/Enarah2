@@ -18,7 +18,15 @@ type ProductItem = {
 
 export default function Products() {
   const { isAr } = useLanguage()
-  const [products, setProducts] = useState<ProductItem[]>([])
+  const [products, setProducts] = useState<ProductItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('enarah_cached_products')
+      if (cached) {
+        try { return JSON.parse(cached) } catch {}
+      }
+    }
+    return []
+  })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -84,13 +92,12 @@ export default function Products() {
                }
             })
           
-          setProducts(formattedProducts.reverse())
-        } else {
-          setProducts([])
+          const loadedProducts = formattedProducts.reverse()
+          setProducts(loadedProducts)
+          localStorage.setItem('enarah_cached_products', JSON.stringify(loadedProducts))
         }
       } catch (error) {
         console.error('Fetch Products Error:', error)
-        setProducts([])
       } finally {
         setLoading(false)
       }
