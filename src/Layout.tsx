@@ -19,9 +19,9 @@ export default function Layout() {
   const y = useMotionValue(0)
   
   // ضبط مقاييس الحبل بناءً على نوع الجهاز ليكون ملائماً للهواتف
-  const defaultHeight = isMobile ? 80 : 120
-  const maxDrag = isMobile ? 80 : 150
-  const cordHeight = useTransform(y, [0, maxDrag], [defaultHeight, defaultHeight + 120])
+  const defaultHeight = isMobile ? 65 : 120
+  const maxDrag = isMobile ? 65 : 150
+  const cordHeight = useTransform(y, [0, maxDrag], [defaultHeight, defaultHeight + 100])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -136,7 +136,7 @@ export default function Layout() {
       damping: 24
     })
 
-    const threshold = isMobile ? 55 : 90
+    const threshold = isMobile ? 45 : 90
     if (currentY >= threshold) {
       const isLight = document.documentElement.classList.contains('light')
       playClickSound(!isLight)
@@ -206,21 +206,21 @@ export default function Layout() {
       />
 
       {/* 2. حبل السحب العائم التفاعلي لتعديل وتعتيم الضوء وسحب المفتاح */}
-      <div className="fixed top-0 left-6 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
+      <div className="fixed top-0 right-24 md:right-auto md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
         <motion.div 
-          className="w-[1.5px] md:w-[2px] bg-gradient-to-b from-[#111] via-[#444] to-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
+          className="w-[1px] md:w-[2px] bg-gradient-to-b from-[#111] via-[#444] to-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
           style={{ height: cordHeight }}
         />
         <motion.div 
           drag="y"
           dragConstraints={{ top: 0, bottom: maxDrag }}
-          dragElastic={isMobile ? 0.75 : 0.25}
+          dragElastic={isMobile ? 1.2 : 0.25}
           style={{ y }}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={handleDragEnd}
-          className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-[1.5px] md:border-2 border-white cursor-grab active:cursor-grabbing pointer-events-auto shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300"
+          className="w-3.5 h-3.5 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-[1.2px] md:border-2 border-white cursor-grab active:cursor-grabbing pointer-events-auto shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300"
         >
-          <div className="w-1 h-1 md:w-[6px] md:h-[6px] bg-white rounded-full opacity-90" />
+          <div className="w-[3px] h-[3px] md:w-[6px] md:h-[6px] bg-white rounded-full opacity-90" />
         </motion.div>
 
         {/* مؤشر الإرشاد العائم */}
@@ -230,8 +230,8 @@ export default function Layout() {
             : 'bg-slate-900/90 text-blue-400 border-white/10 shadow-black/40'
         }`}>
           {isDragging 
-            ? (isAr ? 'شد الحبل للتعتيم والتبديل...' : 'Pull to switch...') 
-            : (isAr ? 'اسحب خيط الإنارة 💡' : 'Pull Light Cord 💡')}
+            ? (isAr ? 'اترك الحبل الآن...' : 'Release now...') 
+            : (isAr ? 'اسحب الإنارة لتغيير وضع الإضاءة 💡' : 'Pull light to change mode 💡')}
         </div>
       </div>
 
