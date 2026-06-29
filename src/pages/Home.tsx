@@ -438,64 +438,7 @@ export default function Home() {
           className="fixed top-0 right-0 w-[140vw] h-[140vh] pointer-events-none z-0 filter blur-[40px] hidden md:block"
         />
 
-        {/* 2. مجسم المصباح المعلق ثلاثي الأبعاد (Floating SVG 3D Bulb) */}
-        <motion.div 
-          initial={{ y: -80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.8, type: 'spring' }}
-          className="fixed right-[-20px] md:right-4 top-[80px] md:top-[100px] w-20 md:w-36 h-36 md:h-56 z-20 pointer-events-none flex flex-col items-center select-none"
-        >
-          {/* سلك التعليق النحيف */}
-          <div className="w-[1.5px] h-12 md:h-20 bg-gradient-to-b from-[#0a192f] via-slate-700 to-slate-500" />
-          
-          <div className="relative w-full aspect-[2/3] flex flex-col items-center justify-start">
-            {/* توهج هالة المصباح */}
-            <motion.div 
-              style={{ opacity: bulbAuraOpacity, willChange: 'opacity' }}
-              className="absolute inset-0 rounded-full bg-blue-500/10 blur-xl pointer-events-none animate-pulse"
-            />
-            
-            {/* مجسم المصباح SVG */}
-            <svg viewBox="0 0 100 150" className="w-full h-full drop-shadow-[0_4px_15px_rgba(0,0,0,0.4)]">
-              {/* القاعدة المعدنية للمصباح */}
-              <path d="M40 100 h20 v6 h-20 z M42 106 h16 v6 h-16 z M45 112 h10 v4 h-10 z" fill="#4b5563" stroke="#1f2937" strokeWidth="1"/>
-              {/* نقطة تلامس الكهرباء السفلى */}
-              <path d="M47 116 h6 v3 h-6 z" fill="#111827" />
-              
-              {/* أسلاك دعم الفتيل الداخلي */}
-              <path d="M44 100 L44 75 M56 100 L56 75" fill="none" stroke="#4b5563" strokeWidth="1"/>
-              
-              {/* الفتيل المضيء التفاعلي المتصل بالتمرير */}
-              <motion.path 
-                d="M44 75 Q50 58 56 75" 
-                fill="none" 
-                style={{ 
-                  stroke: filamentColor,
-                  filter: filamentGlow,
-                  willChange: 'stroke, filter',
-                }}
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-              
-              {/* الانتفاخ الزجاجي الخارجي للمصباح */}
-              <path 
-                d="M32 100 C20 88 15 72 15 55 C15 25 30.5 8 50 8 C69.5 8 85 25 85 55 C85 72 80 88 68 100 Z" 
-                className="light-bulb-glass"
-                strokeWidth="1.25"
-              />
-              
-              {/* لمعان زجاجي علوي جانبي */}
-              <path 
-                d="M22 50 C22 34 30 16 45 11" 
-                fill="none" 
-                className="light-bulb-gleam"
-                strokeWidth="1.5" 
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-        </motion.div>
+
 
         {/* 1. الواجهة الترحيبية بالفيديو فائق السرعة */}
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
