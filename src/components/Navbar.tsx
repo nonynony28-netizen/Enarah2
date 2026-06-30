@@ -133,10 +133,10 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`flex items-center justify-between h-14 md:h-16 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
+          <div className="flex items-center justify-between h-14 md:h-16 flex-row">
 
             {/* Logo Group containing Logo & Mobile Cart Button to space them nicely */}
-            <div className={`flex items-center gap-4 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
+            <div className="flex items-center gap-4 flex-row">
               <Link to="/" className="flex items-center gap-3 group">
                 <motion.div
                   whileHover={{ rotate: 15, scale: 1.1 }}
@@ -183,7 +183,7 @@ export default function Navbar() {
             </div>
 
             {/* Desktop Nav قائمة الكمبيوتر */}
-            <div className={`hidden md:flex items-center gap-1.5 relative ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
+            <div className="hidden md:flex items-center gap-1.5 relative flex-row">
               {/* الرئيسية */}
               <Link
                 to="/"
