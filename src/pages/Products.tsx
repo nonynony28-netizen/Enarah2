@@ -9,6 +9,37 @@ const glowingTitleStyle = {
   textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
 }
 
+const productTranslations: Record<string, { name: string; description: string }> = {
+  "سبوت لايت": {
+    name: "Spotlights",
+    description: "Various types of spotlights, including LED, single, anti-glare, and adjustable styles designed for all spaces and activities."
+  },
+  "مفاتيح وبرايز": {
+    name: "Switches & Sockets",
+    description: "A wide selection of modern switches and sockets from various global brands to suit every corner and style of your home."
+  },
+  "مواد تأسيس الكهربائي": {
+    name: "Electrical Installation Materials",
+    description: "All electric installation components from early wiring foundations to final premium finishes with certified high quality."
+  },
+  "ثريات": {
+    name: "Chandeliers",
+    description: "A premium range of crystal and modern decorative chandeliers, carefully chosen to suit all modern and classic tastes."
+  },
+  "الأسلاك والكوابل": {
+    name: "Wires & Cables",
+    description: "Certified Italian wires directly from original manufacturers, guaranteeing top quality and safety in all standard gauges."
+  },
+  "سكة الليد": {
+    name: "LED Track Lights",
+    description: "Flexible, magnetic, surface-mounted, and recessed LED track systems designed to adapt to all architectural needs."
+  },
+  "انترفون": {
+    name: "Intercom Systems",
+    description: "All types of wired and wireless video intercom systems from top global manufacturers, ensuring durability and home security."
+  }
+};
+
 type ProductItem = {
   id: string
   name: string
@@ -194,70 +225,87 @@ export default function Products() {
 
         {!loading && products.length > 0 && (
           <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-            {products.map((product) => (
-              <motion.div variants={itemVariants} key={product.id} style={{ willChange: "transform, opacity" }} className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-2 shadow-xl flex flex-col h-full">
-                <div className="relative overflow-hidden aspect-[4/3] bg-[#0a192f] flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-80 z-10" />
-                  <ImageIcon className="absolute w-12 h-12 text-white/5" />
-                  <img src={product.image} alt={product.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 relative" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                  {product.video && (
-                    <div className="absolute top-4 right-4 z-20 bg-[#0a192f]/80 border border-blue-500/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                      <PlayCircle className="w-4 h-4 text-blue-400" />
-                      <span className="text-blue-200 text-xs font-bold">
-                        {isAr ? 'فيديو متاح' : 'Video Available'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-6 md:p-8 flex flex-col flex-grow relative z-20">
-                  <h2 className="text-white font-bold text-xl md:text-2xl mb-3 group-hover:text-blue-400 transition-colors duration-300 line-clamp-1">{product.name}</h2>
-                  <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-8">
-                    {product.description || (isAr ? 'لا يوجد وصف متاح لهذا المنتج حالياً.' : 'No description available for this product currently.')}
-                  </p>
-                  <div className="mt-auto space-y-3">
-                    <button
-                      onClick={(e) => handleAddToCart(e, product)}
-                      disabled={addingId === product.id}
-                      className={`w-full py-3.5 border transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 rounded-xl shadow-sm cursor-pointer ${
-                        addingId === product.id
-                          ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
-                          : 'bg-blue-600/10 hover:bg-blue-600 border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                      }`}
-                    >
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={addingId === product.id ? 'added' : 'add'}
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 4 }}
-                          transition={{ duration: 0.2 }}
-                          className="flex items-center gap-2"
-                        >
-                          {addingId === product.id ? (
-                            <>
-                              <Check className="w-4 h-4" />
-                              <span>{isAr ? 'تمت الإضافة بنجاح! ✓' : 'Added Successfully! ✓'}</span>
-                            </>
-                          ) : (
-                            <>
-                              <ShoppingCart className="w-4 h-4" />
-                              <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
-                            </>
-                          )}
-                        </motion.span>
-                      </AnimatePresence>
-                    </button>
+            {products.map((product) => {
+              // Translate on the fly
+              let displayName = product.name;
+              let displayDesc = product.description;
 
+              if (!isAr) {
+                // Find matching English translation
+                const matchedTranslation = Object.entries(productTranslations).find(([key]) => {
+                  return product.name.trim().includes(key) || key.includes(product.name.trim());
+                });
+                if (matchedTranslation) {
+                  displayName = matchedTranslation[1].name;
+                  displayDesc = matchedTranslation[1].description;
+                }
+              }
+
+              return (
+                <motion.div variants={itemVariants} key={product.id} style={{ willChange: "transform, opacity" }} className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-2 shadow-xl flex flex-col h-full">
+                  <div className="relative overflow-hidden aspect-[4/3] bg-[#0a192f] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-80 z-10" />
+                    <ImageIcon className="absolute w-12 h-12 text-white/5" />
+                    <img src={product.image} alt={displayName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 relative" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                     {product.video && (
-                      <a href={product.video} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 w-full py-3 bg-white/5 border border-white/10 text-slate-300 hover:bg-[#0f213a] rounded-xl transition-all duration-300 font-bold text-xs">
-                        <PlayCircle className="w-4 h-4 text-blue-400" /> 
-                        {isAr ? 'شاهد فيديو للمنتج' : 'Watch Product Video'}
-                      </a>
+                      <div className="absolute top-4 right-4 z-20 bg-[#0a192f]/80 border border-blue-500/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                        <PlayCircle className="w-4 h-4 text-blue-400" />
+                        <span className="text-blue-200 text-xs font-bold">
+                          {isAr ? 'فيديو متاح' : 'Video Available'}
+                        </span>
+                      </div>
                     )}
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="p-6 md:p-8 flex flex-col flex-grow relative z-20">
+                    <h2 className="text-white font-bold text-xl md:text-2xl mb-3 group-hover:text-blue-400 transition-colors duration-300 line-clamp-1">{displayName}</h2>
+                    <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-8">
+                      {displayDesc || (isAr ? 'لا يوجد وصف متاح لهذا المنتج حالياً.' : 'No description available for this product currently.')}
+                    </p>
+                    <div className="mt-auto space-y-3">
+                      <button
+                        onClick={(e) => handleAddToCart(e, { ...product, name: displayName, description: displayDesc })}
+                        disabled={addingId === product.id}
+                        className={`w-full py-3.5 border transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 rounded-xl shadow-sm cursor-pointer ${
+                          addingId === product.id
+                            ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+                            : 'bg-blue-600/10 hover:bg-blue-600 border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                        }`}
+                      >
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={addingId === product.id ? 'added' : 'add'}
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 4 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2"
+                          >
+                            {addingId === product.id ? (
+                              <>
+                                <Check className="w-4 h-4" />
+                                <span>{isAr ? 'تمت الإضافة بنجاح! ✓' : 'Added Successfully! ✓'}</span>
+                              </>
+                            ) : (
+                              <>
+                                <ShoppingCart className="w-4 h-4" />
+                                <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
+                              </>
+                            )}
+                          </motion.span>
+                        </AnimatePresence>
+                      </button>
+
+                      {product.video && (
+                        <a href={product.video} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 w-full py-3 bg-white/5 border border-white/10 text-slate-300 hover:bg-[#0f213a] rounded-xl transition-all duration-300 font-bold text-xs">
+                          <PlayCircle className="w-4 h-4 text-blue-400" /> 
+                          {isAr ? 'شاهد فيديو للمنتج' : 'Watch Product Video'}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )
+            })}
           </motion.div>
         )}
       </div>
