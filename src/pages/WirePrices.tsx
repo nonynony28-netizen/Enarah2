@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck, ArrowRight, MessageCircle, Loader2, CheckCircle, ShoppingCart, X } from 'lucide-react'
+import { motion, useInView } from 'framer-motion'
+import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck, ArrowRight, ShoppingCart } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
+import { useCart } from '../hooks/useCart'
 
 // نمط الوهج الأزرق للعناوين
 const glowingTitleStyle = {
@@ -60,10 +61,7 @@ export default function WirePrices() {
     return defaultWireData
   })
   
-  const [selectedWire, setSelectedWire] = useState<typeof defaultWireData[0] | null>(null)
-  const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
-  const [orderStatus, setOrderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-
+  const { addToCart } = useCart()
   const [wireUpdates, setWireUpdates] = useState<any[]>([])
   const [selectedChartWireId, setSelectedChartWireId] = useState('1.5')
 
@@ -106,56 +104,6 @@ export default function WirePrices() {
     }
     fetchWirePrices()
   }, [])
-
-  const submitOrder = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedWire) return
-    setOrderStatus('loading')
-    try {
-      const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
-      
-      // إرسال الطلبية لقاعدة البيانات
-      await fetch('https://enarah2.vercel.app/api/save-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `🛒 طلبية أسلاك: مقاس ${selectedWire.id} مم`,
-          phone: orderForm.phone,
-          email: `المدينة: ${orderForm.city} | العدد: ${orderForm.quantity} لفة | الإجمالي: ${totalPrice} ${isAr ? 'د.ل' : 'LYD'}`,
-          type: 'contact' 
-        })
-      })
-
-      const telegramBotToken = "8951369127:AAFxThF562Xt9LxsQZMibNOxrFTeJtuScOM" 
-      const telegramChatId = "8372746727"
-      
-      const telegramMessage = !isAr
-        ? `🚨 *New Wire Order!*\n\n🛒 *Size:* ${selectedWire.id} mm\n📦 *Quantity:* ${orderForm.quantity} Rolls\n💰 *Total:* ${totalPrice} LYD\n📍 *City:* ${orderForm.city}\n📞 *Phone:* ${orderForm.phone}`
-        : `🚨 *طلب أسلاك جديد!*\n\n🛒 *المقاس:* ${selectedWire.size}\n📦 *الكمية:* ${orderForm.quantity} لفة\n💰 *الإجمالي:* ${totalPrice} د.ل\n📍 *المدينة:* ${orderForm.city}\n📞 *الهاتف:* ${orderForm.phone}`;
-
-      if (telegramBotToken) {
-        fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: telegramChatId, text: telegramMessage, parse_mode: 'Markdown' })
-        }).catch(() => {});
-      }
-
-      // تحويل المستخدم إلى الواتس اب للتأكيد الفوري
-      const whatsappMsg = !isAr
-        ? `Hello, I want to confirm an Italian wire order:\n\n*Size:* ${selectedWire.id} mm\n*Quantity:* ${orderForm.quantity} Rolls\n*Total:* ${totalPrice} LYD\n*City:* ${orderForm.city}\n*Phone:* ${orderForm.phone}`
-        : `السلام عليكم، أريد تأكيد طلب شراء سلك إيطالي:\n\n*المقاس:* ${selectedWire.size}\n*الكمية:* ${orderForm.quantity} لفة\n*الإجمالي:* ${totalPrice} د.ل\n*المدينة:* ${orderForm.city}\n*الهاتف:* ${orderForm.phone}`;
-      
-      const whatsappUrl = `https://wa.me/218916580068?text=${encodeURIComponent(whatsappMsg)}`;
-      window.location.href = whatsappUrl;
-
-      setOrderStatus('success')
-      setTimeout(() => {
-        setOrderStatus('idle')
-        setSelectedWire(null)
-        setOrderForm({ phone: '', city: '', quantity: 1 })
-      }, 3000)
-    } catch { setOrderStatus('error') }
-  }
 
   // تصفية وحساب البيانات التاريخية للرسم البياني البورصة
   const getHistoryData = () => {
@@ -328,13 +276,18 @@ export default function WirePrices() {
                       </div>
 
                       <button 
-                        onClick={() => setSelectedWire(wire)}
-                        className={`flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97] whitespace-nowrap ${
+                        onClick={() => addToCart({
+                          id: `wire-${wire.id}`,
+                          name: isAr ? `سلك إيطالي مقاس ${wire.size}` : `Italian Wire ${wire.id}mm`,
+                          description: isAr ? `سلك مفرد لفة 100 متر - سعر اللفة: ${wire.price} د.ل` : `Single 100m Roll - price: ${wire.price} LYD`,
+                          image: '/images/cat-cables.jpg'
+                        })}
+                        className={`flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97] whitespace-nowrap cursor-pointer ${
                           isAr ? 'flex-row' : 'flex-row-reverse'
                         }`}
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        <span>{isAr ? 'اطلب الآن' : 'Order Now'}</span>
+                        <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
                       </button>
                     </div>
                   </div>
@@ -491,162 +444,7 @@ export default function WirePrices() {
           </div>
         </FadeIn>
 
-        {/* نافذة الطلب المنبثقة (Modal) */}
-        <AnimatePresence>
-          {selectedWire && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-              <div className="absolute inset-0 bg-[#06152b]/95" onClick={() => setSelectedWire(null)} />
-              <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="relative w-full max-w-md bg-[#0d2342] border border-blue-500/20 rounded-[2rem] overflow-hidden shadow-2xl">
-                <button onClick={() => setSelectedWire(null)} className={`absolute top-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10 ${
-                  isAr ? 'left-4' : 'right-4'
-                }`}><X className="w-5 h-5" /></button>
-                <div className="p-6 md:p-8">
-                  {orderStatus === 'loading' || orderStatus === 'success' ? (
-                    <div className="text-center py-10 px-4 flex flex-col items-center justify-center relative min-h-[360px]">
-                      {/* بقعة وهج خلفية خفيفة */}
-                      <div className="absolute w-40 h-40 bg-blue-500/10 rounded-full blur-[80px] -z-10 pointer-events-none animate-pulse" />
-                      
-                      {orderStatus === 'loading' ? (
-                        <div className="flex flex-col items-center justify-center space-y-6">
-                          {/* حلقات التوجيه الإلكتروني */}
-                          <div className="relative w-24 h-24 flex items-center justify-center">
-                            <span className="absolute inset-0 rounded-full border-2 border-dashed border-blue-500/30 animate-spin [animation-duration:15s]" />
-                            <span className="absolute inset-2.5 rounded-full border border-blue-400/40 animate-pulse" />
-                            <span className="absolute inset-5 rounded-full bg-blue-600/10 border border-blue-500/20" />
-                            <Loader2 className="w-9 h-9 text-blue-400 animate-spin relative z-10" />
-                          </div>
-                          
-                          <div>
-                            <h3 className="text-2xl font-bold text-white mb-2 animate-pulse font-sans">
-                              {isAr ? 'تجهيز طلبك الرقمي' : 'Preparing your digital order'}
-                            </h3>
-                            <p className="text-blue-300 text-sm max-w-xs mx-auto leading-relaxed">
-                              {isAr 
-                                ? 'نقوم بإنشاء اتصال آمن ونقل بياناتك إلى سجل المبيعات والواتساب...'
-                                : 'Establishing a secure connection and transferring your details to our sales ledger...'
-                              }
-                            </p>
-                          </div>
 
-                          {/* خط تقدم مستمر */}
-                          <div className="w-full max-w-[200px] h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
-                            <div className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full animate-[loadingBar_1.8s_ease-out_infinite]" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center space-y-6">
-                          {/* دائرة النجاح المنبثقة مع الجزيئات المتطايرة */}
-                          <div className="relative w-24 h-24 flex items-center justify-center">
-                            {/* موجات نجاح نابضة */}
-                            <div className="absolute inset-0 rounded-full bg-green-500/10 border border-green-500/30 animate-ping [animation-duration:1.5s]" />
-                            <div className="absolute inset-2.5 rounded-full bg-green-600/20 border border-green-400/20" />
-                            
-                            {/* زر النجاح ثلاثي الأبعاد المضيء */}
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-[0_0_25px_rgba(34,197,94,0.4)] relative z-10 scale-100 animate-[bounceIn_0.5s_cubic-bezier(0.175,0.885,0.32,1.275)]">
-                              <CheckCircle className="w-9 h-9 text-white" />
-                            </div>
-
-                            {/* جزيئات نيون تتلاشى للخارج */}
-                            <span className="absolute w-2.5 h-2.5 rounded-full bg-green-400 animate-[particleTop_1.2s_ease-out_infinite] top-0 left-1/2" />
-                            <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-400 animate-[particleBottom_1.2s_ease-out_infinite] bottom-0 left-1/2" />
-                            <span className="absolute w-2.5 h-2.5 rounded-full bg-green-300 animate-[particleLeft_1.2s_ease-out_infinite] left-0 top-1/2" />
-                            <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-300 animate-[particleRight_1.2s_ease-out_infinite] right-0 top-1/2" />
-                          </div>
-                          
-                          <div>
-                            <h3 className="text-2xl font-bold text-white mb-2">{isAr ? 'تم تسجيل طلبك بنجاح!' : 'Order Placed Successfully!'}</h3>
-                            <p className="text-emerald-200 text-sm max-w-xs mx-auto leading-relaxed">
-                              {isAr 
-                                ? 'تم التوثيق الرقمي. جاري تحويلك الآن للواتساب للتأكيد الفوري والمتابعة...'
-                                : 'Digital confirmation documented. Redirecting you to WhatsApp for instant verification...'
-                              }
-                            </p>
-                          </div>
-
-                          {/* خط تعبئة تقدم توجيه الواتساب */}
-                          <div className="w-full max-w-[220px] h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                            <div className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full animate-[successProgress_2.5s_ease-in-out_forwards]" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <h3 className={`text-2xl font-bold text-white mb-2 ${isAr ? 'pr-6 text-right' : 'pl-6 text-left'}`}>
-                        {isAr ? 'طلب سريع' : 'Quick Order'}
-                      </h3>
-                      <p className={`text-blue-300 mb-6 font-medium ${isAr ? 'text-right' : 'text-left'}`}>
-                        {isAr ? `سلك إيطالي مقاس ${getLocalizedSize(selectedWire.id, isAr)}` : `Italian Wire Size: ${getLocalizedSize(selectedWire.id, isAr)}`}
-                      </p>
-                      
-                      <form onSubmit={submitOrder} className="space-y-4 md:space-y-5">
-                        <div className={isAr ? 'text-right' : 'text-left'}>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'رقم الهاتف للتواصل' : 'Contact Phone Number'}</label>
-                          <input 
-                            required 
-                            type="tel" 
-                            value={orderForm.phone} 
-                            onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} 
-                            className={`w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all ${
-                              isAr ? 'text-right' : 'text-left'
-                            }`}
-                            placeholder="09X XXX XXXX" 
-                          />
-                        </div>
-                        
-                        <div className={isAr ? 'text-right' : 'text-left'}>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'المدينة' : 'City'}</label>
-                          <input 
-                            required 
-                            type="text" 
-                            value={orderForm.city} 
-                            onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} 
-                            className={`w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all ${
-                              isAr ? 'text-right' : 'text-left'
-                            }`}
-                            placeholder={isAr ? 'اسم مدينتك' : 'Your city name'} 
-                          />
-                        </div>
-                        
-                        <div className={isAr ? 'text-right' : 'text-left'}>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'الكمية (عدد اللفات)' : 'Quantity (Number of Rolls)'}</label>
-                          <div className={`flex items-center bg-[#0a192f] border border-white/10 rounded-xl overflow-hidden ${
-                            isAr ? 'flex-row' : 'flex-row-reverse'
-                          }`}>
-                            <button type="button" onClick={() => setOrderForm({...orderForm, quantity: Math.max(1, orderForm.quantity - 1)})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">-</button>
-                            <input type="number" min="1" value={orderForm.quantity} onChange={(e) => setOrderForm({...orderForm, quantity: parseInt(e.target.value) || 1})} className="w-full bg-transparent text-white text-center font-bold outline-none" />
-                            <button type="button" onClick={() => setOrderForm({...orderForm, quantity: orderForm.quantity + 1})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">+</button>
-                          </div>
-                        </div>
-                        
-                        <div className={`p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6 ${
-                          isAr ? 'flex-row' : 'flex-row-reverse'
-                        }`}>
-                          <span className="text-slate-300 font-bold">{isAr ? 'الإجمالي:' : 'Total:'}</span>
-                          <span className="text-2xl font-extrabold text-white">
-                            {(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)}{' '}
-                            <span className="text-sm font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
-                          </span>
-                        </div>
-                        
-                        <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                          {orderStatus === 'loading' ? (
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                          ) : (
-                            <>
-                              <MessageCircle className="w-6 h-6 animate-pulse" />
-                              <span>{isAr ? 'تأكيد الطلب وإرساله بالواتساب' : 'Confirm & Send via WhatsApp'}</span>
-                            </>
-                          )}
-                        </button>
-                      </form>
-                    </>
-                  )}
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
       </div>
     </div>
