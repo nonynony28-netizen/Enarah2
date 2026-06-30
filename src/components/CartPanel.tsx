@@ -29,7 +29,12 @@ export default function CartPanel() {
   return (
     <AnimatePresence>
       {isCartOpen && (
-        <div className="fixed inset-0 z-[3000] flex justify-end">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[3000] flex justify-end"
+        >
           {/* Backdrop overlay خلفية معتمة ضبابية */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -220,7 +225,7 @@ export default function CartPanel() {
 
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   )
