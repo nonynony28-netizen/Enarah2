@@ -18,9 +18,9 @@ export default function Layout() {
 
   const y = useMotionValue(0)
   
-  // ضبط مقاييس الحبل بناءً على نوع الجهاز ليكون ملائماً للهواتف
-  const defaultHeight = isMobile ? 65 : 120
-  const maxDrag = isMobile ? 65 : 150
+  // ضبط مقاييس الحبل بناءً على نوع الجهاز ليكون ملائماً للهواتف ومنع تداخل الإيماءات
+  const defaultHeight = isMobile ? 130 : 160
+  const maxDrag = isMobile ? 100 : 150
   const cordHeight = useTransform(y, [0, maxDrag], [defaultHeight, defaultHeight + 100])
 
   useEffect(() => {
@@ -136,7 +136,7 @@ export default function Layout() {
       damping: 24
     })
 
-    const threshold = isMobile ? 45 : 90
+    const threshold = isMobile ? 60 : 90
     if (currentY >= threshold) {
       const isLight = document.documentElement.classList.contains('light')
       playClickSound(!isLight)
@@ -215,7 +215,7 @@ export default function Layout() {
           drag="y"
           dragConstraints={{ top: 0, bottom: maxDrag }}
           dragElastic={isMobile ? 1.2 : 0.25}
-          style={{ y }}
+          style={{ y, touchAction: 'none' }}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={handleDragEnd}
           className="w-3.5 h-3.5 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-[1.2px] md:border-2 border-white cursor-grab active:cursor-grabbing pointer-events-auto shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300"
