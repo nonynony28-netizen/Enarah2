@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck, ArrowRight, ShoppingCart } from 'lucide-react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck, ArrowRight, ShoppingCart, Check } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
@@ -64,6 +64,21 @@ export default function WirePrices() {
   const { addToCart } = useCart()
   const [wireUpdates, setWireUpdates] = useState<any[]>([])
   const [selectedChartWireId, setSelectedChartWireId] = useState('1.5')
+  const [addingId, setAddingId] = useState<string | null>(null)
+
+  const handleAddToCart = (wire: any) => {
+    const itemId = `wire-${wire.id}`
+    setAddingId(itemId)
+    addToCart({
+      id: itemId,
+      name: isAr ? `سلك إيطالي مقاس ${wire.size}` : `Italian Wire ${wire.id}mm`,
+      description: isAr ? `سلك مفرد لفة 100 متر - سعر اللفة: ${wire.price} د.ل` : `Single 100m Roll - price: ${wire.price} LYD`,
+      image: '/images/cat-cables.jpg'
+    })
+    setTimeout(() => {
+      setAddingId(null)
+    }, 1200)
+  }
 
   useEffect(() => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -276,18 +291,36 @@ export default function WirePrices() {
                       </div>
 
                       <button 
-                        onClick={() => addToCart({
-                          id: `wire-${wire.id}`,
-                          name: isAr ? `سلك إيطالي مقاس ${wire.size}` : `Italian Wire ${wire.id}mm`,
-                          description: isAr ? `سلك مفرد لفة 100 متر - سعر اللفة: ${wire.price} د.ل` : `Single 100m Roll - price: ${wire.price} LYD`,
-                          image: '/images/cat-cables.jpg'
-                        })}
-                        className={`flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97] whitespace-nowrap cursor-pointer ${
-                          isAr ? 'flex-row' : 'flex-row-reverse'
+                        onClick={() => handleAddToCart(wire)}
+                        disabled={addingId === `wire-${wire.id}`}
+                        className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer border ${
+                          addingId === `wire-${wire.id}`
+                            ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+                            : 'bg-blue-600 border-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:bg-blue-500 hover:scale-[1.03] active:scale-[0.97]'
                         }`}
                       >
-                        <ShoppingCart className="w-4 h-4" />
-                        <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={addingId === `wire-${wire.id}` ? 'added' : 'add'}
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 4 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2"
+                          >
+                            {addingId === `wire-${wire.id}` ? (
+                              <>
+                                <Check className="w-4 h-4" />
+                                <span>{isAr ? 'تمت الإضافة! ✓' : 'Added! ✓'}</span>
+                              </>
+                            ) : (
+                              <>
+                                <ShoppingCart className="w-4 h-4" />
+                                <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
+                              </>
+                            )}
+                          </motion.span>
+                        </AnimatePresence>
                       </button>
                     </div>
                   </div>

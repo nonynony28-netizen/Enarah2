@@ -41,7 +41,7 @@ export default function CartPanel() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className={`relative z-10 w-full max-w-md h-full bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] shadow-2xl border-white/10 flex flex-col justify-between ${
+            className={`relative z-10 w-[88%] sm:w-full sm:max-w-md h-full bg-[#0a192f]/95 backdrop-blur-2xl shadow-2xl flex flex-col justify-between border-white/10 ${
               isAr ? 'border-l' : 'border-r'
             }`}
           >
@@ -154,6 +154,13 @@ export default function CartPanel() {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-slate-400">{isAr ? 'عدد الأصناف المطلوبة:' : 'Total items:'}</span>
                     <span className="text-white font-black text-lg">{cartCount}</span>
+                  </div>
+
+                  {/* Trust Advice Banner */}
+                  <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs text-center leading-relaxed">
+                    {isAr 
+                      ? '⚡ سيتم مراجعة وتأكيد طلبك وتفاصيله مباشرة مع المبيعات فور إرسال رسالة الواتساب.'
+                      : '⚡ Your order details will be directly verified and confirmed by sales upon sending the WhatsApp message.'}
                   </div>
 
                   {/* زر تأكيد الطلب للواتساب */}

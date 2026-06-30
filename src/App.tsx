@@ -99,7 +99,6 @@ function App() {
 
       <WhatsAppButton />
       <AIChatWidget />
-      <BottomNavBar />
     </>
   )
 }

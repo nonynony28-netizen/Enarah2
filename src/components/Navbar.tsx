@@ -264,7 +264,8 @@ export default function Navbar() {
                   {cartCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      animate={{ scale: [0, 1.4, 1] }}
+                      transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                       key={cartCount}
                       className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border border-[#0a192f] text-[10px] font-black text-white flex items-center justify-center shadow-[0_0_8px_#ef4444]"
                     >
@@ -301,7 +302,8 @@ export default function Navbar() {
                 {cartCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                    animate={{ scale: [0, 1.4, 1] }}
+                    transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                     key={cartCount}
                     className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-red-500 border border-[#0a192f] text-[9px] font-black text-white flex items-center justify-center shadow-[0_0_6px_#ef4444]"
                   >

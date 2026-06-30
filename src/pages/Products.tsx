@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight, ShoppingCart } from 'lucide-react'
+import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight, ShoppingCart, Check } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
@@ -30,6 +30,20 @@ export default function Products() {
     return []
   })
   const [loading, setLoading] = useState(true)
+  const [addingId, setAddingId] = useState<string | null>(null)
+
+  const handleAddToCart = (product: ProductItem) => {
+    setAddingId(product.id)
+    addToCart({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      image: product.image
+    })
+    setTimeout(() => {
+      setAddingId(null)
+    }, 1200)
+  }
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -201,16 +215,36 @@ export default function Products() {
                   </p>
                   <div className="mt-auto space-y-3">
                     <button
-                      onClick={() => addToCart({
-                        id: product.id,
-                        name: product.name,
-                        description: product.description,
-                        image: product.image
-                      })}
-                      className="w-full py-3.5 bg-blue-600/10 hover:bg-blue-600 border border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white rounded-xl transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={addingId === product.id}
+                      className={`w-full py-3.5 border transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 rounded-xl shadow-sm cursor-pointer ${
+                        addingId === product.id
+                          ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+                          : 'bg-blue-600/10 hover:bg-blue-600 border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                      }`}
                     >
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={addingId === product.id ? 'added' : 'add'}
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 4 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex items-center gap-2"
+                        >
+                          {addingId === product.id ? (
+                            <>
+                              <Check className="w-4 h-4" />
+                              <span>{isAr ? 'تمت الإضافة بنجاح! ✓' : 'Added Successfully! ✓'}</span>
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
+                            </>
+                          )}
+                        </motion.span>
+                      </AnimatePresence>
                     </button>
 
                     {product.video && (
