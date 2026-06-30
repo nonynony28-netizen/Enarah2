@@ -257,17 +257,17 @@ export default function Navbar() {
               <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="relative p-2.5 rounded-full bg-white/5 hover:bg-blue-500/10 text-slate-300 hover:text-blue-400 border border-white/5 hover:border-blue-500/30 transition-all duration-300 active:scale-95 shadow-sm"
+                  className="relative p-2.5 rounded-full bg-white/5 hover:bg-blue-500/10 text-slate-300 hover:text-blue-400 border border-white/5 hover:border-blue-500/30 transition-all duration-300 active:scale-95 shadow-sm cursor-pointer"
                   title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
                 >
-                  <ShoppingCart className="w-5 h-5" />
+                  <ShoppingCart className="w-5.5 h-5.5" />
                   {cartCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: [0, 1.4, 1] }}
                       transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                       key={cartCount}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border border-[#0a192f] text-[10px] font-black text-white flex items-center justify-center shadow-[0_0_8px_#ef4444]"
+                      className="absolute -top-1 -right-1 w-5.5 h-5.5 rounded-full bg-red-600 border-2 border-[#0a192f] text-[11px] font-black text-white flex items-center justify-center shadow-[0_0_10px_#ef4444]"
                     >
                       {cartCount}
                     </motion.span>
@@ -295,17 +295,17 @@ export default function Navbar() {
               {/* Shopping Cart Button (Mobile) */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 h-9 w-9 rounded-full bg-white/5 text-slate-300 hover:text-white border border-white/5 active:scale-95 transition-all flex items-center justify-center shadow-sm"
+                className="relative h-11 w-11 rounded-full bg-white/5 text-slate-300 hover:text-white border border-white/5 active:scale-95 transition-all flex items-center justify-center shadow-sm cursor-pointer"
                 title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-5.5 h-5.5" />
                 {cartCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: [0, 1.4, 1] }}
                     transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                     key={cartCount}
-                    className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-red-500 border border-[#0a192f] text-[9px] font-black text-white flex items-center justify-center shadow-[0_0_6px_#ef4444]"
+                    className="absolute -top-1 -right-1 w-5.5 h-5.5 rounded-full bg-red-600 border-2 border-[#0a192f] text-[11px] font-black text-white flex items-center justify-center shadow-[0_0_10px_#ef4444]"
                   >
                     {cartCount}
                   </motion.span>
