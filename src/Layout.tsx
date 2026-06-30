@@ -206,7 +206,7 @@ export default function Layout() {
       />
 
       {/* 2. حبل السحب العائم التفاعلي لتعديل وتعتيم الضوء وسحب المفتاح */}
-      <div className="fixed top-0 right-24 md:right-auto md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
+      <div className="fixed top-0 left-16 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
         <motion.div 
           className="w-[1px] md:w-[2px] bg-gradient-to-b from-[#111] via-[#444] to-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
           style={{ height: cordHeight }}

@@ -135,28 +135,52 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={`flex items-center justify-between h-14 md:h-16 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
 
-            {/* Logo الشعار */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <motion.div
-                whileHover={{ rotate: 15, scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
-              </motion.div>
-              <span className="font-extrabold text-xl md:text-2xl tracking-wide">
-                {isAr ? (
-                  <>
-                    <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">الإنارة</span>{' '}
-                    <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">الحديثة</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">ENARAH</span>{' '}
-                    <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">MODERN</span>
-                  </>
-                )}
-              </span>
-            </Link>
+            {/* Logo Group containing Logo & Mobile Cart Button to space them nicely */}
+            <div className={`flex items-center gap-4 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
+              <Link to="/" className="flex items-center gap-3 group">
+                <motion.div
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+                </motion.div>
+                <span className="font-extrabold text-xl md:text-2xl tracking-wide">
+                  {isAr ? (
+                    <>
+                      <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">الإنارة</span>{' '}
+                      <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">الحديثة</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">ENARAH</span>{' '}
+                      <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">MODERN</span>
+                    </>
+                  )}
+                </span>
+              </Link>
+
+              {/* Shopping Cart Button for Mobile (Positioned on the opposite side of Hamburger Menu) */}
+              <div className="md:hidden flex items-center">
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative h-11 w-11 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 active:scale-95 transition-all flex items-center justify-center shadow-lg shadow-blue-500/5 cursor-pointer"
+                  title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
+                >
+                  <ShoppingCart className="w-5.5 h-5.5" />
+                  {cartCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: [0, 1.4, 1] }}
+                      transition={{ type: 'spring', stiffness: 450, damping: 12 }}
+                      key={cartCount}
+                      className="absolute -top-1 -right-1 w-5.5 h-5.5 rounded-full bg-red-600 border-2 border-[#0a192f] text-[11px] font-black text-white flex items-center justify-center shadow-[0_0_10px_#ef4444]"
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </button>
+              </div>
+            </div>
 
             {/* Desktop Nav قائمة الكمبيوتر */}
             <div className={`hidden md:flex items-center gap-1.5 relative ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
@@ -292,26 +316,6 @@ export default function Navbar() {
 
             {/* Mobile Actions & Menu Button زر الجوال مع مفتاح الإنارة */}
             <div className="flex md:hidden items-center gap-2">
-              {/* Shopping Cart Button (Mobile) */}
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className="relative h-11 w-11 rounded-full bg-white/5 text-slate-300 hover:text-white border border-white/5 active:scale-95 transition-all flex items-center justify-center shadow-sm cursor-pointer"
-                title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
-              >
-                <ShoppingCart className="w-5.5 h-5.5" />
-                {cartCount > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: [0, 1.4, 1] }}
-                    transition={{ type: 'spring', stiffness: 450, damping: 12 }}
-                    key={cartCount}
-                    className="absolute -top-1 -right-1 w-5.5 h-5.5 rounded-full bg-red-600 border-2 border-[#0a192f] text-[11px] font-black text-white flex items-center justify-center shadow-[0_0_10px_#ef4444]"
-                  >
-                    {cartCount}
-                  </motion.span>
-                )}
-              </button>
-
               <button
                 onClick={toggleLanguage}
                 className="relative px-3.5 py-1.5 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_12px_rgba(59,130,246,0.4)] border border-blue-400/20 text-xs font-black"

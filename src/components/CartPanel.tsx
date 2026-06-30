@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Minus, Trash2, ShoppingCart, MessageSquare } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
@@ -15,6 +16,15 @@ export default function CartPanel() {
     cartCount,
     sendOrderToWhatsApp
   } = useCart()
+
+  useEffect(() => {
+    if (isCartOpen && cartItems.length === 0) {
+      const timer = setTimeout(() => {
+        setIsCartOpen(false)
+      }, 350)
+      return () => clearTimeout(timer)
+    }
+  }, [cartItems.length, isCartOpen, setIsCartOpen])
 
   const pricedTotal = cartItems.reduce((acc, item) => {
     return acc + (item.price ? item.price * item.quantity : 0)
