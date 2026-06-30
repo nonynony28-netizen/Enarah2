@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+﻿import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
@@ -1351,132 +1351,6 @@ export default function Home() {
           </div>
         </section>
         
-        {/* ======================================
-            نافذة الطلب المنبثقة (Modal)
-        ====================================== */}
-        <AnimatePresence>
-          {selectedWire && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-              <div className="absolute inset-0 bg-[#06152b]/95" onClick={() => setSelectedWire(null)} />
-              <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="relative w-full max-w-md bg-[#0d2342] border border-blue-500/20 rounded-[2rem] overflow-hidden shadow-2xl">
-                <button onClick={() => setSelectedWire(null)} className="absolute top-4 left-4 p-2 bg-white/5 hover:bg-red-500 text-white rounded-full transition-colors z-10"><X className="w-5 h-5" /></button>
-                <div className="p-6 md:p-8">
-                  {orderStatus === 'loading' || orderStatus === 'success' ? (
-                    <div className="text-center py-10 px-4 flex flex-col items-center justify-center relative min-h-[360px]">
-                      {/* بقعة وهج خلفية خفيفة */}
-                      <div className="absolute w-40 h-40 bg-blue-500/10 rounded-full blur-[80px] -z-10 pointer-events-none animate-pulse" />
-                      
-                      {orderStatus === 'loading' ? (
-                        <div className="flex flex-col items-center justify-center space-y-6">
-                          {/* حلقات التوجيه الإلكتروني */}
-                          <div className="relative w-24 h-24 flex items-center justify-center">
-                            <span className="absolute inset-0 rounded-full border-2 border-dashed border-blue-500/30 animate-spin [animation-duration:15s]" />
-                            <span className="absolute inset-2.5 rounded-full border border-blue-400/40 animate-pulse" />
-                            <span className="absolute inset-5 rounded-full bg-blue-600/10 border border-blue-500/20" />
-                            <Loader2 className="w-9 h-9 text-blue-400 animate-spin relative z-10" />
-                          </div>
-                          
-                          <div>
-                            <h3 className="text-2xl font-bold text-white mb-2 animate-pulse font-sans">
-                              {isAr ? 'تجهيز طلبك الرقمي' : 'Preparing Your Digital Order'}
-                            </h3>
-                            <p className="text-blue-300 text-sm max-w-xs mx-auto leading-relaxed">
-                              {isAr 
-                                ? 'نقوم بإنشاء اتصال آمن ونقل بياناتك إلى سجل المبيعات والواتساب...'
-                                : 'Creating a secure connection and forwarding your order details to WhatsApp...'}
-                            </p>
-                          </div>
-
-                          {/* خط تقدم مستمر */}
-                          <div className="w-full max-w-[200px] h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
-                            <div className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full animate-[loadingBar_1.8s_ease-out_infinite]" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center space-y-6">
-                          {/* دائرة النجاح المنبثقة مع الجزيئات المتطايرة */}
-                          <div className="relative w-24 h-24 flex items-center justify-center">
-                            {/* موجات نجاح نابضة */}
-                            <div className="absolute inset-0 rounded-full bg-green-500/10 border border-green-500/30 animate-ping [animation-duration:1.5s]" />
-                            <div className="absolute inset-2.5 rounded-full bg-green-600/20 border border-green-400/20" />
-                            
-                            {/* زر النجاح ثلاثي الأبعاد المضيء */}
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-[0_0_25px_rgba(34,197,94,0.4)] relative z-10 scale-100 animate-[bounceIn_0.5s_cubic-bezier(0.175,0.885,0.32,1.275)]">
-                              <CheckCircle className="w-9 h-9 text-white" />
-                            </div>
-
-                            {/* جزيئات نيون تتلاشى للخارج */}
-                            <span className="absolute w-2.5 h-2.5 rounded-full bg-green-400 animate-[particleTop_1.2s_ease-out_infinite] top-0 left-1/2" />
-                            <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-400 animate-[particleBottom_1.2s_ease-out_infinite] bottom-0 left-1/2" />
-                            <span className="absolute w-2.5. h-2.5 rounded-full bg-green-300 animate-[particleLeft_1.2s_ease-out_infinite] left-0 top-1/2" />
-                            <span className="absolute w-2.5. h-2.5 rounded-full bg-emerald-300 animate-[particleRight_1.2s_ease-out_infinite] right-0 top-1/2" />
-                          </div>
-                          
-                          <div>
-                            <h3 className="text-2xl font-bold text-white mb-2">
-                              {isAr ? 'تم تسجيل طلبك بنجاح!' : 'Order Placed Successfully!'}
-                            </h3>
-                            <p className="text-emerald-200 text-sm max-w-xs mx-auto leading-relaxed">
-                              {isAr
-                                ? 'تم التوثيق الرقمي. جاري تحويلك الآن للواتساب للتأكيد الفوري والمتابعة...'
-                                : 'Digital verification complete. Redirecting you to WhatsApp for final confirmation...'}
-                            </p>
-                          </div>
-
-                          {/* خط تعبئة تقدم توجيه الواتساب */}
-                          <div className="w-full max-w-[220px] h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                            <div className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full animate-[successProgress_2.5s_ease-in-out_forwards]" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <h3 className="text-2xl font-bold text-white mb-2 pr-6">{isAr ? 'طلب سريع' : 'Quick Order'}</h3>
-                      <p className="text-blue-300 mb-6 font-medium">
-                        {isAr ? `سلك إيطالي مقاس ${getLocalizedSize(selectedWire.size, isAr)}` : `Italian Wire Size: ${getLocalizedSize(selectedWire.size, isAr)}`}
-                      </p>
-                      <form onSubmit={submitOrder} className="space-y-4 md:space-y-5">
-                        <div>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'رقم الهاتف للتواصل' : 'Contact Phone Number'}</label>
-                          <input required type="tel" value={orderForm.phone} onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder="09X XXX XXXX" />
-                        </div>
-                        <div>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'المدينة' : 'City'}</label>
-                          <input required type="text" value={orderForm.city} onChange={(e) => setOrderForm({...orderForm, city: e.target.value})} className="w-full bg-[#0a192f] border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all text-right" placeholder={isAr ? 'اسم مدينتك' : 'Your city name'} />
-                        </div>
-                        <div>
-                          <label className="block text-slate-300 text-sm font-bold mb-2">{isAr ? 'الكمية (عدد اللفات)' : 'Quantity (Number of Rolls)'}</label>
-                          <div className="flex items-center bg-[#0a192f] border border-white/10 rounded-xl overflow-hidden">
-                            <button type="button" onClick={() => setOrderForm({...orderForm, quantity: Math.max(1, orderForm.quantity - 1)})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">-</button>
-                            <input type="number" min="1" value={orderForm.quantity} onChange={(e) => setOrderForm({...orderForm, quantity: parseInt(e.target.value) || 1})} className="w-full bg-transparent text-white text-center font-bold outline-none" />
-                            <button type="button" onClick={() => setOrderForm({...orderForm, quantity: orderForm.quantity + 1})} className="px-5 py-3 text-white hover:bg-white/10 font-bold">+</button>
-                          </div>
-                        </div>
-                        <div className="p-4 bg-[#0a192f] border border-blue-500/20 rounded-xl flex justify-between items-center mt-6">
-                          <span className="text-slate-300 font-bold">{isAr ? 'الإجمالي:' : 'Total:'}</span>
-                          <span className="text-2xl font-extrabold text-white">
-                            {(parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)} <span className="text-sm font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
-                          </span>
-                        </div>
-                        <button type="submit" disabled={orderStatus === 'loading'} className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg mt-4 disabled:opacity-50 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                          {orderStatus === 'loading' ? (
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                          ) : (
-                            <>
-                              <MessageCircle className="w-6 h-6 animate-pulse" />
-                              {isAr ? 'تأكيد الطلب وإرساله بالواتساب' : 'Confirm Order & Send via WhatsApp'}
-                            </>
-                          )}
-                        </button>
-                      </form>
-                    </>
-                  )}
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* معرض الصور المنبثق التفاعلي للمشاريع (Lightbox Gallery) */}
         <AnimatePresence>
@@ -1639,3 +1513,4 @@ export default function Home() {
     </>
   )
 }
+
