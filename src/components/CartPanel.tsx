@@ -21,9 +21,9 @@ export default function CartPanel() {
   }, 0)
 
   const slideVariants = {
-    hidden: { x: isAr ? '100%' : '-100%' },
+    hidden: { x: isAr ? '-100%' : '100%' },
     visible: { x: 0, transition: { type: 'tween', ease: 'easeOut', duration: 0.3 } },
-    exit: { x: isAr ? '100%' : '-100%', transition: { type: 'tween', ease: 'easeIn', duration: 0.25 } }
+    exit: { x: isAr ? '-100%' : '100%', transition: { type: 'tween', ease: 'easeIn', duration: 0.25 } }
   }
 
   return (
