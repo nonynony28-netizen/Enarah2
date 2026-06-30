@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight } from 'lucide-react'
+import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight, ShoppingCart } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
+import { useCart } from '../hooks/useCart'
 
 const glowingTitleStyle = {
   textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
@@ -18,6 +19,7 @@ type ProductItem = {
 
 export default function Products() {
   const { isAr } = useLanguage()
+  const { addToCart } = useCart()
   const [products, setProducts] = useState<ProductItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_products')
@@ -197,12 +199,27 @@ export default function Products() {
                   <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-8">
                     {product.description || (isAr ? 'لا يوجد وصف متاح لهذا المنتج حالياً.' : 'No description available for this product currently.')}
                   </p>
-                  {product.video && (
-                    <a href={product.video} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all duration-300 font-bold text-sm shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                      <PlayCircle className="w-5 h-5" /> 
-                      {isAr ? 'شاهد فيديو للمنتج' : 'Watch Product Video'}
-                    </a>
-                  )}
+                  <div className="mt-auto space-y-3">
+                    <button
+                      onClick={() => addToCart({
+                        id: product.id,
+                        name: product.name,
+                        description: product.description,
+                        image: product.image
+                      })}
+                      className="w-full py-3.5 bg-blue-600/10 hover:bg-blue-600 border border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white rounded-xl transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
+                    </button>
+
+                    {product.video && (
+                      <a href={product.video} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 w-full py-3 bg-white/5 border border-white/10 text-slate-300 hover:bg-[#0f213a] rounded-xl transition-all duration-300 font-bold text-xs">
+                        <PlayCircle className="w-4 h-4 text-blue-400" /> 
+                        {isAr ? 'شاهد فيديو للمنتج' : 'Watch Product Video'}
+                      </a>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             ))}

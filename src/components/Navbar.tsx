@@ -3,15 +3,18 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
-  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders, Globe
+  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders, Globe, ShoppingCart
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useCart } from '../hooks/useCart'
+import CartPanel from './CartPanel'
 
 // نمط الوهج للعناوين والشعارات المضيئة
 const glowingTitleStyle = { textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)' }
 
 export default function Navbar() {
   const { toggleLanguage, t, isAr } = useLanguage()
+  const { cartCount, setIsCartOpen } = useCart()
 
   const servicesDropdownLabel = t('nav.servicesDropdown') || 'الأقسام والأسعار';
   const servicesDropdownItems = [
@@ -250,6 +253,27 @@ export default function Navbar() {
                 )
               })}
 
+              {/* Shopping Cart Button (Desktop) */}
+              <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative p-2.5 rounded-full bg-white/5 hover:bg-blue-500/10 text-slate-300 hover:text-blue-400 border border-white/5 hover:border-blue-500/30 transition-all duration-300 active:scale-95 shadow-sm"
+                  title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      key={cartCount}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border border-[#0a192f] text-[10px] font-black text-white flex items-center justify-center shadow-[0_0_8px_#ef4444]"
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </button>
+              </div>
+
               {/* Language Switcher */}
               <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
                 <button
@@ -267,6 +291,25 @@ export default function Navbar() {
 
             {/* Mobile Actions & Menu Button زر الجوال مع مفتاح الإنارة */}
             <div className="flex md:hidden items-center gap-2">
+              {/* Shopping Cart Button (Mobile) */}
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 h-9 w-9 rounded-full bg-white/5 text-slate-300 hover:text-white border border-white/5 active:scale-95 transition-all flex items-center justify-center shadow-sm"
+                title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {cartCount > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    key={cartCount}
+                    className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-red-500 border border-[#0a192f] text-[9px] font-black text-white flex items-center justify-center shadow-[0_0_6px_#ef4444]"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </button>
+
               <button
                 onClick={toggleLanguage}
                 className="relative px-3.5 py-1.5 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_12px_rgba(59,130,246,0.4)] border border-blue-400/20 text-xs font-black"
@@ -440,6 +483,8 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <CartPanel />
     </>
   )
 }
