@@ -16,6 +16,10 @@ export default function CartPanel() {
     sendOrderToWhatsApp
   } = useCart()
 
+  const pricedTotal = cartItems.reduce((acc, item) => {
+    return acc + (item.price ? item.price * item.quantity : 0)
+  }, 0)
+
   const slideVariants = {
     hidden: { x: isAr ? '100%' : '-100%' },
     visible: { x: 0, transition: { type: 'tween', ease: 'easeOut', duration: 0.3 } },
@@ -37,6 +41,7 @@ export default function CartPanel() {
 
           {/* Cart Sidebar السلة الجانبية */}
           <motion.div
+            onClick={(e) => e.stopPropagation()}
             variants={slideVariants}
             initial="hidden"
             animate="visible"
@@ -65,9 +70,10 @@ export default function CartPanel() {
                 </div>
                 <button
                   onClick={() => setIsCartOpen(false)}
-                  className="p-2 rounded-full bg-white/5 text-slate-300 hover:text-white active:scale-95 transition-all border border-white/5"
+                  className="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 active:scale-90 transition-all border border-white/5 cursor-pointer"
+                  aria-label={isAr ? 'إغلاق السلة' : 'Close cart'}
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 
@@ -113,6 +119,24 @@ export default function CartPanel() {
                           {item.description || (isAr ? 'لا يوجد وصف متاح' : 'No description')}
                         </p>
 
+                        {/* سعر الصنف والعدد الإجمالي */}
+                        {item.price ? (
+                          <div className="mt-2 flex flex-wrap items-baseline gap-2">
+                            <span className="text-blue-300 text-sm font-black">
+                              {item.price.toFixed(2)} <span className="text-[10px] font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                            </span>
+                            {item.quantity > 1 && (
+                              <span className="text-slate-400 text-xs font-semibold">
+                                ({isAr ? 'المجموع:' : 'Subtotal:'} <span className="text-blue-200">{(item.price * item.quantity).toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</span>)
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-500 text-[10px] font-bold mt-1.5 bg-white/5 border border-white/5 px-2 py-0.5 rounded-md inline-block">
+                            {isAr ? '🔍 السعر يحدد مع المبيعات' : '🔍 Price verified on checkout'}
+                          </span>
+                        )}
+
                         {/* معدلات الكميات */}
                         <div className="flex items-center gap-3 mt-3">
                           <div className="flex items-center bg-[#0a192f] border border-white/10 rounded-lg p-0.5 overflow-hidden">
@@ -155,6 +179,16 @@ export default function CartPanel() {
                     <span className="text-slate-400">{isAr ? 'عدد الأصناف المطلوبة:' : 'Total items:'}</span>
                     <span className="text-white font-black text-lg">{cartCount}</span>
                   </div>
+
+                  {/* إجمالي سعر المواد المسعرة */}
+                  {pricedTotal > 0 && (
+                    <div className="flex items-center justify-between border-t border-white/5 pt-3">
+                      <span className="text-slate-300 font-bold">{isAr ? 'إجمالي المواد المسعرة:' : 'Total priced items:'}</span>
+                      <span className="text-blue-300 font-black text-xl">
+                        {pricedTotal.toFixed(2)} <span className="text-xs font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                      </span>
+                    </div>
+                  )}
 
                   {/* Trust Advice Banner */}
                   <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs text-center leading-relaxed">

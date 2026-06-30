@@ -7,6 +7,7 @@ export type CartItem = {
   description: string;
   image: string;
   quantity: number;
+  price?: number;
 };
 
 type CartParticle = {
@@ -17,7 +18,7 @@ type CartParticle = {
 
 type CartContextType = {
   cartItems: CartItem[];
-  addToCart: (product: { id: string; name: string; description: string; image: string }) => void;
+  addToCart: (product: { id: string; name: string; description: string; image: string; price?: number }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -52,7 +53,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('enarah_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product: { id: string; name: string; description: string; image: string }) => {
+  const addToCart = (product: { id: string; name: string; description: string; image: string; price?: number }) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
@@ -62,7 +63,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
-    // Do not open cart automatically as per user request
   };
 
   const removeFromCart = (id: string) => {
@@ -99,9 +99,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ? 'السلام عليكم ورحمة الله وبركاته، أود تأكيد طلب المنتجات التالية من شركة الإنارة الحديثة:\n\n'
       : 'Hello, I would like to place an order for the following items from Enarah Modern:\n\n';
 
+    let pricedTotal = 0;
+    let hasPriced = false;
+
     cartItems.forEach((item, index) => {
-      text += `${index + 1}. *${item.name}* (الكمية: ${item.quantity})\n`;
+      if (item.price) {
+        hasPriced = true;
+        const subtotal = item.price * item.quantity;
+        pricedTotal += subtotal;
+        text += `${index + 1}. *${item.name}* (الكمية: ${item.quantity}) - السعر: ${item.price.toFixed(2)} د.ل (الإجمالي: ${subtotal.toFixed(2)} د.ل)\n`;
+      } else {
+        text += `${index + 1}. *${item.name}* (الكمية: ${item.quantity}) - [السعر يحدد مع المبيعات]\n`;
+      }
     });
+
+    if (hasPriced) {
+      text += isAr
+        ? `\n💰 إجمالي المواد المسعرة: ${pricedTotal.toFixed(2)} د.ل\n`
+        : `\n💰 Total for priced items: ${pricedTotal.toFixed(2)} LYD\n`;
+    }
 
     text += isAr
       ? `\nإجمالي عدد الأصناف: ${cartCount}\nيرجى التواصل معي لتأكيد الأسعار وتفاصيل التسليم.`

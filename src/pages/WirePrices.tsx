@@ -73,8 +73,9 @@ export default function WirePrices() {
     addToCart({
       id: itemId,
       name: isAr ? `سلك إيطالي مقاس ${wire.size}` : `Italian Wire ${wire.id}mm`,
-      description: isAr ? `سلك مفرد لفة 100 متر - سعر اللفة: ${wire.price} د.ل` : `Single 100m Roll - price: ${wire.price} LYD`,
-      image: '/images/cat-cables.jpg'
+      description: isAr ? `سلك مفرد لفة 100 متر` : `Single 100m Roll`,
+      image: '/images/cat-cables.jpg',
+      price: parseFloat(wire.price)
     })
     setTimeout(() => {
       setAddingId(null)

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
@@ -184,8 +184,9 @@ export default function Home() {
     addToCart({
       id: itemId,
       name: isAr ? `سلك إيطالي مقاس ${wire.size}` : `Italian Wire ${wire.id}mm`,
-      description: isAr ? `سلك مفرد لفة 100 متر - سعر اللفة: ${wire.price} د.ل` : `Single 100m Roll - price: ${wire.price} LYD`,
-      image: '/images/cat-cables.jpg'
+      description: isAr ? `سلك مفرد لفة 100 متر` : `Single 100m Roll`,
+      image: '/images/cat-cables.jpg',
+      price: parseFloat(wire.price)
     })
     setTimeout(() => {
       setAddingId(null)
