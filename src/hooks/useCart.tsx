@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export type CartItem = {
   id: string;
@@ -6,6 +7,12 @@ export type CartItem = {
   description: string;
   image: string;
   quantity: number;
+};
+
+type CartParticle = {
+  id: number;
+  x: number;
+  y: number;
 };
 
 type CartContextType = {
@@ -18,6 +25,7 @@ type CartContextType = {
   isCartOpen: boolean;
   setIsCartOpen: (isOpen: boolean) => void;
   sendOrderToWhatsApp: (isAr: boolean) => void;
+  triggerFlyAnimation: (x: number, y: number) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -38,6 +46,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [particles, setParticles] = useState<CartParticle[]>([]);
 
   useEffect(() => {
     localStorage.setItem('enarah_cart', JSON.stringify(cartItems));
@@ -53,7 +62,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
-    setIsCartOpen(true);
+    // Do not open cart automatically as per user request
   };
 
   const removeFromCart = (id: string) => {
@@ -75,6 +84,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  const triggerFlyAnimation = (x: number, y: number) => {
+    const id = Date.now() + Math.random();
+    setParticles((prev) => [...prev, { id, x, y }]);
+    setTimeout(() => {
+      setParticles((prev) => prev.filter((p) => p.id !== id));
+    }, 900);
+  };
 
   const sendOrderToWhatsApp = (isAr: boolean) => {
     const phone = '218916580068';
@@ -106,9 +123,37 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isCartOpen,
         setIsCartOpen,
         sendOrderToWhatsApp,
+        triggerFlyAnimation,
       }}
     >
       {children}
+
+      {/* flying particles renderer */}
+      <AnimatePresence>
+        {particles.map((p) => {
+          const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+          const targetX = isRTL ? 75 : (typeof window !== 'undefined' ? window.innerWidth - 75 : 1200);
+          const targetY = 28;
+
+          return (
+            <motion.div
+              key={p.id}
+              initial={{ x: p.x - 10, y: p.y - 10, scale: 1.2, opacity: 1 }}
+              animate={{
+                x: targetX,
+                y: targetY,
+                scale: 0.15,
+                opacity: 0,
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.85, ease: [0.25, 1, 0.5, 1] }}
+              className="fixed z-[9999] pointer-events-none w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-[10px] font-black text-white shadow-[0_0_12px_rgba(59,130,246,0.8)] border border-blue-300/40"
+            >
+              +1
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </CartContext.Provider>
   );
 };

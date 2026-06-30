@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
 import { useLanguage } from '../hooks/useLanguage'
+import { useCart } from '../hooks/useCart'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
-  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle
+  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check
 } from 'lucide-react'
 
 // نمط الوهج
@@ -173,9 +174,23 @@ export default function Home() {
     return defaultWireData
   })
   
-  const [selectedWire, setSelectedWire] = useState<typeof wirePrices[0] | null>(null)
-  const [orderForm, setOrderForm] = useState({ phone: '', city: '', quantity: 1 })
-  const [orderStatus, setOrderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const { addToCart, triggerFlyAnimation } = useCart()
+  const [addingId, setAddingId] = useState<string | null>(null)
+
+  const handleAddToCart = (e: React.MouseEvent, wire: any) => {
+    const itemId = `wire-${wire.id}`
+    triggerFlyAnimation(e.clientX, e.clientY)
+    setAddingId(itemId)
+    addToCart({
+      id: itemId,
+      name: isAr ? `سلك إيطالي مقاس ${wire.size}` : `Italian Wire ${wire.id}mm`,
+      description: isAr ? `سلك مفرد لفة 100 متر - سعر اللفة: ${wire.price} د.ل` : `Single 100m Roll - price: ${wire.price} LYD`,
+      image: '/images/cat-cables.jpg'
+    })
+    setTimeout(() => {
+      setAddingId(null)
+    }, 1200)
+  }
 
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -317,47 +332,7 @@ export default function Home() {
     fetchHomeData()
   }, [isAr])
 
-  const submitOrder = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedWire) return
-    setOrderStatus('loading')
-    try {
-      const totalPrice = (parseFloat(selectedWire.price) * orderForm.quantity).toFixed(2)
-      await fetch('https://enarah2.vercel.app/api/save-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `🛒 طلبية أسلاك: مقاس ${selectedWire.size}`,
-          phone: orderForm.phone,
-          email: `المدينة: ${orderForm.city} | العدد: ${orderForm.quantity} لفة | الإجمالي: ${totalPrice} د.ل`,
-          type: 'contact' 
-        })
-      })
 
-      const telegramBotToken = "8951369127:AAFxThF562Xt9LxsQZMibNOxrFTeJtuScOM" 
-      const telegramChatId = "8372746727"
-      const telegramMessage = `🚨 *طلب أسلاك جديد!*\n\n🛒 *المقاس:* ${selectedWire.size}\n📦 *الكمية:* ${orderForm.quantity} لفة\n💰 *الإجمالي:* ${totalPrice} د.ل\n📍 *المدينة:* ${orderForm.city}\n📞 *الهاتف:* ${orderForm.phone}`;
-
-      if (telegramBotToken) {
-        fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: telegramChatId, text: telegramMessage, parse_mode: 'Markdown' })
-        }).catch(() => {});
-      }
-
-      // تحويل المستخدم إلى الواتس اب للتأكيد الفوري
-      const whatsappMsg = `السلام عليكم، أريد تأكيد طلب شراء سلك إيطالي:\n\n*المقاس:* ${selectedWire.size}\n*الكمية:* ${orderForm.quantity} لفة\n*الإجمالي:* ${totalPrice} د.ل\n*المدينة:* ${orderForm.city}\n*الهاتف:* ${orderForm.phone}`;
-      const whatsappUrl = `https://wa.me/218916580068?text=${encodeURIComponent(whatsappMsg)}`;
-      window.location.href = whatsappUrl;
-
-      setOrderStatus('success')
-      setTimeout(() => {
-        setOrderStatus('idle')
-        setSelectedWire(null)
-        setOrderForm({ phone: '', city: '', quantity: 1 })
-      }, 3000)
-    } catch { setOrderStatus('error') }
-  }
 
   // فتح معرض الصور للمشروع
   const openGallery = (project: ProjectItem) => {
@@ -1299,8 +1274,37 @@ export default function Home() {
                         <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${wire.trend === 'up' ? 'bg-green-500/10 border-green-500/30 text-green-400' : wire.trend === 'down' ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-slate-500/10 border-slate-500/30 text-slate-400'}`}>
                           {wire.trend === 'up' && <TrendingUp className="w-4 h-4" />}{wire.trend === 'down' && <TrendingDown className="w-4 h-4" />}{wire.trend === 'same' && <Minus className="w-4 h-4" />}
                         </div>
-                        <button onClick={() => setSelectedWire(wire)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:bg-blue-500 transition-all hover:scale-[1.03] active:scale-[0.97]">
-                          <ShoppingCart className="w-4 h-4" /> {isAr ? 'اطلب الآن' : 'Order Now'}
+                        <button 
+                          onClick={(e) => handleAddToCart(e, wire)}
+                          disabled={addingId === `wire-${wire.id}`}
+                          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer border ${
+                            addingId === `wire-${wire.id}`
+                              ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+                              : 'bg-blue-600 border-blue-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:bg-blue-500 hover:scale-[1.03] active:scale-[0.97]'
+                          }`}
+                        >
+                          <AnimatePresence mode="wait">
+                            <motion.span
+                              key={addingId === `wire-${wire.id}` ? 'added' : 'add'}
+                              initial={{ opacity: 0, y: -4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 4 }}
+                              transition={{ duration: 0.2 }}
+                              className="flex items-center gap-2"
+                            >
+                              {addingId === `wire-${wire.id}` ? (
+                                <>
+                                  <Check className="w-4 h-4" />
+                                  <span>{isAr ? 'تمت الإضافة! ✓' : 'Added! ✓'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <ShoppingCart className="w-4 h-4" />
+                                  <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
+                                </>
+                              )}
+                            </motion.span>
+                          </AnimatePresence>
                         </button>
                       </div>
                     </div>

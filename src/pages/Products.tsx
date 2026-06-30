@@ -19,7 +19,7 @@ type ProductItem = {
 
 export default function Products() {
   const { isAr } = useLanguage()
-  const { addToCart } = useCart()
+  const { addToCart, triggerFlyAnimation } = useCart()
   const [products, setProducts] = useState<ProductItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_products')
@@ -32,7 +32,8 @@ export default function Products() {
   const [loading, setLoading] = useState(true)
   const [addingId, setAddingId] = useState<string | null>(null)
 
-  const handleAddToCart = (product: ProductItem) => {
+  const handleAddToCart = (e: React.MouseEvent, product: ProductItem) => {
+    triggerFlyAnimation(e.clientX, e.clientY)
     setAddingId(product.id)
     addToCart({
       id: product.id,
@@ -215,7 +216,7 @@ export default function Products() {
                   </p>
                   <div className="mt-auto space-y-3">
                     <button
-                      onClick={() => handleAddToCart(product)}
+                      onClick={(e) => handleAddToCart(e, product)}
                       disabled={addingId === product.id}
                       className={`w-full py-3.5 border transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 rounded-xl shadow-sm cursor-pointer ${
                         addingId === product.id

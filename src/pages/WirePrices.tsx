@@ -61,13 +61,14 @@ export default function WirePrices() {
     return defaultWireData
   })
   
-  const { addToCart } = useCart()
+  const { addToCart, triggerFlyAnimation } = useCart()
   const [wireUpdates, setWireUpdates] = useState<any[]>([])
   const [selectedChartWireId, setSelectedChartWireId] = useState('1.5')
   const [addingId, setAddingId] = useState<string | null>(null)
 
-  const handleAddToCart = (wire: any) => {
+  const handleAddToCart = (e: React.MouseEvent, wire: any) => {
     const itemId = `wire-${wire.id}`
+    triggerFlyAnimation(e.clientX, e.clientY)
     setAddingId(itemId)
     addToCart({
       id: itemId,
@@ -291,7 +292,7 @@ export default function WirePrices() {
                       </div>
 
                       <button 
-                        onClick={() => handleAddToCart(wire)}
+                        onClick={(e) => handleAddToCart(e, wire)}
                         disabled={addingId === `wire-${wire.id}`}
                         className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer border ${
                           addingId === `wire-${wire.id}`
