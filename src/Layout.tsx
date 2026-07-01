@@ -136,7 +136,7 @@ export default function Layout() {
       damping: 24
     })
 
-    const threshold = isMobile ? 60 : 90
+    const threshold = isMobile ? 50 : 90
     if (currentY >= threshold) {
       const isLight = document.documentElement.classList.contains('light')
       playClickSound(!isLight)
@@ -214,13 +214,16 @@ export default function Layout() {
         <motion.div 
           drag="y"
           dragConstraints={{ top: 0, bottom: maxDrag }}
-          dragElastic={isMobile ? 1.2 : 0.25}
+          dragElastic={isMobile ? 0.5 : 0.25}
           style={{ y, touchAction: 'none' }}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={handleDragEnd}
-          className="w-3.5 h-3.5 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-[1.2px] md:border-2 border-white cursor-grab active:cursor-grabbing pointer-events-auto shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300"
+          className="w-12 h-12 flex items-center justify-center cursor-grab active:cursor-grabbing pointer-events-auto -mt-5"
+          title={isAr ? 'اسحب لتغيير وضع الإضاءة' : 'Pull to change lighting mode'}
         >
-          <div className="w-[3px] h-[3px] md:w-[6px] md:h-[6px] bg-white rounded-full opacity-90" />
+          <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-[1.5px] border-white shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300">
+            <div className="w-[4px] h-[4px] bg-white rounded-full opacity-90" />
+          </div>
         </motion.div>
 
         {/* مؤشر الإرشاد العائم */}
