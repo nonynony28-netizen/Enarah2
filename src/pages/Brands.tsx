@@ -4,11 +4,6 @@ import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 
-// نمط الوهج الأزرق للعناوين الفخمة
-const glowingTitleStyle = {
-  textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
-}
-
 // مكون الأنيميشن السريع
 function FadeIn({
   children,
@@ -26,7 +21,7 @@ function FadeIn({
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      style={{ willChange: "opacity, transform" }} // تسريع الأداء
+      style={{ willChange: "opacity, transform" }}
     >
       {children}
     </motion.div>
@@ -38,11 +33,112 @@ export default function Brands() {
 
   const brands = [
     {
-      name: isAr ? 'الوكالات العالمية' : 'Global Agencies',
+      id: 'legrand',
+      name: 'Legrand',
+      origin: isAr ? 'فرنسا 🇫🇷' : 'France 🇫🇷',
       description: isAr 
-        ? 'نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية'
-        : 'A selection of the most prominent global brands and companies specialized in lighting, installations, and electrical materials.',
-      image: "https://i.postimg.cc/9XqR1x8c/IMG-3397.webp"
+        ? 'شركة فرنسية عالمية رائدة في مجال البنية التحتية الكهربائية والرقمية للمباني، وتشتهر بمفاتيح التوصيل الفاخرة وأنظمة التحكم الذكية.'
+        : 'A French global leader in electrical and digital building infrastructures, renowned for premium wiring devices and smart control systems.',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Logo_Legrand.svg/320px-Logo_Legrand.svg.png'
+    },
+    {
+      id: 'philips',
+      name: 'Philips',
+      origin: isAr ? 'هولندا 🇳🇱' : 'Netherlands 🇳🇱',
+      description: isAr 
+        ? 'الرائد العالمي في مجال حلول الإضاءة المبتكرة، ومصابيح LED الموفرة للطاقة، وأنظمة الإضاءة الذكية الفاخرة.'
+        : 'The global pioneer in innovative lighting solutions, energy-efficient LED technology, and premium smart home lighting systems.',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Philips_logo_new.svg/320px-Philips_logo_new.svg.png'
+    },
+    {
+      id: 'gewiss',
+      name: 'Gewiss',
+      origin: isAr ? 'إيطاليا 🇮🇹' : 'Italy 🇮🇹',
+      description: isAr 
+        ? 'علامة إيطالية فاخرة متخصصة في أنظمة التشغيل الآلي للمباني، وتوزيع الطاقة، وحلول الإنارة الفنية والصناعية المتكاملة.'
+        : 'A luxury Italian brand specialized in building automation, power distribution, and advanced technical/industrial lighting systems.',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Gewiss_logo.svg/320px-Gewiss_logo.svg.png'
+    },
+    {
+      id: 'chint',
+      name: 'CHINT',
+      origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
+      description: isAr 
+        ? 'مجموعة عالمية كبرى لإنتاج وتطوير معدات توزيع الكهرباء ذات الجهد المنخفض، والقواطع الآمنة، وأنظمة الحماية الكهربائية.'
+        : 'A leading global provider of smart energy solutions, low-voltage electrical distribution gear, and advanced protective systems.',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Chint_Group_logo.svg/320px-Chint_Group_logo.svg.png'
+    },
+    {
+      id: 'wellmax',
+      name: 'WELLMAX',
+      origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
+      description: isAr 
+        ? 'عملاق تكنولوجيا مصابيح LED الملقب بـ "ملك اللمبات"، ويتميز بأعلى معايير الكفاءة والعمر الافتراضي الممتد للإنارة السكنية.'
+        : 'A renowned global LED packaging and bulb design giant, famous for high efficiency and extended lifespan in residential lighting.',
+      logoUrl: '/images/brand-wellmax.jpg'
+    },
+    {
+      id: 'alfanar',
+      name: 'Alfanar',
+      origin: isAr ? 'السعودية 🇸🇦' : 'Saudi Arabia 🇸🇦',
+      description: isAr 
+        ? 'من أكبر الشركات الإقليمية تصنيعاً للكابلات النحاسية، ولوحات التوزيع الكهربائية الآمنة، والمفاتيح والأفياش المقاومة للحريق.'
+        : 'A leading regional powerhouse in manufacturing premium cables, electrical distribution boards, and fire-resistant wiring accessories.',
+      logoUrl: 'https://i.postimg.cc/mD71Kz1G/alfanar.png'
+    },
+    {
+      id: 'fumagalli',
+      name: 'Fumagalli',
+      origin: isAr ? 'إيطاليا 🇮🇹' : 'Italy 🇮🇹',
+      description: isAr 
+        ? 'الشركة الإيطالية الأولى عالمياً في إنتاج إضاءات الحدائق والإنارة الخارجية المقاومة للصدأ والتآكل بفضل مادة الراتنج الفريدة.'
+        : 'The ultimate Italian manufacturer of outdoor and garden lighting, famous for rust-free and shockproof resin composite posts.',
+      logoUrl: 'https://i.postimg.cc/qvh8K09h/fumagalli.png'
+    },
+    {
+      id: 'commax',
+      name: 'Commax',
+      origin: isAr ? 'كوريا الجنوبية 🇰🇷' : 'South Korea 🇰🇷',
+      description: isAr 
+        ? 'الرائد الكوري الجنوبي في أنظمة الاتصال الداخلي الذكي (الانتركم) وشاشات المراقبة وحلول الاتصالات المنزلية المتكاملة.'
+        : 'A South Korean global leader in smart video intercoms, residential surveillance screens, and home security solutions.',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/COMMAX_logo.png'
+    },
+    {
+      id: 'cata',
+      name: 'CATA',
+      origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+      description: isAr 
+        ? 'ماركة تركية متميزة تقدم أحدث حلول الإضاءة الزخرفية والسبوت لايت والمصابيح الليد العصرية المناسبة للمنازل والمكاتب.'
+        : 'A prominent Turkish brand offering modern decorative lighting, high-quality spot lights, and elegant LED solutions for homes & offices.',
+      logoUrl: 'https://i.postimg.cc/3Rx23n4x/cata.png'
+    },
+    {
+      id: 'borsan',
+      name: 'Borsan',
+      origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+      description: isAr 
+        ? 'من كبرى المصانع التركية المنتجة للكابلات الكهربائية النحاسية عالية التوصيل، وكابلات الاتصالات وتجهيزات التركيب الكهربائي.'
+        : 'One of the leading Turkish manufacturers of highly conductive copper electrical cables, telecom wires, and wiring equipment.',
+      logoUrl: 'https://i.postimg.cc/KvvQ2xNq/borsan.png'
+    },
+    {
+      id: 'makel',
+      name: 'Makel',
+      origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+      description: isAr 
+        ? 'شركة صناعية تركية رائدة في إنتاج المفاتيح الكهربائية، والمقابس، وقواطع الدورة الفردية والثنائية للحماية من الالتماس.'
+        : 'A Turkish pioneer in producing premium electrical switches, wall sockets, and safety circuit breakers for electric protection.',
+      logoUrl: 'https://i.postimg.cc/j5G5wDpx/makel.png'
+    },
+    {
+      id: 'isildar',
+      name: 'Isildar',
+      origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+      description: isAr 
+        ? 'أنظمة إضاءة ومواد تأسيس كهربائي تركية مبتكرة مصممة لأقسى ظروف العمل وتوفر تكلفة تشغيل اقتصادية.'
+        : 'Innovative Turkish lighting and wiring installation brands designed for heavy duty performance and cost-effective operations.',
+      logoUrl: 'https://i.postimg.cc/VvF4X1r7/isildar.png'
     }
   ]
 
@@ -93,30 +189,44 @@ export default function Brands() {
         {/* شبكة الماركات (معدلة لتصبح كروت أنيقة بجانب بعضها) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {brands.map((brand, i) => (
-            <FadeIn key={i} delay={0.2 + (i * 0.1)}>
-              <div className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden hover:border-blue-500/30 transition-all duration-500 hover:-translate-y-2 shadow-xl flex flex-col h-full">
-
-                {/* Brand Image Section */}
-                <div className="bg-[#0a192f] p-8">
-                  <div className="aspect-[16/9] overflow-hidden flex items-center justify-center rounded-2xl relative">
+            <FadeIn key={brand.id} delay={0.2 + (i * 0.05)}>
+              <div className="group relative bg-[#0f213a]/80 border border-white/5 hover:border-blue-500/30 rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(10,25,47,0.8),0_0_20px_rgba(59,130,246,0.1)] flex flex-col h-full">
+                
+                {/* Brand Logo Container */}
+                <div className="bg-[#0a192f] p-8 flex items-center justify-center min-h-[160px] relative border-b border-white/5">
+                  <div className="w-full max-w-[180px] h-[70px] overflow-hidden flex items-center justify-center relative">
                     <img
-                      src={brand.image}
+                      src={brand.logoUrl}
                       alt={brand.name}
-                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 relative z-10"
+                      className="w-full h-full object-contain filter brightness-100 group-hover:scale-105 transition-all duration-500 z-10"
                       onError={(e) => {
-                        e.currentTarget.src = '/images/fallback.jpg'
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.parentElement?.querySelector('.brand-fallback');
+                        if (fallback) fallback.classList.remove('hidden');
                       }}
                     />
-                    {/* توهج خلف اللوجو عند تمرير الماوس */}
-                    <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl z-0" />
+                    {/* Fallback Text Logo */}
+                    <div className="brand-fallback hidden absolute inset-0 flex items-center justify-center text-white font-black text-2xl tracking-wider select-none z-10">
+                      {brand.name}
+                    </div>
                   </div>
+                  {/* Glow Backdrop */}
+                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl z-0" />
                 </div>
 
-                {/* Brand Name Only */}
-                <div className="p-6 text-center border-t border-white/5 bg-[#0f213a] flex-grow flex items-center justify-center">
-                  <h2 className="text-2xl font-bold text-white group-hover:text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.1)] transition-colors duration-300 tracking-wide">
-                    {brand.name}
-                  </h2>
+                {/* Brand Details Container */}
+                <div className="p-6 flex flex-col flex-grow bg-[#0f213a]/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors duration-300">
+                      {brand.name}
+                    </h2>
+                    <span className="text-xs px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-slate-400 font-semibold">
+                      {brand.origin}
+                    </span>
+                  </div>
+                  <p className="text-slate-400 text-sm leading-relaxed font-sans font-medium flex-grow">
+                    {brand.description}
+                  </p>
                 </div>
 
               </div>
