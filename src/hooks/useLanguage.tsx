@@ -158,7 +158,10 @@ const translations: Record<Language, Record<string, string>> = {
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('ar');
+  const [language, setLanguageState] = useState<Language>(() => {
+    const saved = localStorage.getItem('enarah_lang');
+    return (saved === 'ar' || saved === 'en') ? saved : 'ar';
+  });
 
   const dir = language === 'ar' ? 'rtl' : 'ltr';
 
