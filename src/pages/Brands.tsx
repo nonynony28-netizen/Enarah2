@@ -39,7 +39,7 @@ export default function Brands() {
       description: isAr 
         ? 'شركة فرنسية عالمية رائدة في مجال البنية التحتية الكهربائية والرقمية للمباني، وتشتهر بمفاتيح التوصيل الفاخرة وأنظمة التحكم الذكية.'
         : 'A French global leader in electrical and digital building infrastructures, renowned for premium wiring devices and smart control systems.',
-      logoUrl: '/images/brand-legrand.png'
+      logoUrl: '/images/brand-legrand.png?v=2'
     },
     {
       id: 'philips',
@@ -48,7 +48,7 @@ export default function Brands() {
       description: isAr 
         ? 'الرائد العالمي في مجال حلول الإضاءة المبتكرة، ومصابيح LED الموفرة للطاقة، وأنظمة الإضاءة الذكية الفاخرة.'
         : 'The global pioneer in innovative lighting solutions, energy-efficient LED technology, and premium smart home lighting systems.',
-      logoUrl: '/images/brand-philips.png'
+      logoUrl: '/images/brand-philips.png?v=2'
     },
     {
       id: 'gewiss',
@@ -57,7 +57,7 @@ export default function Brands() {
       description: isAr 
         ? 'علامة إيطالية فاخرة متخصصة في أنظمة التشغيل الآلي للمباني، وتوزيع الطاقة، وحلول الإنارة الفنية والصناعية المتكاملة.'
         : 'A luxury Italian brand specialized in building automation, power distribution, and advanced technical/industrial lighting systems.',
-      logoUrl: '/images/brand-gewiss.png'
+      logoUrl: '/images/brand-gewiss.png?v=2'
     },
     {
       id: 'chint',
@@ -66,7 +66,7 @@ export default function Brands() {
       description: isAr 
         ? 'مجموعة عالمية كبرى لإنتاج وتطوير معدات توزيع الكهرباء ذات الجهد المنخفض، والقواطع الآمنة، وأنظمة الحماية الكهربائية.'
         : 'A leading global provider of smart energy solutions, low-voltage electrical distribution gear, and advanced protective systems.',
-      logoUrl: '/images/brand-chint.png'
+      logoUrl: '/images/brand-chint.png?v=2'
     },
     {
       id: 'wellmax',
@@ -75,7 +75,7 @@ export default function Brands() {
       description: isAr 
         ? 'عملاق تكنولوجيا مصابيح LED الملقب بـ "ملك اللمبات"، ويتميز بأعلى معايير الكفاءة والعمر الافتراضي الممتد للإنارة السكنية.'
         : 'A renowned global LED packaging and bulb design giant, famous for high efficiency and extended lifespan in residential lighting.',
-      logoUrl: '/images/brand-wellmax.png'
+      logoUrl: '/images/brand-wellmax.png?v=2'
     },
     {
       id: 'alfanar',
@@ -84,7 +84,7 @@ export default function Brands() {
       description: isAr 
         ? 'من أكبر الشركات الإقليمية تصنيعاً للكابلات النحاسية، ولوحات التوزيع الكهربائية الآمنة، والمفاتيح والأفياش المقاومة للحريق.'
         : 'A leading regional powerhouse in manufacturing premium cables, electrical distribution boards, and fire-resistant wiring accessories.',
-      logoUrl: '/images/brand-alfanar.png'
+      logoUrl: '/images/brand-alfanar.png?v=2'
     },
     {
       id: 'fumagalli',
@@ -93,7 +93,7 @@ export default function Brands() {
       description: isAr 
         ? 'الشركة الإيطالية الأولى عالمياً في إنتاج إضاءات الحدائق والإنارة الخارجية المقاومة للصدأ والتآكل بفضل مادة الراتنج الفريدة.'
         : 'The ultimate Italian manufacturer of outdoor and garden lighting, famous for rust-free and shockproof resin composite posts.',
-      logoUrl: '/images/brand-fumagalli.png'
+      logoUrl: '/images/brand-fumagalli.png?v=2'
     },
     {
       id: 'commax',
@@ -102,7 +102,7 @@ export default function Brands() {
       description: isAr 
         ? 'الرائد الكوري الجنوبي في أنظمة الاتصال الداخلي الذكي (الانتركم) وشاشات المراقبة وحلول الاتصالات المنزلية المتكاملة.'
         : 'A South Korean global leader in smart video intercoms, residential surveillance screens, and home security solutions.',
-      logoUrl: '/images/brand-commax.png'
+      logoUrl: '/images/brand-commax.png?v=2'
     },
     {
       id: 'cata',
@@ -111,7 +111,7 @@ export default function Brands() {
       description: isAr 
         ? 'ماركة تركية متميزة تقدم أحدث حلول الإضاءة الزخرفية والسبوت لايت والمصابيح الليد العصرية المناسبة للمنازل والمكاتب.'
         : 'A prominent Turkish brand offering modern decorative lighting, high-quality spot lights, and elegant LED solutions for homes & offices.',
-      logoUrl: '/images/brand-cata.png'
+      logoUrl: '/images/brand-cata.png?v=2'
     },
     {
       id: 'borsan',
@@ -120,7 +120,7 @@ export default function Brands() {
       description: isAr 
         ? 'من كبرى المصانع التركية المنتجة للكابلات الكهربائية النحاسية عالية التوصيل، وكابلات الاتصالات وتجهيزات التركيب الكهربائي.'
         : 'One of the leading Turkish manufacturers of highly conductive copper electrical cables, telecom wires, and wiring equipment.',
-      logoUrl: '/images/brand-borsan.png'
+      logoUrl: '/images/brand-borsan.png?v=2'
     },
     {
       id: 'makel',
@@ -129,7 +129,7 @@ export default function Brands() {
       description: isAr 
         ? 'شركة صناعية تركية رائدة في إنتاج المفاتيح الكهربائية، والمقابس، وقواطع الدورة الفردية والثنائية للحماية من الالتماس.'
         : 'A Turkish pioneer in producing premium electrical switches, wall sockets, and safety circuit breakers for electric protection.',
-      logoUrl: '/images/brand-makel.png'
+      logoUrl: '/images/brand-makel.png?v=2'
     },
     {
       id: 'isildar',
@@ -138,7 +138,7 @@ export default function Brands() {
       description: isAr 
         ? 'أنظمة إضاءة ومواد تأسيس كهربائي تركية مبتكرة مصممة لأقسى ظروف العمل وتوفر تكلفة تشغيل اقتصادية.'
         : 'Innovative Turkish lighting and wiring installation brands designed for heavy duty performance and cost-effective operations.',
-      logoUrl: '/images/brand-isildar.png'
+      logoUrl: '/images/brand-isildar.png?v=2'
     },
     {
       id: 'icc',
@@ -147,7 +147,7 @@ export default function Brands() {
       description: isAr 
         ? 'أنظمة إنارة كهربائية متطورة وإكسسوارات توصيل كهربائي مصممة للمباني والمشاريع الكبرى بموثوقية وجودة عالية.'
         : 'Advanced electrical lighting fixtures and connection accessories designed for high-reliability building installations.',
-      logoUrl: '/images/brand-icc.png'
+      logoUrl: '/images/brand-icc.png?v=2'
     },
     {
       id: 'ecoliok',
@@ -156,7 +156,7 @@ export default function Brands() {
       description: isAr 
         ? 'حلول إضاءة LED اقتصادية وصديقة للبيئة تتميز بتقديم إنارة قوية ومريحة للعين مع كفاءة في استهلاك الطاقة.'
         : 'Eco-friendly and budget-friendly LED lighting solutions featuring high brightness and lower energy consumption.',
-      logoUrl: '/images/brand-ecoliok.png'
+      logoUrl: '/images/brand-ecoliok.png?v=2'
     },
     {
       id: 'carkit',
@@ -165,7 +165,7 @@ export default function Brands() {
       description: isAr 
         ? 'الرائد التركي في تصنيع حوامل الكابلات المعدنية (Cable Trays) ومجاري الأسلاك وتوصيلات الحماية الأرضية.'
         : 'The Turkish pioneer in manufacturing metal cable trays, wiring trunks, and heavy-duty cable protective systems.',
-      logoUrl: '/images/brand-carkit.png'
+      logoUrl: '/images/brand-carkit.png?v=2'
     },
     {
       id: 'geros',
@@ -174,7 +174,7 @@ export default function Brands() {
       description: isAr 
         ? 'شركة إيطالية لإنتاج علب التوزيع الكهربائية المقاومة للماء، وصناديق التوصيل، وخزائن المفاتيح الفاخرة.'
         : 'A classic Italian manufacturer of waterproof distribution boards, junction boxes, and premium circuit breaker enclosures.',
-      logoUrl: '/images/brand-geros.png'
+      logoUrl: '/images/brand-geros.png?v=2'
     },
     {
       id: 'edison',
@@ -183,7 +183,7 @@ export default function Brands() {
       description: isAr 
         ? 'أفياش وتوصيلات كهربائية عملية وآمنة للاستخدام المنزلي، توفر حماية ممتازة ضد التماس الكهرباء.'
         : 'Reliable electrical accessories, extension cords, and wall outlets designed for household and office electrical safety.',
-      logoUrl: '/images/brand-edison.png'
+      logoUrl: '/images/brand-edison.png?v=2'
     },
     {
       id: 'sharm',
@@ -192,7 +192,7 @@ export default function Brands() {
       description: isAr 
         ? 'علامة تجارية متخصصة في تصميم النجف الحديث والإنارة الديكورية المعاصرة التي تضيف لمسة جمالية لكل غرفة.'
         : 'A brand specialized in modern decorative lighting fixtures, contemporary chandeliers, and aesthetic interior lighting.',
-      logoUrl: '/images/brand-sharm.png'
+      logoUrl: '/images/brand-sharm.png?v=2'
     }
   ]
 
