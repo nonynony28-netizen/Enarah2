@@ -443,70 +443,6 @@ export default function Home() {
                 <span className="text-blue-400 drop-shadow-[0_4px_20px_rgba(59,130,246,0.65)]">{t('hero.title.part2')}</span>
               </h1>
               <p className="text-base md:text-2xl text-blue-50/90 mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
-                <Link 
-                  to="/products" 
-                  className={`group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 bg-[length:200%_auto] text-white font-black text-base md:text-lg rounded-2xl transition-all duration-500 hover:bg-[right_center] flex items-center justify-center gap-3 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_20px_rgba(59,130,246,0.45)] hover:shadow-[0_0_35px_rgba(59,130,246,0.65)] ring-2 ring-blue-500/10 hover:ring-blue-400/30 ${
-                    isAr ? 'flex-row' : 'flex-row-reverse'
-                  }`}
-                >
-                  {/* تأثير لمعة نيون متحركة */}
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmerSweep_1.8s_infinite_ease-in-out]" />
-                  <span>{t('hero.btn.products')}</span>
-                  <ArrowLeft className={`w-5 h-5 transition-transform duration-300 ${isAr ? 'group-hover:-translate-x-2' : 'group-hover:translate-x-2 rotate-180'}`} />
-                </Link>
-                <Link 
-                  to="/contact" 
-                  className={`group relative px-8 py-4 w-full sm:w-auto overflow-hidden bg-[#0d2342]/60 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:bg-blue-600/10 text-white hover:text-blue-300 font-extrabold text-base md:text-lg rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_15px_rgba(255,255,255,0.02)] hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] ring-2 ring-white/5 hover:ring-blue-500/15 ${
-                    isAr ? 'flex-row' : 'flex-row-reverse'
-                  }`}
-                >
-                  <MessageCircle className="w-5 h-5 text-slate-400 group-hover:text-blue-400 group-hover:rotate-12 transition-all duration-300" />
-                  <span>{t('hero.btn.contact')}</span>
-                </Link>
-              </div>
-
-              {/* روابط التواصل الاجتماعي للفيسبوك وتيك توك وإنستغرام */}
-              <div className="flex justify-center mt-12 animate-fade-in">
-                <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a192f]/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
-                  isAr ? 'flex-row' : 'flex-row-reverse'
-                }`}>
-                  <span className={`text-slate-400 text-xs font-bold font-sans ${isAr ? 'pl-3 border-l' : 'pr-3 border-r'} border-white/10`}>
-                    {isAr ? 'تابع صفحاتنا:' : 'Follow us:'}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <a 
-                      href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2.5 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 hover:text-white hover:bg-blue-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.1)]"
-                      title="فيسبوك"
-                    >
-                      <Facebook className="w-5 h-5" />
-                    </a>
-                    <a 
-                      href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2.5 rounded-xl bg-pink-600/10 border border-pink-500/20 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(236,72,153,0.1)]"
-                      title="إنستغرام"
-                    >
-                      <Instagram className="w-5 h-5" />
-                    </a>
-                    <a 
-                      href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2.5 rounded-xl bg-slate-200/10 border border-white/10 text-slate-200 hover:text-white hover:bg-black hover:border-slate-800 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-                      title="تيك توك"
-                    >
-                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
             </div>
         </section>
 
@@ -1348,6 +1284,48 @@ export default function Home() {
                 <Zap className="w-6 h-6" />
                 {isAr ? 'تواصل معنا الآن' : 'Contact Us Now'}
               </Link>
+
+              {/* روابط التواصل الاجتماعي للفيسبوك وتيك توك وإنستغرام */}
+              <div className="flex justify-center mt-12 animate-fade-in relative z-10">
+                <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a192f]/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
+                  isAr ? 'flex-row' : 'flex-row-reverse'
+                }`}>
+                  <span className={`text-slate-400 text-xs font-bold font-sans ${isAr ? 'pl-3 border-l' : 'pr-3 border-r'} border-white/10`}>
+                    {isAr ? 'تابع صفحاتنا:' : 'Follow us:'}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 hover:text-white hover:bg-blue-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                      title="فيسبوك"
+                    >
+                      <Facebook className="w-5 h-5" />
+                    </a>
+                    <a 
+                      href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-pink-600/10 border border-pink-500/20 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(236,72,153,0.1)]"
+                      title="إنستغرام"
+                    >
+                      <Instagram className="w-5 h-5" />
+                    </a>
+                    <a 
+                      href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-slate-200/10 border border-white/10 text-slate-200 hover:text-white hover:bg-black hover:border-slate-800 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                      title="تيك توك"
+                    >
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>
