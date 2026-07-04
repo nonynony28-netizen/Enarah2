@@ -143,7 +143,7 @@ export default function Brands() {
     {
       id: 'icc',
       name: 'ICC',
-      origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+      origin: isAr ? 'إيطاليا 🇮🇹' : 'Italy 🇮🇹',
       description: isAr 
         ? 'أنظمة إنارة كهربائية متطورة وإكسسوارات توصيل كهربائي مصممة للمباني والمشاريع الكبرى بموثوقية وجودة عالية.'
         : 'Advanced electrical lighting fixtures and connection accessories designed for high-reliability building installations.',
@@ -188,7 +188,7 @@ export default function Brands() {
     {
       id: 'sharm',
       name: 'Sharm',
-      origin: isAr ? 'مصر 🇪🇬' : 'Egypt 🇪🇬',
+      origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
       description: isAr 
         ? 'علامة تجارية متخصصة في تصميم النجف الحديث والإنارة الديكورية المعاصرة التي تضيف لمسة جمالية لكل غرفة.'
         : 'A brand specialized in modern decorative lighting fixtures, contemporary chandeliers, and aesthetic interior lighting.',
