@@ -73,8 +73,8 @@ export default function Brands() {
       name: 'WELLMAX',
       origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
       description: isAr 
-        ? 'عملاق تكنولوجيا مصابيح LED الملقب بـ "ملك اللمبات"، ويتميز بأعلى معايير الكفاءة والعمر الافتراضي الممتد للإنارة السكنية.'
-        : 'A renowned global LED packaging and bulb design giant, famous for high efficiency and extended lifespan in residential lighting.',
+        ? 'عملاق تكنولوجيا مصابيح LED الملقب بـ "ملك اللمبات"، ويتميز باستخدام شرائح إضاءة متطورة من شركة Samsung، مع ضمان لمدة سنتين لكافة المنتجات.'
+        : 'A renowned global LED giant, featuring advanced Samsung LED chips, and offering a 2-year warranty on all products.',
       logoUrl: '/images/brand-wellmax.png?v=2'
     },
     {
