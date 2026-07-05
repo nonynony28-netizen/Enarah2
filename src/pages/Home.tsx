@@ -153,6 +153,7 @@ export default function Home() {
   const bulbAuraOpacity = useTransform(scrollYProgress, [0, 0.45], [0.1, 0.85])
 
   const [pageLoading, setPageLoading] = useState(true)
+  const [videoLoaded, setVideoLoaded] = useState(false)
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_featured_projects')
@@ -421,17 +422,26 @@ export default function Home() {
           <div className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] overflow-hidden flex items-center justify-center">
             
             {/* الكود النهائي للفيديو: تحميل مسبق قوي، وبدون تأثيرات بطء */}
+            <img
+              src="/images/poster.jpg"
+              alt="Poster background"
+              className={`absolute top-0 left-0 w-full h-full object-cover opacity-60 pointer-events-none transition-opacity duration-1000 ${
+                videoLoaded ? 'opacity-0' : 'opacity-60'
+              }`}
+            />
             <video
               autoPlay
               loop
               muted
               playsInline
               preload="auto"
-              poster="/poster.jpg"
-              className="absolute top-0 left-0 w-full h-full object-cover opacity-60 mix-blend-screen pointer-events-none"
+              onPlay={() => setVideoLoaded(true)}
+              className={`absolute top-0 left-0 w-full h-full object-cover mix-blend-screen pointer-events-none transition-opacity duration-1000 ${
+                videoLoaded ? 'opacity-60' : 'opacity-0'
+              }`}
               style={{ willChange: 'transform', transform: 'translateZ(0)' }}
             >
-              <source src="https://api-f.streamable.com/api/v1/videos/wlb611/mp4" type="video/mp4" />
+              <source src="/bg-video.mp4" type="video/mp4" />
             </video>
             
             <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none" />
