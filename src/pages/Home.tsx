@@ -426,7 +426,7 @@ export default function Home() {
               src="/images/poster.jpg"
               alt="Poster background"
               className={`absolute top-0 left-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
-                videoLoaded ? 'opacity-0' : 'opacity-[0.35]'
+                videoLoaded ? 'opacity-0' : 'opacity-[0.5]'
               }`}
             />
             <video
@@ -437,7 +437,7 @@ export default function Home() {
               preload="auto"
               onPlay={() => setVideoLoaded(true)}
               className={`absolute top-0 left-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
-                videoLoaded ? 'opacity-[0.35]' : 'opacity-0'
+                videoLoaded ? 'opacity-[0.5]' : 'opacity-0'
               }`}
               style={{ willChange: 'transform', transform: 'translateZ(0)' }}
             >
@@ -445,7 +445,7 @@ export default function Home() {
             </video>
             
             {/* طبقة تظليل داكنة إضافية لضمان راحة العين ووضوح النصوص بنسبة 100% */}
-            <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/15 pointer-events-none" />
             
             <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none" />
           </div>
