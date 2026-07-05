@@ -425,8 +425,8 @@ export default function Home() {
             <img
               src="/images/poster.jpg"
               alt="Poster background"
-              className={`absolute top-0 left-0 w-full h-full object-cover opacity-60 pointer-events-none transition-opacity duration-1000 ${
-                videoLoaded ? 'opacity-0' : 'opacity-60'
+              className={`absolute top-0 left-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
+                videoLoaded ? 'opacity-0' : 'opacity-[0.35]'
               }`}
             />
             <video
@@ -436,13 +436,16 @@ export default function Home() {
               playsInline
               preload="auto"
               onPlay={() => setVideoLoaded(true)}
-              className={`absolute top-0 left-0 w-full h-full object-cover mix-blend-screen pointer-events-none transition-opacity duration-1000 ${
-                videoLoaded ? 'opacity-60' : 'opacity-0'
+              className={`absolute top-0 left-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
+                videoLoaded ? 'opacity-[0.35]' : 'opacity-0'
               }`}
               style={{ willChange: 'transform', transform: 'translateZ(0)' }}
             >
               <source src="/bg-video.mp4" type="video/mp4" />
             </video>
+            
+            {/* طبقة تظليل داكنة إضافية لضمان راحة العين ووضوح النصوص بنسبة 100% */}
+            <div className="absolute inset-0 bg-black/30 pointer-events-none" />
             
             <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none" />
           </div>
