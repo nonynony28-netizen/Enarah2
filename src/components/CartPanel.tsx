@@ -177,7 +177,70 @@ export default function CartPanel() {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-              ))
+                {/* تفاصيل الدفع والتحويل المصرفي - تصميم مدمج داخل القائمة المنسدلة */}
+                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-2.5 shadow-sm text-right mt-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                    <span>{isAr ? 'الحسابات المصرفية للتحويل والدفع:' : 'Bank Transfer Accounts:'}</span>
+                  </div>
+                  
+                  <div className="divide-y divide-white/5 space-y-2 text-xs">
+                    {/* الحساب الأول - مصرف الوحدة */}
+                    <div className="pt-2 first:pt-0 space-y-0.5">
+                      <div className="flex justify-between items-center text-[10px] text-slate-400">
+                        <span>{isAr ? 'مصرف الوحدة' : 'Al-Wahda Bank'}</span>
+                        <span className="text-slate-300 font-bold">{isAr ? 'معرض الانارة الحديثة-همالي قرقوم' : 'Modern Enarah Showroom'}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-black/20 px-2 py-1 rounded border border-white/5">
+                        <span className="font-mono font-bold text-blue-300 tracking-wider text-xs">115007000090012</span>
+                        <button
+                          onClick={() => handleCopy('115007000090012')}
+                          className="p-0.5 rounded text-slate-400 hover:text-blue-300 hover:bg-white/5 transition-all cursor-pointer"
+                          title={isAr ? 'نسخ الرقم' : 'Copy'}
+                        >
+                          {copiedText === '115007000090012' ? (
+                            <Check className="w-3.5 h-3.5 text-green-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* الحساب الثاني - مصرف التجارة والتنمية */}
+                    <div className="pt-2 space-y-0.5">
+                      <div className="flex justify-between items-center text-[10px] text-slate-400">
+                        <span>{isAr ? 'مصرف التجارة والتنمية' : 'Bank of Commerce & Development'}</span>
+                        <span className="text-slate-300 font-bold text-right">{isAr ? 'مصطفي محمد سليمان قرقوم' : 'Mustafa Mohamed Qarqoum'}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-black/20 px-2 py-1 rounded border border-white/5">
+                        <span className="font-mono font-bold text-blue-300 tracking-wider text-xs">0014264755001</span>
+                        <button
+                          onClick={() => handleCopy('0014264755001')}
+                          className="p-0.5 rounded text-slate-400 hover:text-blue-300 hover:bg-white/5 transition-all cursor-pointer"
+                          title={isAr ? 'نسخ الرقم' : 'Copy'}
+                        >
+                          {copiedText === '0014264755001' ? (
+                            <Check className="w-3.5 h-3.5 text-green-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* الملاحظة الجانبية الهامة */}
+                  <div className="pt-2 border-t border-white/5 text-[10px] text-amber-300 flex items-start gap-1.5 leading-normal">
+                    <span className="shrink-0 text-xs">⚠️</span>
+                    <p className="font-bold text-slate-300 text-right">
+                      {isAr 
+                        ? 'نرجو تأكيد الطلب وإرسال قسيمة التحويل للمبيعات لتسجيل الحجز فوراً.'
+                        : 'Please confirm your order and send the transfer receipt to sales.'}
+                    </p>
+                  </div>
+                </div>
+              </>
             )}
           </div>
 
@@ -199,86 +262,7 @@ export default function CartPanel() {
                 </div>
               )}
 
-              {/* تفاصيل الدفع والتحويل المصرفي */}
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3.5 shadow-inner">
-                <div className="flex items-center gap-2 text-xs font-bold text-blue-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                  <span>{isAr ? 'بيانات الدفع والتحويل المصرفي:' : 'Bank Transfer Payment Details:'}</span>
-                </div>
-                
-                <div className="grid grid-cols-1 gap-2.5">
-                  {/* الحساب الأول - مصرف الوحدة */}
-                  <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-blue-500/10 transition-colors duration-300 space-y-1 relative group/bank">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400">{isAr ? 'المصرف:' : 'Bank:'}</span>
-                      <span className="text-xs font-bold text-white">{isAr ? 'مصرف الوحدة' : 'Al-Wahda Bank'}</span>
-                    </div>
-                    <div className="flex justify-between items-start gap-4">
-                      <span className="text-[10px] text-slate-400 shrink-0">{isAr ? 'اسم الحساب:' : 'Account Name:'}</span>
-                      <span className="text-xs font-bold text-slate-300 text-right leading-normal">{isAr ? 'معرض الانارة الحديثة-همالي قرقوم' : 'Modern Enarah Showroom - Hemali Qarqoum'}</span>
-                    </div>
-                    <div className="flex justify-between items-center pt-1.5 border-t border-white/5 mt-1">
-                      <span className="text-[10px] text-slate-400">{isAr ? 'رقم الحساب:' : 'Account No:'}</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-mono font-bold text-blue-300">115007000090012</span>
-                        <button
-                          onClick={() => handleCopy('115007000090012')}
-                          className="p-1 rounded bg-white/5 hover:bg-blue-600/20 text-slate-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
-                          title={isAr ? 'نسخ الرقم' : 'Copy Number'}
-                        >
-                          {copiedText === '115007000090012' ? (
-                            <Check className="w-3.5 h-3.5 text-green-400" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* الحساب الثاني - مصرف التجارة والتنمية */}
-                  <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-blue-500/10 transition-colors duration-300 space-y-1 relative group/bank">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400">{isAr ? 'المصرف:' : 'Bank:'}</span>
-                      <span className="text-xs font-bold text-white">{isAr ? 'مصرف التجارة والتنمية' : 'Bank of Commerce & Development'}</span>
-                    </div>
-                    <div className="flex justify-between items-start gap-4">
-                      <span className="text-[10px] text-slate-400 shrink-0">{isAr ? 'اسم الحساب:' : 'Account Name:'}</span>
-                      <span className="text-xs font-bold text-slate-300 text-right leading-normal">{isAr ? 'مصطفي محمد سليمان قرقوم' : 'Mustafa Mohamed Soliman Qarqoum'}</span>
-                    </div>
-                    <div className="flex justify-between items-center pt-1.5 border-t border-white/5 mt-1">
-                      <span className="text-[10px] text-slate-400">{isAr ? 'رقم الحساب:' : 'Account No:'}</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-mono font-bold text-blue-300">0014264755001</span>
-                        <button
-                          onClick={() => handleCopy('0014264755001')}
-                          className="p-1 rounded bg-white/5 hover:bg-blue-600/20 text-slate-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
-                          title={isAr ? 'نسخ الرقم' : 'Copy Number'}
-                        >
-                          {copiedText === '0014264755001' ? (
-                            <Check className="w-3.5 h-3.5 text-green-400" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ملاحظة جانبية لتأكيد الطلب وقسيمة التحويل */}
-                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2 text-[11px] text-amber-300 leading-relaxed shadow-sm">
-                  <span className="text-xs mt-0.5">⚠️</span>
-                  <div>
-                    <span className="font-black block mb-0.5">{isAr ? 'ملاحظة هامة:' : 'Important Note:'}</span>
-                    <p className="font-medium text-slate-300 text-right leading-normal">
-                      {isAr 
-                        ? 'نرجو تأكيد الطلب وإرسال قسيمة التحويل للمبيعات لتسجيل الحجز فوراً.'
-                        : 'Please confirm your order and send the transfer receipt to sales to secure your reservation.'}
-                    </p>
-                  </div>
-                </div>
-              </div>
 
               {/* Trust Advice Banner */}
               <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs text-center leading-relaxed">
