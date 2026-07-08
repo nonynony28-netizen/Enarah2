@@ -104,11 +104,12 @@ export default function CartPanel() {
                 </p>
               </div>
             ) : (
-              cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/20 transition-all duration-300 shadow-md group"
-                >
+              <>
+                {cartItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/20 transition-all duration-300 shadow-md group"
+                  >
                   {/* صورة مصغرة */}
                   <div className="w-16 h-16 rounded-xl bg-slate-900 overflow-hidden flex-shrink-0 border border-white/10 relative">
                     <img
@@ -177,7 +178,9 @@ export default function CartPanel() {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                {/* تفاصيل الدفع والتحويل المصرفي - تصميم مدمج داخل القائمة المنسدلة */}
+              ))}
+
+              {/* تفاصيل الدفع والتحويل المصرفي - تصميم مدمج داخل القائمة المنسدلة */}
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-2.5 shadow-sm text-right mt-4">
                   <div className="flex items-center gap-2 text-xs font-bold text-blue-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
