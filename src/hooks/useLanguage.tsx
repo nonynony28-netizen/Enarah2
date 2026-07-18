@@ -25,6 +25,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.branches': 'فروعنا',
     'nav.contact': 'تواصل معنا',
     'nav.servicesDropdown': 'الأقسام والأسعار',
+    'nav.contractors': 'المقاولين والكميات',
     
     // Hero
     'hero.title.part1': 'الإنارة',
@@ -96,6 +97,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.branches': 'Branches',
     'nav.contact': 'Contact Us',
     'nav.servicesDropdown': 'Sections & Prices',
+    'nav.contractors': 'Contractors & Bulk',
 
     // Hero
     'hero.title.part1': 'ENARAH',

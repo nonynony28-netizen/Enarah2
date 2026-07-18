@@ -22,6 +22,7 @@ export default function Navbar() {
     { path: '/wire-prices', label: t('nav.wirePrices'), desc: isAr ? 'النشرة اليومية المحدثة لأسعار الأسلاك الإيطالية المعتمدة.' : 'Daily updated price list for certified Italian wires.', icon: Zap },
     { path: '/brands', label: t('nav.brands'), desc: isAr ? 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.' : 'Our partners and top certified global brands.', icon: Award },
     { path: '/projects', label: t('nav.projects'), desc: isAr ? 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.' : 'Explore some of our executed electrical and engineering projects.', icon: Sparkles },
+    { path: '/contractors', label: t('nav.contractors'), desc: isAr ? 'بوابة مخصصة للمقاولين وشركات التشطيب لطلب عروض أسعار للكميات والتوريدات.' : 'Dedicated portal for contractors and finishing companies to request custom bulk quotes.', icon: Sliders },
   ];
 
   const localizedOtherLinks = [

@@ -16,6 +16,7 @@ import Branches from './pages/Branches'
 import Contact from './pages/Contact'
 import Blog from './pages/Blog'
 import WirePrices from './pages/WirePrices' // 👈 أضفنا صفحة الأسعار هنا
+import Contractors from './pages/Contractors'
 
 
 import BottomNavBar from './components/BottomNavBar'
@@ -89,6 +90,7 @@ function App() {
           
           {/* 👈 مسار صفحة أسعار الأسلاك */}
           <Route path="/wire-prices" element={<PageTransition><WirePrices /></PageTransition>} /> 
+          <Route path="/contractors" element={<PageTransition><Contractors /></PageTransition>} /> 
 
 
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
