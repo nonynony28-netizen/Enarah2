@@ -4,6 +4,7 @@ import { Calendar, Zap, TrendingUp, TrendingDown, Minus, ShieldCheck, ArrowRight
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
+import WireAnatomyScroll from '../components/WireAnatomyScroll'
 
 // نمط الوهج الأزرق للعناوين
 const glowingTitleStyle = {
@@ -232,6 +233,11 @@ export default function WirePrices() {
               <span>{isAr ? 'تحديث اليوم:' : 'Today\'s Update:'} {currentDate}</span>
             </div>
           </div>
+        </FadeIn>
+
+        {/* التشريح التفاعلي للأسلاك المرتبط بالتمرير */}
+        <FadeIn delay={0.15}>
+          <WireAnatomyScroll />
         </FadeIn>
 
         {/* جدول الأسعار */}
