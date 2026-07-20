@@ -10,7 +10,7 @@ export default function WireAnatomyScroll() {
   // Track scroll progress of the container
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start end', 'end start']
+    offset: ['start 15%', 'end 85%']
   })
 
   // Map scroll progress to the widths of insulation and sheath layers
@@ -25,7 +25,7 @@ export default function WireAnatomyScroll() {
   const sheathLabelOpacity = useTransform(scrollYProgress, [0.7, 0.85], [0, 1])
 
   return (
-    <div ref={containerRef} className="relative w-full py-10 my-10">
+    <div ref={containerRef} className="relative w-full min-h-[130vh] lg:min-h-[160vh] py-10 my-10">
       <div className="text-center mb-10 max-w-2xl mx-auto px-4">
         <h3 className="text-2xl md:text-3xl font-black text-white mb-3">
           {isAr ? 'التشريح التفاعلي للأسلاك الإيطالية' : 'Interactive Anatomy of Italian Wires'}
@@ -41,7 +41,7 @@ export default function WireAnatomyScroll() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
         
         {/* Left Sticky Panel: Visual Wire Render */}
-        <div className="lg:col-span-6 sticky top-28 h-[40vh] lg:h-[50vh] flex items-center justify-center p-6 rounded-[2.5rem] bg-[#0f213a]/40 backdrop-blur-md border border-white/5 shadow-2xl overflow-hidden z-20">
+        <div className="lg:col-span-6 sticky top-28 h-[45vh] lg:h-[55vh] flex items-center justify-center p-6 rounded-[2.5rem] bg-[#0f213a]/40 backdrop-blur-md border border-white/5 shadow-2xl overflow-hidden z-20">
           {/* Ambient Glows */}
           <div className="absolute -top-12 -left-12 w-48 h-48 bg-blue-500/10 rounded-full blur-[80px]" />
           <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-amber-500/5 rounded-full blur-[80px]" />
@@ -149,10 +149,10 @@ export default function WireAnatomyScroll() {
         </div>
 
         {/* Right Panel: Storytelling Sections */}
-        <div className="lg:col-span-6 space-y-12 pb-20">
+        <div className="lg:col-span-6 space-y-24 lg:space-y-36 pb-32 py-10">
           
           {/* Card 1 */}
-          <div className="p-6 md:p-8 rounded-3xl bg-[#0f213a]/30 border border-white/5 hover:border-amber-500/20 transition-all duration-300 space-y-4 text-right">
+          <div className="min-h-[35vh] lg:min-h-[45vh] flex flex-col justify-center p-6 md:p-8 rounded-3xl bg-[#0f213a]/30 border border-white/5 hover:border-amber-500/20 transition-all duration-300 space-y-4 text-right">
             <div className="flex items-center gap-3 justify-end">
               <h4 className="text-lg md:text-xl font-bold text-white">
                 {isAr ? '1. القلب الموصل: النحاس النقي' : '1. Conductor: Pure Copper'}
@@ -169,7 +169,7 @@ export default function WireAnatomyScroll() {
           </div>
 
           {/* Card 2 */}
-          <div className="p-6 md:p-8 rounded-3xl bg-[#0f213a]/30 border border-white/5 hover:border-blue-500/20 transition-all duration-300 space-y-4 text-right">
+          <div className="min-h-[35vh] lg:min-h-[45vh] flex flex-col justify-center p-6 md:p-8 rounded-3xl bg-[#0f213a]/30 border border-white/5 hover:border-blue-500/20 transition-all duration-300 space-y-4 text-right">
             <div className="flex items-center gap-3 justify-end">
               <h4 className="text-lg md:text-xl font-bold text-white">
                 {isAr ? '2. العازل الداخلي: PVC ملون' : '2. Insulation: PVC Compound'}
@@ -186,7 +186,7 @@ export default function WireAnatomyScroll() {
           </div>
 
           {/* Card 3 */}
-          <div className="p-6 md:p-8 rounded-3xl bg-[#0f213a]/30 border border-white/5 hover:border-slate-500/20 transition-all duration-300 space-y-4 text-right">
+          <div className="min-h-[35vh] lg:min-h-[45vh] flex flex-col justify-center p-6 md:p-8 rounded-3xl bg-[#0f213a]/30 border border-white/5 hover:border-slate-500/20 transition-all duration-300 space-y-4 text-right">
             <div className="flex items-center gap-3 justify-end">
               <h4 className="text-lg md:text-xl font-bold text-white">
                 {isAr ? '3. الغلاف الخارجي: حماية إضافية ومقاومة حريق' : '3. Protective Sheath: Flame-Retardant Jacket'}
