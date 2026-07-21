@@ -1,6 +1,7 @@
 // file name: api/delete-user.js
 
 import { MongoClient, ObjectId } from "mongodb";
+import { deleteImageFromR2 } from "../lib/r2.js";
 
 // =====================================
 // MongoDB Cache
@@ -9,7 +10,6 @@ let cachedClient = null;
 let cachedDb = null;
 
 async function connectToDatabase() {
-  // إعادة استخدام الاتصال
   if (cachedClient && cachedDb) {
     return {
       client: cachedClient,
@@ -42,9 +42,7 @@ async function connectToDatabase() {
 // API Handler
 // =====================================
 export default async function handler(req, res) {
-  // =====================================
   // CORS
-  // =====================================
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -55,16 +53,10 @@ export default async function handler(req, res) {
     "Content-Type, x-admin-password"
   );
 
-  // =====================================
-  // OPTIONS
-  // =====================================
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // =====================================
-  // GET → شرح API بدل 405
-  // =====================================
   if (req.method === "GET") {
     return res.status(200).json({
       success: true,
@@ -78,9 +70,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // =====================================
-  // DELETE فقط
-  // =====================================
   if (req.method !== "DELETE") {
     return res.status(405).json({
       success: false,
@@ -88,7 +77,7 @@ export default async function handler(req, res) {
     });
   }
 
-  // التحقق من صلاحية كلمة مرور المسؤول
+  // Admin Password Check
   const adminPassword = process.env.ADMIN_PASSWORD || "EnarahAdmin2026";
   const clientPassword = req.headers["x-admin-password"];
   if (clientPassword !== adminPassword) {
@@ -99,72 +88,51 @@ export default async function handler(req, res) {
   }
 
   try {
-    // =====================================
-    // Database Connection
-    // =====================================
     const { db } = await connectToDatabase();
-
-    // =====================================
-    // Read Body
-    // =====================================
     const { id } = req.body || {};
 
-    // =====================================
-    // Validation
-    // =====================================
-    if (!id) {
+    if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        error: "ID is required",
+        error: "Valid MongoDB ID is required",
       });
     }
 
-    // تحقق من صحة ObjectId
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid MongoDB ID",
-      });
-    }
-
-    // =====================================
-    // Delete Item
-    // =====================================
-    const result = await db
-      .collection("users")
-      .deleteOne({
-        _id: new ObjectId(id),
-      });
-
-    // =====================================
-    // Not Found
-    // =====================================
-    if (result.deletedCount === 0) {
+    // 1. Retrieve the item first to get its image URL
+    const itemToDelete = await db.collection("users").findOne({ _id: new ObjectId(id) });
+    if (!itemToDelete) {
       return res.status(404).json({
         success: false,
         error: "Item not found",
       });
     }
 
-    // =====================================
-    // Success
-    // =====================================
+    // 2. Delete the associated image from Cloudflare R2 automatically
+    try {
+      const phoneData = JSON.parse(itemToDelete.phone || "{}");
+      if (phoneData.imageUrl) {
+        await deleteImageFromR2(phoneData.imageUrl);
+      }
+    } catch (e) {
+      console.warn("Could not parse image URL for R2 cleanup:", e);
+    }
+
+    // 3. Delete item from MongoDB
+    const result = await db.collection("users").deleteOne({
+      _id: new ObjectId(id),
+    });
+
     return res.status(200).json({
       success: true,
-      message: "Item deleted successfully",
+      message: "Item and associated Cloudflare R2 image deleted successfully",
       deletedId: id,
     });
   } catch (error) {
-    console.error(
-      "MongoDB Delete Error:",
-      error
-    );
+    console.error("MongoDB Delete Error:", error);
 
     return res.status(500).json({
       success: false,
-      error:
-        error.message ||
-        "Internal Server Error",
+      error: error.message || "Internal Server Error",
     });
   }
 }

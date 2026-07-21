@@ -1,6 +1,8 @@
 // file name: api/save-user.js
 
 import { MongoClient } from "mongodb";
+import { uploadSingleImage } from "../lib/multer.js";
+import { processAndUploadImage } from "../lib/r2.js";
 
 // =====================================
 // MongoDB Cache
@@ -37,13 +39,25 @@ async function connectToDatabase() {
   };
 }
 
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) return reject(result);
+      return resolve(result);
+    });
+  });
+}
+
+export const config = {
+  api: {
+    bodyParser: false, // Disable default bodyParser for multipart FormData support
+  },
+};
+
 // =====================================
 // API Handler
 // =====================================
 export default async function handler(req, res) {
-  // =====================================
-  // CORS
-  // =====================================
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -54,95 +68,42 @@ export default async function handler(req, res) {
     "Content-Type, x-admin-password"
   );
 
-  // =====================================
-  // OPTIONS
-  // =====================================
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // =====================================
-  // GET → API Test Page
-  // =====================================
   if (req.method === "GET") {
     return res.status(200).json({
       success: true,
-      message:
-        "API is working. Use POST to save data.",
+      message: "API is working. Use POST to save data.",
       endpoint: "/api/save-user",
       method: "POST",
-      required_fields: [
-        "name",
-        "email",
-      ],
-      optional_fields: [
-        "phone",
-        "type",
-      ],
-      supported_types: [
-        "user",
-        "product",
-      ],
     });
   }
 
-  // =====================================
-  // POST only
-  // =====================================
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      error:
-        "Method Not Allowed",
+      error: "Method Not Allowed",
     });
   }
 
   try {
-    const { db } =
-      await connectToDatabase();
+    // Run Multer to handle multipart form data file uploads
+    try {
+      await runMiddleware(req, res, uploadSingleImage);
+    } catch (err) {
+      console.warn("Multer notice:", err.message);
+    }
 
-    const body =
-      req.body || {};
+    const body = req.body || {};
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const type = typeof body.type === "string" ? body.type.trim().toLowerCase() : "user";
+    const description = typeof body.description === "string" ? body.description.trim() : "";
+    const category = typeof body.category === "string" ? body.category.trim() : "";
+    let imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() : "";
 
-    // =====================================
-    // Fields
-    // =====================================
-    const name =
-      typeof body.name ===
-      "string"
-        ? body.name.trim()
-        : "";
-
-    const email =
-      typeof body.email ===
-      "string"
-        ? body.email
-            .trim()
-            .toLowerCase()
-        : "";
-
-    const phone =
-      typeof body.phone ===
-      "string"
-        ? body.phone.trim()
-        : "";
-
-    // =====================================
-    // Type Support
-    // default = user
-    // product = media uploader
-    // =====================================
-    const type =
-      typeof body.type ===
-      "string"
-        ? body.type
-            .trim()
-            .toLowerCase()
-        : "user";
-
-    // =====================================
-    // Admin Password Protection
-    // =====================================
     const isAdminAction = type === "product" || type === "project" || email === "admin_wire_prices@app.local";
     if (isAdminAction) {
       const adminPassword = process.env.ADMIN_PASSWORD || "EnarahAdmin2026";
@@ -155,116 +116,47 @@ export default async function handler(req, res) {
       }
     }
 
-    // =====================================
-    // Validation
-    // =====================================
     if (!name || !email) {
       return res.status(400).json({
         success: false,
-        error:
-          "name and email are required",
+        error: "name and email are required",
       });
     }
 
-    // =====================================
-    // Duplicate Protection
-    // المنتجات يسمح بتكرارها
-    // المستخدم العادي لا
-    // =====================================
-    if (
-      type !== "product"
-    ) {
-      const existingUser =
-        await db
-          .collection(
-            "users"
-          )
-          .findOne({
-            email,
-          });
-
-      if (
-        existingUser
-      ) {
-        return res.status(409).json({
-          success: false,
-          error:
-            "User already exists",
-        });
-      }
+    // Process and upload file automatically to Cloudflare R2 if attached
+    if (req.file) {
+      imageUrl = await processAndUploadImage(req.file.buffer, "products");
     }
 
-    // =====================================
-    // Normalize phone/media JSON
-    // =====================================
-    let normalizedPhone =
-      phone;
+    const phoneData = {
+      imageUrl,
+      description,
+      type,
+      category,
+    };
 
-    try {
-      if (phone) {
-        normalizedPhone =
-          JSON.stringify(
-            JSON.parse(
-              phone
-            )
-          );
-      }
-    } catch {
-      normalizedPhone =
-        phone;
-    }
-
-    // =====================================
-    // New Record
-    // =====================================
+    const { db } = await connectToDatabase();
     const newUser = {
       type,
       name,
       email,
-      phone:
-        normalizedPhone,
-      createdAt:
-        new Date(),
+      phone: JSON.stringify(phoneData),
+      createdAt: new Date(),
     };
 
-    const result =
-      await db
-        .collection(
-          "users"
-        )
-        .insertOne(
-          newUser
-        );
+    const result = await db.collection("users").insertOne(newUser);
 
-    // =====================================
-    // Success
-    // =====================================
     return res.status(201).json({
       success: true,
-      message:
-        type ===
-        "product"
-          ? "Product saved successfully"
-          : "User saved successfully",
-      insertedId:
-        result.insertedId,
-      savedData: {
-        type,
-        name,
-        email,
-      },
+      message: type === "product" ? "Product saved successfully" : "User saved successfully",
+      insertedId: result.insertedId,
+      imageUrl,
     });
   } catch (error) {
-    console.error(
-      "MongoDB Save Error:",
-      error
-    );
-
+    console.error("MongoDB Save Error:", error);
     return res.status(500).json({
       success: false,
-      error:
-        error.message ||
-        "Internal Server Error",
+      error: error.message || "Internal Server Error",
     });
   }
 }

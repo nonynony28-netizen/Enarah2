@@ -35,13 +35,19 @@
     }
     .success { color: #86efac; }
     .error { color: #fca5a5; }
+    .preview-box {
+      margin-top: -10px; margin-bottom: 20px; text-align: center;
+    }
+    .preview-box img {
+      max-width: 100%; max-height: 220px; border-radius: 12px; border: 2px solid #3b82f6; display: none; box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h1>إضافة للموقع</h1>
-    <p>ارفع منتجاتك ومشاريعك بسهولة إلى قاعدة البيانات</p>
+    <p>ارفع منتجاتك ومشاريعك بسهولة مع تحويل وتحسين فوري للصور عبر Cloudflare R2</p>
 
     <label for="itemType">ما الذي تريد رفعه؟</label>
     <select id="itemType">
@@ -60,8 +66,13 @@
     <label for="description">الوصف التفصيلي</label>
     <textarea id="description" placeholder="اكتب وصفاً جذاباً هنا..."></textarea>
 
-    <label for="imageUrl" id="imageLabel">رابط الصورة</label>
-    <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg" />
+    <!-- اختيار صورة أوتوماتيكي مع الضغط للـ WebP -->
+    <label for="imageFile">صورة المنتج (سيتم تحويلها لـ WebP وتصغير أبعادها تلقائياً):</label>
+    <input type="file" id="imageFile" accept="image/*" />
+
+    <div class="preview-box">
+      <img id="imagePreview" alt="معاينة الصورة" />
+    </div>
 
     <label for="videoUrl">رابط الفيديو (اختياري)</label>
     <input type="url" id="videoUrl" placeholder="https://example.com/video.mp4" />
@@ -76,6 +87,8 @@
     const responseBox = document.getElementById("response");
     const itemTypeSelect = document.getElementById("itemType");
     const categoryContainer = document.getElementById("categoryContainer");
+    const imageFileInput = document.getElementById("imageFile");
+    const imagePreview = document.getElementById("imagePreview");
 
     function getAdminPassword() {
       let pwd = sessionStorage.getItem('admin_password');
@@ -88,21 +101,24 @@
       return pwd || "";
     }
 
-    // إظهار حقل التصنيف وتعديل حقل الصور بناءً على الاختيار
+    // معاينة الصورة المختارة فورياً
+    imageFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          imagePreview.src = event.target.result;
+          imagePreview.style.display = "inline-block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview.style.display = "none";
+      }
+    });
+
     itemTypeSelect.addEventListener("change", (e) => {
       const isProject = e.target.value === "project";
       categoryContainer.style.display = isProject ? "block" : "none";
-      
-      const imageLabel = document.getElementById("imageLabel");
-      const imageUrlInput = document.getElementById("imageUrl");
-      
-      if (isProject) {
-        imageLabel.textContent = 'روابط الصور (يمكنك وضع عدة روابط مفصولة بفاصلة ",")';
-        imageUrlInput.placeholder = "https://example.com/1.jpg, https://example.com/2.jpg";
-      } else {
-        imageLabel.textContent = 'رابط الصورة';
-        imageUrlInput.placeholder = "https://example.com/image.jpg";
-      }
     });
 
     saveBtn.addEventListener("click", async () => {
@@ -110,43 +126,37 @@
       const category = document.getElementById("category").value.trim();
       const title = document.getElementById("title").value.trim();
       const description = document.getElementById("description").value.trim();
-      const imageUrl = document.getElementById("imageUrl").value.trim();
       const videoUrl = document.getElementById("videoUrl").value.trim();
+      const file = imageFileInput.files[0];
 
       const pwd = getAdminPassword();
-      if (!pwd) {
-        return showResponse("الرجاء إدخال كلمة مرور صالحة للنشر.", false);
-      }
+      if (!pwd) return showResponse("الرجاء إدخال كلمة مرور صالحة للنشر.", false);
 
       if (!title) return showResponse("الرجاء كتابة الاسم أو العنوان.", false);
       if (!description) return showResponse("الرجاء كتابة الوصف.", false);
       if (itemType === "project" && !category) return showResponse("الرجاء كتابة تصنيف المشروع.", false);
-      if (!imageUrl && !videoUrl) return showResponse("يجب إضافة رابط صورة أو فيديو على الأقل.", false);
+      if (!file && !videoUrl) return showResponse("يرجى اختيار صورة للمنتج.", false);
 
       saveBtn.disabled = true;
-      saveBtn.textContent = "جاري الرفع والنشر...";
+      saveBtn.textContent = "جاري تحويل الصورة وضغطها والرفع لـ R2...";
 
       try {
-        const payload = {
-          name: title,
-          email: `media_${Date.now()}@upload.local`,
-          type: itemType, // 'product' أو 'project' لتفعيل التحقق في السيرفر
-          phone: JSON.stringify({
-            imageUrl,
-            videoUrl,
-            description,
-            type: itemType,        // 'product' أو 'project'
-            category: category     // 'طبي'، 'مول' الخ
-          }),
-        };
+        const formData = new FormData();
+        formData.append("name", title);
+        formData.append("email", `media_${Date.now()}@upload.local`);
+        formData.append("type", itemType);
+        formData.append("description", description);
+        formData.append("category", category);
+        if (file) {
+          formData.append("image", file);
+        }
 
         const res = await fetch("https://enarah2.vercel.app/api/save-user", {
           method: "POST",
           headers: { 
-            "Content-Type": "application/json",
             "x-admin-password": pwd
           },
-          body: JSON.stringify(payload),
+          body: formData,
         });
 
         if (res.status === 401) {
@@ -159,17 +169,18 @@
         const data = await res.json();
 
         if (data.success) {
-          showResponse("تم الحفظ بنجاح! سيظهر الآن في الموقع.", true);
+          showResponse("تم الرفع وضغط الصورة ونشر المنتج بنجاح! 🎉\nالرابط: " + (data.imageUrl || ""), true);
           document.getElementById("title").value = "";
           document.getElementById("description").value = "";
-          document.getElementById("imageUrl").value = "";
           document.getElementById("videoUrl").value = "";
           document.getElementById("category").value = "";
+          imageFileInput.value = "";
+          imagePreview.style.display = "none";
         } else {
           showResponse(data.error || "حدث خطأ غير متوقع.", false);
         }
       } catch (error) {
-        showResponse("فشل في الاتصال بقاعدة البيانات.", false);
+        showResponse("فشل في الاتصال بالسيرفر.", false);
         console.error(error);
       }
 

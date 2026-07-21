@@ -1,10 +1,9 @@
 // file name: api/update-user.js
 
 import { MongoClient, ObjectId } from "mongodb";
+import { uploadSingleImage } from "../lib/multer.js";
+import { processAndUploadImage, deleteImageFromR2 } from "../lib/r2.js";
 
-// =====================================
-// MongoDB Cache
-// =====================================
 let cachedClient = null;
 let cachedDb = null;
 
@@ -37,11 +36,22 @@ async function connectToDatabase() {
   };
 }
 
-// =====================================
-// API Handler
-// =====================================
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) return reject(result);
+      return resolve(result);
+    });
+  });
+}
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(req, res) {
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -63,7 +73,6 @@ export default async function handler(req, res) {
       endpoint: "/api/update-user",
       method: "POST",
       required_fields: ["id", "name"],
-      optional_fields: ["phone", "email", "type"]
     });
   }
 
@@ -74,7 +83,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // التحقق من صلاحية كلمة مرور المسؤول
   const adminPassword = process.env.ADMIN_PASSWORD || "EnarahAdmin2026";
   const clientPassword = req.headers["x-admin-password"];
   if (clientPassword !== adminPassword) {
@@ -85,68 +93,74 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { db } = await connectToDatabase();
+    try {
+      await runMiddleware(req, res, uploadSingleImage);
+    } catch (err) {
+      console.warn("Multer notice:", err.message);
+    }
+
     const body = req.body || {};
 
     const id = typeof body.id === "string" ? body.id.trim() : "";
     const name = typeof body.name === "string" ? body.name.trim() : "";
-    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
-    const type = typeof body.type === "string" ? body.type.trim().toLowerCase() : "";
+    const description = typeof body.description === "string" ? body.description.trim() : "";
+    const category = typeof body.category === "string" ? body.category.trim() : "";
 
-    if (!id) {
+    if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        error: "id is required",
+        error: "Valid MongoDB ID is required",
       });
     }
 
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid MongoDB ID",
-      });
-    }
-
-    if (!name) {
-      return res.status(400).json({
-        success: false,
-        error: "name is required",
-      });
-    }
-
-    // Prepare update payload
-    const updateData = {};
-    if (name) updateData.name = name;
-    if (email) updateData.email = email;
-    if (type) updateData.type = type;
-
-    if (phone) {
-      let normalizedPhone = phone;
-      try {
-        normalizedPhone = JSON.stringify(JSON.parse(phone));
-      } catch {
-        normalizedPhone = phone;
-      }
-      updateData.phone = normalizedPhone;
-    }
-
-    const result = await db.collection("users").updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updateData }
-    );
-
-    if (result.matchedCount === 0) {
+    const { db } = await connectToDatabase();
+    const existingItem = await db.collection("users").findOne({ _id: new ObjectId(id) });
+    if (!existingItem) {
       return res.status(404).json({
         success: false,
         error: "Item not found",
       });
     }
 
+    let existingPhoneData = {};
+    try {
+      existingPhoneData = JSON.parse(existingItem.phone || "{}");
+    } catch {}
+
+    let imageUrl = existingPhoneData.imageUrl || "";
+
+    // If a new image file is provided in update form:
+    if (req.file) {
+      // 1. Delete old image from R2
+      if (imageUrl) {
+        await deleteImageFromR2(imageUrl);
+      }
+      // 2. Process and upload new image to R2
+      imageUrl = await processAndUploadImage(req.file.buffer, "products");
+    }
+
+    const updatedPhoneData = {
+      ...existingPhoneData,
+      imageUrl,
+      description: description || existingPhoneData.description,
+      category: category || existingPhoneData.category,
+    };
+
+    const updateData = {
+      phone: JSON.stringify(updatedPhoneData),
+    };
+    if (name) updateData.name = name;
+
+    await db.collection("users").updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+
     return res.status(200).json({
       success: true,
       message: "Item updated successfully",
       updatedId: id,
+      imageUrl,
     });
   } catch (error) {
     console.error("MongoDB Update Error:", error);
