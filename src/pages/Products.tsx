@@ -326,13 +326,6 @@ export default function Products() {
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                         onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} 
                       />
-                      
-                      {/* عداد المنتجات داخل شارة علوية */}
-                      <div className="absolute top-4 left-4 z-20 bg-blue-950/80 border border-blue-500/30 px-3 py-1 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-                        <span className="text-blue-300 text-xs font-black">
-                          {catProductCount} {isAr ? 'منتج' : 'items'}
-                        </span>
-                      </div>
                     </div>
 
                     <div className="p-6 flex flex-col flex-grow justify-between">
