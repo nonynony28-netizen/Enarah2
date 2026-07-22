@@ -8,6 +8,9 @@ export type CartItem = {
   image: string;
   quantity: number;
   price?: number;
+  discountPrice?: number;
+  stockStatus?: string;
+  stockQty?: number;
 };
 
 type CartParticle = {
@@ -18,7 +21,7 @@ type CartParticle = {
 
 type CartContextType = {
   cartItems: CartItem[];
-  addToCart: (product: { id: string; name: string; description: string; image: string; price?: number }) => void;
+  addToCart: (product: { id: string; name: string; description: string; image: string; price?: number; discountPrice?: number; stockStatus?: string; stockQty?: number }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -53,10 +56,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('enarah_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product: { id: string; name: string; description: string; image: string; price?: number }) => {
+  const addToCart = (product: { id: string; name: string; description: string; image: string; price?: number; discountPrice?: number; stockStatus?: string; stockQty?: number }) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
+        if (product.stockQty !== undefined && existingItem.quantity >= product.stockQty) {
+          alert(typeof window !== 'undefined' && localStorage.getItem('enarah_lang') === 'en'
+            ? `Sorry, only ${product.stockQty} units are in stock.`
+            : `عذراً، تتوفر ${product.stockQty} قطعة فقط من هذا المنتج في المخزن.`);
+          return prevItems;
+        }
         return prevItems.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );

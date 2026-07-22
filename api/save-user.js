@@ -102,7 +102,15 @@ export default async function handler(req, res) {
     const type = typeof body.type === "string" ? body.type.trim().toLowerCase() : "user";
     const description = typeof body.description === "string" ? body.description.trim() : "";
     const category = typeof body.category === "string" ? body.category.trim() : "";
-    let imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() : "";
+    const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl.trim() : "";
+    const priceStr = typeof body.price === "string" ? body.price.trim() : "";
+    const discountPriceStr = typeof body.discountPrice === "string" ? body.discountPrice.trim() : "";
+    const stockStatus = typeof body.stockStatus === "string" ? body.stockStatus.trim().toLowerCase() : "available";
+    const stockQtyStr = typeof body.stockQty === "string" ? body.stockQty.trim() : "";
+
+    const price = priceStr ? parseFloat(priceStr) : undefined;
+    const discountPrice = discountPriceStr ? parseFloat(discountPriceStr) : undefined;
+    const stockQty = stockQtyStr ? parseInt(stockQtyStr, 10) : undefined;
 
     const isAdminAction = type === "product" || type === "project" || email === "admin_wire_prices@app.local";
     if (isAdminAction) {
@@ -130,9 +138,14 @@ export default async function handler(req, res) {
 
     const phoneData = {
       imageUrl,
+      videoUrl,
       description,
       type,
       category,
+      price,
+      discountPrice,
+      stockStatus,
+      stockQty,
     };
 
     const { db } = await connectToDatabase();

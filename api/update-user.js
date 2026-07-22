@@ -103,8 +103,28 @@ export default async function handler(req, res) {
 
     const id = typeof body.id === "string" ? body.id.trim() : "";
     const name = typeof body.name === "string" ? body.name.trim() : "";
-    const description = typeof body.description === "string" ? body.description.trim() : "";
-    const category = typeof body.category === "string" ? body.category.trim() : "";
+
+    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    let incomingPhoneData = {};
+    if (phone) {
+      try {
+        incomingPhoneData = JSON.parse(phone);
+      } catch {}
+    }
+
+    const description = incomingPhoneData.description || (typeof body.description === "string" ? body.description.trim() : "");
+    const category = incomingPhoneData.category || (typeof body.category === "string" ? body.category.trim() : "");
+    const videoUrl = incomingPhoneData.videoUrl || (typeof body.videoUrl === "string" ? body.videoUrl.trim() : "");
+    
+    // Parse numeric/string values for pricing and inventory
+    const priceRaw = incomingPhoneData.price !== undefined ? incomingPhoneData.price : body.price;
+    const discountPriceRaw = incomingPhoneData.discountPrice !== undefined ? incomingPhoneData.discountPrice : body.discountPrice;
+    const stockStatus = (incomingPhoneData.stockStatus || body.stockStatus || "available").trim().toLowerCase();
+    const stockQtyRaw = incomingPhoneData.stockQty !== undefined ? incomingPhoneData.stockQty : body.stockQty;
+
+    const price = priceRaw !== "" && priceRaw !== undefined ? parseFloat(priceRaw) : undefined;
+    const discountPrice = discountPriceRaw !== "" && discountPriceRaw !== undefined ? parseFloat(discountPriceRaw) : undefined;
+    const stockQty = stockQtyRaw !== "" && stockQtyRaw !== undefined ? parseInt(stockQtyRaw, 10) : undefined;
 
     if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({
@@ -144,6 +164,11 @@ export default async function handler(req, res) {
       imageUrl,
       description: description || existingPhoneData.description,
       category: category || existingPhoneData.category,
+      videoUrl: videoUrl || existingPhoneData.videoUrl,
+      price: price !== undefined ? price : existingPhoneData.price,
+      discountPrice: discountPrice !== undefined ? discountPrice : existingPhoneData.discountPrice,
+      stockStatus: stockStatus || existingPhoneData.stockStatus,
+      stockQty: stockQty !== undefined ? stockQty : existingPhoneData.stockQty,
     };
 
     const updateData = {

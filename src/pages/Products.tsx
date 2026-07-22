@@ -46,6 +46,10 @@ type ProductItem = {
   description: string
   image: string
   video?: string
+  price?: number
+  discountPrice?: number
+  stockStatus?: string
+  stockQty?: number
 }
 
 export default function Products() {
@@ -70,7 +74,11 @@ export default function Products() {
       id: product.id,
       name: product.name,
       description: product.description,
-      image: product.image
+      image: product.image,
+      price: product.discountPrice && product.price && product.discountPrice < product.price ? product.discountPrice : product.price,
+      discountPrice: product.discountPrice,
+      stockStatus: product.stockStatus,
+      stockQty: product.stockQty
     })
     setTimeout(() => {
       setAddingId(null)
@@ -137,6 +145,10 @@ export default function Products() {
                  description: descText,
                  image: mediaData.imageUrl || '/images/default-product.jpg',
                  video: mediaData.videoUrl || '',
+                 price: mediaData.price,
+                 discountPrice: mediaData.discountPrice,
+                 stockStatus: mediaData.stockStatus || 'available',
+                 stockQty: mediaData.stockQty,
                }
             })
           
@@ -247,6 +259,28 @@ export default function Products() {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-80 z-10" />
                     <ImageIcon className="absolute w-12 h-12 text-white/5" />
                     <img src={product.image} alt={displayName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 relative" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                    
+                    {/* شارة حالة التوفر والكمية */}
+                    {product.stockStatus === 'out_of_stock' || (product.stockQty !== undefined && product.stockQty <= 0) ? (
+                      <div className="absolute top-4 left-4 z-20 bg-red-950/80 border border-red-500/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                        <span className="text-red-400 text-xs font-bold">
+                          {isAr ? 'نفذت الكمية ❌' : 'Out of Stock ❌'}
+                        </span>
+                      </div>
+                    ) : product.stockQty !== undefined && product.stockQty > 0 ? (
+                      <div className="absolute top-4 left-4 z-20 bg-emerald-950/85 border border-emerald-500/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                        <span className="text-emerald-300 text-xs font-black">
+                          {isAr ? `متوفر: ${product.stockQty} قطعة` : `Stock: ${product.stockQty} pcs`}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="absolute top-4 left-4 z-20 bg-blue-950/80 border border-blue-500/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                        <span className="text-blue-300 text-xs font-bold">
+                          {isAr ? 'متوفر ✅' : 'In Stock ✅'}
+                        </span>
+                      </div>
+                    )}
+
                     {product.video && (
                       <div className="absolute top-4 right-4 z-20 bg-[#0a192f]/80 border border-blue-500/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         <PlayCircle className="w-4 h-4 text-blue-400" />
@@ -258,29 +292,61 @@ export default function Products() {
                   </div>
                   <div className="p-6 md:p-8 flex flex-col flex-grow relative z-20">
                     <h2 className="text-white font-bold text-xl md:text-2xl mb-3 group-hover:text-blue-400 transition-colors duration-300 line-clamp-1">{displayName}</h2>
-                    <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-8">
+                    <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-6">
                       {displayDesc || (isAr ? 'لا يوجد وصف متاح لهذا المنتج حالياً.' : 'No description available for this product currently.')}
                     </p>
+
+                    {/* عرض الأسعار والخصومات */}
+                    <div className="mb-6 flex flex-wrap items-baseline gap-2">
+                      {product.price ? (
+                        product.discountPrice && product.discountPrice < product.price ? (
+                          <>
+                            <span className="text-2xl font-black text-emerald-400">
+                              {product.discountPrice.toFixed(2)} <span className="text-xs font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                            </span>
+                            <span className="text-sm line-through text-slate-500 ml-1">
+                              {product.price.toFixed(2)} {isAr ? 'د.ل' : 'LYD'}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 animate-pulse">
+                              {isAr ? `وفر %${Math.round(((product.price - product.discountPrice) / product.price) * 100)}` : `Save ${Math.round(((product.price - product.discountPrice) / product.price) * 100)}%`}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-2xl font-black text-blue-400">
+                            {product.price.toFixed(2)} <span className="text-xs font-normal text-slate-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-xs font-semibold text-slate-500 bg-white/5 border border-white/5 px-3 py-1 rounded-lg">
+                          {isAr ? '🔍 السعر يحدد مع المبيعات' : '🔍 Price upon request'}
+                        </span>
+                      )}
+                    </div>
+
                     <div className="mt-auto space-y-3">
                       <button
                         onClick={(e) => handleAddToCart(e, { ...product, name: displayName, description: displayDesc })}
-                        disabled={addingId === product.id}
+                        disabled={addingId === product.id || product.stockStatus === 'out_of_stock' || (product.stockQty !== undefined && product.stockQty <= 0)}
                         className={`w-full py-3.5 border transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 rounded-xl shadow-sm cursor-pointer ${
-                          addingId === product.id
-                            ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
-                            : 'bg-blue-600/10 hover:bg-blue-600 border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                          product.stockStatus === 'out_of_stock' || (product.stockQty !== undefined && product.stockQty <= 0)
+                            ? 'bg-white/5 border-white/10 text-slate-500 cursor-not-allowed'
+                            : addingId === product.id
+                              ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+                              : 'bg-blue-600/10 hover:bg-blue-600 border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
                         }`}
                       >
                         <AnimatePresence mode="wait">
                           <motion.span
-                            key={addingId === product.id ? 'added' : 'add'}
+                            key={(product.stockStatus === 'out_of_stock' || (product.stockQty !== undefined && product.stockQty <= 0)) ? 'out' : addingId === product.id ? 'added' : 'add'}
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 4 }}
                             transition={{ duration: 0.2 }}
                             className="flex items-center gap-2"
                           >
-                            {addingId === product.id ? (
+                            {(product.stockStatus === 'out_of_stock' || (product.stockQty !== undefined && product.stockQty <= 0)) ? (
+                              <span>{isAr ? 'نفذت الكمية من المخزن' : 'Out of Stock'}</span>
+                            ) : addingId === product.id ? (
                               <>
                                 <Check className="w-4 h-4" />
                                 <span>{isAr ? 'تمت الإضافة بنجاح! ✓' : 'Added Successfully! ✓'}</span>

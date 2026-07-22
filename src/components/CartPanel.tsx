@@ -160,7 +160,15 @@ export default function CartPanel() {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => {
+                            if (item.stockQty !== undefined && item.quantity >= item.stockQty) {
+                              alert(isAr
+                                ? `عذراً، تتوفر ${item.stockQty} قطعة فقط من هذا المنتج في المخزن حالياً.`
+                                : `Sorry, only ${item.stockQty} units of this product are currently available in stock.`);
+                              return;
+                            }
+                            updateQuantity(item.id, item.quantity + 1);
+                          }}
                           className="p-1 text-slate-400 hover:text-white hover:bg-white/5 rounded-md active:scale-95 transition-all"
                         >
                           <Plus className="w-3.5 h-3.5" />

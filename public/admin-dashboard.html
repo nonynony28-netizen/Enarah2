@@ -113,6 +113,29 @@
            <label style="display:block; margin-bottom:5px; font-weight:bold;">التصنيف (للمشاريع):</label>
            <input type="text" id="edit_category" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" />
          </div>
+         
+         <!-- حقول تعديل السعر والمخزون للمنتجات -->
+         <div id="editInventoryContainer" style="margin-bottom: 15px;">
+            <div style="margin-bottom: 10px;">
+              <label style="display:block; margin-bottom:5px; font-weight:bold;">السعر الأصلي (د.ل):</label>
+              <input type="number" id="edit_price" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" step="0.01" />
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label style="display:block; margin-bottom:5px; font-weight:bold;">سعر العرض / الخصم (د.ل):</label>
+              <input type="number" id="edit_discountPrice" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" step="0.01" />
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label style="display:block; margin-bottom:5px; font-weight:bold;">حالة التوفر:</label>
+              <select id="edit_stockStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;">
+                <option value="available">متوفر في المخزن ✅</option>
+                <option value="out_of_stock">نفذت الكمية ❌</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label style="display:block; margin-bottom:5px; font-weight:bold;">الكمية المتاحة:</label>
+              <input type="number" id="edit_stockQty" style="width:100%; padding:10px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; box-sizing: border-box;" min="0" />
+            </div>
+         </div>
        </div>
        <div style="display:flex; gap:10px; margin-top:25px;">
          <button id="saveEditBtn" onclick="saveItemEdit()" style="flex:1; padding:12px; background:#10b981; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:16px;">حفظ التغييرات</button>
@@ -225,10 +248,31 @@
               </div>`;
           }
           else {
+            // تنسيق وعرض الأسعار والتخفيضات في لوحة التحكم
+            let priceHtml = "";
+            if (media.price) {
+              const originalPrice = parseFloat(media.price);
+              const discountPrice = media.discountPrice ? parseFloat(media.discountPrice) : null;
+              if (discountPrice && discountPrice < originalPrice) {
+                priceHtml = `<p><span class="label">السعر:</span> <span style="text-decoration: line-through; color: #94a3b8; margin-left: 5px;">${originalPrice.toFixed(2)} د.ل</span> <span style="color: #10b981; font-weight: bold;">${discountPrice.toFixed(2)} د.ل</span> <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-right: 5px;">خصم %${Math.round(((originalPrice - discountPrice) / originalPrice) * 100)}</span></p>`;
+              } else {
+                priceHtml = `<p><span class="label">السعر:</span> <span style="color: #3b82f6; font-weight: bold;">${originalPrice.toFixed(2)} د.ل</span></p>`;
+              }
+            } else {
+              priceHtml = `<p><span class="label">السعر:</span> <span style="color: #94a3b8; font-style: italic;">غير مسعر بعد</span></p>`;
+            }
+
+            const isOut = media.stockStatus === 'out_of_stock' || (media.stockQty !== undefined && parseInt(media.stockQty, 10) === 0);
+            const stockHtml = isOut
+              ? `<span style="background: rgba(244, 63, 94, 0.15); color: #fca5a5; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(244, 63, 94, 0.3); display: inline-block;">نفذت الكمية ❌</span>`
+              : `<span style="background: rgba(16, 185, 129, 0.15); color: #a7f3d0; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block;">متوفر في المخزن ✅ ${media.stockQty !== undefined ? `(${media.stockQty} قطعة)` : ''}</span>`;
+
             card.innerHTML = `<span class="badge product-badge">منتج 🔵</span>
               ${media.imageUrl ? `<img src="${media.imageUrl}" alt="product image" />` : ""}
               <h3>${item.name || "منتج بدون اسم"}</h3>
               <p>${media.description || ""}</p>
+              ${priceHtml}
+              <div style="margin-top: 10px; margin-bottom: 15px;">${stockHtml}</div>
               <div style="display: flex; gap: 10px; margin-top: 14px;">
                 <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
                 <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
@@ -368,15 +412,23 @@
       if (media.type === 'project') {
         categoryRow.style.display = 'block';
         categoryInput.value = media.category || '';
+        document.getElementById('editInventoryContainer').style.display = 'none';
         document.getElementById('editModalTitle').innerText = 'تعديل المشروع 🟡';
         editImageLabel.innerText = 'روابط الصور (يمكنك وضع عدة روابط مفصولة بفاصلة ",")';
         editImageUrlInput.placeholder = 'https://example.com/1.jpg, https://example.com/2.jpg';
       } else {
         categoryRow.style.display = 'none';
         categoryInput.value = '';
+        document.getElementById('editInventoryContainer').style.display = 'block';
         document.getElementById('editModalTitle').innerText = 'تعديل المنتج 🔵';
         editImageLabel.innerText = 'رابط الصورة:';
         editImageUrlInput.placeholder = 'https://example.com/image.jpg';
+        
+        // تعبئة حقول السعر والمخزون
+        document.getElementById('edit_price').value = media.price || '';
+        document.getElementById('edit_discountPrice').value = media.discountPrice || '';
+        document.getElementById('edit_stockStatus').value = media.stockStatus || 'available';
+        document.getElementById('edit_stockQty').value = media.stockQty !== undefined ? media.stockQty : '';
       }
 
       document.getElementById('editModal').style.display = 'flex';
@@ -394,6 +446,11 @@
       const imageUrl = document.getElementById('edit_imageUrl').value.trim();
       const videoUrl = document.getElementById('edit_videoUrl').value.trim();
       const category = document.getElementById('edit_category').value.trim();
+
+      const price = document.getElementById('edit_price').value.trim();
+      const discountPrice = document.getElementById('edit_discountPrice').value.trim();
+      const stockStatus = document.getElementById('edit_stockStatus').value;
+      const stockQty = document.getElementById('edit_stockQty').value.trim();
 
       if (!name) {
         alert('الاسم مطلوب.');
@@ -413,6 +470,11 @@
         };
         if (type === 'project') {
           phoneObj.category = category;
+        } else {
+          phoneObj.price = price ? parseFloat(price) : undefined;
+          phoneObj.discountPrice = discountPrice ? parseFloat(discountPrice) : undefined;
+          phoneObj.stockStatus = stockStatus;
+          phoneObj.stockQty = stockQty !== '' ? parseInt(stockQty, 10) : undefined;
         }
 
         const pwd = getAdminPassword();
