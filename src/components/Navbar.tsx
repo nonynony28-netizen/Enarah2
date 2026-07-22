@@ -129,12 +129,12 @@ export default function Navbar() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'bg-[#0a192f]/80 backdrop-blur-xl shadow-lg border-b border-blue-500/10 py-2'
+            ? 'bg-[#0a192f] shadow-lg border-b border-blue-500/10 py-2'
             : 'bg-transparent py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 md:h-16 flex-row">
+          <div className={`flex items-center justify-between h-14 md:h-16 w-full ${isAr ? 'flex-row-reverse md:flex-row' : 'flex-row'}`}>
 
             {/* Logo Group containing Logo & Mobile Cart Button to space them nicely */}
             <div className="flex items-center gap-4 flex-row">
@@ -226,7 +226,7 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: 'easeOut' }}
-                      className={`absolute top-full mt-2 w-[480px] bg-[#0a192f]/95 backdrop-blur-xl border border-blue-500/20 rounded-[1.5rem] p-4 shadow-2xl z-50 grid grid-cols-2 gap-3 ${
+                      className={`absolute top-full mt-2 w-[480px] bg-[#0a192f] border border-blue-500/20 rounded-[1.5rem] p-4 shadow-2xl z-50 grid grid-cols-2 gap-3 ${
                         isAr ? 'right-0' : 'left-0'
                       }`}
                     >
@@ -326,7 +326,6 @@ export default function Navbar() {
                 <span>{isAr ? 'EN' : 'AR'}</span>
               </button>
 
-
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 rounded-full text-slate-300 hover:text-white hover:bg-blue-500/20 active:scale-95 transition-all duration-300"
@@ -348,15 +347,15 @@ export default function Navbar() {
             transition={{ duration: 0.25 }}
             className="fixed inset-0 z-40 md:hidden"
           >
-            {/* الخلفية المظلمة الضبابية الخفيفة */}
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+            {/* الخلفية المظلمة الشفافة السريعة */}
+            <div className="absolute inset-0 bg-black/75" onClick={() => setIsOpen(false)} />
             
             <motion.div
               initial={{ x: isAr ? '100%' : '-100%' }} 
               animate={{ x: 0 }} 
               exit={{ x: isAr ? '100%' : '-100%' }}
               transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
-              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] shadow-2xl overflow-y-auto flex flex-col justify-between ${
+              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-[#0a192f] shadow-2xl overflow-y-auto flex flex-col justify-between ${
                 isAr ? 'right-0 border-l border-blue-500/20' : 'left-0 border-r border-blue-500/20'
               }`}
             >

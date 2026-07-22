@@ -44,10 +44,10 @@ export default function CartPanel() {
         isCartOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}
     >
-      {/* Backdrop overlay خلفية معتمة ضبابية فاخرة */}
+      {/* Backdrop overlay خلفية معتمة سريعة */}
       <div
         onClick={() => setIsCartOpen(false)}
-        className={`absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-500 cursor-pointer ${
+        className={`absolute inset-0 bg-black/75 transition-opacity duration-300 cursor-pointer ${
           isCartOpen ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -55,7 +55,7 @@ export default function CartPanel() {
       {/* Cart Sidebar السلة الجانبية الزجاجية */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative z-10 w-[90%] sm:w-full sm:max-w-md h-full bg-[#071325]/95 backdrop-blur-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col justify-between border-white/10 transition-transform duration-500 ease-out ${
+        className={`relative z-10 w-[90%] sm:w-full sm:max-w-md h-full bg-[#071325] shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col justify-between border-white/10 transition-transform duration-300 ease-out ${
           isAr 
             ? `border-l ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}` 
             : `border-r ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}`
@@ -69,7 +69,7 @@ export default function CartPanel() {
         <div className="relative z-10 flex flex-col h-full justify-between">
           
           {/* رأس السلة Header */}
-          <div className="flex flex-col border-b border-white/10 bg-[#0a1b36]/90 backdrop-blur-xl px-6 py-5 shadow-sm">
+          <div className="flex flex-col border-b border-white/10 bg-[#0a1b36] px-6 py-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)] border border-blue-400/30">
