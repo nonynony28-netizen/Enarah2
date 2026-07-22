@@ -153,7 +153,14 @@ export default function Home() {
   const bulbAuraOpacity = useTransform(scrollYProgress, [0, 0.45], [0.1, 0.85])
 
   const [pageLoading, setPageLoading] = useState(true)
-  const [videoLoaded, setVideoLoaded] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true
+      videoRef.current.play().catch(() => {})
+    }
+  }, [])
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_featured_projects')
@@ -413,25 +420,16 @@ export default function Home() {
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] overflow-hidden flex items-center justify-center">
             
-            {/* الكود النهائي للفيديو: تحميل مسبق قوي، وبدون تأثيرات بطء */}
-            <img
-              src="/images/poster.jpg"
-              alt="Poster background"
-              className={`absolute top-0 left-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
-                videoLoaded ? 'opacity-0' : 'opacity-[0.5]'
-              }`}
-            />
+            {/* الكود النهائي للفيديو: تشغيل مباشر فوري بدون أي تأخير أو شاشة سوداء */}
             <video
+              ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
               preload="auto"
-              onPlay={() => setVideoLoaded(true)}
-              className={`absolute top-0 left-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
-                videoLoaded ? 'opacity-[0.5]' : 'opacity-0'
-              }`}
-              style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-50 z-0"
+              style={{ transform: 'translateZ(0)' }}
             >
               <source src="/bg-video.mp4" type="video/mp4" />
             </video>
@@ -448,7 +446,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-blue-500/15 via-indigo-500/20 to-blue-500/15 border border-blue-400/30 text-blue-300 text-xs sm:text-sm font-black shadow-[0_0_20px_rgba(59,130,246,0.25)] mb-6 backdrop-blur-md"
+                className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-blue-500/15 via-indigo-500/20 to-blue-500/15 border border-blue-400/30 text-blue-300 text-xs sm:text-sm font-black shadow-[0_0_20px_rgba(59,130,246,0.25)] mb-6"
               >
                 <Sparkles className="w-4 h-4 text-blue-400 animate-spin" style={{ animationDuration: '6s' }} />
                 <span>{isAr ? 'معرض إنارة ومواد تأسيس فاخرة معتمدة' : 'Premium Architectural Lighting & Electrical Solutions'}</span>
@@ -498,7 +496,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
-                  className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0f213a]/50 backdrop-blur-xl border border-white/10 w-full max-w-[360px] flex flex-col justify-between overflow-hidden shadow-2xl gap-6 min-h-[340px]"
+                  className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0f213a] border border-white/10 w-full max-w-[360px] flex flex-col justify-between overflow-hidden shadow-2xl gap-6 min-h-[340px]"
                 >
                   {/* Subtle Grid backdrop */}
                   <div className="absolute inset-0 bg-animated-grid opacity-10 pointer-events-none" />
@@ -570,7 +568,7 @@ export default function Home() {
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     whileHover={{ y: -4, transition: { duration: 0.3, ease: "easeOut" } }}
-                    className="relative p-6 rounded-2xl bg-gradient-to-br from-[#0c1e38]/80 via-[#0a192f]/90 to-[#071325]/90 backdrop-blur-xl border border-white/10 hover:border-blue-400/30 transition-all duration-300 flex flex-col md:flex-row items-start gap-5 cursor-default group shadow-lg hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)] overflow-hidden"
+                    className="relative p-6 rounded-2xl bg-[#0c1e38] border border-white/10 hover:border-blue-400/30 transition-all duration-300 flex flex-col md:flex-row items-start gap-5 cursor-default group shadow-lg hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)] overflow-hidden"
                   >
                     {/* شريط الإضاءة العريض المتوهج عند التمرير */}
                     <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
