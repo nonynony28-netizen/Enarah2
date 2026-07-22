@@ -55,6 +55,7 @@ type ProductItem = {
 export default function Products() {
   const { isAr } = useLanguage()
   const { addToCart, triggerFlyAnimation } = useCart()
+  const [selectedCategory, setSelectedCategory] = useState('all')
   const [products, setProducts] = useState<ProductItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_products')
@@ -149,6 +150,7 @@ export default function Products() {
                  discountPrice: mediaData.discountPrice,
                  stockStatus: mediaData.stockStatus || 'available',
                  stockQty: mediaData.stockQty,
+                 category: mediaData.category || item.category || 'عام'
                }
             })
           
@@ -165,6 +167,24 @@ export default function Products() {
 
     fetchProducts()
   }, [isAr])
+
+  const categoryTabs = [
+    { id: 'all', labelAr: 'جميع الأقسام ✨', labelEn: 'All Categories ✨' },
+    { id: 'الأسلاك والكوابل', labelAr: 'الأسلاك والكوابل 🔌', labelEn: 'Wires & Cables 🔌' },
+    { id: 'سبوت لايت', labelAr: 'سبوت لايت 💡', labelEn: 'Spotlights 💡' },
+    { id: 'مفاتيح وبرايز', labelAr: 'مفاتيح وبرايز ⚡', labelEn: 'Switches & Sockets ⚡' },
+    { id: 'ثريات', labelAr: 'ثريات 💎', labelEn: 'Chandeliers 💎' },
+    { id: 'سكة الليد', labelAr: 'سكة الليد 🔦', labelEn: 'LED Track Lights 🔦' },
+    { id: 'انترفون', labelAr: 'انترفون 🔔', labelEn: 'Intercom Systems 🔔' },
+    { id: 'مواد تأسيس الكهربائي', labelAr: 'مواد التأسيس 📦', labelEn: 'Installation Materials 📦' }
+  ]
+
+  const displayedProducts = products.filter(p => {
+    if (selectedCategory === 'all') return true
+    const pCat = (p.category || '').trim()
+    const pName = (p.name || '').trim()
+    return pCat.includes(selectedCategory) || pName.includes(selectedCategory)
+  })
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -209,35 +229,73 @@ export default function Products() {
           </div>
         </motion.div>
 
+        {/* شريط تصفح الأقسام الرئيسي (Interactive Category Filter Bar) */}
+        {!loading && (
+          <div className="mb-10 md:mb-14">
+            <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 scrollbar-none max-w-full px-2">
+              {categoryTabs.map((tab) => {
+                const isActive = selectedCategory === tab.id
+                const count = tab.id === 'all' 
+                  ? products.length 
+                  : products.filter(p => (p.category || '').includes(tab.id) || p.name.includes(tab.id)).length
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSelectedCategory(tab.id)}
+                    className={`relative px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all duration-300 flex items-center gap-2 cursor-pointer shrink-0 outline-none border ${
+                      isActive 
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-400/40 shadow-[0_0_20px_rgba(59,130,246,0.5)]' 
+                        : 'bg-[#0c1e38] text-slate-300 hover:text-white border-white/10 hover:border-blue-400/30'
+                    }`}
+                  >
+                    <span>{isAr ? tab.labelAr : tab.labelEn}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-white/5 text-slate-400'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {loading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-16 h-16 text-blue-400 animate-spin relative z-10 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
             <p className="text-blue-100 mt-6 font-medium text-lg animate-pulse">
-              {isAr ? 'جاري جلب أحدث المنتجات...' : 'Fetching latest products...'}
+              {isAr ? 'جاري جلب أحدث المنتجات والأقسام...' : 'Fetching products & categories...'}
             </p>
           </motion.div>
         )}
 
-        {!loading && products.length === 0 && (
+        {!loading && displayedProducts.length === 0 && (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-12 text-center max-w-2xl mx-auto shadow-2xl">
             <div className="w-24 h-24 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
               <PackageSearch className="w-12 h-12 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-3">
-              {isAr ? 'المعرض قيد التحديث' : 'Gallery Under Update'}
+              {isAr ? 'لا توجد منتجات في هذا القسم حالياً' : 'No products in this category yet'}
             </h3>
-            <p className="text-slate-400 text-base leading-relaxed">
+            <p className="text-slate-400 text-base leading-relaxed mb-6">
               {isAr
-                ? 'نحن نقوم بتحديث المعرض بأحدث المنتجات، يرجى العودة قريباً للاطلاع على تشكيلتنا الجديدة.'
-                : 'We are currently updating our gallery with the newest products. Please check back soon to view our new collection.'
+                ? 'نحن نقوم بتحديث المعرض وإضافة منتجات هذا القسم قريباً. يمكنك تصفح باقي الأقسام.'
+                : 'We are currently adding products to this category. Please feel free to check other categories.'
               }
             </p>
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all cursor-pointer"
+            >
+              {isAr ? 'عرض جميع المنتجات' : 'Show All Products'}
+            </button>
           </motion.div>
         )}
 
-        {!loading && products.length > 0 && (
+        {!loading && displayedProducts.length > 0 && (
           <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-            {products.map((product) => {
+            {displayedProducts.map((product) => {
               // Translate on the fly
               let displayName = product.name;
               let displayDesc = product.description;

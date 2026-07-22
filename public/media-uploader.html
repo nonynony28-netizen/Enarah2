@@ -55,9 +55,18 @@
       <option value="project">مشروع (يظهر في صفحة المشاريع والرئيسية)</option>
     </select>
 
-    <div id="categoryContainer" style="display: none;">
-      <label for="category">تصنيف المشروع (مثل: طبي، مول تجاري، مقهى)</label>
-      <input type="text" id="category" placeholder="التصنيف سيظهر في الشارة الذهبية للمشروع" />
+    <div id="categoryContainer">
+      <label for="category">قسم المنتج / تصنيف المشروع</label>
+      <select id="category" style="width:100%; padding:12px; background:#0c1e38; color:#fff; border:1px solid rgba(59,130,246,0.3); border-radius:12px; margin-bottom:15px; font-weight:bold;">
+        <option value="الأسلاك والكوابل">الأسلاك والكوابل 🔌</option>
+        <option value="سبوت لايت">سبوت لايت 💡</option>
+        <option value="مفاتيح وبرايز">مفاتيح وبرايز ⚡</option>
+        <option value="ثريات">ثريات 💎</option>
+        <option value="سكة الليد">سكة الليد 🔦</option>
+        <option value="انترفون">انترفون 🔔</option>
+        <option value="مواد تأسيس الكهربائي">مواد تأسيس الكهرباء 📦</option>
+        <option value="عام" selected>قسم عام 🌟</option>
+      </select>
     </div>
 
     <label for="title">الاسم أو العنوان</label>
