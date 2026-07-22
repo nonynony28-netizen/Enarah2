@@ -511,12 +511,12 @@ export default function Home() {
               ].map((item, i) => (
                 <motion.div
                   key={item.title}
-                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ delay: i * 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  whileHover={{ y: -6, transition: { duration: 0.3, ease: "easeOut" } }}
-                  className="relative p-7 md:p-8 rounded-[2rem] bg-[#0c1e38] border border-white/10 hover:border-blue-400/40 transition-all duration-500 flex flex-col justify-between cursor-default group shadow-xl hover:shadow-[0_15px_40px_rgba(59,130,246,0.18)] overflow-hidden"
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{ delay: i * 0.12, duration: 0.5, ease: "easeOut" }}
+                  style={{ transform: 'translateZ(0)' }}
+                  className="relative p-7 md:p-8 rounded-[2rem] bg-[#0c1e38] border border-white/10 hover:border-blue-400/40 transition-all duration-300 flex flex-col justify-between cursor-default group shadow-xl hover:shadow-[0_15px_40px_rgba(59,130,246,0.18)] overflow-hidden"
                 >
                   {/* شريط الوهج العلوي عند التمرير */}
                   <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
