@@ -48,17 +48,22 @@ export default function Layout() {
   }, [])
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    const calcScroll = () => {
+      const scrollTop = window.scrollY || window.pageYOffset || 0
+      const totalHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight
+      )
+      const docHeight = totalHeight - window.innerHeight
       if (docHeight > 0) {
-        setScrollPercent(scrollTop / docHeight)
+        setScrollPercent(Math.min(1, Math.max(0, scrollTop / docHeight)))
       } else {
         setScrollPercent(0)
       }
 
-      // تفعيل مفتاح الضوء وتشغيل الصوت تلقائياً عند التمرير لأسفل الصفحة (أول 30 بكسل)
-      if (scrollTop > 30) {
+      if (scrollTop > 40) {
         setIsScrollActivated(true)
         if (!hasPlayedSwitchSound) {
           playClickSound(true)
@@ -69,8 +74,25 @@ export default function Layout() {
         setHasPlayedSwitchSound(false)
       }
     }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+
+    window.addEventListener('scroll', calcScroll, { passive: true })
+    window.addEventListener('resize', calcScroll)
+    window.addEventListener('load', calcScroll)
+
+    let ro: ResizeObserver | null = null
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => calcScroll())
+      ro.observe(document.body)
+    }
+
+    calcScroll()
+
+    return () => {
+      window.removeEventListener('scroll', calcScroll)
+      window.removeEventListener('resize', calcScroll)
+      window.removeEventListener('load', calcScroll)
+      if (ro) ro.disconnect()
+    }
   }, [hasPlayedSwitchSound])
 
   useEffect(() => {
@@ -151,7 +173,7 @@ export default function Layout() {
       {/* الخلفية الإبداعية فائقة الأداء والمتحركة ببطء */}
       <div className="fixed inset-0 -z-50 w-full h-full bg-[#050b14] overflow-hidden pointer-events-none">
         {/* التدرج اللوني الذي يتحرك ببطء */}
-        <div className="absolute -inset-[50%] w-[200%] h-[200%] bg-ultra-ambient animate-slow-rotate opacity-90"></div>
+        <div className="hidden md:block absolute -inset-[50%] w-[200%] h-[200%] bg-ultra-ambient animate-slow-rotate opacity-90"></div>
         {/* الشبكة الهندسية الفاخرة */}
         <div className="absolute inset-0 bg-animated-grid opacity-[0.06]"></div>
         {/* طبقة تظليل داكنة ناعمة لضمان سهولة قراءة النصوص */}
