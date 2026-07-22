@@ -570,57 +570,52 @@ export default function Home() {
                           : (isAr ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وحساب أحمال الكهرباء بدقة لتجنب أي هدر.' : 'Our specialized team is always available to help you select products, request custom volumes, and calculate electrical loads accurately.')}
                       </p>
 
-                      {/* قائمة المميزات ثلاثية النقاط */}
-                      <div className="space-y-3 mb-8">
+                      {/* قائمة المميزات الممتدة (Extended Feature List) */}
+                      <div className="space-y-3.5 mb-2">
                         {(activeWhySlide === 0
                           ? (isAr ? [
-                              'منتجات أصلية معتمدة وفق أعلى معايير الجودة والأمان.',
-                              'عزل حراري وكهربائي ممتاز يدوم لسنوات طويلة.',
-                              'فحص دقيق واختبار شامل قبل التوريد لجميع العملاء.'
+                              'منتجات أصلية معتمدة وفق أعلى معايير الجودة والسلامة العالمية.',
+                              'عزل حراري وكهربائي ممتاز يدوم لسنوات طويلة دون تلف.',
+                              'ضمان حقيقي واختبار قياسي شامل قبل التوريد لجميع العملاء.',
+                              'حماية كاملة للمبنى والأسلاك من أخطار التماس والحرارة.'
                             ] : [
-                              'Certified original products meeting top quality and safety standards.',
-                              'Superior thermal and electrical insulation built to last.',
-                              'Thorough quality inspection and testing before dispatch.'
+                              'Certified original products meeting top international safety standards.',
+                              'Superior thermal and electrical insulation built to last without decay.',
+                              'Real warranty and comprehensive testing prior to customer delivery.',
+                              'Complete building and wiring protection from electrical hazards.'
                             ])
                           : activeWhySlide === 1
                           ? (isAr ? [
-                              'توفير كافة مستلزمات التأسيس والإنارة من مكان واحد.',
+                              'توفير كافة مستلزمات التأسيس والإنارة من مكان واحد بدون عناء.',
                               'كابلات، أسلاك إيطالية، مفاتيح ذكية وسبوتات بأحدث التقنيات.',
-                              'أسعار مناسبة ومعتمدة يومياً للمشترين والمقاولين.'
+                              'تجهيز كامل للكميات والمشاريع بأسعار معتمدة ومنافسة.',
+                              'حلول ديكورية وإنارية متكاملة تناسب جميع التصاميم والمعايير.'
                             ] : [
-                              'All electrical and lighting requirements provided in one place.',
+                              'All electrical and lighting requirements provided effortlessly in one place.',
                               'Italian wires, smart switches, and spotlights with modern tech.',
-                              'Competitive daily-updated standard prices for all buyers.'
+                              'Complete project volume provisioning at competitive standard prices.',
+                              'Integrated decorative lighting solutions tailored to all designs.'
                             ])
                           : (isAr ? [
                               'فريق مهندسين وفنيين متخصصين لإجابة كافة استفساراتك.',
                               'حساب الأحمال والتكلفة والكميات المطلوبة بدقة بدون هدر.',
-                              'توصيل سريع وآمن لكافة المدن والمشاريع والمناطق.'
+                              'متابعة مستمرة وتنسيق كامل حتى وصول طلبك بأمان.',
+                              'توصيل سريع ومضمون لكافة المدن والمشاريع والمناطق.'
                             ] : [
                               'Dedicated engineers and specialists to answer all your queries.',
                               'Accurate calculation of loads, quantities, and budgets without waste.',
-                              'Fast and safe delivery to all cities and project sites.'
+                              'Continuous tracking and coordination until safe order arrival.',
+                              'Fast and guaranteed delivery to all cities and project sites.'
                             ])
                         ).map((feat, idx) => (
                           <div key={idx} className="flex items-center gap-3">
                             <div className="p-1 rounded-full bg-blue-500/20 text-blue-400 shrink-0 border border-blue-400/30">
-                              <CheckCircle className="w-4 h-4" />
+                              <CheckCircle className="w-4.5 h-4.5" />
                             </div>
                             <span className="text-xs sm:text-sm text-slate-200 font-bold">{feat}</span>
                           </div>
                         ))}
                       </div>
-                    </div>
-
-                    {/* زر الإجراء السريع */}
-                    <div className="flex items-center gap-4 pt-4 border-t border-white/10">
-                      <Link
-                        to="/products"
-                        className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 cursor-pointer"
-                      >
-                        <span>{isAr ? 'استعرض المنتجات المعتمدة' : 'Explore Certified Products'}</span>
-                        <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-                      </Link>
                     </div>
                   </div>
 
