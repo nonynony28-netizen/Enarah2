@@ -304,7 +304,7 @@ export default function Navbar() {
               <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
                 <button
                   onClick={toggleLanguage}
-                  className="relative px-3.5 py-1.5 h-9 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.4)] border border-blue-400/30 text-xs font-black"
+                  className="relative px-3.5 py-1.5 h-9 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-600/25 to-indigo-600/20 hover:from-blue-600 hover:to-indigo-600 text-cyan-300 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.25)] border border-cyan-400/30 text-xs font-black"
                   title={isAr ? 'Switch to English' : 'التغيير للعربية'}
                 >
                   <Globe className="w-3.5 h-3.5" />
@@ -319,7 +319,7 @@ export default function Navbar() {
             <div className="flex md:hidden items-center gap-2">
               <button
                 onClick={toggleLanguage}
-                className="relative px-3.5 py-1.5 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_12px_rgba(59,130,246,0.4)] border border-blue-400/20 text-xs font-black"
+                className="relative px-3.5 py-1.5 h-9 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-600/25 to-indigo-600/20 text-cyan-300 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_12px_rgba(6,182,212,0.25)] border border-cyan-400/30 text-xs font-black"
                 title={isAr ? 'Switch to English' : 'التغيير للعربية'}
               >
                 <Globe className="w-3.5 h-3.5" />

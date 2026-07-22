@@ -449,20 +449,20 @@ export default function Home() {
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
-              {/* شارة زجاجية مضيئة أعلى الهيرو */}
+              {/* شارة زجاجية مضيئة بلاتينية أعلى الهيرو */}
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-blue-500/15 via-indigo-500/20 to-blue-500/15 border border-blue-400/30 text-blue-300 text-xs sm:text-sm font-black shadow-[0_0_20px_rgba(59,130,246,0.25)] mb-6"
+                className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-cyan-500/15 via-blue-600/20 to-indigo-600/15 border border-cyan-400/30 text-cyan-300 text-xs sm:text-sm font-black shadow-[0_0_25px_rgba(6,182,212,0.25)] mb-6"
               >
-                <Sparkles className="w-4 h-4 text-blue-400 animate-spin" style={{ animationDuration: '6s' }} />
+                <Sparkles className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
                 <span>{isAr ? 'معرض إنارة ومواد تأسيس فاخرة معتمدة' : 'Premium Architectural Lighting & Electrical Solutions'}</span>
               </motion.div>
 
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-normal tracking-tight text-white py-2">
                 <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">{t('hero.title.part1')}</span>{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 drop-shadow-[0_0_35px_rgba(59,130,246,0.7)]">{t('hero.title.part2')}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-300 drop-shadow-[0_0_35px_rgba(59,130,246,0.7)]">{t('hero.title.part2')}</span>
               </h1>
               
               <p className="text-base md:text-2xl text-blue-50/90 mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
