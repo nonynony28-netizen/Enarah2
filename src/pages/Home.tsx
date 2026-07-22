@@ -511,10 +511,10 @@ export default function Home() {
               ].map((item, i) => (
                 <motion.div
                   key={item.title}
-                  initial={{ opacity: 0, y: 18 }}
+                  initial={{ opacity: 0, y: 22 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.15 }}
-                  transition={{ delay: i * 0.12, duration: 0.5, ease: "easeOut" }}
+                  transition={{ delay: i * 0.35, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
                   style={{ transform: 'translateZ(0)' }}
                   className="relative p-7 md:p-8 rounded-[2rem] bg-[#0c1e38] border border-white/10 hover:border-blue-400/40 transition-all duration-300 flex flex-col justify-between cursor-default group shadow-xl hover:shadow-[0_15px_40px_rgba(59,130,246,0.18)] overflow-hidden"
                 >
