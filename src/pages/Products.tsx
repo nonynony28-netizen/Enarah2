@@ -40,6 +40,19 @@ const productTranslations: Record<string, { name: string; description: string }>
   }
 };
 
+type ProductItem = {
+  id: string
+  name: string
+  description: string
+  image: string
+  video?: string
+  price?: number
+  discountPrice?: number
+  stockStatus?: string
+  stockQty?: number
+  category?: string
+}
+
 const defaultFallbackProducts: ProductItem[] = [
   {
     id: 'wire-italy-25',
@@ -229,118 +242,13 @@ export default function Products() {
   }, [isAr])
 
   const categoriesGrid = [
-    {
-      id: 'الأسلاك والكوابل',
-      titleAr: 'الأسلاك والكوابل المعتمدة',
-      titleEn: 'Certified Wires & Cables',
-      descAr: 'أسلاك إيطالية معتمدة وموصلات فائقة النقاء عازلة للحرارة والكهرباء 100%.',
-      descEn: 'Italian certified wires and ultra-pure copper conductors with thermal insulation.',
-      badgeAr: 'مواصفات إيطالية 🇮🇹',
-      badgeEn: 'Italian Specs 🇮🇹',
-      icon: Zap,
-      gradient: 'from-blue-600/30 via-indigo-950/70 to-[#0a192f]',
-      border: 'border-blue-400/30 hover:border-blue-400/60',
-      glow: 'shadow-[0_0_30px_rgba(59,130,246,0.25)]',
-      accentColor: 'text-blue-400',
-      highlightsAr: ['نحاس نقي 100%', 'عزل حراري ممتاز', 'مقاسات معتمدة'],
-      highlightsEn: ['100% Pure Copper', 'Thermal Insulation', 'Standard Gauges']
-    },
-    {
-      id: 'سبوت لايت',
-      titleAr: 'السبوت لايت والإنارة الغاطسة',
-      titleEn: 'Spotlights & Recessed Lighting',
-      descAr: 'تشكيلة سبوتات ضد التوهج Anti-Glare بإضاءات دافئة وطبيعية تناسب كافة المساحات.',
-      descEn: 'Anti-Glare spotlights with warm and natural light options for modern spaces.',
-      badgeAr: 'مانع للتوهج 💡',
-      badgeEn: 'Anti-Glare 💡',
-      icon: Lightbulb,
-      gradient: 'from-cyan-600/30 via-sky-950/70 to-[#0a192f]',
-      border: 'border-cyan-400/30 hover:border-cyan-400/60',
-      glow: 'shadow-[0_0_30px_rgba(6,182,212,0.25)]',
-      accentColor: 'text-cyan-400',
-      highlightsAr: ['مقاوم للتوهج', 'زوايا إضاءة متغيرة', 'عمر افتراضي طويل'],
-      highlightsEn: ['Anti-Glare', 'Adjustable Angles', 'Long Lifespan']
-    },
-    {
-      id: 'مفاتيح وبرايز',
-      titleAr: 'المفاتيح والبرايز الحديثة',
-      titleEn: 'Switches & Sockets',
-      descAr: 'مفاتيح ومآخذ كهربائية عصرية وتصاميم فخمة مقاومة للخدش بأعلى أمان.',
-      descEn: 'Luxury switches and sockets with scratch-resistant finishes and top safety.',
-      badgeAr: 'تصاميم عصرية ⚡',
-      badgeEn: 'Modern Switches ⚡',
-      icon: Shield,
-      gradient: 'from-purple-600/30 via-indigo-950/70 to-[#0a192f]',
-      border: 'border-purple-400/30 hover:border-purple-400/60',
-      glow: 'shadow-[0_0_30px_rgba(168,85,247,0.25)]',
-      accentColor: 'text-purple-400',
-      highlightsAr: ['لمس وذكي Smart', 'مقاومة للحرارة', 'ضمان معتمد'],
-      highlightsEn: ['Smart Touch', 'Heat Resistant', 'Certified Warranty']
-    },
-    {
-      id: 'ثريات',
-      titleAr: 'الثريات والإنارة الديكورية',
-      titleEn: 'Chandeliers & Decorative Lighting',
-      descAr: 'ثريات كريستال وتصاميم مودرن كلاسيكية منتقاة بعناية لتعطي انطباعاً مبهراً.',
-      descEn: 'Crystal chandeliers and decorative modern classic lighting tailored to amaze.',
-      badgeAr: 'كريستال وديكور 💎',
-      badgeEn: 'Luxury Crystal 💎',
-      icon: Sparkles,
-      gradient: 'from-amber-600/30 via-yellow-950/70 to-[#0a192f]',
-      border: 'border-amber-400/30 hover:border-amber-400/60',
-      glow: 'shadow-[0_0_30px_rgba(245,158,11,0.25)]',
-      accentColor: 'text-amber-400',
-      highlightsAr: ['كريستال عالي النقاء', 'تحكم في شدة الضوء', 'تصاميم حصرية'],
-      highlightsEn: ['High-Purity Crystal', 'Dimmable Controls', 'Exclusive Designs']
-    },
-    {
-      id: 'سكة الليد',
-      titleAr: 'أنظمة سكة الليد المغناطيسية',
-      titleEn: 'Magnetic LED Track Lighting',
-      descAr: 'أنظمة سكة ليد مرنة غاطسة وظاهرة تتيح لك إعادة توزيع الضوء بسهولة.',
-      descEn: 'Flexible magnetic recessed and surface LED track lighting systems.',
-      badgeAr: 'أنظمة غاطسة 🔦',
-      badgeEn: 'Magnetic Tracks 🔦',
-      icon: PackageSearch,
-      gradient: 'from-emerald-600/30 via-teal-950/70 to-[#0a192f]',
-      border: 'border-emerald-400/30 hover:border-emerald-400/60',
-      glow: 'shadow-[0_0_30px_rgba(16,185,129,0.25)]',
-      accentColor: 'text-emerald-400',
-      highlightsAr: ['تركيب مغناطيسي مرن', 'إضاءات خطية وموجهة', 'تصميم معماري'],
-      highlightsEn: ['Flexible Magnetic', 'Linear & Spot Light', 'Architectural']
-    },
-    {
-      id: 'انترفون',
-      titleAr: 'أنظمة الانترفون والحماية',
-      titleEn: 'Video Intercom Systems',
-      descAr: 'أنظمة انترفون مرئية سلكية ولاسلكية من أفضل الماركات العالمية لحماية المبنى.',
-      descEn: 'Wired and wireless video intercom systems for ultimate home security.',
-      badgeAr: 'حماية وأمان 🔔',
-      badgeEn: 'Smart Security 🔔',
-      icon: Award,
-      gradient: 'from-rose-600/30 via-pink-950/70 to-[#0a192f]',
-      border: 'border-rose-400/30 hover:border-rose-400/60',
-      glow: 'shadow-[0_0_30px_rgba(244,63,94,0.25)]',
-      accentColor: 'text-rose-400',
-      highlightsAr: ['شاشات HD عالية الدقة', 'رؤية ليلية', 'اتصال لاسلكي'],
-      highlightsEn: ['HD Screens', 'Night Vision', 'Wireless Connectivity']
-    },
-    {
-      id: 'مواد تأسيس الكهربائي',
-      titleAr: 'مواد التأسيس الكهربائي الشاملة',
-      titleEn: 'Electrical Foundation Materials',
-      descAr: 'مستلزمات التأسيس الأولي من علب غاطسة، قسامات، وكابلات رئيسية للمشاريع.',
-      descEn: 'Complete electrical foundation supplies, junction boxes, and main cables.',
-      badgeAr: 'تأسيس للمشاريع 📦',
-      badgeEn: 'Project Supplies 📦',
-      icon: PlayCircle,
-      gradient: 'from-orange-600/30 via-amber-950/70 to-[#0a192f]',
-      border: 'border-orange-400/30 hover:border-orange-400/60',
-      glow: 'shadow-[0_0_30px_rgba(249,115,22,0.25)]',
-      accentColor: 'text-orange-400',
-      highlightsAr: ['علب وقسامات معتمدة', 'مقاومة للصدمات', 'توفير بالكميات'],
-      highlightsEn: ['Junction Boxes', 'Impact Resistant', 'Bulk Discounts']
-    }
+    { id: 'الأسلاك والكوابل', titleAr: 'الأسلاك والكوابل', titleEn: 'Wires & Cables', icon: Zap },
+    { id: 'سبوت لايت', titleAr: 'سبوت لايت', titleEn: 'Spotlights', icon: Lightbulb },
+    { id: 'مفاتيح وبرايز', titleAr: 'مفاتيح وبرايز', titleEn: 'Switches & Sockets', icon: Shield },
+    { id: 'ثريات', titleAr: 'ثريات', titleEn: 'Chandeliers', icon: Sparkles },
+    { id: 'سكة الليد', titleAr: 'سكة الليد', titleEn: 'LED Track Lights', icon: PackageSearch },
+    { id: 'انترفون', titleAr: 'انترفون', titleEn: 'Intercom Systems', icon: Award },
+    { id: 'مواد تأسيس الكهربائي', titleAr: 'مواد التأسيس', titleEn: 'Installation Materials', icon: PlayCircle }
   ]
 
   const displayedProducts = products.filter(p => {
@@ -393,75 +301,38 @@ export default function Products() {
           </div>
         </motion.div>
 
-        {/* شبكة الأقسام الرئيسية الفاخرة الموزعة (Custom Distributed Categories Bento Showcase Grid) */}
+        {/* شبكة الأقسام الرئيسية المبسطة والراقية (Premium Minimalist Categories Grid) */}
         {!loading && selectedCategory === 'all' && (
-          <div className="mb-16 md:mb-20">
-            <div className="text-center mb-8">
-              <span className="px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/25 text-blue-300 text-xs font-black shadow-sm">
-                {isAr ? 'الأقسام والتصنيفات الرئيسية 📦' : 'Main Categories & Sections 📦'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="mb-16 md:mb-24">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {categoriesGrid.map((cat, i) => {
                 const CatIcon = cat.icon
                 const catProductCount = products.filter(p => (p.category || '').includes(cat.id) || p.name.includes(cat.id)).length
                 return (
                   <motion.div
                     key={cat.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08, duration: 0.5, ease: 'easeOut' }}
+                    transition={{ delay: i * 0.05, duration: 0.4, ease: 'easeOut' }}
                     style={{ transform: 'translateZ(0)' }}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`relative p-7 sm:p-8 rounded-[2.2rem] bg-gradient-to-b ${cat.gradient} border ${cat.border} transition-all duration-300 flex flex-col justify-between cursor-pointer group shadow-xl hover:${cat.glow} overflow-hidden`}
+                    className="relative p-6 rounded-2xl bg-[#0f213a] border border-white/5 hover:border-blue-500/30 transition-all duration-300 flex items-center justify-between cursor-pointer group shadow-lg hover:bg-[#142a4a] hover:-translate-y-1"
                   >
-                    {/* شريط الوهج النيوني العلوي عند التمرير */}
-                    <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group-hover:bg-blue-600/10 group-hover:border-blue-500/20">
+                        <CatIcon className="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors duration-300" />
+                      </div>
+                      <div className="text-right">
+                        <h3 className="text-base sm:text-lg font-black text-white group-hover:text-blue-400 transition-colors duration-300">
+                          {isAr ? cat.titleAr : cat.titleEn}
+                        </h3>
+                        <span className="text-xs text-slate-400 font-bold block mt-0.5">
+                          {catProductCount} {isAr ? 'منتج' : 'items'}
+                        </span>
+                      </div>
+                    </div>
                     
-                    <div>
-                      {/* رأس كرت القسم: الشارة والأيقونة والعدد */}
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 shadow-lg flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
-                          <CatIcon className={`w-7 h-7 ${cat.accentColor} drop-shadow-[0_0_12px_rgba(59,130,246,0.6)]`} />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-black px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/25 text-blue-300 shadow-sm">
-                            {isAr ? cat.badgeAr : cat.badgeEn}
-                          </span>
-                          <span className="text-[11px] font-black px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-slate-200">
-                            {catProductCount} {isAr ? 'منتج' : 'items'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* عنوان ووصف القسم */}
-                      <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-blue-300 transition-colors duration-300 mb-3 tracking-wide">
-                        {isAr ? cat.titleAr : cat.titleEn}
-                      </h3>
-                      <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium mb-6">
-                        {isAr ? cat.descAr : cat.descEn}
-                      </p>
-
-                      {/* نقاط تميز القسم */}
-                      <div className="space-y-2 mb-8">
-                        {(isAr ? cat.highlightsAr : cat.highlightsEn).map((hl, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse shadow-[0_0_6px_#3b82f6]" />
-                            <span className="text-xs text-slate-300 font-bold">{hl}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* زر الدخول للقسم */}
-                    <div className="pt-4 border-t border-white/10 flex items-center justify-between mt-auto">
-                      <span className="text-xs font-black text-blue-300 group-hover:text-white transition-colors duration-300 flex items-center gap-2">
-                        <span>{isAr ? 'استعرض منتجات القسم' : 'Browse Category Products'}</span>
-                        <ArrowLeft className={`w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1 ${isAr ? '' : 'rotate-180'}`} />
-                      </span>
-                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-                    </div>
+                    <ArrowLeft className={`w-4 h-4 text-slate-500 transition-all duration-300 group-hover:text-blue-400 group-hover:-translate-x-1 ${isAr ? '' : 'rotate-180'}`} />
                   </motion.div>
                 )
               })}
