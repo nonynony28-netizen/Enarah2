@@ -40,17 +40,85 @@ const productTranslations: Record<string, { name: string; description: string }>
   }
 };
 
-type ProductItem = {
-  id: string
-  name: string
-  description: string
-  image: string
-  video?: string
-  price?: number
-  discountPrice?: number
-  stockStatus?: string
-  stockQty?: number
-}
+const defaultFallbackProducts: ProductItem[] = [
+  {
+    id: 'wire-italy-25',
+    name: 'سلك كهربائي إيطالي معتمد 2.5 مم',
+    description: 'أسلاك إيطالية معتمدة وموصلات نحاسية فائقة النقاء عازلة للحرارة والكهرباء 100%.',
+    image: '/images/default-product.jpg',
+    price: 185,
+    discountPrice: 165,
+    stockStatus: 'available',
+    stockQty: 100,
+    category: 'الأسلاك والكوابل'
+  },
+  {
+    id: 'spot-antiglare-7w',
+    name: 'سبوت لايت 7 واط ضد التوهج Anti-Glare',
+    description: 'سبوت لايت معتمد بزاوية إضاءة مريحة للعين وإطار غاطس فاخر لمختلف الغرف.',
+    image: '/images/default-product.jpg',
+    price: 35,
+    discountPrice: 28,
+    stockStatus: 'available',
+    stockQty: 85,
+    category: 'سبوت لايت'
+  },
+  {
+    id: 'switch-touch-gold',
+    name: 'مفتاح كهربائي ذكي مودرن',
+    description: 'مفاتيح ومآخذ كهربائية عصرية وتصاميم فخمة مقاومة للخدش والحرارة.',
+    image: '/images/default-product.jpg',
+    price: 65,
+    discountPrice: 55,
+    stockStatus: 'available',
+    stockQty: 60,
+    category: 'مفاتيح وبرايز'
+  },
+  {
+    id: 'chandelier-crystal-modern',
+    name: 'ثريا كريستال فاخرة مودرن',
+    description: 'ثريات كريستال وتصاميم مودرن كلاسيكية منتقاة بعناية لتعطي انطباعاً مبهراً.',
+    image: '/images/default-product.jpg',
+    price: 450,
+    discountPrice: 390,
+    stockStatus: 'available',
+    stockQty: 25,
+    category: 'ثريات'
+  },
+  {
+    id: 'led-track-magnetic-2m',
+    name: 'سكة ليد مغناطيسية غاطسة 2 متر',
+    description: 'أنظمة سكة ليد مرنة غاطسة وظاهرة تتيح لك إعادة توزيع الضوء بسهولة.',
+    image: '/images/default-product.jpg',
+    price: 140,
+    discountPrice: 120,
+    stockStatus: 'available',
+    stockQty: 40,
+    category: 'سكة الليد'
+  },
+  {
+    id: 'intercom-hd-video',
+    name: 'انترفون مرئي ذكي شاشة HD',
+    description: 'أنظمة انترفون مرئية سلكية ولاسلكية من أفضل الماركات العالمية لحماية المبنى.',
+    image: '/images/default-product.jpg',
+    price: 380,
+    discountPrice: 320,
+    stockStatus: 'available',
+    stockQty: 30,
+    category: 'انترفون'
+  },
+  {
+    id: 'junction-box-foundation',
+    name: 'علب وقسامات تأسيس كهرباء معتمدة',
+    description: 'مستلزمات التأسيس الأولي من علب غاطسة، قسامات، وكابلات رئيسية للمشاريع.',
+    image: '/images/default-product.jpg',
+    price: 25,
+    discountPrice: 20,
+    stockStatus: 'available',
+    stockQty: 200,
+    category: 'مواد تأسيس الكهربائي'
+  }
+]
 
 export default function Products() {
   const { isAr } = useLanguage()
@@ -60,10 +128,13 @@ export default function Products() {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_products')
       if (cached) {
-        try { return JSON.parse(cached) } catch {}
+        try { 
+          const parsed = JSON.parse(cached) 
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed
+        } catch {}
       }
     }
-    return []
+    return defaultFallbackProducts
   })
   const [loading, setLoading] = useState(true)
   const [addingId, setAddingId] = useState<string | null>(null)
@@ -96,74 +167,63 @@ export default function Products() {
           const formattedProducts: ProductItem[] = data.data
             .filter((item: any) => item.type !== 'contact')
             .filter((item: any) => {
-               // الفلتر الهجومي القاهر للزوار
-               const itemName = String(item.name || '').toLowerCase().trim()
-               const itemEmail = String(item.email || '').toLowerCase().trim()
+                const itemName = String(item.name || '').toLowerCase().trim()
+                const itemEmail = String(item.email || '').toLowerCase().trim()
 
-               // سحق أي شيء يمت بصلة للزوار والتحليلات
-               if (itemName.includes('visitor') || itemEmail.includes('visitor') || itemEmail.includes('visit_') || itemEmail.includes('analytics.local')) {
-                 return false;
-               }
-               
-               // إخفاء أسعار الأسلاك
-               if (itemEmail.includes('admin_wire_prices')) return false;
+                if (itemName.includes('visitor') || itemEmail.includes('visitor') || itemEmail.includes('visit_') || itemEmail.includes('analytics.local')) {
+                  return false;
+                }
+                if (itemEmail.includes('admin_wire_prices')) return false;
 
-               // إخفاء المشاريع
-               try {
-                 const phoneData = item.phone ? JSON.parse(item.phone) : {}
-                 if (phoneData.type === 'project') return false;
-               } catch {
-                 // تجاهل الأخطاء
-               }
-               
-               return true; // إذا نجح في الهروب من الفلاتر، فهو منتج
-            })
+                try {
+                  const phoneData = item.phone ? JSON.parse(item.phone) : {}
+                  if (phoneData.type === 'project') return false;
+                } catch {}
+                
+                return true;
+             })
             .map((item: any, index: number) => {
-               let mediaData: any = {}
-               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
+                let mediaData: any = {}
+                try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
 
-               // جلب الوصف حسب لغة المستخدم إذا كان بصيغة JSON، أو عرضه مباشرة
-               let descText = mediaData.description || (item.email && !item.email.includes('@upload.local') ? item.email : '')
-               try {
-                 const descObj = JSON.parse(descText)
-                 descText = isAr ? (descObj.ar || descObj.en || descText) : (descObj.en || descObj.ar || descText)
-               } catch {
-                 // ليس JSON، اتركه كما هو
-               }
+                let descText = mediaData.description || (item.email && !item.email.includes('@upload.local') ? item.email : '')
+                try {
+                  const descObj = JSON.parse(descText)
+                  descText = isAr ? (descObj.ar || descObj.en || descText) : (descObj.en || descObj.ar || descText)
+                } catch {}
 
-               // جلب الاسم حسب لغة المستخدم إذا كان بصيغة JSON، أو عرضه مباشرة
-               let nameText = item.name || 'بدون اسم'
-               try {
-                 const nameObj = JSON.parse(nameText)
-                 nameText = isAr ? (nameObj.ar || nameObj.en || nameText) : (nameObj.en || nameObj.ar || nameText)
-               } catch {
-                 // ليس JSON، اتركه كما هو
-               }
+                let nameText = item.name || 'بدون اسم'
+                try {
+                  const nameObj = JSON.parse(nameText)
+                  nameText = isAr ? (nameObj.ar || nameObj.en || nameText) : (nameObj.en || nameObj.ar || nameText)
+                } catch {}
 
-               return {
-                 id: item._id || String(index),
-                 name: nameText,
-                 description: descText,
-                 image: mediaData.imageUrl || '/images/default-product.jpg',
-                 video: mediaData.videoUrl || '',
-                 price: mediaData.price,
-                 discountPrice: mediaData.discountPrice,
-                 stockStatus: mediaData.stockStatus || 'available',
-                 stockQty: mediaData.stockQty,
-                 category: mediaData.category || item.category || 'عام'
-               }
-            })
-          
-          const loadedProducts = formattedProducts.reverse()
-          setProducts(loadedProducts)
-          localStorage.setItem('enarah_cached_products', JSON.stringify(loadedProducts))
-        }
-      } catch (error) {
-        console.error('Fetch Products Error:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
+                return {
+                  id: item._id || String(index),
+                  name: nameText,
+                  description: descText,
+                  image: mediaData.imageUrl || '/images/default-product.jpg',
+                  video: mediaData.videoUrl || '',
+                  price: mediaData.price,
+                  discountPrice: mediaData.discountPrice,
+                  stockStatus: mediaData.stockStatus || 'available',
+                  stockQty: mediaData.stockQty,
+                  category: mediaData.category || item.category || 'عام'
+                }
+             })
+           
+           const loadedProducts = formattedProducts.reverse()
+           if (loadedProducts.length > 0) {
+             setProducts(loadedProducts)
+             localStorage.setItem('enarah_cached_products', JSON.stringify(loadedProducts))
+           }
+         }
+       } catch (error) {
+         console.error('Fetch Products Error:', error)
+       } finally {
+         setLoading(false)
+       }
+     }
 
     fetchProducts()
   }, [isAr])
