@@ -170,62 +170,11 @@ export default function Layout() {
 
   return (
     <div className="relative min-h-screen text-white">
-      {/* الخلفية الإبداعية فائقة الأداء والمتحركة ببطء */}
-      <div className="fixed inset-0 -z-50 w-full h-full bg-[#050b14] overflow-hidden pointer-events-none">
-        {/* التدرج اللوني الذي يتحرك ببطء */}
-        <div className="hidden md:block absolute -inset-[50%] w-[200%] h-[200%] bg-ultra-ambient animate-slow-rotate opacity-90"></div>
-        {/* الشبكة الهندسية الفاخرة */}
+      {/* الخلفية الزرقاء الملكية الفاخرة (Deep Luxury Blue Background) */}
+      <div className="fixed inset-0 -z-50 w-full h-full bg-[#0a192f] overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#071325]"></div>
         <div className="absolute inset-0 bg-animated-grid opacity-[0.06]"></div>
-        {/* طبقة تظليل داكنة ناعمة لضمان سهولة قراءة النصوص */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050b14]/30 via-transparent to-[#050b14]/60"></div>
       </div>
-
-      {/* مفتاح/مصباح بدء التشغيل التلقائي المضيء في أعلى وسط الصفحة */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center select-none">
-        {/* قاعدة التثبيت السقفية */}
-        <div className="w-12 h-1.5 bg-slate-800 rounded-b-md border-b border-white/10" />
-        {/* المفتاح/المصباح التفاعلي الذي ينكبس عند التمرير */}
-        <motion.div 
-          animate={{ 
-            y: isScrollActivated ? 3 : 0,
-            scale: isScrollActivated ? 0.95 : 1,
-            boxShadow: isScrollActivated 
-              ? "0 0 20px rgba(59, 130, 246, 0.8), inset 0 0 8px rgba(59, 130, 246, 0.5)" 
-              : "0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 5px rgba(239, 68, 68, 0.2)"
-          }}
-          transition={{ type: "spring", stiffness: 450, damping: 14 }}
-          className={`w-5.5 h-5.5 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
-            isScrollActivated 
-              ? 'border-blue-400 bg-blue-500/20' 
-              : 'border-red-500/60 bg-red-500/10'
-          }`}
-        >
-          {/* لمبة ليد صغيرة داخل المفتاح */}
-          <div className={`w-1.5 h-1.5 rounded-full ${
-            isScrollActivated ? 'bg-blue-400 animate-ping' : 'bg-red-500'
-          }`} />
-        </motion.div>
-      </div>
-
-      {/* 1. عمود النور الشمسي بالجل الأزرق الممتد في الخلفية للتفاعل مع التمرير (6px Core with Blue Gel Glow) */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[12px] h-full bg-white/[0.01] border-l border-white/[0.02] border-r border-white/[0.02] -z-40 pointer-events-none">
-        <motion.div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[6px] bg-gradient-to-b from-amber-400 via-yellow-300 to-transparent shadow-[0_0_20px_rgba(37,99,235,0.9),0_0_35px_rgba(37,99,235,0.6),0_0_50px_rgba(37,99,235,0.3)]"
-          style={{ height: isScrollActivated ? `${scrollPercent * 100}%` : '0%' }}
-        />
-      </div>
-
-      {/* هالة الضوء النيونية الشمسية الزرقاء التفاعلية التي تتحرك مع التمرير */}
-      <div 
-        className="fixed left-1/2 w-[550px] h-[550px] rounded-full pointer-events-none -z-30 transition-all duration-300 ease-out"
-        style={{ 
-          top: `${window.innerHeight * 0.15 + (scrollPercent * (window.innerHeight * 0.7))}px`,
-          transform: 'translate(-50%, -50%)',
-          background: isScrollActivated
-            ? 'radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, rgba(245, 158, 11, 0.03) 45%, transparent 70%)'
-            : 'none',
-        }}
-      />
 
       {/* 2. حبل السحب العائم التفاعلي لتعديل وتعتيم الضوء وسحب المفتاح */}
       <div className="fixed top-0 left-16 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
