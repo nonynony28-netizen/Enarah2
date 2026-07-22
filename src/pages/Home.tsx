@@ -402,17 +402,9 @@ export default function Home() {
         {/* =========================================================
             محاكي الإنارة ثلاثي الأبعاد المرتبط بالتمرير (Scroll 3D Bulb)
             ========================================================= */}
-        {/* 1. الكشاف الخلفي العملاق (Dynamic Scroll Spotlight) */}
-        <motion.div 
-          style={{
-            opacity: spotlightOpacity,
-            scale: spotlightScale,
-            rotate: spotlightRotate,
-            transformOrigin: 'top right',
-            background: 'radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.45) 0%, rgba(212, 160, 23, 0.15) 35%, transparent 75%)',
-            willChange: 'transform, opacity',
-          }}
-          className="fixed top-0 right-0 w-[140vw] h-[140vh] pointer-events-none z-0 filter blur-[40px] hidden md:block"
+        {/* الكشاف الخلفي الناعم والخفيف (GPU Optimized Smooth Spotlight) */}
+        <div 
+          className="fixed top-0 right-0 w-full h-screen pointer-events-none z-0 bg-[radial-gradient(circle_at_100%_0%,rgba(59,130,246,0.15)_0%,rgba(212,160,23,0.05)_40%,transparent_70%)] hidden md:block"
         />
 
 
