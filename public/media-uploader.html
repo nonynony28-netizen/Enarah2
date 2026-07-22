@@ -79,6 +79,25 @@
     <label for="imageFile">صورة المنتج (سيتم تحويلها لـ WebP وتصغير أبعادها تلقائياً):</label>
     <input type="file" id="imageFile" accept="image/*" />
 
+    <!-- خانة توضيح حجم الصورة قبل وبعد الضغط التلقائي -->
+    <div id="sizeEstimationBox" style="display: none; margin-top: 15px; margin-bottom: 20px; padding: 18px; border-radius: 12px; background: #0c1e38; border: 1px solid rgba(59, 130, 246, 0.25); font-size: 14px; line-height: 1.6; text-align: right; box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.1);">
+      <div style="font-weight: bold; color: #3b82f6; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
+        <span>📊</span> <span>تفاصيل تحسين وضغط الملف التلقائي:</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: rgba(255, 255, 255, 0.7);">حجم الملف الأصلي:</span>
+        <span id="originalSizeVal" style="font-weight: bold; color: #fca5a5; direction: ltr;">--</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: rgba(255, 255, 255, 0.7);">الحجم المتوقع بعد الضغط والتحويل (WebP):</span>
+        <span id="compressedSizeVal" style="font-weight: bold; color: #86efac; direction: ltr;">--</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px; margin-top: 4px;">
+        <span style="color: rgba(255, 255, 255, 0.85); font-weight: bold;">نسبة توفير المساحة المتوقعة:</span>
+        <span id="savingsVal" style="font-weight: 900; color: #38bdf8; font-size: 16px;">--</span>
+      </div>
+    </div>
+
     <div class="preview-box">
       <img id="imagePreview" alt="معاينة الصورة" />
     </div>
@@ -129,18 +148,93 @@
       return pwd || "";
     }
 
-    // معاينة الصورة المختارة فورياً
+    function formatBytes(bytes, decimals = 2) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    // معاينة الصورة المختارة وحساب نسب الضغط التلقائي
     imageFileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
+      const sizeBox = document.getElementById("sizeEstimationBox");
+      
       if (file) {
+        // 1. عرض معاينة الصورة
         const reader = new FileReader();
         reader.onload = (event) => {
           imagePreview.src = event.target.result;
           imagePreview.style.display = "inline-block";
         };
         reader.readAsDataURL(file);
+
+        // 2. تفعيل حساب وضغط الملف التجريبي في المتصفح
+        sizeBox.style.display = "block";
+        const originalSize = file.size;
+        document.getElementById("originalSizeVal").textContent = formatBytes(originalSize);
+        document.getElementById("compressedSizeVal").textContent = "جاري حساب الضغط...";
+        document.getElementById("savingsVal").textContent = "--";
+
+        // إذا كان الملف صورة، نقوم بمحاكاة الضغط الفعلي
+        if (file.type.startsWith("image/")) {
+          const img = new Image();
+          img.src = URL.createObjectURL(file);
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            let width = img.width;
+            let height = img.height;
+            const maxDim = 1600;
+
+            // تطبيق نفس خوارزمية التصغير الخاصة بالسيرفر (Max 1600px inside)
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // تصدير بصيغة WebP وبجودة 82% كما يفعل السيرفر تماماً
+            canvas.toBlob((blob) => {
+              let finalSize = 0;
+              if (blob) {
+                finalSize = blob.size;
+              } else {
+                finalSize = Math.round(originalSize * 0.3); // تقدير احتياطي
+              }
+
+              document.getElementById("compressedSizeVal").textContent = formatBytes(finalSize);
+              const savingsPercent = Math.max(0, Math.round(((originalSize - finalSize) / originalSize) * 100));
+              document.getElementById("savingsVal").textContent = `${savingsPercent}% 🔥`;
+
+              URL.revokeObjectURL(img.src);
+            }, "image/webp", 0.82);
+          };
+          img.onerror = () => {
+            const finalSize = Math.round(originalSize * 0.35);
+            document.getElementById("compressedSizeVal").textContent = formatBytes(finalSize);
+            document.getElementById("savingsVal").textContent = "65% (تقديري) 🔥";
+          };
+        } else {
+          // للملفات الأخرى كالفيديوهات
+          const finalSize = Math.round(originalSize * 0.5);
+          document.getElementById("compressedSizeVal").textContent = formatBytes(finalSize);
+          document.getElementById("savingsVal").textContent = "50% (تقديري) 🔥";
+        }
       } else {
         imagePreview.style.display = "none";
+        sizeBox.style.display = "none";
       }
     });
 
