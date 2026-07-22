@@ -482,114 +482,75 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-              
-              {/* Left Column: Visual High-Tech Neon Bulb Composition */}
-              <div className="lg:col-span-5 relative w-full flex items-center justify-center min-h-[300px]">
-                {/* Background lighting waves */}
-                <div className="absolute w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
-                <div className="absolute w-48 h-48 bg-amber-500/5 rounded-full blur-[70px] pointer-events-none" />
-
-                {/* 3D Glassmorphic Console with Glowing Lightbulb */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0f213a] border border-white/10 w-full max-w-[360px] flex flex-col justify-between overflow-hidden shadow-2xl gap-6 min-h-[340px]"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
+              {[
+                { 
+                  icon: Award, 
+                  title: isAr ? 'جودة عالية ومعتمدة' : 'High & Certified Quality', 
+                  desc: isAr ? 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والأمان لتدوم طويلاً.' : 'We select all installation and lighting materials with extreme care to match top quality and safety standards.',
+                  badge: isAr ? 'مواد أصلية 🛡️' : 'Original Materials 🛡️',
+                  stat: isAr ? '100% منتجات أصلية' : '100% Original Products',
+                  color: 'from-blue-500/20 to-indigo-500/20 border-blue-400/30 text-blue-400'
+                },
+                { 
+                  icon: Shield, 
+                  title: isAr ? 'حلول كهربائية وإنارة متكاملة' : 'Complete Electrical Solutions', 
+                  desc: isAr ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك، مفاتيح ذكية، وسبوتات إنارة في مكان واحد.' : 'We provide everything you need to establish your home or project from cables, wires, smart switches, and spotlights in one place.',
+                  badge: isAr ? 'شامل ومتكامل 📦' : 'All-in-One 📦',
+                  stat: isAr ? 'تأسيس وإنارة شاملة' : 'Full Installation & Lighting',
+                  color: 'from-amber-500/20 to-yellow-500/20 border-amber-400/30 text-amber-400'
+                },
+                { 
+                  icon: Sparkles, 
+                  title: isAr ? 'خدمة عملاء ودعم سريع' : 'Fast Sales Support', 
+                  desc: isAr ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وتسهيل توصيلها بأمان.' : 'Our dedicated sales support team is always available to help you select products, request custom volumes, and ensure safe deliveries.',
+                  badge: isAr ? 'دعم مبيعات 📞' : 'Sales Support 📞',
+                  stat: isAr ? 'استشارات واستجابة فورية' : 'Instant Consultations & Support',
+                  color: 'from-emerald-500/20 to-teal-500/20 border-emerald-400/30 text-emerald-400'
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ delay: i * 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -6, transition: { duration: 0.3, ease: "easeOut" } }}
+                  className="relative p-7 md:p-8 rounded-[2rem] bg-[#0c1e38] border border-white/10 hover:border-blue-400/40 transition-all duration-500 flex flex-col justify-between cursor-default group shadow-xl hover:shadow-[0_15px_40px_rgba(59,130,246,0.18)] overflow-hidden"
                 >
-                  {/* Subtle Grid backdrop */}
-                  <div className="absolute inset-0 bg-animated-grid opacity-10 pointer-events-none" />
+                  {/* شريط الوهج العلوي عند التمرير */}
+                  <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                  {/* Top Badge */}
-                  <div className="relative z-20 flex justify-between items-center w-full">
-                    <span className="text-[10px] font-bold px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 rounded-full font-sans uppercase tracking-wider">
-                      Enarah Smart UI
-                    </span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]" />
-                  </div>
-
-                  {/* Glowing light bulb icon in the center */}
-                  <div className="relative flex items-center justify-center z-10 py-2">
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-blue-600/10 border border-blue-500/35 flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.25)]">
-                      <Lightbulb className="w-12 h-12 sm:w-14 sm:h-14 text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.85)] animate-pulse" />
-                      {/* Decorative glowing dots */}
-                      <span className="absolute top-2 left-2 w-2 h-2 rounded-full bg-blue-400 animate-ping" />
-                      <span className="absolute bottom-4 right-2 w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  <div>
+                    {/* رأس الكرت: الأيقونة والشارة */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} border shadow-lg flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}>
+                        <item.icon className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 shadow-sm">
+                        {item.badge}
+                      </span>
                     </div>
+
+                    {/* عنوان الكرت والوصف */}
+                    <h3 className="text-xl md:text-2xl font-black text-white group-hover:text-blue-300 transition-colors duration-300 mb-3 tracking-wide">
+                      {item.title}
+                    </h3>
+                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed font-medium mb-6">
+                      {item.desc}
+                    </p>
                   </div>
 
-                  {/* Bottom Stats Badge */}
-                  <div className="relative z-20 w-full flex items-center justify-between gap-4">
-                    <motion.div 
-                      whileHover={{ scale: 1.03 }}
-                      className="cursor-default bg-white/5 border border-white/10 rounded-2xl p-3 flex-1 text-center transition-all duration-300 hover:border-blue-500/30 hover:bg-blue-600/5"
-                    >
-                      <span className="text-2xl font-black text-white block leading-none">100%</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">{isAr ? 'منتجات أصلية' : 'Original Products'}</span>
-                    </motion.div>
-                    <motion.div 
-                      whileHover={{ scale: 1.03 }}
-                      className="cursor-default bg-white/5 border border-white/10 rounded-2xl p-3 flex-1 text-center transition-all duration-300 hover:border-blue-500/30 hover:bg-blue-600/5"
-                    >
-                      <span className="text-2xl font-black text-blue-300 block leading-none">100%</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-1.5">{isAr ? 'ضمان وموثوقية' : 'Guaranteed Quality'}</span>
-                    </motion.div>
+                  {/* ذيل الكرت: الشارة التوضيحية البارزة */}
+                  <div className="pt-4 border-t border-white/5 flex items-center justify-between mt-auto">
+                    <span className="text-[11px] font-bold text-slate-400 group-hover:text-white transition-colors duration-300">
+                      {item.stat}
+                    </span>
+                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
                   </div>
                 </motion.div>
-              </div>
-
-              {/* Right Column: Ultra-Sleek Glassmorphic Animated Cards */}
-              <div className="lg:col-span-7 flex flex-col gap-5">
-                {[
-                  { 
-                    icon: Award, 
-                    title: isAr ? 'جودة عالية ومعتمدة' : 'High & Certified Quality', 
-                    desc: isAr ? 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والأمان لتدوم طويلاً.' : 'We select all installation and lighting materials with extreme care to match the highest quality and safety standards.',
-                    badge: isAr ? 'مواد أصلية 🛡️' : 'Original Materials 🛡️',
-                  },
-                  { 
-                    icon: Shield, 
-                    title: isAr ? 'حلول كهربائية وإنارة متكاملة' : 'Complete Electrical Solutions', 
-                    desc: isAr ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك، مفاتيح ذكية، وسبوتات إنارة في مكان واحد دون عناء البحث.' : 'We provide everything you need to establish your home or project from cables, wires, smart switches, and spotlights in one place.',
-                    badge: isAr ? 'شامل ومتكامل 📦' : 'All-in-One 📦',
-                  },
-                  { 
-                    icon: Sparkles, 
-                    title: isAr ? 'خدمة عملاء ودعم سريع' : 'Fast Sales Support', 
-                    desc: isAr ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وتسهيل توصيلها بأمان.' : 'Our dedicated sales support team is always available to help you select products, request custom volumes, and ensure safe deliveries.',
-                    badge: isAr ? 'دعم مبيعات 📞' : 'Sales Support 📞',
-                  },
-                ].map((item, i) => (
-                  <motion.div
-                    key={item.title}
-                    initial={{ opacity: 0, y: 25, scale: 0.96 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ delay: i * 0.25, duration: 0.55, ease: [0.25, 1, 0.5, 1] }}
-                    whileHover={{ y: -4, transition: { duration: 0.3, ease: "easeOut" } }}
-                    className="relative p-6 rounded-2xl bg-[#0c1e38] border border-white/10 hover:border-blue-400/30 transition-all duration-300 flex flex-col md:flex-row items-start gap-5 cursor-default group shadow-lg hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)] overflow-hidden"
-                  >
-                    {/* شريط الإضاءة العريض المتوهج عند التمرير */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-                    {/* حاوي الأيقونة المضيء الفاخر */}
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/20 border border-blue-400/20 group-hover:border-blue-400/40 text-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.15)] flex items-center justify-center transition-all duration-500 shrink-0 group-hover:scale-105">
-                      <item.icon className="w-7 h-7 group-hover:scale-110 transition-transform duration-500 text-blue-400" />
-                    </div>
-
-                    {/* التفاصيل والنصوص */}
-                    <div className="flex-grow w-full relative z-10">
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <h3 className="text-lg md:text-xl font-black text-white group-hover:text-blue-300 transition-colors duration-300 tracking-wide">{item.title}</h3>
-                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 backdrop-blur-md shadow-sm">{item.badge}</span>
-                      </div>
-                      <p className="text-slate-300 text-xs md:text-sm leading-relaxed font-medium">{item.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         </section>
