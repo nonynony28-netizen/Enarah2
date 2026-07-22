@@ -468,52 +468,6 @@ export default function Home() {
               </h1>
               
               <p className="text-base md:text-2xl text-blue-50/90 mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
-
-              {/* أزرار العمليات والتفاعل السريع في الهيرو */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="flex flex-wrap items-center justify-center gap-4 mt-6 mb-12"
-              >
-                <Link
-                  to="/products"
-                  className="px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-base rounded-2xl shadow-[0_0_30px_rgba(59,130,246,0.4)] border border-blue-400/40 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 cursor-pointer"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  <span>{isAr ? 'تصفح معرض المنتجات 🛒' : 'Browse Gallery 🛒'}</span>
-                </Link>
-                <a
-                  href="#simulator"
-                  className="px-7 py-4 bg-white/5 hover:bg-white/10 text-white font-bold text-base rounded-2xl border border-white/15 backdrop-blur-md transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2 cursor-pointer"
-                >
-                  <Sparkles className="w-5 h-5 text-amber-400" />
-                  <span>{isAr ? 'محاكي الإضاءة التفاعلي ⚡' : 'Interactive Simulator ⚡'}</span>
-                </a>
-                <a
-                  href="#wires"
-                  className="px-7 py-4 bg-white/5 hover:bg-white/10 text-slate-200 font-bold text-base rounded-2xl border border-white/15 backdrop-blur-md transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2 cursor-pointer"
-                >
-                  <Calculator className="w-5 h-5 text-blue-400" />
-                  <span>{isAr ? 'حاسبة أسعار الأسلاك 🔌' : 'Wire Price Calculator 🔌'}</span>
-                </a>
-              </motion.div>
-
-              {/* شريط الإحصائيات الفاخر المضيء */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto pt-6 border-t border-white/10">
-                <div className="p-4 rounded-2xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 backdrop-blur-md text-center shadow-lg hover:border-blue-500/30 transition-all">
-                  <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-sky-300 to-indigo-300 block">500+</span>
-                  <span className="text-xs font-bold text-slate-300 mt-1 block">{isAr ? 'مشروع منفذ ومجهز' : 'Projects Completed'}</span>
-                </div>
-                <div className="p-4 rounded-2xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 backdrop-blur-md text-center shadow-lg hover:border-emerald-500/30 transition-all">
-                  <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-300 block">100%</span>
-                  <span className="text-xs font-bold text-slate-300 mt-1 block">{isAr ? 'منتجات إيطالية أصلية' : 'Original Italian Products'}</span>
-                </div>
-                <div className="p-4 rounded-2xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 backdrop-blur-md text-center shadow-lg hover:border-amber-500/30 transition-all">
-                  <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-300 block">{isAr ? 'ضمان معتمد' : 'Warranty'}</span>
-                  <span className="text-xs font-bold text-slate-300 mt-1 block">{isAr ? 'دعم واستشارات مجانية' : 'Certified Warranty'}</span>
-                </div>
-              </div>
             </div>
         </section>
 
