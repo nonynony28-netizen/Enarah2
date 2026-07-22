@@ -462,8 +462,8 @@ export default function Home() {
         {/* 2. لماذا نحن */}
         <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           {/* بقع توهج نيونية خفيفة عائمة */}
-          <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0 animate-float-1" />
-          <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0 animate-float-2" />
+          <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
+          <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12 md:mb-16">
@@ -485,39 +485,36 @@ export default function Home() {
               {/* Left Column: Visual High-Tech Neon Bulb Composition */}
               <div className="lg:col-span-5 relative w-full flex items-center justify-center min-h-[300px]">
                 {/* Background lighting waves */}
-                <div className="absolute w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] animate-pulse" />
-                <div className="absolute w-48 h-48 bg-amber-500/5 rounded-full blur-[70px] animate-pulse [animation-delay:2s]" />
+                <div className="absolute w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
+                <div className="absolute w-48 h-48 bg-amber-500/5 rounded-full blur-[70px] pointer-events-none" />
 
                 {/* 3D Glassmorphic Console with Glowing Lightbulb */}
                 <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="relative p-8 rounded-[2.5rem] bg-[#0f213a]/50 backdrop-blur-xl border border-white/10 w-full max-w-[360px] aspect-square flex flex-col justify-between overflow-hidden shadow-2xl"
+                  transition={{ duration: 0.6 }}
+                  className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0f213a]/50 backdrop-blur-xl border border-white/10 w-full max-w-[360px] flex flex-col justify-between overflow-hidden shadow-2xl gap-6 min-h-[340px]"
                 >
                   {/* Subtle Grid backdrop */}
                   <div className="absolute inset-0 bg-animated-grid opacity-10 pointer-events-none" />
-
-                  {/* Rotating decorative halo rings */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] rounded-full border border-dashed border-blue-500/25 animate-spin [animation-duration:40s]" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full border border-blue-500/10 animate-spin [animation-direction:reverse] [animation-duration:20s]" />
-
-                  {/* Glowing light bulb icon in the center */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10">
-                    <div className="relative w-28 h-28 rounded-full bg-blue-600/10 border border-blue-500/35 flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.25)]">
-                      <Lightbulb className="w-14 h-14 text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.85)] animate-pulse" />
-                      {/* Decorative glowing dots */}
-                      <span className="absolute top-2 left-2 w-2 h-2 rounded-full bg-blue-400 animate-ping" />
-                      <span className="absolute bottom-4 right-2 w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    </div>
-                  </div>
 
                   {/* Top Badge */}
                   <div className="relative z-20 flex justify-between items-center w-full">
                     <span className="text-[10px] font-bold px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 rounded-full font-sans uppercase tracking-wider">
                       Enarah Smart UI
                     </span>
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]" />
+                  </div>
+
+                  {/* Glowing light bulb icon in the center */}
+                  <div className="relative flex items-center justify-center z-10 py-2">
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-blue-600/10 border border-blue-500/35 flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.25)]">
+                      <Lightbulb className="w-12 h-12 sm:w-14 sm:h-14 text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.85)] animate-pulse" />
+                      {/* Decorative glowing dots */}
+                      <span className="absolute top-2 left-2 w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+                      <span className="absolute bottom-4 right-2 w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    </div>
                   </div>
 
                   {/* Bottom Stats Badge */}
@@ -567,11 +564,11 @@ export default function Home() {
                 ].map((item, i) => (
                   <motion.div
                     key={item.title}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.15, duration: 0.6 }}
-                    whileHover={{ scale: 1.01, x: isAr ? -4 : 4 }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                    whileHover={{ scale: 1.01 }}
                     className={`relative p-5 md:p-6 rounded-[1.8rem] bg-[#0f213a]/30 backdrop-blur-md transition-all duration-300 flex flex-col md:flex-row items-start gap-4 md:gap-5 cursor-default group shadow-[0_4px_25px_rgba(0,0,0,0.1)] border ${
                       isAr ? 'bg-gradient-to-l' : 'bg-gradient-to-r'
                     } ${item.color}`}
@@ -582,10 +579,10 @@ export default function Home() {
                     </div>
 
                     {/* Text Details */}
-                    <div className="flex-grow">
-                      <div className={`flex flex-wrap items-center justify-between gap-2 mb-2 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
+                    <div className="flex-grow w-full">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <h3 className="text-lg md:text-xl font-extrabold text-white group-hover:text-blue-300 transition-colors">{item.title}</h3>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">{item.badge}</span>
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">{item.badge}</span>
                       </div>
                       <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{item.desc}</p>
                     </div>
