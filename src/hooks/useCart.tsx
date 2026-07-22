@@ -34,11 +34,30 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const ONE_HOUR_MS = 60 * 60 * 1000; // ساعة كاملة بالمللي ثانية (3600000)
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cart');
-      if (cached) {
+      const lastUpdated = localStorage.getItem('enarah_cart_timestamp');
+
+      if (cached && lastUpdated) {
+        const timePassed = Date.now() - Number(lastUpdated);
+        // إذا انقضت أكثر من ساعة منذ آخر نشاط بالسلة: إفراغ السلة تلقائياً
+        if (timePassed > ONE_HOUR_MS) {
+          localStorage.removeItem('enarah_cart');
+          localStorage.removeItem('enarah_cart_timestamp');
+          return [];
+        }
+        try {
+          return JSON.parse(cached);
+        } catch {
+          return [];
+        }
+      } else if (cached && !lastUpdated) {
+        // حماية بأثر رجعي للسلات القديمة
+        localStorage.setItem('enarah_cart_timestamp', Date.now().toString());
         try {
           return JSON.parse(cached);
         } catch {
@@ -52,9 +71,45 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [particles, setParticles] = useState<CartParticle[]>([]);
 
+  // حفظ السلة وتحديث الطابع الزمني للنشاط
   useEffect(() => {
-    localStorage.setItem('enarah_cart', JSON.stringify(cartItems));
+    if (typeof window !== 'undefined') {
+      if (cartItems.length > 0) {
+        localStorage.setItem('enarah_cart', JSON.stringify(cartItems));
+        if (!localStorage.getItem('enarah_cart_timestamp')) {
+          localStorage.setItem('enarah_cart_timestamp', Date.now().toString());
+        }
+      } else {
+        localStorage.removeItem('enarah_cart');
+        localStorage.removeItem('enarah_cart_timestamp');
+      }
+    }
   }, [cartItems]);
+
+  // فحص تاريخ الصلاحية تلقائياً عند العودة للموقع أو فتح النافذة بعد غياب أكثر من ساعة
+  useEffect(() => {
+    const checkCartExpiration = () => {
+      if (typeof window !== 'undefined') {
+        const lastUpdated = localStorage.getItem('enarah_cart_timestamp');
+        if (lastUpdated) {
+          const timePassed = Date.now() - Number(lastUpdated);
+          if (timePassed > ONE_HOUR_MS) {
+            setCartItems([]);
+            localStorage.removeItem('enarah_cart');
+            localStorage.removeItem('enarah_cart_timestamp');
+          }
+        }
+      }
+    };
+
+    window.addEventListener('focus', checkCartExpiration);
+    document.addEventListener('visibilitychange', checkCartExpiration);
+
+    return () => {
+      window.removeEventListener('focus', checkCartExpiration);
+      document.removeEventListener('visibilitychange', checkCartExpiration);
+    };
+  }, []);
 
   const addToCart = (product: { id: string; name: string; description: string; image: string; price?: number; discountPrice?: number; stockStatus?: string; stockQty?: number }) => {
     setCartItems((prevItems) => {
