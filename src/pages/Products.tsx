@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight, ArrowLeft, ShoppingCart, Check, Zap, Shield, Award, Sparkles, Lightbulb } from 'lucide-react'
+import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight, ArrowLeft, ShoppingCart, Check } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
@@ -54,11 +54,63 @@ type ProductItem = {
 }
 
 const defaultFallbackProducts: ProductItem[] = [
+  // Categories (العناوين الرئيسية المأخوذة من قاعدة البيانات كقيمة افتراضية):
+  {
+    id: 'cat-wires',
+    name: 'الأسلاك والكوابل',
+    description: 'الأسلاك الايطاليه من المصدر مباشرة لضمان الجوده العاليه نوفرها لكم بجميع القياسات',
+    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
+    category: ''
+  },
+  {
+    id: 'cat-spots',
+    name: 'سبوت لايت',
+    description: 'سبوتات بأنواعها المختلفه المضاده للتوهج والمتحركة والمناسبة لجميع الأنشطة والأماكن',
+    image: 'https://i.postimg.cc/9XDrxxfX/IMG-3399.webp',
+    category: ''
+  },
+  {
+    id: 'cat-switches',
+    name: 'مفاتيح وبرايز',
+    description: 'تشكيله كبيره من المفاتيح والبرايز المختلفه والشركات المتنوعه لتناسب كل ركن وزاويه في بيتك',
+    image: 'https://i.postimg.cc/rFdZwLwK/IMG-3396.webp',
+    category: ''
+  },
+  {
+    id: 'cat-chandeliers',
+    name: 'ثريات',
+    description: 'تشكيله واسعه من الثريات الكريستاليه والديكوريه الحديثه لتناسب جميع الأذواق',
+    image: 'https://i.postimg.cc/QxrShKw7/IMG-3394.webp',
+    category: ''
+  },
+  {
+    id: 'cat-led',
+    name: 'سكة الليد',
+    description: 'نوفر السكك المختلفه منها المغناطيسيه والمرنه والخارجيه والمدفونه لتناسب جميع الأذواق',
+    image: 'https://i.postimg.cc/4xjYRVFC/IMG-3391.webp',
+    category: ''
+  },
+  {
+    id: 'cat-intercom',
+    name: 'انترفون',
+    description: 'جميع أنواع الانترفونات السلكية منها واللاسلكية وبمختلف الشركات العالميه والجوده الممتازة',
+    image: 'https://i.postimg.cc/pLN7ftsB/IMG-3725.webp',
+    category: ''
+  },
+  {
+    id: 'cat-foundation',
+    name: 'مواد تأسيس الكهربائي',
+    description: 'جميع مواد التأسيس من البدايه حتي اخر خطوه في التشطيب بالجوده العاليه والمواد المميزه',
+    image: 'https://i.postimg.cc/zDy4VhdZ/IMG-3395.webp',
+    category: ''
+  },
+
+  // Fallback Products:
   {
     id: 'wire-italy-25',
     name: 'سلك كهربائي إيطالي معتمد 2.5 مم',
     description: 'أسلاك إيطالية معتمدة وموصلات نحاسية فائقة النقاء عازلة للحرارة والكهرباء 100%.',
-    image: '/images/default-product.jpg',
+    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 185,
     discountPrice: 165,
     stockStatus: 'available',
@@ -69,7 +121,7 @@ const defaultFallbackProducts: ProductItem[] = [
     id: 'spot-antiglare-7w',
     name: 'سبوت لايت 7 واط ضد التوهج Anti-Glare',
     description: 'سبوت لايت معتمد بزاوية إضاءة مريحة للعين وإطار غاطس فاخر لمختلف الغرف.',
-    image: '/images/default-product.jpg',
+    image: 'https://i.postimg.cc/9XDrxxfX/IMG-3399.webp',
     price: 35,
     discountPrice: 28,
     stockStatus: 'available',
@@ -80,56 +132,12 @@ const defaultFallbackProducts: ProductItem[] = [
     id: 'switch-touch-gold',
     name: 'مفتاح كهربائي ذكي مودرن',
     description: 'مفاتيح ومآخذ كهربائية عصرية وتصاميم فخمة مقاومة للخدش والحرارة.',
-    image: '/images/default-product.jpg',
+    image: 'https://i.postimg.cc/rFdZwLwK/IMG-3396.webp',
     price: 65,
     discountPrice: 55,
     stockStatus: 'available',
     stockQty: 60,
     category: 'مفاتيح وبرايز'
-  },
-  {
-    id: 'chandelier-crystal-modern',
-    name: 'ثريا كريستال فاخرة مودرن',
-    description: 'ثريات كريستال وتصاميم مودرن كلاسيكية منتقاة بعناية لتعطي انطباعاً مبهراً.',
-    image: '/images/default-product.jpg',
-    price: 450,
-    discountPrice: 390,
-    stockStatus: 'available',
-    stockQty: 25,
-    category: 'ثريات'
-  },
-  {
-    id: 'led-track-magnetic-2m',
-    name: 'سكة ليد مغناطيسية غاطسة 2 متر',
-    description: 'أنظمة سكة ليد مرنة غاطسة وظاهرة تتيح لك إعادة توزيع الضوء بسهولة.',
-    image: '/images/default-product.jpg',
-    price: 140,
-    discountPrice: 120,
-    stockStatus: 'available',
-    stockQty: 40,
-    category: 'سكة الليد'
-  },
-  {
-    id: 'intercom-hd-video',
-    name: 'انترفون مرئي ذكي شاشة HD',
-    description: 'أنظمة انترفون مرئية سلكية ولاسلكية من أفضل الماركات العالمية لحماية المبنى.',
-    image: '/images/default-product.jpg',
-    price: 380,
-    discountPrice: 320,
-    stockStatus: 'available',
-    stockQty: 30,
-    category: 'انترفون'
-  },
-  {
-    id: 'junction-box-foundation',
-    name: 'علب وقسامات تأسيس كهرباء معتمدة',
-    description: 'مستلزمات التأسيس الأولي من علب غاطسة، قسامات، وكابلات رئيسية للمشاريع.',
-    image: '/images/default-product.jpg',
-    price: 25,
-    discountPrice: 20,
-    stockStatus: 'available',
-    stockQty: 200,
-    category: 'مواد تأسيس الكهربائي'
   }
 ]
 
@@ -221,7 +229,7 @@ export default function Products() {
                   discountPrice: mediaData.discountPrice,
                   stockStatus: mediaData.stockStatus || 'available',
                   stockQty: mediaData.stockQty,
-                  category: mediaData.category || item.category || 'عام'
+                  category: (mediaData.category || item.category || '').trim()
                 }
              })
            
@@ -241,22 +249,14 @@ export default function Products() {
     fetchProducts()
   }, [isAr])
 
-  const categoriesGrid = [
-    { id: 'الأسلاك والكوابل', titleAr: 'الأسلاك والكوابل', titleEn: 'Wires & Cables', icon: Zap },
-    { id: 'سبوت لايت', titleAr: 'سبوت لايت', titleEn: 'Spotlights', icon: Lightbulb },
-    { id: 'مفاتيح وبرايز', titleAr: 'مفاتيح وبرايز', titleEn: 'Switches & Sockets', icon: Shield },
-    { id: 'ثريات', titleAr: 'ثريات', titleEn: 'Chandeliers', icon: Sparkles },
-    { id: 'سكة الليد', titleAr: 'سكة الليد', titleEn: 'LED Track Lights', icon: PackageSearch },
-    { id: 'انترفون', titleAr: 'انترفون', titleEn: 'Intercom Systems', icon: Award },
-    { id: 'مواد تأسيس الكهربائي', titleAr: 'مواد التأسيس', titleEn: 'Installation Materials', icon: PlayCircle }
-  ]
+  // تصنيف الأقسام المرفوعة في قاعدة البيانات (حيث حقل القسم فارغ أو غير موجود)
+  const dynamicCategories = products.filter(p => !p.category || p.category.trim() === '')
 
-  const displayedProducts = products.filter(p => {
-    if (selectedCategory === 'all') return true
-    const pCat = (p.category || '').trim()
-    const pName = (p.name || '').trim()
-    return pCat.includes(selectedCategory) || pName.includes(selectedCategory)
-  })
+  // المنتجات الحقيقية المرفوعة تحت الأقسام
+  const actualProducts = products.filter(p => p.category && p.category.trim() !== '')
+
+  // المنتجات التي سيتم عرضها بناءً على التصفية الحالية
+  const displayedProducts = actualProducts.filter(p => p.category && p.category.trim() === selectedCategory.trim())
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -301,13 +301,12 @@ export default function Products() {
           </div>
         </motion.div>
 
-        {/* شبكة الأقسام الرئيسية المبسطة والراقية (Premium Minimalist Categories Grid) */}
+        {/* شبكة الأقسام الرئيسية الديناميكية المستمدة من قاعدة البيانات (Dynamic Categories Showcase Bento Grid) */}
         {!loading && selectedCategory === 'all' && (
           <div className="mb-16 md:mb-24">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {categoriesGrid.map((cat, i) => {
-                const CatIcon = cat.icon
-                const catProductCount = products.filter(p => (p.category || '').includes(cat.id) || p.name.includes(cat.id)).length
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {dynamicCategories.map((cat, i) => {
+                const catProductCount = actualProducts.filter(p => p.category && p.category.trim() === cat.name.trim()).length
                 return (
                   <motion.div
                     key={cat.id}
@@ -315,24 +314,45 @@ export default function Products() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05, duration: 0.4, ease: 'easeOut' }}
                     style={{ transform: 'translateZ(0)' }}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className="relative p-6 rounded-2xl bg-[#0f213a] border border-white/5 hover:border-blue-500/30 transition-all duration-300 flex items-center justify-between cursor-pointer group shadow-lg hover:bg-[#142a4a] hover:-translate-y-1"
+                    onClick={() => setSelectedCategory(cat.name)}
+                    className="group relative rounded-3xl bg-[#0f213a] border border-white/5 overflow-hidden hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1.5 shadow-xl flex flex-col h-full cursor-pointer"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group-hover:bg-blue-600/10 group-hover:border-blue-500/20">
-                        <CatIcon className="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors duration-300" />
-                      </div>
-                      <div className="text-right">
-                        <h3 className="text-base sm:text-lg font-black text-white group-hover:text-blue-400 transition-colors duration-300">
-                          {isAr ? cat.titleAr : cat.titleEn}
-                        </h3>
-                        <span className="text-xs text-slate-400 font-bold block mt-0.5">
+                    {/* صورة كرت القسم الفاخرة */}
+                    <div className="relative aspect-[4/3] bg-[#0a192f] overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-85 z-10" />
+                      <img 
+                        src={cat.image} 
+                        alt={cat.name} 
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} 
+                      />
+                      
+                      {/* عداد المنتجات داخل شارة علوية */}
+                      <div className="absolute top-4 left-4 z-20 bg-blue-950/80 border border-blue-500/30 px-3 py-1 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                        <span className="text-blue-300 text-xs font-black">
                           {catProductCount} {isAr ? 'منتج' : 'items'}
                         </span>
                       </div>
                     </div>
-                    
-                    <ArrowLeft className={`w-4 h-4 text-slate-500 transition-all duration-300 group-hover:text-blue-400 group-hover:-translate-x-1 ${isAr ? '' : 'rotate-180'}`} />
+
+                    <div className="p-6 flex flex-col flex-grow justify-between">
+                      <div>
+                        <h3 className="text-xl font-black text-white group-hover:text-blue-400 transition-colors duration-300 mb-2 leading-tight">
+                          {cat.name}
+                        </h3>
+                        <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium line-clamp-2 mb-4">
+                          {cat.description || (isAr ? 'تصفح تشكيلة متميزة من أرقى الماركات والمواصفات.' : 'Browse a curated collection from the finest brands.')}
+                        </p>
+                      </div>
+
+                      <div className="pt-4 border-t border-white/5 flex items-center justify-between mt-auto">
+                        <span className="text-xs font-black text-blue-300 group-hover:text-white transition-colors duration-300 flex items-center gap-2">
+                          <span>{isAr ? 'استعرض هذا القسم' : 'Browse Category'}</span>
+                          <ArrowLeft className={`w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1 ${isAr ? '' : 'rotate-180'}`} />
+                        </span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                      </div>
+                    </div>
                   </motion.div>
                 )
               })}
@@ -374,7 +394,7 @@ export default function Products() {
           </motion.div>
         )}
 
-        {!loading && displayedProducts.length === 0 && (
+        {!loading && selectedCategory !== 'all' && displayedProducts.length === 0 && (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-12 text-center max-w-2xl mx-auto shadow-2xl">
             <div className="w-24 h-24 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
               <PackageSearch className="w-12 h-12 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
@@ -392,12 +412,12 @@ export default function Products() {
               onClick={() => setSelectedCategory('all')}
               className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all cursor-pointer"
             >
-              {isAr ? 'عرض جميع المنتجات' : 'Show All Products'}
+              {isAr ? 'العودة لكافة الأقسام' : 'Show All Categories'}
             </button>
           </motion.div>
         )}
 
-        {!loading && displayedProducts.length > 0 && (
+        {!loading && selectedCategory !== 'all' && displayedProducts.length > 0 && (
           <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {displayedProducts.map((product) => {
               // Translate on the fly
@@ -418,7 +438,7 @@ export default function Products() {
               return (
                 <motion.div variants={itemVariants} key={product.id} style={{ willChange: "transform, opacity" }} className="group relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-2 shadow-xl flex flex-col h-full">
                   <div className="relative overflow-hidden aspect-[4/3] bg-[#0a192f] flex items-center justify-center">
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-80 z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-85 z-10" />
                     <ImageIcon className="absolute w-12 h-12 text-white/5" />
                     <img src={product.image} alt={displayName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 relative" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                     
