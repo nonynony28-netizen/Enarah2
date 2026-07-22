@@ -549,7 +549,7 @@ export default function Home() {
                 </motion.div>
               </div>
 
-              {/* Right Column: Dynamic Stacked Glass Cards */}
+              {/* Right Column: Ultra-Sleek Glassmorphic Animated Cards */}
               <div className="lg:col-span-7 flex flex-col gap-5">
                 {[
                   { 
@@ -557,46 +557,45 @@ export default function Home() {
                     title: isAr ? 'جودة عالية ومعتمدة' : 'High & Certified Quality', 
                     desc: isAr ? 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والأمان لتدوم طويلاً.' : 'We select all installation and lighting materials with extreme care to match the highest quality and safety standards.',
                     badge: isAr ? 'مواد أصلية 🛡️' : 'Original Materials 🛡️',
-                    color: 'from-blue-500/10 hover:border-blue-500/40 text-blue-400 border-blue-500/20'
                   },
                   { 
                     icon: Shield, 
                     title: isAr ? 'حلول كهربائية وإنارة متكاملة' : 'Complete Electrical Solutions', 
                     desc: isAr ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك، مفاتيح ذكية، وسبوتات إنارة في مكان واحد دون عناء البحث.' : 'We provide everything you need to establish your home or project from cables, wires, smart switches, and spotlights in one place.',
                     badge: isAr ? 'شامل ومتكامل 📦' : 'All-in-One 📦',
-                    color: 'from-amber-500/10 hover:border-amber-500/40 text-amber-400 border-amber-500/20'
                   },
                   { 
                     icon: Sparkles, 
                     title: isAr ? 'خدمة عملاء ودعم سريع' : 'Fast Sales Support', 
                     desc: isAr ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وتسهيل توصيلها بأمان.' : 'Our dedicated sales support team is always available to help you select products, request custom volumes, and ensure safe deliveries.',
                     badge: isAr ? 'دعم مبيعات 📞' : 'Sales Support 📞',
-                    color: 'from-indigo-500/10 hover:border-indigo-500/40 text-indigo-400 border-indigo-500/20'
                   },
                 ].map((item, i) => (
                   <motion.div
                     key={item.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1, duration: 0.5 }}
-                    whileHover={{ scale: 1.01 }}
-                    className={`relative p-5 md:p-6 rounded-[1.8rem] bg-[#0f213a]/30 backdrop-blur-md transition-all duration-300 flex flex-col md:flex-row items-start gap-4 md:gap-5 cursor-default group shadow-[0_4px_25px_rgba(0,0,0,0.1)] border ${
-                      isAr ? 'bg-gradient-to-l' : 'bg-gradient-to-r'
-                    } ${item.color}`}
+                    initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    whileHover={{ y: -4, transition: { duration: 0.3, ease: "easeOut" } }}
+                    className="relative p-6 rounded-2xl bg-gradient-to-br from-[#0c1e38]/80 via-[#0a192f]/90 to-[#071325]/90 backdrop-blur-xl border border-white/10 hover:border-blue-400/30 transition-all duration-300 flex flex-col md:flex-row items-start gap-5 cursor-default group shadow-lg hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)] overflow-hidden"
                   >
-                    {/* Icon container */}
-                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-600/10 group-hover:border-blue-500/30 transition-all duration-300 shrink-0">
-                      <item.icon className="w-7 h-7" />
+                    {/* شريط الإضاءة العريض المتوهج عند التمرير */}
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                    {/* حاوي الأيقونة المضيء الفاخر */}
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/20 border border-blue-400/20 group-hover:border-blue-400/40 text-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.15)] flex items-center justify-center transition-all duration-500 shrink-0 group-hover:scale-105">
+                      <item.icon className="w-7 h-7 group-hover:scale-110 transition-transform duration-500 text-blue-400" />
                     </div>
 
-                    {/* Text Details */}
-                    <div className="flex-grow w-full">
+                    {/* التفاصيل والنصوص */}
+                    <div className="flex-grow w-full relative z-10">
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <h3 className="text-lg md:text-xl font-extrabold text-white group-hover:text-blue-300 transition-colors">{item.title}</h3>
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">{item.badge}</span>
+                        <h3 className="text-lg md:text-xl font-black text-white group-hover:text-blue-300 transition-colors duration-300 tracking-wide">{item.title}</h3>
+                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 backdrop-blur-md shadow-sm">{item.badge}</span>
                       </div>
-                      <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{item.desc}</p>
+                      <p className="text-slate-300 text-xs md:text-sm leading-relaxed font-medium">{item.desc}</p>
                     </div>
                   </motion.div>
                 ))}
