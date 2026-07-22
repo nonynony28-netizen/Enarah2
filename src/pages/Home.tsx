@@ -449,16 +449,6 @@ export default function Home() {
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
-              {/* شارة زجاجية مضيئة بلاتينية أعلى الهيرو */}
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-cyan-500/15 via-blue-600/20 to-indigo-600/15 border border-cyan-400/30 text-cyan-300 text-xs sm:text-sm font-black shadow-[0_0_25px_rgba(6,182,212,0.25)] mb-6"
-              >
-                <Sparkles className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
-                <span>{isAr ? 'معرض إنارة ومواد تأسيس فاخرة معتمدة' : 'Premium Architectural Lighting & Electrical Solutions'}</span>
-              </motion.div>
 
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-normal tracking-tight text-white py-2">
                 <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">{t('hero.title.part1')}</span>{' '}
