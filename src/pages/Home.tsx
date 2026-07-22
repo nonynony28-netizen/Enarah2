@@ -495,12 +495,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* مفاتيح التنقل بين الشرائح (Interactive Tab Segmented Control) */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-3 max-w-2xl mx-auto mb-10 p-1.5 rounded-2xl bg-[#0a192f] border border-blue-500/20 shadow-xl">
+            {/* مفاتيح التنقل بين الشرائح (Interactive Harmonized Tab Segmented Control) */}
+            <div className="flex items-center justify-center gap-1.5 sm:gap-3 max-w-xl mx-auto mb-4 p-1.5 rounded-2xl bg-[#0a192f] border border-blue-500/30 shadow-2xl">
               {[
-                { id: 0, icon: Award, label: isAr ? 'جودة معتمدة 🛡️' : 'Certified Quality 🛡️' },
-                { id: 1, icon: Shield, label: isAr ? 'حلول متكاملة 📦' : 'All-in-One 📦' },
-                { id: 2, icon: Sparkles, label: isAr ? 'دعم واستشارات 📞' : 'Sales Support 📞' }
+                { id: 0, icon: Award, label: isAr ? 'جودة معتمدة' : 'Certified Quality', badge: '🛡️' },
+                { id: 1, icon: Shield, label: isAr ? 'حلول متكاملة' : 'All-in-One', badge: '📦' },
+                { id: 2, icon: Sparkles, label: isAr ? 'دعم فني' : 'Sales Support', badge: '📞' }
               ].map((tab) => {
                 const isActive = activeWhySlide === tab.id
                 const TabIcon = tab.icon
@@ -508,26 +508,52 @@ export default function Home() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveWhySlide(tab.id)}
-                    className={`relative px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-black transition-all duration-300 flex items-center justify-center gap-2 flex-1 cursor-pointer outline-none ${
+                    className={`relative px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-300 flex items-center justify-center gap-1.5 flex-1 cursor-pointer outline-none text-center ${
                       isActive ? 'text-white' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeWhyTab"
-                        className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl border border-blue-400/40 shadow-[0_0_18px_rgba(59,130,246,0.5)] -z-10"
+                        className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl border border-blue-400/40 shadow-[0_0_20px_rgba(59,130,246,0.6)] -z-10"
                         transition={{ type: 'spring', stiffness: 450, damping: 30 }}
                       />
                     )}
                     <TabIcon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                     <span className="truncate">{tab.label}</span>
+                    <span className="text-xs hidden md:inline">{tab.badge}</span>
                   </button>
                 )
               })}
             </div>
 
+            {/* مؤشر حركي توضيحي يدعو للتنقل بين اللقطات */}
+            <div className="flex items-center justify-center gap-2 mb-8">
+              <span className="text-[11px] font-bold text-blue-300 bg-blue-500/10 px-3.5 py-1.5 rounded-full border border-blue-400/25 shadow-sm animate-pulse flex items-center gap-1.5">
+                <span>{isAr ? 'انقر الأسهم أو التبويبات لرؤية اللقطة التالية 👈' : 'Click arrows or tabs to view next slide 👈'}</span>
+              </span>
+            </div>
+
             {/* مسرح الشريحة التفاعلية (World-Class Interactive Showcase Stage) */}
             <div className="relative max-w-5xl mx-auto">
+
+              {/* أسهم تنقل بارزة عائمة على جانبي البطاقة للتنقل الفوري (Floating Side Navigation Arrows) */}
+              <button
+                onClick={() => setActiveWhySlide((prev) => (prev - 1 + 3) % 3)}
+                className="absolute top-1/2 -translate-y-1/2 -right-3 sm:-right-6 z-30 p-3 sm:p-3.5 rounded-full bg-[#0a192f] hover:bg-blue-600 border border-blue-400/40 text-white transition-all duration-300 active:scale-95 cursor-pointer shadow-[0_0_25px_rgba(59,130,246,0.4)] group"
+                title={isAr ? 'الشريحة السابقة (انقر لرؤية اللقطة الأخرى)' : 'Previous Slide'}
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
+              </button>
+
+              <button
+                onClick={() => setActiveWhySlide((prev) => (prev + 1) % 3)}
+                className="absolute top-1/2 -translate-y-1/2 -left-3 sm:-left-6 z-30 p-3 sm:p-3.5 rounded-full bg-[#0a192f] hover:bg-blue-600 border border-blue-400/40 text-white transition-all duration-300 active:scale-95 cursor-pointer shadow-[0_0_25px_rgba(59,130,246,0.4)] group"
+                title={isAr ? 'الشريحة التالية (انقر لرؤية اللقطة الأخرى)' : 'Next Slide'}
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
+              </button>
+
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeWhySlide}
@@ -576,7 +602,7 @@ export default function Home() {
                           ? (isAr ? [
                               'منتجات أصلية معتمدة وفق أعلى معايير الجودة والسلامة العالمية.',
                               'عزل حراري وكهربائي ممتاز يدوم لسنوات طويلة دون تلف.',
-                              'ضمان حقيقي واختبار قياسي شامل قبل التوريد لجميع العملاء.',
+                              'ضمان حقيقي وااختبار قياسي شامل قبل التوريد لجميع العملاء.',
                               'حماية كاملة للمبنى والأسلاك من أخطار التماس والحرارة.'
                             ] : [
                               'Certified original products meeting top international safety standards.',
@@ -647,38 +673,20 @@ export default function Home() {
                 </motion.div>
               </AnimatePresence>
 
-              {/* أسهم التصفح وشريط المؤشرات */}
-              <div className="flex items-center justify-between mt-6 px-2 sm:px-4">
-                <button
-                  onClick={() => setActiveWhySlide((prev) => (prev - 1 + 3) % 3)}
-                  className="p-3 rounded-full bg-[#0a192f] hover:bg-blue-600/20 border border-white/10 text-slate-300 hover:text-white transition-all active:scale-95 cursor-pointer shadow-md"
-                  title={isAr ? 'الشريحة السابقة' : 'Previous Slide'}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-
-                {/* مؤشرات الشرائح المضيئة */}
-                <div className="flex items-center gap-2">
-                  {[0, 1, 2].map((idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveWhySlide(idx)}
-                      className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                        activeWhySlide === idx
-                          ? 'w-8 bg-blue-500 shadow-[0_0_12px_#3b82f6]'
-                          : 'w-2.5 bg-white/20 hover:bg-white/40'
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => setActiveWhySlide((prev) => (prev + 1) % 3)}
-                  className="p-3 rounded-full bg-[#0a192f] hover:bg-blue-600/20 border border-white/10 text-slate-300 hover:text-white transition-all active:scale-95 cursor-pointer shadow-md"
-                  title={isAr ? 'الشريحة التالية' : 'Next Slide'}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
+              {/* مؤشرات التصفح السفلية */}
+              <div className="flex items-center justify-center gap-2 mt-6">
+                {[0, 1, 2].map((idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveWhySlide(idx)}
+                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      activeWhySlide === idx
+                        ? 'w-8 bg-blue-500 shadow-[0_0_12px_#3b82f6]'
+                        : 'w-2.5 bg-white/20 hover:bg-white/40'
+                    }`}
+                    title={isAr ? `انقل للشريحة ${idx + 1}` : `Go to slide ${idx + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </div>
