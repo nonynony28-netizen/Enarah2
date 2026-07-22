@@ -2,7 +2,7 @@
 
 import { MongoClient } from "mongodb";
 import { uploadSingleImage } from "../lib/multer.js";
-import { processAndUploadImage } from "../lib/r2.js";
+import { processAndUploadImage, uploadVideoToR2 } from "../lib/r2.js";
 
 // =====================================
 // MongoDB Cache
@@ -131,14 +131,22 @@ export default async function handler(req, res) {
       });
     }
 
-    // Process and upload file automatically to Cloudflare R2 if attached
-    if (req.file) {
-      imageUrl = await processAndUploadImage(req.file.buffer, "products");
+    // Process and upload files automatically to Cloudflare R2 if attached
+    let imageUrl = "";
+    let finalVideoUrl = videoUrl;
+
+    if (req.files) {
+      if (req.files.image && req.files.image[0]) {
+        imageUrl = await processAndUploadImage(req.files.image[0].buffer, "products");
+      }
+      if (req.files.video && req.files.video[0]) {
+        finalVideoUrl = await uploadVideoToR2(req.files.video[0].buffer, req.files.video[0].mimetype);
+      }
     }
 
     const phoneData = {
       imageUrl,
-      videoUrl,
+      videoUrl: finalVideoUrl,
       description,
       type,
       category,

@@ -120,7 +120,24 @@
       <input type="number" id="stockQty" placeholder="مثال: 50" min="0" />
     </div>
 
-    <label for="videoUrl">رابط الفيديو (اختياري)</label>
+    <label for="videoFile">رفع ملف فيديو مباشر من جهازك (اختياري - صيغة MP4 أو WebM):</label>
+    <input type="file" id="videoFile" accept="video/*" />
+
+    <!-- حقل تفاصيل حجم الفيديو -->
+    <div id="videoSizeBox" style="display: none; margin-top: -10px; margin-bottom: 20px; padding: 15px; border-radius: 12px; background: #0c1e38; border: 1px solid rgba(59, 130, 246, 0.25); font-size: 14px; line-height: 1.6; text-align: right; box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.1);">
+      <div style="font-weight: bold; color: #3b82f6; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 15px;">
+        <span>🎥</span> <span>تفاصيل ملف الفيديو المختار للرفع المباشر:</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: rgba(255, 255, 255, 0.7);">حجم الفيديو الفعلي:</span>
+        <span id="videoSizeVal" style="font-weight: bold; color: #38bdf8; direction: ltr;">--</span>
+      </div>
+      <div style="margin-top: 8px; color: rgba(255, 255, 255, 0.5); font-size: 12px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 6px;">
+        ⚠️ يتم رفع ملف الفيديو المختار بكامل جودته الأصلية ومواصفاته دون ضغط لتجنب حدوث أي تشويه أو تقليل للدقة.
+      </div>
+    </div>
+
+    <label for="videoUrl">رابط فيديو خارجي (أو اتركه فارغاً وسيتم اعتماد الفيديو المرفوع بالأعلى):</label>
     <input type="url" id="videoUrl" placeholder="https://example.com/video.mp4" />
 
     <button id="saveBtn">حفظ ونشر في الموقع</button>
@@ -136,6 +153,9 @@
     const inventoryContainer = document.getElementById("inventoryContainer");
     const imageFileInput = document.getElementById("imageFile");
     const imagePreview = document.getElementById("imagePreview");
+    const videoFileInput = document.getElementById("videoFile");
+    const videoSizeBox = document.getElementById("videoSizeBox");
+    const videoSizeVal = document.getElementById("videoSizeVal");
 
     function getAdminPassword() {
       let pwd = sessionStorage.getItem('admin_password');
@@ -156,6 +176,17 @@
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
+
+    // حساب حجم الفيديو المختار للرفع تلقائياً
+    videoFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        videoSizeBox.style.display = "block";
+        videoSizeVal.textContent = formatBytes(file.size);
+      } else {
+        videoSizeBox.style.display = "none";
+      }
+    });
 
     // معاينة الصورة المختارة وحساب نسب الضغط التلقائي
     imageFileInput.addEventListener("change", (e) => {
@@ -251,6 +282,7 @@
       const description = document.getElementById("description").value.trim();
       const videoUrl = document.getElementById("videoUrl").value.trim();
       const file = imageFileInput.files[0];
+      const videoFile = videoFileInput.files[0];
 
       // حقول المخزون والأسعار
       const price = document.getElementById("price").value.trim();
@@ -264,10 +296,10 @@
       if (!title) return showResponse("الرجاء كتابة الاسم أو العنوان.", false);
       if (!description) return showResponse("الرجاء كتابة الوصف.", false);
       if (itemType === "project" && !category) return showResponse("الرجاء كتابة تصنيف المشروع.", false);
-      if (!file && !videoUrl) return showResponse("يرجى اختيار صورة للمنتج.", false);
+      if (!file && !videoUrl && !videoFile) return showResponse("يرجى اختيار صورة أو فيديو للمنتج.", false);
 
       saveBtn.disabled = true;
-      saveBtn.textContent = "جاري تحويل الصورة وضغطها والرفع لـ R2...";
+      saveBtn.textContent = "جاري رفع الملفات ومعالجتها ونشرها لـ R2...";
 
       try {
         const formData = new FormData();
@@ -289,6 +321,9 @@
         if (file) {
           formData.append("image", file);
         }
+        if (videoFile) {
+          formData.append("video", videoFile);
+        }
 
         const res = await fetch("https://enarah2.vercel.app/api/save-user", {
           method: "POST",
@@ -308,7 +343,7 @@
         const data = await res.json();
 
         if (data.success) {
-          showResponse("تم الرفع وضغط الصورة ونشر المنتج بنجاح! 🎉\nالرابط: " + (data.imageUrl || ""), true);
+          showResponse("تم الرفع ونشر المنتج بنجاح! 🎉\nالرابط: " + (data.imageUrl || data.videoUrl || ""), true);
           document.getElementById("title").value = "";
           document.getElementById("description").value = "";
           document.getElementById("videoUrl").value = "";
@@ -318,7 +353,10 @@
           document.getElementById("stockQty").value = "";
           document.getElementById("stockStatus").value = "available";
           imageFileInput.value = "";
+          videoFileInput.value = "";
           imagePreview.style.display = "none";
+          videoSizeBox.style.display = "none";
+          document.getElementById("sizeEstimationBox").style.display = "none";
         } else {
           showResponse(data.error || "حدث خطأ غير متوقع.", false);
         }
