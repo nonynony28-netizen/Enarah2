@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight, ShoppingCart, Check, Zap, Shield, Award, Sparkles, Lightbulb } from 'lucide-react'
+import { PlayCircle, PackageSearch, Loader2, Image as ImageIcon, ArrowRight, ArrowLeft, ShoppingCart, Check, Zap, Shield, Award, Sparkles, Lightbulb } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
