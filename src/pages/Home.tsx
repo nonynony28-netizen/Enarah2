@@ -563,10 +563,10 @@ export default function Home() {
                 ].map((item, i) => (
                   <motion.div
                     key={item.title}
-                    initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                    initial={{ opacity: 0, y: 25, scale: 0.96 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ delay: i * 0.25, duration: 0.55, ease: [0.25, 1, 0.5, 1] }}
                     whileHover={{ y: -4, transition: { duration: 0.3, ease: "easeOut" } }}
                     className="relative p-6 rounded-2xl bg-[#0c1e38] border border-white/10 hover:border-blue-400/30 transition-all duration-300 flex flex-col md:flex-row items-start gap-5 cursor-default group shadow-lg hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)] overflow-hidden"
                   >
