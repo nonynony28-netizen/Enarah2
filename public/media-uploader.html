@@ -313,6 +313,10 @@
       saveBtn.disabled = true;
       saveBtn.textContent = "جاري رفع الملفات ومعالجتها ونشرها لـ R2...";
 
+      const apiBase = (window.location.origin && window.location.origin.startsWith("http")) 
+        ? window.location.origin 
+        : "https://enarah2.vercel.app";
+
       try {
         let uploadedDirectVideoUrl = videoUrl;
 
@@ -339,7 +343,7 @@
             chunkFormData.append("mimeType", videoFile.type || "video/mp4");
             chunkFormData.append("chunk", blobChunk, `chunk_${i}.mp4`);
 
-            const chunkRes = await fetch("/api/upload-chunk", {
+            const chunkRes = await fetch(`${apiBase}/api/upload-chunk`, {
               method: "POST",
               headers: {
                 "x-admin-password": pwd
@@ -383,7 +387,7 @@
           formData.append("image", file);
         }
 
-        const res = await fetch("/api/save-user", {
+        const res = await fetch(`${apiBase}/api/save-user`, {
           method: "POST",
           headers: { 
             "x-admin-password": pwd
@@ -416,11 +420,11 @@
           videoSizeBox.style.display = "none";
           document.getElementById("sizeEstimationBox").style.display = "none";
         } else {
-          showResponse(data.error || "حدث خطأ غير متوقع.", false);
+          showResponse(data.error || "حدث خطأ أثناء حفظ البيانات.", false);
         }
       } catch (error) {
-        showResponse(error.message || "فشل في الاتصال بالسيرفر.", false);
-        console.error(error);
+        showResponse(error.message ? `فشل في الاتصال بالسيرفر: ${error.message}` : "فشل في الاتصال بالسيرفر.", false);
+        console.error("Upload error details:", error);
       }
 
       saveBtn.disabled = false;
