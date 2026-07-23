@@ -452,7 +452,7 @@ export default function Home() {
 
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-normal tracking-tight text-white py-2">
                 <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">{t('hero.title.part1')}</span>{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-300 drop-shadow-[0_0_35px_rgba(59,130,246,0.7)]">{t('hero.title.part2')}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 drop-shadow-[0_0_35px_rgba(249,115,22,0.7)]">{t('hero.title.part2')}</span>
               </h1>
               
               <p className="text-base md:text-2xl text-blue-50/90 mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
@@ -462,14 +462,14 @@ export default function Home() {
         {/* 2. لماذا نحن - شريحة ميزات تفاعلية عالمية (World-Class Interactive Feature Showcase) */}
         <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           {/* بقع توهج نيونية خفيفة عائمة */}
-          <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-          <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0" />
+          <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-orange-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
+          <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-10 md:mb-14">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
                 {isAr ? 'لماذا' : 'Why'}{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 drop-shadow-[0_2px_10px_rgba(249,115,22,0.3)]">
                   {isAr ? 'نحن؟' : 'Choose Us?'}
                 </span>
               </h2>

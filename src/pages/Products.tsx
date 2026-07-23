@@ -283,21 +283,21 @@ export default function Products() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-16 md:mb-20">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
             {isAr ? (
-              <>معرض <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 drop-shadow-[0_4px_15px_rgba(245,158,11,0.3)]">المنتجات</span></>
+              <>معرض <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 drop-shadow-[0_4px_15px_rgba(249,115,22,0.4)]">المنتجات</span></>
             ) : (
-              <>Products <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 drop-shadow-[0_4px_15px_rgba(245,158,11,0.3)]">Gallery</span></>
+              <>Products <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 drop-shadow-[0_4px_15px_rgba(249,115,22,0.4)]">Gallery</span></>
             )}
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm">
             {isAr 
-              ? 'اكتشف أحدث وأرقى منتجات الإنارة والتأسيس الكهربائي التي اخترناها بعناية لتناسب ذوقك واحتياجاتك'
+              ? 'اكتشف أحدث وأرقى منتجات الإنارة والتأسيس الكهربائي التي اخترناها بعناية لتناسب ذوقك وااحتياجاتك'
               : 'Discover the latest and finest lighting and electrical installation products, carefully selected to fit your taste and needs'
             }
           </p>
           <div className="flex items-center justify-center gap-1.5 mt-6">
-            <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-            <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-            <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+            <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-orange-500 rounded-full" />
+            <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse shadow-[0_0_8px_#f97316]" />
+            <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-orange-500 rounded-full" />
           </div>
         </motion.div>
 
@@ -315,7 +315,7 @@ export default function Products() {
                     transition={{ delay: i * 0.05, duration: 0.4, ease: 'easeOut' }}
                     style={{ transform: 'translateZ(0)' }}
                     onClick={() => setSelectedCategory(cat.name)}
-                    className="group relative rounded-3xl bg-[#0f213a] border border-white/5 overflow-hidden hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1.5 shadow-xl flex flex-col h-full cursor-pointer"
+                    className="group relative rounded-3xl bg-[#0f213a] border border-white/10 overflow-hidden hover:border-orange-500/60 transition-all duration-300 hover:-translate-y-1.5 shadow-xl flex flex-col h-full cursor-pointer"
                   >
                     {/* صورة كرت القسم الفاخرة */}
                     <div className="relative aspect-[4/3] bg-[#0a192f] overflow-hidden">
@@ -330,20 +330,20 @@ export default function Products() {
 
                     <div className="p-6 flex flex-col flex-grow justify-between">
                       <div>
-                        <h3 className="text-xl font-black text-white group-hover:text-blue-400 transition-colors duration-300 mb-2 leading-tight">
+                        <h3 className="text-xl font-black text-white group-hover:text-orange-400 transition-colors duration-300 mb-2 leading-tight">
                           {cat.name}
                         </h3>
-                        <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium line-clamp-2 mb-4">
+                        <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium line-clamp-2 mb-4">
                           {cat.description || (isAr ? 'تصفح تشكيلة متميزة من أرقى الماركات والمواصفات.' : 'Browse a curated collection from the finest brands.')}
                         </p>
                       </div>
 
                       <div className="pt-4 border-t border-white/5 flex items-center justify-between mt-auto">
-                        <span className="text-xs font-black text-blue-300 group-hover:text-white transition-colors duration-300 flex items-center gap-2">
+                        <span className="text-xs font-black text-orange-400 group-hover:text-amber-300 transition-colors duration-300 flex items-center gap-2">
                           <span>{isAr ? 'استعرض هذا القسم' : 'Browse Category'}</span>
                           <ArrowLeft className={`w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1 ${isAr ? '' : 'rotate-180'}`} />
                         </span>
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse shadow-[0_0_6px_#f97316]" />
                       </div>
                     </div>
                   </motion.div>
@@ -355,9 +355,9 @@ export default function Products() {
 
         {/* رأس القسم المحدد عند اختيار قسم معين (Selected Category Header) */}
         {!loading && selectedCategory !== 'all' && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 p-6 rounded-2xl bg-[#0c1e38] border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 p-6 rounded-2xl bg-[#0c1e38] border border-orange-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
             <div className="flex items-center gap-3">
-              <span className="px-3.5 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-black">
+              <span className="px-3.5 py-1.5 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-black">
                 {isAr ? 'القسم الحالي' : 'Active Category'}
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white">
@@ -370,7 +370,7 @@ export default function Products() {
 
             <button
               onClick={() => setSelectedCategory('all')}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-white/10 hover:bg-blue-600 border border-white/15 text-white font-bold text-xs sm:text-sm transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs sm:text-sm transition-all active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(249,115,22,0.3)]"
             >
               <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
               <span>{isAr ? 'العودة لكافة الأقسام' : 'Show All Categories'}</span>
@@ -507,7 +507,7 @@ export default function Products() {
                             ? 'bg-white/5 border-white/10 text-slate-500 cursor-not-allowed'
                             : addingId === product.id
                               ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
-                              : 'bg-blue-600/10 hover:bg-blue-600 border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                              : 'bg-orange-500/15 hover:bg-orange-500 border-orange-500/30 hover:border-orange-400 text-orange-400 hover:text-white hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]'
                         }`}
                       >
                         <AnimatePresence mode="wait">

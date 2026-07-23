@@ -213,7 +213,7 @@ export default function WirePrices() {
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
               {isAr ? 'أسعار الأسلاك' : 'Wire Prices'}{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 drop-shadow-[0_4px_15px_rgba(249,115,22,0.4)]">
                 {isAr ? 'الإيطالية' : 'Italian'}
               </span>
             </h1>
@@ -225,8 +225,7 @@ export default function WirePrices() {
               }
             </p>
 
-            {/* شريط التاريخ */}
-            <div className={`inline-flex items-center gap-3 px-6 py-3 bg-[#0d2342] border border-blue-500/30 rounded-2xl text-blue-300 font-bold text-lg shadow-[0_0_15px_rgba(59,130,246,0.2)] ${
+            <div className={`inline-flex items-center gap-3 px-6 py-3 bg-[#0d2342] border border-orange-500/30 rounded-2xl text-orange-300 font-bold text-lg shadow-[0_0_15px_rgba(249,115,22,0.2)] ${
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
               <Calendar className="w-5 h-5" />

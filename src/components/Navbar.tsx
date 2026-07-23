@@ -143,18 +143,18 @@ export default function Navbar() {
                   whileHover={{ rotate: 15, scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+                  <Lightbulb className="w-7 h-7 text-orange-400 drop-shadow-[0_0_15px_rgba(249,115,22,0.8)]" />
                 </motion.div>
                 <span className="font-extrabold text-xl md:text-2xl tracking-wide">
                   {isAr ? (
                     <>
                       <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">الإنارة</span>{' '}
-                      <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">الحديثة</span>
+                      <span className="text-orange-400 drop-shadow-[0_0_15px_rgba(249,115,22,0.8)]">الحديثة</span>
                     </>
                   ) : (
                     <>
                       <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">ENARAH</span>{' '}
-                      <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">MODERN</span>
+                      <span className="text-orange-400 drop-shadow-[0_0_15px_rgba(249,115,22,0.8)]">MODERN</span>
                     </>
                   )}
                 </span>
