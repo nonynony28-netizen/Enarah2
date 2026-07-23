@@ -428,24 +428,17 @@ export default function Home() {
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] overflow-hidden flex items-center justify-center">
             
-            {/* للموبايل والهواتف القديمة: عرض صورة بوستر خفيفة جداً بدلاً من فيديو لتسريع الفتح بـ 10 أضعاف */}
-            <img
-              src="/poster.jpg"
-              alt="الإنارة الحديثة"
-              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-50 z-0 block md:hidden"
-              loading="eager"
-              decoding="async"
-            />
-            {/* للشاشات الكبيرة: تشغيل فيديو خلفي فائق الجودة */}
+            {/* فيديو الخلفية الترحيبي فائق السرعة والمسرّع بالعتاد يعمل على كافة الهواتف والحواسيب */}
             <video
               ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
-              preload="auto"
-              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-50 z-0 hidden md:block"
-              style={{ transform: 'translateZ(0)' }}
+              preload="metadata"
+              poster="/poster.jpg"
+              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-50 z-0"
+              style={{ transform: 'translateZ(0)', willChange: 'transform' }}
             >
               <source src="/bg-video.mp4" type="video/mp4" />
             </video>
