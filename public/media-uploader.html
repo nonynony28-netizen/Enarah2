@@ -337,9 +337,9 @@
             chunkFormData.append("chunkIndex", i);
             chunkFormData.append("totalChunks", totalChunks);
             chunkFormData.append("mimeType", videoFile.type || "video/mp4");
-            chunkFormData.append("chunk", blobChunk, `chunk_${i}.bin`);
+            chunkFormData.append("chunk", blobChunk, `chunk_${i}.mp4`);
 
-            const chunkRes = await fetch("https://enarah2.vercel.app/api/upload-chunk", {
+            const chunkRes = await fetch("/api/upload-chunk", {
               method: "POST",
               headers: {
                 "x-admin-password": pwd
@@ -383,7 +383,7 @@
           formData.append("image", file);
         }
 
-        const res = await fetch("https://enarah2.vercel.app/api/save-user", {
+        const res = await fetch("/api/save-user", {
           method: "POST",
           headers: { 
             "x-admin-password": pwd
@@ -401,7 +401,7 @@
         const data = await res.json();
 
         if (data.success) {
-          showResponse("تم الرفع ونشر المنتج بنجاح! 🎉\nالرابط: " + (data.imageUrl || data.videoUrl || ""), true);
+          showResponse("تم الرفع ونشر المنتج بنجاح! 🎉\nالرابط: " + (data.imageUrl || data.videoUrl || uploadedDirectVideoUrl || ""), true);
           document.getElementById("title").value = "";
           document.getElementById("description").value = "";
           document.getElementById("videoUrl").value = "";
@@ -419,7 +419,7 @@
           showResponse(data.error || "حدث خطأ غير متوقع.", false);
         }
       } catch (error) {
-        showResponse("فشل في الاتصال بالسيرفر.", false);
+        showResponse(error.message || "فشل في الاتصال بالسيرفر.", false);
         console.error(error);
       }
 
