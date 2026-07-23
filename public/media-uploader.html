@@ -314,6 +314,44 @@
       saveBtn.textContent = "جاري رفع الملفات ومعالجتها ونشرها لـ R2...";
 
       try {
+        let uploadedDirectVideoUrl = videoUrl;
+
+        // في حال اختيار ملف فيديو: نقوم برفعه مباشرة لـ Cloudflare R2 بدون الحجم المحظور بالسيرفر
+        if (videoFile) {
+          saveBtn.textContent = "🎬 جاري رفع الفيديو مباشرة إلى Cloudflare R2...";
+          
+          const presignRes = await fetch("https://enarah2.vercel.app/api/get-r2-upload-url", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-admin-password": pwd
+            },
+            body: JSON.stringify({ fileType: videoFile.type || "video/mp4" })
+          });
+
+          const presignData = await presignRes.json();
+          if (!presignRes.ok || !presignData.success) {
+            throw new Error(presignData.error || "فشل الحصول على رابط رفع الفيديو.");
+          }
+
+          // رفع الفيديو مباشرة عبر R2 Presigned Upload URL
+          const uploadToR2Res = await fetch(presignData.uploadUrl, {
+            method: "PUT",
+            headers: {
+              "Content-Type": videoFile.type || "video/mp4"
+            },
+            body: videoFile
+          });
+
+          if (!uploadToR2Res.ok) {
+            throw new Error("فشل رفع ملف الفيديو مباشرة إلى Cloudflare R2.");
+          }
+
+          uploadedDirectVideoUrl = presignData.publicUrl;
+        }
+
+        saveBtn.textContent = "💾 جاري حفظ البيانات في قاعدة البيانات...";
+
         const formData = new FormData();
         formData.append("name", title);
         let emailVal = `media_${Date.now()}@upload.local`;
@@ -323,7 +361,7 @@
         formData.append("type", itemType);
         formData.append("description", description);
         formData.append("category", category);
-        formData.append("videoUrl", videoUrl);
+        formData.append("videoUrl", uploadedDirectVideoUrl);
         
         // إلحاق بيانات الأسعار والمخزون في حال كان منتجاً
         if (itemType === "product") {
@@ -335,9 +373,6 @@
 
         if (file) {
           formData.append("image", file);
-        }
-        if (videoFile) {
-          formData.append("video", videoFile);
         }
 
         const res = await fetch("https://enarah2.vercel.app/api/save-user", {
