@@ -723,77 +723,27 @@ export default function Home() {
         </section>
 
         {/* =========================================================
-            قسم عرض الفيديو الثاني (استعراض الجودة والمشاريع)
+            قسم عرض الفيديو الثاني (بدون عنوان - مشغل تلقائي مستمر)
             ========================================================= */}
-        <section id="showcase-video" className="py-16 md:py-20 relative overflow-hidden bg-transparent border-t border-white/[0.05]">
+        <section id="showcase-video" className="py-12 md:py-16 relative overflow-hidden bg-transparent border-t border-white/[0.05]">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {/* عنوان قسم الفيديو الثاني */}
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-bold mb-4 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                <Video className="w-4 h-4 text-blue-400 animate-pulse" />
-                <span>{isAr ? 'عرض فني واستعراض عام 🎬' : 'Technical & Projects Showcase 🎬'}</span>
-              </div>
-
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
-                {isAr ? 'شاهد ' : 'Watch Our '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">
-                  {isAr ? 'جودة وتفاصيل منتجاتنا' : 'Quality & Project Details'}
-                </span>
-              </h2>
-
-              <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
-                {isAr 
-                  ? 'جولة مرئية استعراضية تعكس دقة التصنيع والتأسيس الفني لمنتجات الإنارة الحديثة والمستلزمات الكهربائية.'
-                  : 'A visual walkthrough demonstrating precision manufacturing and installation of modern lighting and electrical supplies.'}
-              </p>
-
-              <div className="flex items-center justify-center gap-1.5 mt-4">
-                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
-              </div>
-            </div>
-
-            {/* مسرح المشغل الفاخر للفيديو الثاني */}
+            {/* مسرح الفيديو الثاني - يعمل تلقائياً وباستمرار بدون عناوين */}
             <div className="relative rounded-[2.5rem] overflow-hidden border border-blue-500/30 bg-[#0a192f]/90 shadow-[0_0_50px_rgba(59,130,246,0.25)] group">
               <div className="relative aspect-video w-full overflow-hidden bg-black flex items-center justify-center">
                 <video
                   key={secondaryVideoUrl}
-                  controls
+                  autoPlay
+                  loop
+                  muted
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   poster="/poster.jpg"
                   className="w-full h-full object-cover"
+                  style={{ transform: 'translateZ(0)' }}
                 >
                   <source src={secondaryVideoUrl} type="video/mp4" />
-                  متصفحك لا يدعم تشغيل الفيديو.
                 </video>
-              </div>
-
-              {/* شريط معلومات تفصيلي تحت مشغل الفيديو */}
-              <div className="p-5 md:p-6 bg-[#0d2342]/95 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/40 text-blue-300 flex items-center justify-center shrink-0 shadow-md">
-                    <Sparkles className="w-5 h-5 text-blue-400 animate-pulse" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-extrabold text-sm md:text-base">
-                      {isAr ? 'الإنارة الحديثة - خيارك المضمون للتأسيس' : 'Modern Lighting - Guaranteed Choice'}
-                    </h4>
-                    <p className="text-slate-400 text-xs font-medium">
-                      {isAr ? 'مستلزمات كهربائية وإضاءة معتمدة بمواصفات 2026' : 'Certified electrical and lighting supplies 2026'}
-                    </p>
-                  </div>
-                </div>
-
-                <a
-                  href="/products"
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs md:text-sm transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:scale-105 active:scale-95 shrink-0 flex items-center gap-2"
-                >
-                  <span>{isAr ? 'استكشف المنتجات والمواصفات' : 'Explore Products & Specs'}</span>
-                  <ChevronLeft className="w-4 h-4" />
-                </a>
               </div>
             </div>
 
