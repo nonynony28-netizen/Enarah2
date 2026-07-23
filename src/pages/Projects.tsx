@@ -173,7 +173,7 @@ export default function Projects() {
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className={`mb-6 flex ${isAr ? 'justify-start' : 'justify-start'}`}>
-            <Link to="/" className={`inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-orange-500/50 rounded-xl text-slate-300 hover:text-orange-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] ${
+            <Link to="/" className={`inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] ${
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
               <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
@@ -186,18 +186,18 @@ export default function Projects() {
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
-              {isAr ? 'جزء من' : 'Part of'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 drop-shadow-[0_4px_15px_rgba(249,115,22,0.4)]">{isAr ? 'مشاريعنا' : 'Our Projects'}</span>
+              {isAr ? 'جزء من' : 'Part of'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_20px_rgba(59,130,246,0.4)]">{isAr ? 'مشاريعنا' : 'Our Projects'}</span>
             </h1>
-            <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm">
+            <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm font-medium">
               {isAr 
                 ? 'استعرض أبرز المشاريع التجارية والسكينة التي تم توريد وتنفيذ الإنارة والتأسيس الكهربائي لها بالكامل'
                 : 'Browse prominent commercial and residential projects fully supplied and executed with our lighting and wiring solutions'
               }
             </p>
             <div className="flex items-center justify-center gap-1.5 mt-6">
-              <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-orange-500 rounded-full" />
-              <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse shadow-[0_0_8px_#f97316]" />
-              <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-orange-500 rounded-full" />
+              <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
+              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
+              <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
             </div>
           </div>
         </FadeIn>
@@ -205,16 +205,16 @@ export default function Projects() {
         {/* شاشة التحميل */}
         {loading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-32">
-            <Loader2 className="w-16 h-16 text-orange-400 animate-spin relative z-10 drop-shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
-            <p className="text-orange-100 mt-6 font-medium text-lg animate-pulse">{isAr ? 'جاري جلب أحدث المشاريع...' : 'Fetching latest projects...'}</p>
+            <Loader2 className="w-16 h-16 text-blue-400 animate-spin relative z-10 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+            <p className="text-blue-100 mt-6 font-medium text-lg animate-pulse">{isAr ? 'جاري جلب أحدث المشاريع...' : 'Fetching latest projects...'}</p>
           </motion.div>
         )}
 
         {/* لا يوجد مشاريع */}
         {!loading && projects.length === 0 && (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-12 text-center max-w-2xl mx-auto shadow-2xl">
-            <div className="w-24 h-24 bg-orange-500/10 border border-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(249,115,22,0.15)]">
-              <PackageSearch className="w-12 h-12 text-orange-400 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
+            <div className="w-24 h-24 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+              <PackageSearch className="w-12 h-12 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-3">{isAr ? 'لا توجد مشاريع مضافة حالياً' : 'No projects available currently'}</h3>
             <p className="text-slate-400 text-base leading-relaxed">
@@ -234,7 +234,7 @@ export default function Projects() {
                 <div 
                   onClick={() => openGallery(project)}
                   style={{ willChange: "transform, opacity" }} 
-                  className={`group relative bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden hover:border-orange-500/50 transition-all duration-300 hover:-translate-y-2 shadow-xl flex flex-col h-full cursor-pointer ${
+                  className={`group relative bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2 shadow-xl flex flex-col h-full cursor-pointer ${
                     isAr ? 'text-right' : 'text-left'
                   }`}
                 >
@@ -244,7 +244,7 @@ export default function Projects() {
                     
                     {/* شارة التصنيف */}
                     <div className={`absolute top-4 z-20 ${isAr ? 'right-4' : 'left-4'}`}>
-                      <span className="px-4 py-1.5 bg-[#0a192f]/80 border border-orange-500/30 text-orange-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                      <span className="px-4 py-1.5 bg-[#0a192f]/80 border border-blue-500/30 text-blue-300 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         {project.category}
                       </span>
                     </div>
