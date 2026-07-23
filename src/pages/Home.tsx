@@ -464,9 +464,12 @@ export default function Home() {
 
         {/* 1. الواجهة الترحيبية بالفيديو فائق السرعة */}
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] overflow-hidden flex items-center justify-center">
+          <div 
+            className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] bg-cover bg-center overflow-hidden flex items-center justify-center"
+            style={{ backgroundImage: "url('/poster.jpg')" }}
+          >
             
-            {/* فيديو الخلفية الترحيبي فائق السرعة والمسرّع بالعتاد يعمل على كافة الهواتف والحواسيب */}
+            {/* فيديو الخلفية الترحيبي فائق السرعة: فتح واستجابة فورية 0 ثواني تأخير */}
             <video
               ref={videoRef}
               key={heroVideoUrl}
@@ -474,9 +477,11 @@ export default function Home() {
               loop
               muted
               playsInline
-              preload="metadata"
+              preload="auto"
               poster="/poster.jpg"
-              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-50 z-0"
+              onCanPlay={(e) => { e.currentTarget.play().catch(() => {}); }}
+              onLoadedData={(e) => { e.currentTarget.play().catch(() => {}); }}
+              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-60 z-0"
               style={{ transform: 'translateZ(0)', willChange: 'transform' }}
             >
               <source src={heroVideoUrl} type="video/mp4" />
