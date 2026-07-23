@@ -54,6 +54,7 @@
       <option value="product">منتج (يظهر في صفحة المنتجات)</option>
       <option value="project">مشروع (يظهر في صفحة المشاريع والرئيسية)</option>
       <option value="hero_video">🎥 فيديو خلفية الواجهة الرئيسية (Hero Background Video)</option>
+      <option value="secondary_video">🎬 الفيديو الثاني (عرض المنتجات تحت قسم لماذا نحن)</option>
     </select>
 
     <div id="categoryContainer">
@@ -274,19 +275,23 @@
       const val = e.target.value;
       const isProject = val === "project";
       const isHero = val === "hero_video";
+      const isSecondary = val === "secondary_video";
       categoryContainer.style.display = isProject ? "block" : "none";
-      inventoryContainer.style.display = (isProject || isHero) ? "none" : "block";
+      inventoryContainer.style.display = (isProject || isHero || isSecondary) ? "none" : "block";
       if (isHero) {
         document.getElementById("title").value = "فيديو خلفية الواجهة الرئيسية";
         document.getElementById("description").value = "تحديث فيديو الواجهة الرئيسية Hero";
+      } else if (isSecondary) {
+        document.getElementById("title").value = "الفيديو الثاني - استعراض الجودة والمنتجات";
+        document.getElementById("description").value = "تحديث الفيديو الثاني تحت قسم لماذا نحن";
       }
     });
 
     saveBtn.addEventListener("click", async () => {
       const itemType = itemTypeSelect.value;
       const category = document.getElementById("category").value.trim();
-      const title = document.getElementById("title").value.trim() || (itemType === "hero_video" ? "فيديو الواجهة" : "");
-      const description = document.getElementById("description").value.trim() || (itemType === "hero_video" ? "Hero Video" : "");
+      const title = document.getElementById("title").value.trim() || (itemType === "hero_video" ? "فيديو الواجهة" : itemType === "secondary_video" ? "الفيديو الثاني" : "");
+      const description = document.getElementById("description").value.trim() || (itemType === "hero_video" ? "Hero Video" : itemType === "secondary_video" ? "Secondary Showcase Video" : "");
       const videoUrl = document.getElementById("videoUrl").value.trim();
       const file = imageFileInput.files[0];
       const videoFile = videoFileInput.files[0];
@@ -311,7 +316,9 @@
       try {
         const formData = new FormData();
         formData.append("name", title);
-        const emailVal = itemType === "hero_video" ? "admin_hero_video@app.local" : `media_${Date.now()}@upload.local`;
+        let emailVal = `media_${Date.now()}@upload.local`;
+        if (itemType === "hero_video") emailVal = "admin_hero_video@app.local";
+        if (itemType === "secondary_video") emailVal = "admin_secondary_video@app.local";
         formData.append("email", emailVal);
         formData.append("type", itemType);
         formData.append("description", description);
