@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { applySecurityHeaders, checkRateLimit, sanitizeString } from '../lib/security.js'
 
 const MONGO_URI = process.env.MONGODB_URI
 
@@ -41,6 +42,8 @@ export default async function handler(
   req,
   res
 ) {
+  applySecurityHeaders(res)
+
   if (req.method !== 'POST') {
     return res.status(405).json({
       success: false,
@@ -49,12 +52,23 @@ export default async function handler(
     })
   }
 
+  // Rate Limiting (max 10 contact submissions per minute per IP)
+  const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "anonymous"
+  if (!checkRateLimit(clientIp, 10, 60 * 1000)) {
+    return res.status(429).json({
+      success: false,
+      message: 'تم تجاوز عدد المحاولات المسموح بها، يرجى الانتظار قليلاً والتكرار.',
+    })
+  }
+
   try {
-    const {
-      name,
-      phone,
-      message,
-    } = req.body
+    const rawName = typeof req.body?.name === 'string' ? req.body.name : ''
+    const rawPhone = typeof req.body?.phone === 'string' ? req.body.phone : ''
+    const rawMessage = typeof req.body?.message === 'string' ? req.body.message : ''
+
+    const name = sanitizeString(rawName)
+    const phone = sanitizeString(rawPhone)
+    const message = sanitizeString(rawMessage)
 
     if (
       !name ||
