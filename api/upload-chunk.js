@@ -1,6 +1,7 @@
 // file name: api/upload-chunk.js
 
 import { uploadVideoToR2 } from "../lib/r2.js";
+import { uploadSingleImage } from "../lib/multer.js";
 import { applySecurityHeaders } from "../lib/security.js";
 
 // Global in-memory storage for active chunked upload sessions
@@ -15,6 +16,21 @@ setInterval(() => {
     }
   }
 }, 10 * 60 * 1000);
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) return reject(result);
+      return resolve(result);
+    });
+  });
+}
+
+export const config = {
+  api: {
+    bodyParser: false, // Disable default bodyParser to handle binary FormData chunks
+  },
+};
 
 export default async function handler(req, res) {
   applySecurityHeaders(res);
@@ -37,34 +53,42 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, error: "Unauthorized: Invalid admin password" });
     }
 
-    let body = req.body || {};
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {}
+    // Parse binary FormData chunk with Multer
+    try {
+      await runMiddleware(req, res, uploadSingleImage);
+    } catch (err) {
+      console.warn("Multer chunk notice:", err.message);
     }
 
-    const { uploadId, chunkIndex, totalChunks, chunkData, mimeType } = body;
+    const body = req.body || {};
+    const uploadId = body.uploadId;
+    const chunkIndex = parseInt(body.chunkIndex, 10);
+    const totalChunks = parseInt(body.totalChunks, 10);
+    const mimeType = body.mimeType || "video/mp4";
 
-    if (!uploadId || chunkIndex === undefined || !totalChunks || !chunkData) {
-      return res.status(400).json({ success: false, error: "بيانات الحزمة غير مكتملة." });
+    let chunkBuffer = null;
+    if (req.files && req.files.chunk && req.files.chunk[0]) {
+      chunkBuffer = req.files.chunk[0].buffer;
+    } else if (req.files && req.files.image && req.files.image[0]) {
+      chunkBuffer = req.files.image[0].buffer;
     }
 
-    // Convert Base64 chunk to Buffer
-    const bufferChunk = Buffer.from(chunkData, "base64");
+    if (!uploadId || isNaN(chunkIndex) || isNaN(totalChunks) || !chunkBuffer) {
+      return res.status(400).json({ success: false, error: "بيانات الجزء المرفوع غير مكتملة." });
+    }
 
     let session = chunkStore.get(uploadId);
     if (!session) {
       session = {
         chunks: new Array(totalChunks),
         receivedCount: 0,
-        mimeType: mimeType || "video/mp4",
+        mimeType: mimeType,
         createdAt: Date.now(),
       };
       chunkStore.set(uploadId, session);
     }
 
-    session.chunks[chunkIndex] = bufferChunk;
+    session.chunks[chunkIndex] = chunkBuffer;
     session.receivedCount++;
 
     // When all chunks arrive
