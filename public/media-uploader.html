@@ -316,38 +316,56 @@
       try {
         let uploadedDirectVideoUrl = videoUrl;
 
-        // في حال اختيار ملف فيديو: نقوم برفعه مباشرة لـ Cloudflare R2 بدون الحجم المحظور بالسيرفر
+        // في حال اختيار ملف فيديو: نقوم بتقسيمه لأجزاء (Chunks) 1MB لضمان رفعه بدون حد الحجم
         if (videoFile) {
-          saveBtn.textContent = "🎬 جاري رفع الفيديو مباشرة إلى Cloudflare R2...";
-          
-          const presignRes = await fetch("https://enarah2.vercel.app/api/get-r2-upload-url", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-admin-password": pwd
-            },
-            body: JSON.stringify({ fileType: videoFile.type || "video/mp4" })
-          });
+          const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB كل جزء
+          const totalChunks = Math.ceil(videoFile.size / CHUNK_SIZE);
+          const uploadId = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-          const presignData = await presignRes.json();
-          if (!presignRes.ok || !presignData.success) {
-            throw new Error(presignData.error || "فشل الحصول على رابط رفع الفيديو.");
+          saveBtn.textContent = `🎬 جاري تحضير رفع الفيديو (${totalChunks} أجزاء)...`;
+
+          for (let i = 0; i < totalChunks; i++) {
+            const start = i * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, videoFile.size);
+            const blobChunk = videoFile.slice(start, end);
+
+            // تحويل الجزء إلى Base64
+            const arrayBuffer = await blobChunk.arrayBuffer();
+            const bytes = new Uint8Array(arrayBuffer);
+            let binary = "";
+            const len = bytes.byteLength;
+            for (let b = 0; b < len; b++) {
+              binary += String.fromCharCode(bytes[b]);
+            }
+            const base64Chunk = btoa(binary);
+
+            const percent = Math.round(((i + 1) / totalChunks) * 100);
+            saveBtn.textContent = `🎬 جاري رفع الفيديو (الجزء ${i + 1} من ${totalChunks} - ${percent}%)...`;
+
+            const chunkRes = await fetch("https://enarah2.vercel.app/api/upload-chunk", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-admin-password": pwd
+              },
+              body: JSON.stringify({
+                uploadId,
+                chunkIndex: i,
+                totalChunks,
+                chunkData: base64Chunk,
+                mimeType: videoFile.type || "video/mp4"
+              })
+            });
+
+            const chunkData = await chunkRes.json();
+            if (!chunkRes.ok || !chunkData.success) {
+              throw new Error(chunkData.error || `فشل رفع الجزء ${i + 1} من الفيديو.`);
+            }
+
+            if (chunkData.isComplete && chunkData.publicUrl) {
+              uploadedDirectVideoUrl = chunkData.publicUrl;
+            }
           }
-
-          // رفع الفيديو مباشرة عبر R2 Presigned Upload URL
-          const uploadToR2Res = await fetch(presignData.uploadUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": videoFile.type || "video/mp4"
-            },
-            body: videoFile
-          });
-
-          if (!uploadToR2Res.ok) {
-            throw new Error("فشل رفع ملف الفيديو مباشرة إلى Cloudflare R2.");
-          }
-
-          uploadedDirectVideoUrl = presignData.publicUrl;
         }
 
         saveBtn.textContent = "💾 جاري حفظ البيانات في قاعدة البيانات...";
