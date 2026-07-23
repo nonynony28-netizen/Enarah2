@@ -41,8 +41,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Alexandria', 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
-    letter-spacing: -0.015em;
+    font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: 0em;
   }
   .ltr-layout body, [dir="ltr"] body {
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
