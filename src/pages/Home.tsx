@@ -181,7 +181,14 @@ export default function Home() {
     }
     return defaultWireData
   })
-  
+
+  const [heroVideoUrl, setHeroVideoUrl] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('enarah_cached_hero_video') || '/bg-video.mp4'
+    }
+    return '/bg-video.mp4'
+  })
+
   const { addToCart, triggerFlyAnimation } = useCart()
   const [addingId, setAddingId] = useState<string | null>(null)
 
@@ -322,6 +329,18 @@ export default function Home() {
           setFeaturedProjects(loadedProjects)
           localStorage.setItem('enarah_cached_featured_projects', JSON.stringify(loadedProjects))
 
+          const heroVideoEntry = data.data.find((item: any) => item.email === 'admin_hero_video@app.local' || item.type === 'hero_video')
+          if (heroVideoEntry) {
+            try {
+              const videoObj = JSON.parse(heroVideoEntry.phone)
+              const vidUrl = videoObj.videoUrl || videoObj.imageUrl
+              if (vidUrl) {
+                setHeroVideoUrl(vidUrl)
+                localStorage.setItem('enarah_cached_hero_video', vidUrl)
+              }
+            } catch {}
+          }
+
           const wireUpdates = data.data.filter((item: any) => item.email === 'admin_wire_prices@app.local')
           if (wireUpdates.length > 0) {
              const chronological = wireUpdates.reverse() 
@@ -431,6 +450,7 @@ export default function Home() {
             {/* فيديو الخلفية الترحيبي فائق السرعة والمسرّع بالعتاد يعمل على كافة الهواتف والحواسيب */}
             <video
               ref={videoRef}
+              key={heroVideoUrl}
               autoPlay
               loop
               muted
@@ -440,7 +460,7 @@ export default function Home() {
               className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-50 z-0"
               style={{ transform: 'translateZ(0)', willChange: 'transform' }}
             >
-              <source src="/bg-video.mp4" type="video/mp4" />
+              <source src={heroVideoUrl} type="video/mp4" />
             </video>
             
             {/* طبقة تظليل داكنة إضافية لضمان راحة العين ووضوح النصوص بنسبة 100% */}
