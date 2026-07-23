@@ -723,14 +723,14 @@ export default function Home() {
         </section>
 
         {/* =========================================================
-            قسم عرض الفيديو الثاني (بدون عنوان - مشغل تلقائي مستمر)
+            قسم عرض الفيديو الثاني (بعرض الشاشة الكاملة على جميع الأجهزة)
             ========================================================= */}
-        <section id="showcase-video" className="py-12 md:py-16 relative overflow-hidden bg-transparent border-t border-white/[0.05]">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <section id="showcase-video" className="w-full py-6 md:py-10 relative overflow-hidden bg-transparent border-y border-blue-500/20">
+          <div className="w-full relative z-10">
             
-            {/* مسرح الفيديو الثاني - يعمل تلقائياً وباستمرار بدون عناوين */}
-            <div className="relative rounded-[2.5rem] overflow-hidden border border-blue-500/30 bg-[#0a192f]/90 shadow-[0_0_50px_rgba(59,130,246,0.25)] group">
-              <div className="relative aspect-video w-full overflow-hidden bg-black flex items-center justify-center">
+            {/* مسرح الفيديو الثاني بعرض الشاشة الكاملة 100% بدون أي حواف جانبية */}
+            <div className="relative w-full overflow-hidden bg-black shadow-[0_0_50px_rgba(59,130,246,0.25)]">
+              <div className="relative w-full aspect-video md:aspect-[21/9] max-h-[85vh] overflow-hidden flex items-center justify-center">
                 <video
                   key={secondaryVideoUrl}
                   autoPlay
@@ -740,7 +740,7 @@ export default function Home() {
                   preload="auto"
                   poster="/poster.jpg"
                   className="w-full h-full object-cover"
-                  style={{ transform: 'translateZ(0)' }}
+                  style={{ transform: 'translateZ(0)', willChange: 'transform' }}
                 >
                   <source src={secondaryVideoUrl} type="video/mp4" />
                 </video>
