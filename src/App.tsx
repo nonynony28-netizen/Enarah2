@@ -8,7 +8,6 @@ import AIChatWidget from './components/AIChatWidget'
 import Layout from './Layout'
 
 import Home from './pages/Home'
-import ElectraHero from './components/ElectraHero'
 import Products from './pages/Products'
 import Brands from './pages/Brands'
 import Projects from './pages/Projects'
@@ -83,9 +82,7 @@ function App() {
     <>
       <Routes>
         <Route element={<Layout />}>
-          <Route path="/" element={<PageTransition><ElectraHero /></PageTransition>} />
-          <Route path="/electra" element={<PageTransition><ElectraHero /></PageTransition>} />
-          <Route path="/original-home" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
           <Route path="/brands" element={<PageTransition><Brands /></PageTransition>} />
           <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
