@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
+import HeroScrollCanvas from '../components/HeroScrollCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
@@ -501,37 +502,13 @@ export default function Home() {
 
 
 
-        {/* 1. الواجهة الترحيبية بالفيديو فائق السرعة */}
-        <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-          <div 
-            className="absolute inset-0 w-full h-full z-0 bg-[#060d19] bg-cover bg-center overflow-hidden flex items-center justify-center"
-            style={{ backgroundImage: "url('/poster.jpg')" }}
-          >
-            
-            {/* فيديو الخلفية الترحيبي الأصلي بدقة ووضوح كامل 100% بدون تظليل، يتوقف عند نهاية لقطة لمعة اللمبة */}
-            <video
-              ref={videoRef}
-              key={heroVideoUrl}
-              src={heroVideoUrl}
-              autoPlay
-              muted
-              defaultMuted
-              playsInline
-              webkit-playsinline="true"
-              preload="auto"
-              poster="/poster.jpg"
-              onLoadedMetadata={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
-              onCanPlay={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
-              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-100 z-0"
-              style={{ transform: 'translateZ(0)', willChange: 'transform' }}
-            />
-            
-            {/* تدرج سفلي ناعم فقط لانسجام الحافة السفلية مع باقي الموقع */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060d19]/80 pointer-events-none" />
-          </div>
+        {/* 1. الواجهة الترحيبية التفاعلية المرتبطة بنظام التمرير (Apple-Style 3D Scroll Sequence) */}
+        <section id="hero" className="relative w-full overflow-hidden">
+          <HeroScrollCanvas totalFrames={192} folderPath="/hero-sequence" />
 
-          <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
-
+          {/* محتوى النصوص والترحيب عائم فوق حركة التمرير التفاعلية */}
+          <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-start pt-24 md:pt-36 z-10">
+            <div className="sticky top-[28%] md:top-[32%] max-w-5xl mx-auto px-4 text-center pointer-events-auto">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-normal tracking-tight text-white py-2">
                 <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">{t('hero.title.part1')}</span>{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500 drop-shadow-[0_0_35px_rgba(56,189,248,0.6)]">{t('hero.title.part2')}</span>
@@ -539,6 +516,7 @@ export default function Home() {
               
               <p className="text-base md:text-2xl text-slate-200 mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
             </div>
+          </div>
         </section>
 
         {/* 2. لماذا نحن - شريحة ميزات تفاعلية عالمية (World-Class Interactive Feature Showcase) */}
