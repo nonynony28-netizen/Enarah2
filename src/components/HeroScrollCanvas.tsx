@@ -26,8 +26,8 @@ export const HeroScrollCanvas: React.FC<HeroScrollCanvasProps> = ({
     offset: ["start start", "end end"]
   });
 
-  // ربط قيمة السكرول برقم الإطار من 1 إلى 192
-  const currentFrame = useTransform(scrollYProgress, [0, 1], [1, totalFrames]);
+  // ربط قيمة السكرول برقم الإطار من 1 إلى 192 بحيث ينتهي التسلسل عند 82% من التمرير ويستقر بسلاسة
+  const currentFrame = useTransform(scrollYProgress, [0, 0.82], [1, totalFrames]);
 
   // 1. التحميل المسبق لجميع الإطارات الـ 192 في الذاكرة لمنع أي تقطيع
   useEffect(() => {
@@ -135,7 +135,7 @@ export const HeroScrollCanvas: React.FC<HeroScrollCanvasProps> = ({
   }, [loadedCount]);
 
   return (
-    <div ref={containerRef} className={`relative h-[300vh] w-full ${className}`}>
+    <div ref={containerRef} className={`relative h-[160vh] md:h-[180vh] w-full ${className}`}>
       {/* حاوية ثابتة طوال فترة التمرير */}
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-[#060d19]">
         <canvas

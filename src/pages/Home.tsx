@@ -136,9 +136,10 @@ const getLocalizedProject = (project: { name: string; category: string; descript
 }
 
 function HeroTextOverlay({ scrollYProgress, t, isAr }: { scrollYProgress: any; t: any; isAr: boolean }) {
-  const textOpacity = useTransform(scrollYProgress, [0.12, 0.45], [0, 1]);
-  const textY = useTransform(scrollYProgress, [0.12, 0.45], [35, 0]);
-  const textScale = useTransform(scrollYProgress, [0.12, 0.45], [0.93, 1]);
+  // تدرج السطوع: يظهر عند توهج اللمبة (0.05 -> 0.35) ويختفي بنعومة مع الانتقال للقسم التالي (0.75 -> 0.90)
+  const textOpacity = useTransform(scrollYProgress, [0.05, 0.35, 0.75, 0.90], [0, 1, 1, 0]);
+  const textY = useTransform(scrollYProgress, [0.05, 0.35, 0.75, 0.90], [30, 0, 0, -30]);
+  const textScale = useTransform(scrollYProgress, [0.05, 0.35, 0.75, 0.90], [0.94, 1, 1, 0.95]);
 
   return (
     <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 px-4 pt-16 md:pt-20">
