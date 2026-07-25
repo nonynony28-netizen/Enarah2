@@ -47,6 +47,42 @@ export default function Layout() {
     return () => window.removeEventListener('themechange', handleThemeChange)
   }, [])
 
+  const playClickSound = (isTurningOn: boolean) => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      if (isTurningOn) {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.06);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+
+        osc.start(now);
+        osc.stop(now + 0.06);
+      }
+    } catch {
+      // تجاهل محركات الصوت عند التقييد تلقائياً
+    }
+  }
+
   useEffect(() => {
     const calcScroll = () => {
       const scrollTop = window.scrollY || window.pageYOffset || 0
@@ -102,37 +138,6 @@ export default function Layout() {
       document.documentElement.style.setProperty('--pull-dim-opacity', String(opacity))
     })
   }, [y, maxDrag])
-
-  const playClickSound = (isTurningOn: boolean) => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      
-      const now = audioCtx.currentTime;
-      if (isTurningOn) {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(800, now);
-        osc.frequency.exponentialRampToValueAtTime(1500, now + 0.04);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-        osc.start(now);
-        osc.stop(now + 0.05);
-      } else {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-        osc.start(now);
-        osc.stop(now + 0.06);
-      }
-    } catch (e) {
-      console.log('Audio error:', e);
-    }
-  }
 
   const toggleThemeGlobal = () => {
     const root = window.document.documentElement
