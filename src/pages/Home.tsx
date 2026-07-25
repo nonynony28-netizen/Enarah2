@@ -184,18 +184,32 @@ export default function Home() {
       forcePlayMobileVideo(secondaryVideoRef.current);
     };
 
-    // تشغيل فوري للجوال
     playAll();
 
-    // استجابة فورية لأول إيماءة أو تمرير في شاشات الآيفون والأندرويد (تغلب كامل على Low Power Mode)
     window.addEventListener('touchstart', playAll, { passive: true });
     window.addEventListener('scroll', playAll, { passive: true });
     window.addEventListener('pointerdown', playAll, { passive: true });
+
+    // مراقب التصفح: عند العودة لقسم الهيرو، يعاد تشغيل الفيديو من البداية ويتوقف عند آخر لقطة (لمعة اللمبة)
+    const heroEl = document.getElementById('hero');
+    let observer: IntersectionObserver | null = null;
+    if (heroEl) {
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && videoRef.current) {
+            videoRef.current.currentTime = 0;
+            forcePlayMobileVideo(videoRef.current);
+          }
+        });
+      }, { threshold: 0.25 });
+      observer.observe(heroEl);
+    }
 
     return () => {
       window.removeEventListener('touchstart', playAll);
       window.removeEventListener('scroll', playAll);
       window.removeEventListener('pointerdown', playAll);
+      if (observer) observer.disconnect();
     };
   }, [heroVideoUrl, secondaryVideoUrl])
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
@@ -494,13 +508,12 @@ export default function Home() {
             style={{ backgroundImage: "url('/poster.jpg')" }}
           >
             
-            {/* فيديو الخلفية الترحيبي فائق السرعة: فتح واستجابة فورية 0 ثواني تأخير */}
+            {/* فيديو الخلفية الترحيبي الأصلي بدقة ووضوح كامل 100% بدون تظليل، يتوقف عند نهاية لقطة لمعة اللمبة */}
             <video
               ref={videoRef}
               key={heroVideoUrl}
               src={heroVideoUrl}
               autoPlay
-              loop
               muted
               defaultMuted
               playsInline
@@ -509,14 +522,12 @@ export default function Home() {
               poster="/poster.jpg"
               onLoadedMetadata={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
               onCanPlay={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
-              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-60 z-0"
+              className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-100 z-0"
               style={{ transform: 'translateZ(0)', willChange: 'transform' }}
             />
             
-            {/* طبقة تظليل داكنة إضافية لضمان راحة العين ووضوح النصوص بنسبة 100% */}
-            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-            
-            <div className="absolute inset-0 bg-gradient-to-b from-[#060d19]/40 via-transparent to-[#060d19] pointer-events-none" />
+            {/* تدرج سفلي ناعم فقط لانسجام الحافة السفلية مع باقي الموقع */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060d19]/80 pointer-events-none" />
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
