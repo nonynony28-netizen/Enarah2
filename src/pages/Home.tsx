@@ -152,7 +152,7 @@ export default function Home() {
   const spotlightRotate = useTransform(scrollYProgress, [0, 0.6], [0, -12])
   const bulbAuraOpacity = useTransform(scrollYProgress, [0, 0.45], [0.1, 0.85])
 
-  const [pageLoading, setPageLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const secondaryVideoRef = useRef<HTMLVideoElement>(null)
 
