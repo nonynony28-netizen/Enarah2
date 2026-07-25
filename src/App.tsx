@@ -27,11 +27,11 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [loading, setLoading] = useState(true)
 
-  // 1. شاشة البداية فائقة السلاسة والسرعة
+  // 1. شاشة البداية العادية والأنيقة
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 900)
+    }, 1600)
     return () => clearTimeout(timer)
   }, [])
 
@@ -60,7 +60,7 @@ function App() {
 
   return (
     <>
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {loading && <SplashScreen key="splash" />}
       </AnimatePresence>
       <Routes>

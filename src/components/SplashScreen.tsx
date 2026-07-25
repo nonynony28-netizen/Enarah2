@@ -9,18 +9,17 @@ export default function SplashScreen() {
       initial={{ opacity: 1 }}
       exit={{ 
         opacity: 0, 
-        scale: 1.02,
-        transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } 
+        transition: { duration: 0.5, ease: "easeInOut" } 
       }}
-      className="fixed inset-0 bg-[#02050c] flex flex-col items-center justify-start overflow-hidden z-[9999] pt-0 will-change-transform transform-gpu select-none"
+      className="fixed inset-0 bg-[#02050c] flex flex-col items-center justify-start overflow-hidden z-[9999] pt-0 select-none"
     >
       
-      {/* 1. هيكل المصباح المتدلي والفتيل الهابط من السقف */}
+      {/* 1. هيكل المصباح واللمبة متزامنان تماماً بدون أي التواء أو انزلاق */}
       <motion.div
-        initial={{ y: -250, opacity: 0 }}
+        initial={{ y: -140, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="relative flex flex-col items-center z-20 pointer-events-none transform-gpu"
+        transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+        className="relative flex flex-col items-center z-20 pointer-events-none"
       >
         {/* قاعدة التثبيت في السقف */}
         <div className="w-8 h-3 md:w-10 md:h-3.5 bg-slate-800 rounded-b-lg border-b border-slate-700 shadow-md" />
@@ -40,11 +39,11 @@ export default function SplashScreen() {
             <ellipse cx="32" cy="34" rx="24" ry="4" fill="#3b82f6" fillOpacity="0.85" />
           </svg>
 
-          {/* اللمبة المتوهجة باللون الأزرق */}
+          {/* اللمبة المتوهجة بضوء أزرق ناعم */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.25, delay: 0.2, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.4, ease: "easeOut" }}
             className="absolute bottom-[-8px] md:bottom-[-10px] w-5 h-5 md:w-6 md:h-6 rounded-full bg-sky-100 border border-sky-300"
             style={{
               boxShadow: "0 0 15px #3b82f6, 0 0 30px #3b82f6"
@@ -53,12 +52,12 @@ export default function SplashScreen() {
         </div>
       </motion.div>
 
-      {/* 2. مخروط الضوء الأزرق المتوهج (Volumetric Light Beam) */}
+      {/* 2. مخروط الضوء الأزرق يظهر بعد استقرار اللمبة مباشرة وبدون تشويه */}
       <motion.div
-        initial={{ opacity: 0, scaleY: 0.7 }}
-        animate={{ opacity: 0.9, scaleY: 1 }}
-        transition={{ duration: 0.35, delay: 0.25, ease: "easeOut" }}
-        className="absolute top-[136px] md:top-[190px] left-0 right-0 mx-auto w-[320px] md:w-[500px] h-[240px] md:h-[320px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible transform-gpu"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.85 }}
+        transition={{ duration: 0.5, delay: 0.5, ease: "easeOut" }}
+        className="absolute top-[136px] md:top-[190px] left-0 right-0 mx-auto w-[320px] md:w-[500px] h-[240px] md:h-[320px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible"
       >
         <svg width="100%" height="100%" viewBox="0 0 500 340" preserveAspectRatio="none">
           <defs>
@@ -78,8 +77,8 @@ export default function SplashScreen() {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center transform-gpu"
+          transition={{ duration: 0.5, delay: 0.6, ease: [0.25, 1, 0.5, 1] }}
+          className="flex flex-col items-center"
         >
           {/* اسم الشعار */}
           <h1
@@ -94,11 +93,11 @@ export default function SplashScreen() {
           {/* خط الفاصل المتوهج */}
           <div className="h-0.5 w-[140px] md:w-[180px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-3 md:mt-4 opacity-80" />
 
-          {/* الجملة الصغيرة بالأسفل (نضيء عالمك) */}
+          {/* الجملة الصغيرة بالأسفل */}
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.45, ease: "easeOut" }}
+            transition={{ duration: 0.4, delay: 0.75, ease: "easeOut" }}
             className="text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.4)]"
           >
             {isAr ? 'نضيء عالمك' : 'Lighting Your World'}
