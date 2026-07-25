@@ -3,167 +3,109 @@ import { useLanguage } from "../hooks/useLanguage";
 
 export default function SplashScreen() {
   const { isAr } = useLanguage();
-  // متغيرات حركة إضاءة اللمبة (إضاءة واحدة ناعمة ومتصلة)
-  const bulbVariants = {
-    off: { opacity: 0 },
-    on: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        delay: 1.1,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  // حركة مخروط الضوء الأزرق المتوهج (تلاشي وظهور واحد سلس)
-  const beamVariants = {
-    off: { opacity: 0, scaleY: 0.85 },
-    on: {
-      opacity: 0.95,
-      scaleY: 1,
-      transition: {
-        duration: 0.7,
-        delay: 1.1,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  // حركة ظهور وتوهج الشعار باللون الأزرق الكامل (يظهر بعد تسليط الضوء بـ 0.2 ثانية)
-  const textVariants = {
-    off: { opacity: 0, scale: 0.96, filter: "drop-shadow(0 0 0px rgba(59,130,246,0))" },
-    on: {
-      opacity: 1,
-      scale: 1,
-      filter: "drop-shadow(0 0 25px rgba(59,130,246,0.85))",
-      transition: {
-        duration: 0.8,
-        delay: 1.3, // يبدأ الظهور بعد تسليط الضوء مباشرة
-        ease: "easeOut"
-      }
-    }
-  };
 
   return (
-    <div className="fixed inset-0 bg-[#02050c] flex flex-col items-center justify-start overflow-hidden z-[9999] pt-0">
+    <motion.div 
+      initial={{ opacity: 1 }}
+      exit={{ 
+        opacity: 0, 
+        scale: 1.02,
+        transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } 
+      }}
+      className="fixed inset-0 bg-[#02050c] flex flex-col items-center justify-start overflow-hidden z-[9999] pt-0 will-change-transform transform-gpu select-none"
+    >
       
-      {/* 1. هيكل المصباح المتدلي والفتيل الهابط من السقف - متناسق الأبعاد مع الهواتف */}
+      {/* 1. هيكل المصباح المتدلي والفتيل الهابط من السقف */}
       <motion.div
-        initial={{ y: -350 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 95, damping: 16, delay: 0.1 }}
-        className="relative flex flex-col items-center z-20 pointer-events-none"
+        initial={{ y: -250, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="relative flex flex-col items-center z-20 pointer-events-none transform-gpu"
       >
-        {/* قاعدة التثبيت في السقف (البورتو) */}
+        {/* قاعدة التثبيت في السقف */}
         <div className="w-8 h-3 md:w-10 md:h-3.5 bg-slate-800 rounded-b-lg border-b border-slate-700 shadow-md" />
         
-        {/* سلك التعليق النحيف - طول أقصر على الهواتف لمنع الاقتصاص */}
-        <div className="w-[1.5px] h-[120px] md:h-[180px] bg-slate-600 shadow-[0_0_5px_rgba(59,130,246,0.2)]" />
+        {/* سلك التعليق النحيف */}
+        <div className="w-[1.5px] h-[100px] md:h-[150px] bg-slate-600 shadow-[0_0_5px_rgba(59,130,246,0.2)]" />
         
-        {/* جسم المصباح العصري - متدرج الحجم */}
+        {/* جسم المصباح */}
         <div className="relative flex flex-col items-center">
           <svg 
-            className="w-[54px] h-[36px] md:w-[64px] md:h-[42px] drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]" 
+            className="w-[54px] h-[36px] md:w-[64px] md:h-[42px]" 
             viewBox="0 0 64 42" fill="none"
           >
-            {/* حلقة التثبيت العلوية */}
             <rect x="28" y="0" width="8" height="5" rx="1.5" fill="#475569" />
-            {/* قبعة المصباح */}
             <path d="M22 5H42V10H22V5Z" fill="#3b82f6" />
-            {/* المظلة أو الغطاء القبة الرئيسي */}
             <path d="M8 34C8 20 18 10 32 10C46 10 56 20 56 34H8Z" fill="#111827" stroke="#374151" strokeWidth="2" />
-            {/* حافة الزينة السفلية باللون الأزرق */}
-            <ellipse cx="32" cy="34" rx="24" ry="4" fill="#3b82f6" fillOpacity="0.75" />
+            <ellipse cx="32" cy="34" rx="24" ry="4" fill="#3b82f6" fillOpacity="0.85" />
           </svg>
 
-          {/* اللمبة المتوهجة الفعالة باللون الأزرق */}
+          {/* اللمبة المتوهجة باللون الأزرق */}
           <motion.div 
-            variants={bulbVariants}
-            initial="off"
-            animate="on"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.25, delay: 0.2, ease: "easeOut" }}
             className="absolute bottom-[-8px] md:bottom-[-10px] w-5 h-5 md:w-6 md:h-6 rounded-full bg-sky-100 border border-sky-300"
             style={{
-              boxShadow: "0 0 15px #3b82f6, 0 0 35px #3b82f6, inset 0 0 6px #ffffff"
+              boxShadow: "0 0 15px #3b82f6, 0 0 30px #3b82f6"
             }}
           />
         </div>
       </motion.div>
 
-      {/* 2. مخروط الضوء الأزرق المتوهج (Volumetric SVG Light Beam) - متناسق الأبعاد مع الهواتف */}
+      {/* 2. مخروط الضوء الأزرق المتوهج (Volumetric Light Beam) */}
       <motion.div
-        variants={beamVariants}
-        initial="off"
-        animate="on"
-        className="absolute top-[156px] md:top-[220px] left-0 right-0 mx-auto w-[320px] md:w-[500px] h-[260px] md:h-[340px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible"
+        initial={{ opacity: 0, scaleY: 0.7 }}
+        animate={{ opacity: 0.9, scaleY: 1 }}
+        transition={{ duration: 0.35, delay: 0.25, ease: "easeOut" }}
+        className="absolute top-[136px] md:top-[190px] left-0 right-0 mx-auto w-[320px] md:w-[500px] h-[240px] md:h-[320px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible transform-gpu"
       >
         <svg width="100%" height="100%" viewBox="0 0 500 340" preserveAspectRatio="none">
           <defs>
             <linearGradient id="lampBeamGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#e0f2fe" stopOpacity={0.9} />
-              <stop offset="25%" stopColor="#3b82f6" stopOpacity={0.55} />
-              <stop offset="65%" stopColor="#3b82f6" stopOpacity={0.15} />
+              <stop offset="0%" stopColor="#e0f2fe" stopOpacity={0.85} />
+              <stop offset="30%" stopColor="#3b82f6" stopOpacity={0.5} />
+              <stop offset="70%" stopColor="#3b82f6" stopOpacity={0.12} />
               <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
             </linearGradient>
           </defs>
-          {/* مضلع الإسقاط العريض للضوء */}
           <polygon points="234,0 266,0 450,340 50,340" fill="url(#lampBeamGrad)" />
         </svg>
       </motion.div>
 
-      {/* 3. الشعار الترحيبي المضاء باللمبة والجملة الترحيبية المنسقة - إحداثيات متجاوبة مع الهواتف */}
-      <div className="absolute top-[290px] md:top-[380px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full select-none text-center px-4">
+      {/* 3. الشعار الترحيبي المضاء باللمبة والجملة الترحيبية */}
+      <div className="absolute top-[270px] md:top-[350px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full text-center px-4">
         <motion.div
-          variants={textVariants}
-          initial="off"
-          animate="on"
-          className="flex flex-col items-center"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center transform-gpu"
         >
-          {/* اسم الشعار أزرق بالكامل - حجم خط متجاوب */}
+          {/* اسم الشعار */}
           <h1
-            className="text-4xl md:text-7xl font-black tracking-widest font-cairo text-blue-500 select-none"
+            className="text-4xl md:text-7xl font-black tracking-widest font-cairo text-blue-500"
             style={{
-              textShadow: "0 0 20px rgba(59,130,246,0.85)"
+              textShadow: "0 0 20px rgba(59,130,246,0.75)"
             }}
           >
             {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
           </h1>
 
-          {/* خط الفاصل المتوهج المتناسق باللون الأزرق */}
+          {/* خط الفاصل المتوهج */}
           <div className="h-0.5 w-[140px] md:w-[180px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-3 md:mt-4 opacity-80" />
 
-          {/* الجملة الصغيرة بالأسفل (نضيء عالمك) مع لمعة انعكاسية تمر من الحرف الأول للأخير */}
+          {/* الجملة الصغيرة بالأسفل (نضيء عالمك) */}
           <motion.p
-            initial={{ opacity: 0, y: 10, backgroundPosition: "200% center" }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              backgroundPosition: ["200% center", "-200% center"] // حركة اللمعة الانعكاسية من اليمين لليسار (RTL أول حرف لآخر حرف)
-            }}
-            transition={{ 
-              opacity: { delay: 1.8, duration: 0.6 },
-              y: { delay: 1.8, duration: 0.6 },
-              backgroundPosition: {
-                delay: 2.4, // تبدأ اللمعة مباشرة بعد ظهور الكلمة بالكامل واستقرارها
-                duration: 1.8, 
-                ease: "easeInOut",
-                repeat: 0 // تظهر وتختفي مرة واحدة بإبداع
-              }
-            }}
-            className="text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-5 md:mt-6 select-none"
-            style={{
-              backgroundImage: "linear-gradient(120deg, #38bdf8 35%, #ffffff 50%, #38bdf8 65%)",
-              backgroundSize: "200% auto",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              textShadow: "0 0 10px rgba(56,189,248,0.25)"
-            }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.45, ease: "easeOut" }}
+            className="text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.4)]"
           >
-            نضيء عالمك
+            {isAr ? 'نضيء عالمك' : 'Lighting Your World'}
           </motion.p>
         </motion.div>
       </div>
 
-    </div>
+    </motion.div>
   );
 }

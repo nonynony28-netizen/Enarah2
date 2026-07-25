@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 
 import SplashScreen from './components/SplashScreen'
 import WhatsAppButton from './components/WhatsAppButton'
@@ -14,15 +15,11 @@ import About from './pages/About'
 import Branches from './pages/Branches'
 import Contact from './pages/Contact'
 import Blog from './pages/Blog'
-import WirePrices from './pages/WirePrices' // 👈 أضفنا صفحة الأسعار هنا
+import WirePrices from './pages/WirePrices'
 import Contractors from './pages/Contractors'
-
 
 import BottomNavBar from './components/BottomNavBar'
 
-// ======================================
-// مكون تأثير الانتقال بين الصفحات
-// ======================================
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   return <div className="w-full">{children}</div>
 }
@@ -30,11 +27,11 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [loading, setLoading] = useState(true)
 
-  // 1. شاشة البداية
+  // 1. شاشة البداية فائقة السلاسة والسرعة
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 300)
+    }, 900)
     return () => clearTimeout(timer)
   }, [])
 
@@ -61,12 +58,11 @@ function App() {
     recordVisit();
   }, []);
 
-  if (loading) {
-    return <SplashScreen />
-  }
-
   return (
     <>
+      <AnimatePresence mode="wait">
+        {loading && <SplashScreen key="splash" />}
+      </AnimatePresence>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
