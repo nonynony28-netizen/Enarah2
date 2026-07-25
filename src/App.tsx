@@ -27,11 +27,11 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [loading, setLoading] = useState(true)
 
-  // 1. شاشة البداية العادية والأنيقة
+  // 1. شاشة البداية السينمائية الفاخرة والانسيابية
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 1600)
+    }, 2400)
     return () => clearTimeout(timer)
   }, [])
 
