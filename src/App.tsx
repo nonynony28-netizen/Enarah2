@@ -25,19 +25,7 @@ import BottomNavBar from './components/BottomNavBar'
 // مكون تأثير الانتقال بين الصفحات
 // ======================================
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
-  const location = useLocation()
-  
-  return (
-    <motion.div
-      key={location.pathname} 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} 
-      className="w-full"
-    >
-      {children}
-    </motion.div>
-  )
+  return <div className="w-full">{children}</div>
 }
 
 function App() {
