@@ -13,7 +13,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   totalFrames = 192,
   folderPath = "/hero-sequence",
   className = "",
-  startDelay = 0,
+  startDelay = 2400,
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,7 +59,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     };
   }, [totalFrames, folderPath]);
 
-  // 2. دالة رسم الإطار على الـ Canvas بمنهجية cover المحافظة على الأبعاد
+  // 2. دالة رسم الإطار على الـ Canvas وتخطي الحواف السوداء الداخلية تماماً
   const renderFrame = (idx: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -72,7 +72,13 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     const width = canvas.width;
     const height = canvas.height;
 
-    const imgAspect = img.naturalWidth / img.naturalHeight;
+    // قص الحواف السوداء داخل إطار الصور بنسبة 3.5% ملء كامل الشاشة بدون أي إطارات أو حواف
+    const cropX = img.naturalWidth * 0.035;
+    const cropY = img.naturalHeight * 0.035;
+    const cropW = img.naturalWidth * 0.93;
+    const cropH = img.naturalHeight * 0.93;
+
+    const imgAspect = cropW / cropH;
     const canvasAspect = width / height;
     let renderW = width;
     let renderH = height;
@@ -88,7 +94,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     }
 
     ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
+    ctx.drawImage(img, cropX, cropY, cropW, cropH, offsetX, offsetY, renderW, renderH);
   };
 
   // 3. ضبط أبعاد الكانفاس لتكون دقيقة عالي الوضوح

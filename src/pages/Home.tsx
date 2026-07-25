@@ -535,7 +535,7 @@ export default function Home() {
 
         {/* 1. الواجهة الترحيبية السينمائية التلقائية (Automatic 3D Scene Animation) */}
         <section id="hero" className="relative h-screen w-full overflow-hidden">
-          <HeroAutoCanvas totalFrames={192} folderPath="/hero-sequence" startDelay={0}>
+          <HeroAutoCanvas totalFrames={192} folderPath="/hero-sequence" startDelay={2400}>
             {({ currentFrame, isFinished }) => {
               // تظهر كافة الكلمات والمعلومات فقط بعد اكتمال تشغيل اللقطة بالكامل كـ فيديو واحد كامل
               const showText = isFinished || currentFrame >= 185;
