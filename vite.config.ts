@@ -5,9 +5,6 @@ import { defineConfig } from "vite"
 export default defineConfig({
   base: "/",
   plugins: [react()],
-  esbuild: {
-    keepNames: true,
-  },
   server: {
     port: 3000,
     proxy: {
@@ -21,5 +18,13 @@ export default defineConfig({
     target: "es2020",
     cssCodeSplit: true,
     chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-motion': ['framer-motion'],
+        }
+      }
+    }
   }
 });
