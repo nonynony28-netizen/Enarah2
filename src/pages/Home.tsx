@@ -148,6 +148,20 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const secondaryVideoRef = useRef<HTMLVideoElement>(null)
 
+  const [heroVideoUrl, setHeroVideoUrl] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('enarah_cached_hero_video') || '/bg-video.mp4'
+    }
+    return '/bg-video.mp4'
+  })
+
+  const [secondaryVideoUrl, setSecondaryVideoUrl] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('enarah_cached_secondary_video') || '/bg-video.mp4'
+    }
+    return '/bg-video.mp4'
+  })
+
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = true
@@ -182,20 +196,6 @@ export default function Home() {
       }
     }
     return defaultWireData
-  })
-
-  const [heroVideoUrl, setHeroVideoUrl] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('enarah_cached_hero_video') || '/bg-video.mp4'
-    }
-    return '/bg-video.mp4'
-  })
-
-  const [secondaryVideoUrl, setSecondaryVideoUrl] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('enarah_cached_secondary_video') || '/bg-video.mp4'
-    }
-    return '/bg-video.mp4'
   })
 
   const { addToCart, triggerFlyAnimation } = useCart()

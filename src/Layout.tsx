@@ -5,6 +5,42 @@ import Footer from "./components/Footer";
 import { useLanguage } from "./hooks/useLanguage";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
+function playClickSound(isTurningOn: boolean) {
+  try {
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+    if (isTurningOn) {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
+
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } else {
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(200, now + 0.06);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+
+      osc.start(now);
+      osc.stop(now + 0.06);
+    }
+  } catch {
+    // تجاهل محركات الصوت عند التقييد تلقائياً
+  }
+}
+
 export default function Layout() {
   const { isAr } = useLanguage()
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
@@ -46,42 +82,6 @@ export default function Layout() {
     window.addEventListener('themechange', handleThemeChange)
     return () => window.removeEventListener('themechange', handleThemeChange)
   }, [])
-
-  function playClickSound(isTurningOn: boolean) {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      const now = audioCtx.currentTime;
-      if (isTurningOn) {
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(800, now);
-        osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
-
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-
-        osc.start(now);
-        osc.stop(now + 0.05);
-      } else {
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(200, now + 0.06);
-
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
-
-        osc.start(now);
-        osc.stop(now + 0.06);
-      }
-    } catch {
-      // تجاهل محركات الصوت عند التقييد تلقائياً
-    }
-  }
 
   useEffect(() => {
     const calcScroll = () => {
