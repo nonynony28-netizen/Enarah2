@@ -135,6 +135,36 @@ const getLocalizedProject = (project: { name: string; category: string; descript
   return { name, category, description }
 }
 
+function HeroTextOverlay({ scrollYProgress, t, isAr }: { scrollYProgress: any; t: any; isAr: boolean }) {
+  const textOpacity = useTransform(scrollYProgress, [0.12, 0.45], [0, 1]);
+  const textY = useTransform(scrollYProgress, [0.12, 0.45], [35, 0]);
+  const textScale = useTransform(scrollYProgress, [0.12, 0.45], [0.93, 1]);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 px-4 pt-16 md:pt-20">
+      <motion.div 
+        style={{ opacity: textOpacity, y: textY, scale: textScale }}
+        className="max-w-5xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
+      >
+        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-4 md:mb-6 leading-tight tracking-tight text-white py-2">
+          <span className="text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 drop-shadow-[0_0_35px_rgba(56,189,248,0.7)]">{t('hero.title.part2')}</span>
+        </h1>
+        
+        <p className="text-sm sm:text-lg md:text-2xl text-slate-100 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 drop-shadow-[0_4px_15px_rgba(0,0,0,0.9)]">
+          {t('hero.subtitle')}
+        </p>
+
+        {/* مؤشر توجيهي أنيق للتمرير */}
+        <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-slate-900/70 backdrop-blur-md border border-sky-500/30 text-xs md:text-sm text-sky-300 shadow-2xl">
+          <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+          <span className="font-semibold">{isAr ? 'مرر للأسفل لإضاءة واستكشاف تفاصيل الإنارة 💡' : 'Scroll down to illuminate details 💡'}</span>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { t, isAr } = useLanguage()
   const paintColors = getPaintColors(isAr)
@@ -505,36 +535,9 @@ export default function Home() {
         {/* 1. الواجهة الترحيبية التفاعلية المرتبطة بنظام التمرير (Apple-Style 3D Scroll Sequence) */}
         <section id="hero" className="relative w-full overflow-hidden">
           <HeroScrollCanvas totalFrames={192} folderPath="/hero-sequence">
-            {({ scrollYProgress }) => {
-              // ظهور وتوهج النصوص متزامناً بالكامل مع اكتمال توهج اللمبة داخل المشهد
-              const textOpacity = useTransform(scrollYProgress, [0.12, 0.45], [0, 1]);
-              const textY = useTransform(scrollYProgress, [0.12, 0.45], [35, 0]);
-              const textScale = useTransform(scrollYProgress, [0.12, 0.45], [0.93, 1]);
-
-              return (
-                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 px-4 pt-16 md:pt-20">
-                  <motion.div 
-                    style={{ opacity: textOpacity, y: textY, scale: textScale }}
-                    className="max-w-5xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
-                  >
-                    <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-4 md:mb-6 leading-tight tracking-tight text-white py-2">
-                      <span className="text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 drop-shadow-[0_0_35px_rgba(56,189,248,0.7)]">{t('hero.title.part2')}</span>
-                    </h1>
-                    
-                    <p className="text-sm sm:text-lg md:text-2xl text-slate-100 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 drop-shadow-[0_4px_15px_rgba(0,0,0,0.9)]">
-                      {t('hero.subtitle')}
-                    </p>
-
-                    {/* مؤشر توجيهي أنيق للتمرير */}
-                    <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-slate-900/70 backdrop-blur-md border border-sky-500/30 text-xs md:text-sm text-sky-300 shadow-2xl">
-                      <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
-                      <span className="font-semibold">{isAr ? 'مرر للأسفل لإضاءة واستكشاف تفاصيل الإنارة 💡' : 'Scroll down to illuminate details 💡'}</span>
-                    </div>
-                  </motion.div>
-                </div>
-              );
-            }}
+            {({ scrollYProgress }) => (
+              <HeroTextOverlay scrollYProgress={scrollYProgress} t={t} isAr={isAr} />
+            )}
           </HeroScrollCanvas>
         </section>
 
