@@ -163,20 +163,35 @@ export default function Home() {
   })
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = true
-      videoRef.current.load()
-      videoRef.current.play().catch(() => {})
-    }
-  }, [heroVideoUrl])
+    const playVideos = () => {
+      if (videoRef.current) {
+        videoRef.current.muted = true;
+        videoRef.current.setAttribute('muted', '');
+        videoRef.current.setAttribute('playsinline', '');
+        videoRef.current.play().catch(() => {});
+      }
+      if (secondaryVideoRef.current) {
+        secondaryVideoRef.current.muted = true;
+        secondaryVideoRef.current.setAttribute('muted', '');
+        secondaryVideoRef.current.setAttribute('playsinline', '');
+        secondaryVideoRef.current.play().catch(() => {});
+      }
+    };
 
-  useEffect(() => {
-    if (secondaryVideoRef.current) {
-      secondaryVideoRef.current.muted = true
-      secondaryVideoRef.current.load()
-      secondaryVideoRef.current.play().catch(() => {})
-    }
-  }, [secondaryVideoUrl])
+    // تشغيل فوري بمجرد التجهيز
+    playVideos();
+
+    // تشغيل تلقائي عند أول لمسة أو سحب على شاشات الجوال للتغلب على قيود البث والموفر
+    window.addEventListener('touchstart', playVideos, { passive: true, once: true });
+    window.addEventListener('scroll', playVideos, { passive: true, once: true });
+    window.addEventListener('pointerdown', playVideos, { passive: true, once: true });
+
+    return () => {
+      window.removeEventListener('touchstart', playVideos);
+      window.removeEventListener('scroll', playVideos);
+      window.removeEventListener('pointerdown', playVideos);
+    };
+  }, [heroVideoUrl, secondaryVideoUrl])
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_featured_projects')
@@ -749,6 +764,8 @@ export default function Home() {
                   playsInline
                   preload="auto"
                   poster="/poster.jpg"
+                  onLoadedMetadata={(e) => { e.currentTarget.play().catch(() => {}); }}
+                  onCanPlay={(e) => { e.currentTarget.play().catch(() => {}); }}
                   className="w-full h-full object-cover"
                   style={{ transform: 'translateZ(0)', willChange: 'transform' }}
                 >
