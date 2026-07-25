@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { useScroll, useTransform, motion, MotionValue } from "framer-motion";
 
 interface HeroScrollCanvasProps {
   totalFrames?: number;
   folderPath?: string;
   className?: string;
+  children?: (props: { scrollYProgress: MotionValue<number>; currentFrame: MotionValue<number> }) => React.ReactNode;
 }
 
 export const HeroScrollCanvas: React.FC<HeroScrollCanvasProps> = ({
   totalFrames = 192,
   folderPath = "/hero-sequence",
-  className = ""
+  className = "",
+  children
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -140,6 +142,9 @@ export const HeroScrollCanvas: React.FC<HeroScrollCanvasProps> = ({
           ref={canvasRef}
           className="h-full w-full object-cover transition-opacity duration-300 pointer-events-none"
         />
+
+        {/* محتوى النصوص والترحيب المتزامن مع الإضاءة داخل اللقطة */}
+        {children && children({ scrollYProgress, currentFrame })}
 
         {/* مؤشر تحميل ناعم خفيف يظهر أثناء تجهيز الإطارات 192 */}
         {!isReady && (
