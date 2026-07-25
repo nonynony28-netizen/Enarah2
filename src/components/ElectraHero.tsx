@@ -6,15 +6,16 @@ export const ElectraHero: React.FC = () => {
       {/* Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
+        src="/bg-video.mp4"
         autoPlay
         loop
         muted
+        defaultMuted
         playsInline
+        webkit-playsinline="true"
         preload="auto"
         poster="/poster.jpg"
-      >
-        <source src="/bg-video.mp4" type="video/mp4" />
-      </video>
+      />
 
       {/* Floating Pill Navbar */}
       <nav className="absolute z-20 px-6 md:px-10 pt-6 top-0 left-0 right-0 flex items-center justify-between gap-4">

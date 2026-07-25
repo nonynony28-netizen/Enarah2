@@ -163,33 +163,39 @@ export default function Home() {
   })
 
   useEffect(() => {
-    const playVideos = () => {
-      if (videoRef.current) {
-        videoRef.current.muted = true;
-        videoRef.current.setAttribute('muted', '');
-        videoRef.current.setAttribute('playsinline', '');
-        videoRef.current.play().catch(() => {});
-      }
-      if (secondaryVideoRef.current) {
-        secondaryVideoRef.current.muted = true;
-        secondaryVideoRef.current.setAttribute('muted', '');
-        secondaryVideoRef.current.setAttribute('playsinline', '');
-        secondaryVideoRef.current.play().catch(() => {});
+    const forcePlayMobileVideo = (el: HTMLVideoElement | null) => {
+      if (!el) return;
+      el.defaultMuted = true;
+      el.muted = true;
+      el.volume = 0;
+      el.playsInline = true;
+      el.setAttribute('muted', '');
+      el.setAttribute('playsinline', '');
+      el.setAttribute('webkit-playsinline', 'true');
+      
+      const promise = el.play();
+      if (promise !== undefined) {
+        promise.catch(() => {});
       }
     };
 
-    // تشغيل فوري بمجرد التجهيز
-    playVideos();
+    const playAll = () => {
+      forcePlayMobileVideo(videoRef.current);
+      forcePlayMobileVideo(secondaryVideoRef.current);
+    };
 
-    // تشغيل تلقائي عند أول لمسة أو سحب على شاشات الجوال للتغلب على قيود البث والموفر
-    window.addEventListener('touchstart', playVideos, { passive: true, once: true });
-    window.addEventListener('scroll', playVideos, { passive: true, once: true });
-    window.addEventListener('pointerdown', playVideos, { passive: true, once: true });
+    // تشغيل فوري للجوال
+    playAll();
+
+    // استجابة فورية لأول إيماءة أو تمرير في شاشات الآيفون والأندرويد (تغلب كامل على Low Power Mode)
+    window.addEventListener('touchstart', playAll, { passive: true });
+    window.addEventListener('scroll', playAll, { passive: true });
+    window.addEventListener('pointerdown', playAll, { passive: true });
 
     return () => {
-      window.removeEventListener('touchstart', playVideos);
-      window.removeEventListener('scroll', playVideos);
-      window.removeEventListener('pointerdown', playVideos);
+      window.removeEventListener('touchstart', playAll);
+      window.removeEventListener('scroll', playAll);
+      window.removeEventListener('pointerdown', playAll);
     };
   }, [heroVideoUrl, secondaryVideoUrl])
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
@@ -492,19 +498,20 @@ export default function Home() {
             <video
               ref={videoRef}
               key={heroVideoUrl}
+              src={heroVideoUrl}
               autoPlay
               loop
               muted
+              defaultMuted
               playsInline
+              webkit-playsinline="true"
               preload="auto"
               poster="/poster.jpg"
-              onCanPlay={(e) => { e.currentTarget.play().catch(() => {}); }}
-              onLoadedData={(e) => { e.currentTarget.play().catch(() => {}); }}
+              onLoadedMetadata={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
+              onCanPlay={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
               className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none opacity-60 z-0"
               style={{ transform: 'translateZ(0)', willChange: 'transform' }}
-            >
-              <source src={heroVideoUrl} type="video/mp4" />
-            </video>
+            />
             
             {/* طبقة تظليل داكنة إضافية لضمان راحة العين ووضوح النصوص بنسبة 100% */}
             <div className="absolute inset-0 bg-black/20 pointer-events-none" />
@@ -758,19 +765,20 @@ export default function Home() {
                 <video
                   ref={secondaryVideoRef}
                   key={secondaryVideoUrl}
+                  src={secondaryVideoUrl}
                   autoPlay
                   loop
                   muted
+                  defaultMuted
                   playsInline
+                  webkit-playsinline="true"
                   preload="auto"
                   poster="/poster.jpg"
-                  onLoadedMetadata={(e) => { e.currentTarget.play().catch(() => {}); }}
-                  onCanPlay={(e) => { e.currentTarget.play().catch(() => {}); }}
+                  onLoadedMetadata={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
+                  onCanPlay={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
                   className="w-full h-full object-cover"
                   style={{ transform: 'translateZ(0)', willChange: 'transform' }}
-                >
-                  <source src={secondaryVideoUrl} type="video/mp4" />
-                </video>
+                />
               </div>
             </div>
 
