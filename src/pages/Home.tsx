@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useInView, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'

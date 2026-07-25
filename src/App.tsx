@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { Routes, Route } from 'react-router-dom'
 
 import SplashScreen from './components/SplashScreen'
 import WhatsAppButton from './components/WhatsAppButton'
