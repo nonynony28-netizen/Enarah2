@@ -154,13 +154,23 @@ export default function Home() {
 
   const [pageLoading, setPageLoading] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const secondaryVideoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = true
+      videoRef.current.load()
       videoRef.current.play().catch(() => {})
     }
-  }, [])
+  }, [heroVideoUrl])
+
+  useEffect(() => {
+    if (secondaryVideoRef.current) {
+      secondaryVideoRef.current.muted = true
+      secondaryVideoRef.current.load()
+      secondaryVideoRef.current.play().catch(() => {})
+    }
+  }, [secondaryVideoUrl])
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('enarah_cached_featured_projects')
@@ -336,7 +346,9 @@ export default function Home() {
           setFeaturedProjects(loadedProjects)
           localStorage.setItem('enarah_cached_featured_projects', JSON.stringify(loadedProjects))
 
-          const heroVideoEntry = data.data.find((item: any) => item.email === 'admin_hero_video@app.local' || item.type === 'hero_video')
+          const sortedItems = [...data.data].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+          const heroVideoEntry = sortedItems.find((item: any) => item.email === 'admin_hero_video@app.local' || item.type === 'hero_video')
           if (heroVideoEntry) {
             try {
               const videoObj = JSON.parse(heroVideoEntry.phone)
@@ -348,7 +360,7 @@ export default function Home() {
             } catch {}
           }
 
-          const secondaryVideoEntry = data.data.find((item: any) => item.email === 'admin_secondary_video@app.local' || item.type === 'secondary_video')
+          const secondaryVideoEntry = sortedItems.find((item: any) => item.email === 'admin_secondary_video@app.local' || item.type === 'secondary_video')
           if (secondaryVideoEntry) {
             try {
               const videoObj = JSON.parse(secondaryVideoEntry.phone)
@@ -737,6 +749,7 @@ export default function Home() {
             <div className="relative w-full overflow-hidden bg-black shadow-[0_0_50px_rgba(59,130,246,0.25)]">
               <div className="relative w-full aspect-video md:aspect-[21/9] max-h-[85vh] overflow-hidden flex items-center justify-center">
                 <video
+                  ref={secondaryVideoRef}
                   key={secondaryVideoUrl}
                   autoPlay
                   loop

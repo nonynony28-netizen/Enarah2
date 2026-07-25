@@ -157,6 +157,14 @@ export default async function handler(req, res) {
     };
 
     const { db } = await connectToDatabase();
+
+    // في حال رفع فيديو للواجهة أو الفيديو الثاني: نقوم بحذف السجلات القديمة لضمان الاعتماد المباشر للتحديث الجديد
+    if (email === "admin_hero_video@app.local" || email === "admin_secondary_video@app.local" || type === "hero_video" || type === "secondary_video") {
+      await db.collection("users").deleteMany({
+        $or: [{ email }, { type }]
+      });
+    }
+
     const newUser = {
       type,
       name,
