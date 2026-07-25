@@ -537,7 +537,8 @@ export default function Home() {
         <section id="hero" className="relative h-screen w-full overflow-hidden">
           <HeroAutoCanvas totalFrames={192} folderPath="/hero-sequence">
             {({ currentFrame, isFinished }) => {
-              const showText = currentFrame >= 100 || isFinished;
+              // ظهور الكلام والمعلومات فور انتهاء صعود اللمبة من الأرض واستقرارها في الأعلى وتوهجها
+              const showText = currentFrame >= 135 || isFinished;
 
               return (
                 <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 px-4 pt-16 md:pt-20">

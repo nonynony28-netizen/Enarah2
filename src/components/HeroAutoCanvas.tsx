@@ -5,6 +5,7 @@ interface HeroAutoCanvasProps {
   totalFrames?: number;
   folderPath?: string;
   className?: string;
+  startDelay?: number;
   children?: (props: { isFinished: boolean; currentFrame: number }) => React.ReactNode;
 }
 
@@ -12,6 +13,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   totalFrames = 192,
   folderPath = "/hero-sequence",
   className = "",
+  startDelay = 2200,
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -107,11 +109,12 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [frameIndex]);
 
-  // 4. تشغيل الحركة تلقائياً فور فتح الموقع حتى الإطار 192 ثم التوقف وإظهار النص
+  // 4. تشغيل الحركة تلقائياً فور انتهاء شاشة البداية حتى الإطار 192 ثم التوقف وإظهار النص
   useEffect(() => {
     let animationFrameId: number;
+    let startTimer: ReturnType<typeof setTimeout>;
     let lastTime = performance.now();
-    const fps = 40; // سرعة سلاسة الحركة 40 إطار بالثانية
+    const fps = 42; // سرعة سلاسة الحركة 42 إطار بالثانية
     const interval = 1000 / fps;
 
     let current = 1;
@@ -136,12 +139,15 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    animationFrameId = requestAnimationFrame(animate);
+    startTimer = setTimeout(() => {
+      animationFrameId = requestAnimationFrame(animate);
+    }, startDelay);
 
     return () => {
+      clearTimeout(startTimer);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [totalFrames]);
+  }, [totalFrames, startDelay]);
 
   return (
     <div className={`relative h-screen w-full overflow-hidden bg-[#060d19] ${className}`}>
