@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const adminPassword = process.env.ADMIN_PASSWORD || "EnarahAdmin2026";
+    const adminPassword = process.env.ADMIN_PASSWORD || "23127";
     const clientPassword = req.headers["x-admin-password"];
     if (clientPassword !== adminPassword) {
       return res.status(401).json({
