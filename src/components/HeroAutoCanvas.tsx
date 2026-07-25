@@ -129,15 +129,9 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
           current++;
           setFrameIndex(current);
           renderFrame(current);
-          if (current >= 180 && typeof window !== 'undefined') {
-            window.dispatchEvent(new Event('enarah_hero_finished'));
-          }
         } else {
           setIsFinished(true);
           renderFrame(totalFrames);
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new Event('enarah_hero_finished'));
-          }
           return; // التوقف عند الإطار الأخير (لمعة اللمبة)
         }
       }
