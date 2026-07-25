@@ -168,6 +168,13 @@ function HeroTextOverlay({ scrollYProgress, t, isAr }: { scrollYProgress: any; t
 
 export default function Home() {
   const { t, isAr } = useLanguage()
+  const [isSocialVisible, setIsSocialVisible] = useState(false)
+
+  useEffect(() => {
+    const handleFinished = () => setIsSocialVisible(true)
+    window.addEventListener('enarah_hero_finished', handleFinished)
+    return () => window.removeEventListener('enarah_hero_finished', handleFinished)
+  }, [])
   const paintColors = getPaintColors(isAr)
   const filamentColor = "#fbbf24"
   const filamentGlow = "drop-shadow(0 0 8px rgba(245,158,11,0.85))"
@@ -1696,7 +1703,9 @@ export default function Home() {
         </AnimatePresence>
 
         {/* 🚀 الأيقونات الاجتماعية العائمة */}
-        <div className="fixed left-6 bottom-24 z-40 hidden md:flex flex-col gap-3 animate-fade-in">
+        <div className={`fixed left-6 bottom-24 z-40 hidden md:flex flex-col gap-3 transition-opacity duration-1000 ${
+          isSocialVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}>
           <a 
             href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
             target="_blank" 

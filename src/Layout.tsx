@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useLanguage } from "./hooks/useLanguage";
@@ -43,10 +43,28 @@ function playClickSound(isTurningOn: boolean) {
 
 export default function Layout() {
   const { isAr } = useLanguage()
+  const location = useLocation()
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [isDragging, setIsDragging] = useState(false)
   const [scrollPercent, setScrollPercent] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  
+  // حالة إظهار أشرطة الواجهة بالكامل بعد اكتمال اللقطة
+  const [isUiVisible, setIsUiVisible] = useState(() => (typeof window !== 'undefined' && location.pathname !== '/') ? true : false)
+
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setIsUiVisible(true)
+      return
+    }
+
+    const handleFinished = () => {
+      setIsUiVisible(true)
+    }
+
+    window.addEventListener('enarah_hero_finished', handleFinished)
+    return () => window.removeEventListener('enarah_hero_finished', handleFinished)
+  }, [location.pathname])
   
   // حالات لتفعيل مفتاح الإنارة التفاعلي عند أول تمرير للموقع
   const [isScrollActivated, setIsScrollActivated] = useState(false)
@@ -182,7 +200,9 @@ export default function Layout() {
       </div>
 
       {/* 2. حبل السحب العائم التفاعلي لتعديل وتعتيم الضوء وسحب المفتاح */}
-      <div className="fixed top-0 left-16 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
+      <div className={`fixed top-0 left-16 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none transition-opacity duration-1000 ${
+        isUiVisible ? 'opacity-100' : 'opacity-0'
+      }`}>
         <motion.div 
           className="w-[1px] md:w-[2px] bg-gradient-to-b from-[#111] via-[#444] to-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
           style={{ height: cordHeight }}
@@ -220,7 +240,9 @@ export default function Layout() {
         style={{ opacity: 'var(--pull-dim-opacity, 0)' }}
       />
 
-      <Navbar />
+      <div className={`transition-opacity duration-1000 ${isUiVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <Navbar />
+      </div>
       <div className="relative z-10 w-full">
         <Outlet />
       </div>
