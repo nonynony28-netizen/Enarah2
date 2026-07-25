@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useTransform } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
-import HeroScrollCanvas from '../components/HeroScrollCanvas'
+import HeroAutoCanvas from '../components/HeroAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
@@ -533,13 +533,37 @@ export default function Home() {
 
 
 
-        {/* 1. الواجهة الترحيبية التفاعلية المرتبطة بنظام التمرير (Apple-Style 3D Scroll Sequence) */}
-        <section id="hero" className="relative w-full overflow-hidden">
-          <HeroScrollCanvas totalFrames={192} folderPath="/hero-sequence">
-            {({ scrollYProgress }) => (
-              <HeroTextOverlay scrollYProgress={scrollYProgress} t={t} isAr={isAr} />
-            )}
-          </HeroScrollCanvas>
+        {/* 1. الواجهة الترحيبية السينمائية التلقائية (Automatic 3D Scene Animation) */}
+        <section id="hero" className="relative h-screen w-full overflow-hidden">
+          <HeroAutoCanvas totalFrames={192} folderPath="/hero-sequence">
+            {({ currentFrame, isFinished }) => {
+              const showText = currentFrame >= 100 || isFinished;
+
+              return (
+                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 px-4 pt-16 md:pt-20">
+                  <AnimatePresence>
+                    {showText && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 35, scale: 0.94 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                        className="max-w-5xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
+                      >
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-4 md:mb-6 leading-tight tracking-tight text-white py-2">
+                          <span className="text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 drop-shadow-[0_0_35px_rgba(56,189,248,0.7)]">{t('hero.title.part2')}</span>
+                        </h1>
+                        
+                        <p className="text-sm sm:text-lg md:text-2xl text-slate-100 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 drop-shadow-[0_4px_15px_rgba(0,0,0,0.9)]">
+                          {t('hero.subtitle')}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }}
+          </HeroAutoCanvas>
         </section>
 
         {/* 2. لماذا نحن - شريحة ميزات تفاعلية عالمية (World-Class Interactive Feature Showcase) */}
