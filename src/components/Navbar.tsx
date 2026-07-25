@@ -129,7 +129,7 @@ export default function Navbar() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'bg-[#0a192f] shadow-lg border-b border-blue-500/10 py-2'
+            ? 'bg-[#060d19]/90 backdrop-blur-xl shadow-lg border-b border-sky-500/15 py-2'
             : 'bg-transparent py-4'
         }`}
       >

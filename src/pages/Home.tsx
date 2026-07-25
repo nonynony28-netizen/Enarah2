@@ -465,7 +465,7 @@ export default function Home() {
         {/* 1. الواجهة الترحيبية بالفيديو فائق السرعة */}
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <div 
-            className="absolute inset-0 w-full h-full z-0 bg-[#0a192f] bg-cover bg-center overflow-hidden flex items-center justify-center"
+            className="absolute inset-0 w-full h-full z-0 bg-[#060d19] bg-cover bg-center overflow-hidden flex items-center justify-center"
             style={{ backgroundImage: "url('/poster.jpg')" }}
           >
             
@@ -488,33 +488,33 @@ export default function Home() {
             </video>
             
             {/* طبقة تظليل داكنة إضافية لضمان راحة العين ووضوح النصوص بنسبة 100% */}
-            <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
             
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f] pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#060d19]/40 via-transparent to-[#060d19] pointer-events-none" />
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10 md:mt-20">
 
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-normal tracking-tight text-white py-2">
                 <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.35)]">{t('hero.title.part1')}</span>{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-300 drop-shadow-[0_0_35px_rgba(59,130,246,0.7)]">{t('hero.title.part2')}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500 drop-shadow-[0_0_35px_rgba(56,189,248,0.6)]">{t('hero.title.part2')}</span>
               </h1>
               
-              <p className="text-base md:text-2xl text-blue-50/90 mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
+              <p className="text-base md:text-2xl text-slate-200 mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 shadow-sm">{t('hero.subtitle')}</p>
             </div>
         </section>
 
         {/* 2. لماذا نحن - شريحة ميزات تفاعلية عالمية (World-Class Interactive Feature Showcase) */}
         <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           {/* بقع توهج نيونية خفيفة عائمة */}
-          <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-          <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-400/5 rounded-full blur-[120px] pointer-events-none z-0" />
+          <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-sky-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
+          <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-10 md:mb-14">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
                 {isAr ? 'لماذا' : 'Why'}{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500 drop-shadow-[0_2px_10px_rgba(56,189,248,0.4)]">
                   {isAr ? 'نحن؟' : 'Choose Us?'}
                 </span>
               </h2>
