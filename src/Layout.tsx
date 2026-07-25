@@ -47,7 +47,7 @@ export default function Layout() {
     return () => window.removeEventListener('themechange', handleThemeChange)
   }, [])
 
-  const playClickSound = (isTurningOn: boolean) => {
+  function playClickSound(isTurningOn: boolean) {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const osc = audioCtx.createOscillator();
