@@ -13,7 +13,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   totalFrames = 192,
   folderPath = "/hero-sequence",
   className = "",
-  startDelay = 2200,
+  startDelay = 0,
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

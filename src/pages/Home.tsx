@@ -535,27 +535,27 @@ export default function Home() {
 
         {/* 1. الواجهة الترحيبية السينمائية التلقائية (Automatic 3D Scene Animation) */}
         <section id="hero" className="relative h-screen w-full overflow-hidden">
-          <HeroAutoCanvas totalFrames={192} folderPath="/hero-sequence">
+          <HeroAutoCanvas totalFrames={192} folderPath="/hero-sequence" startDelay={0}>
             {({ currentFrame, isFinished }) => {
-              // ظهور الكلام والمعلومات فور انتهاء صعود اللمبة من الأرض واستقرارها في الأعلى وتوهجها
-              const showText = currentFrame >= 135 || isFinished;
+              // تظهر كافة الكلمات والمعلومات فقط بعد اكتمال تشغيل اللقطة بالكامل كـ فيديو واحد كامل
+              const showText = isFinished || currentFrame >= 185;
 
               return (
-                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 px-4 pt-16 md:pt-20">
+                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-end pb-8 sm:pb-12 md:pb-14 z-10 px-4">
                   <AnimatePresence>
                     {showText && (
                       <motion.div 
-                        initial={{ opacity: 0, y: 35, scale: 0.94 }}
+                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                        className="max-w-5xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
+                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                        className="max-w-4xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center p-5 md:p-7 rounded-3xl bg-slate-950/45 backdrop-blur-md border border-white/10 shadow-2xl"
                       >
-                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-4 md:mb-6 leading-tight tracking-tight text-white py-2">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
                           <span className="text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
                           <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 drop-shadow-[0_0_35px_rgba(56,189,248,0.7)]">{t('hero.title.part2')}</span>
                         </h1>
                         
-                        <p className="text-sm sm:text-lg md:text-2xl text-slate-100 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed font-medium px-2 drop-shadow-[0_4px_15px_rgba(0,0,0,0.9)]">
+                        <p className="text-xs sm:text-base md:text-xl text-slate-200 mb-0 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_4px_15px_rgba(0,0,0,0.9)]">
                           {t('hero.subtitle')}
                         </p>
                       </motion.div>
