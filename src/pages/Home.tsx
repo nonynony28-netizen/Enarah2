@@ -13,13 +13,11 @@ import {
 // نمط الوهج
 const glowingTitleStyle = { textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)' }
 
-function FadeIn({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '50px' })
+function FadeIn({ children }: { children: React.ReactNode, delay?: number }) {
   return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 15 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }} transition={{ duration: 0.5, delay, ease: "easeOut" }} style={{ willChange: "opacity, transform" }}>
+    <div className="w-full transition-opacity duration-300">
       {children}
-    </motion.div>
+    </div>
   )
 }
 
@@ -139,18 +137,12 @@ const getLocalizedProject = (project: { name: string; category: string; descript
 export default function Home() {
   const { t, isAr } = useLanguage()
   const paintColors = getPaintColors(isAr)
-  const { scrollYProgress } = useScroll()
-
-  // Map scroll progress to filament brightness, light cone opacity, and spotlight scale
-  const filamentColor = useTransform(scrollYProgress, [0, 0.45], ["#475569", "#fbbf24"])
-  const filamentGlow = useTransform(scrollYProgress, [0, 0.45], [
-    "drop-shadow(0 0 0px rgba(0,0,0,0))", 
-    "drop-shadow(0 0 8px rgba(245,158,11,0.85))"
-  ])
-  const spotlightOpacity = useTransform(scrollYProgress, [0, 0.6], [0, 0.45])
-  const spotlightScale = useTransform(scrollYProgress, [0, 0.6], [0.85, 1.25])
-  const spotlightRotate = useTransform(scrollYProgress, [0, 0.6], [0, -12])
-  const bulbAuraOpacity = useTransform(scrollYProgress, [0, 0.45], [0.1, 0.85])
+  const filamentColor = "#fbbf24"
+  const filamentGlow = "drop-shadow(0 0 8px rgba(245,158,11,0.85))"
+  const spotlightOpacity = 0.45
+  const spotlightScale = 1
+  const spotlightRotate = 0
+  const bulbAuraOpacity = 0.85
 
   const [pageLoading, setPageLoading] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
