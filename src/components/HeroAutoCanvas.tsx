@@ -119,10 +119,14 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     let offsetY = 0;
 
     if (isMobile) {
-      // عرض اللقطة بالعرض كاملاً بنفس مقاسها الأصلي الحقيقي (100% True Widescreen Landscape Ratio)
-      renderW = width;
-      renderH = width / imgAspect;
-      offsetX = 0;
+      // تكبير اللقطة لتغطي الارتفاع بالكامل بدون أي مسافات أو فراغات داكنة علوية أو سفلية
+      renderH = height * 1.05;
+      renderW = renderH * imgAspect;
+      if (renderW < width * 1.08) {
+        renderW = width * 1.08;
+        renderH = renderW / imgAspect;
+      }
+      offsetX = (width - renderW) / 2;
       offsetY = (height - renderH) / 2;
     } else {
       if (canvasAspect > imgAspect) {
