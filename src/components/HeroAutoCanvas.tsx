@@ -164,7 +164,28 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [frameIndex]);
 
-  // 4. تشغيل الحركة تلقائياً فور انتهاء شاشة البداية حتى الإطار 192 ثم التوقف وإظهار النص
+  const hasScrolledDownRef = useRef(false);
+  const [replayCount, setReplayCount] = useState(0);
+
+  // 4. استشعار التمرير للأسفل ثم العودة لأعلى الصفحة لإعادة تشغيل اللقطة تلقائياً
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      if (scrollY > 400) {
+        hasScrolledDownRef.current = true;
+      } else if (scrollY < 20 && hasScrolledDownRef.current) {
+        hasScrolledDownRef.current = false;
+        setIsFinished(false);
+        setFrameIndex(1);
+        setReplayCount((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 5. تشغيل الحركة تلقائياً وتكرارها فور العودة لأعلى الصفحة حتى الإطار 192 ثم التوقف وإظهار النص
   useEffect(() => {
     let animationFrameId: number;
     let startTimer: ReturnType<typeof setTimeout>;
@@ -174,6 +195,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     const interval = 1000 / fps;
 
     let current = 1;
+    setFrameIndex(1);
 
     const animate = (now: number) => {
       const delta = now - lastTime;
@@ -195,15 +217,17 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
       animationFrameId = requestAnimationFrame(animate);
     };
 
+    const currentDelay = replayCount > 0 ? 0 : startDelay;
+
     startTimer = setTimeout(() => {
       animationFrameId = requestAnimationFrame(animate);
-    }, startDelay);
+    }, currentDelay);
 
     return () => {
       clearTimeout(startTimer);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [totalFrames, startDelay]);
+  }, [totalFrames, startDelay, replayCount]);
 
   return (
     <div className={`relative h-screen w-full overflow-hidden bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] ${className}`}>
