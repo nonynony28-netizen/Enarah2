@@ -9,6 +9,9 @@ interface HeroAutoCanvasProps {
   children?: (props: { isFinished: boolean; currentFrame: number }) => React.ReactNode;
 }
 
+// ذاكرة تخزين عالمية في الـ RAM لضمان عدم إعادة تحميل الصور عند التصفح أو الفتح مجدداً
+const globalImageCache = new Map<string, HTMLImageElement[]>();
+
 export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   totalFrames = 192,
   folderPath = "/hero-sequence",
@@ -18,19 +21,35 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
+  const lastValidImgRef = useRef<HTMLImageElement | null>(null);
   const [frameIndex, setFrameIndex] = useState(1);
   const [isFinished, setIsFinished] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [loadedCount, setLoadedCount] = useState(0);
 
-  // 1. التحميل المسبق لشرايح الصور الـ 192
+  // 1. التحميل المسبق لشرايح الصور الـ 192 بتقنية async decoding الذكية لمحو الثقل ومنع تقطيع الإضاءة
   useEffect(() => {
     let isMounted = true;
+
+    // إذا كانت الصور محمولة سابقاً في ذاكرة الـ RAM، استخدمها فوراً 100% دون الحاجة لطلبها من الإنترنت
+    if (globalImageCache.has(folderPath)) {
+      const cached = globalImageCache.get(folderPath)!;
+      imagesRef.current = cached;
+      setLoadedCount(cached.length);
+      setIsReady(true);
+      if (cached[0]) {
+        lastValidImgRef.current = cached[0];
+      }
+      return;
+    }
+
     const loadedImages: HTMLImageElement[] = [];
     let count = 0;
 
     for (let i = 1; i <= totalFrames; i++) {
       const img = new Image();
+      // فك ضغط الصور خارج المعالج الرئيسي لتجنب الثقل والتهنيج عند أول فتح للموقع
+      img.decoding = "async";
       const paddedIndex = String(i).padStart(3, "0");
       img.src = `${folderPath}/ezgif-frame-${paddedIndex}.jpg`;
 
@@ -38,8 +57,12 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
         if (!isMounted) return;
         count++;
         setLoadedCount(count);
+        if (count === 1) {
+          lastValidImgRef.current = img;
+        }
         if (count === totalFrames) {
           setIsReady(true);
+          globalImageCache.set(folderPath, loadedImages);
         }
       };
 
@@ -59,15 +82,23 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     };
   }, [totalFrames, folderPath]);
 
-  // 2. دالة رسم الإطار على الـ Canvas وتخطي التكبير والزوم على الهواتف مع التسريع العتادي
+  // 2. دالة رسم الإطار على الـ Canvas مع حماية كاملة ومخزن عازل يمنع الوميض وتذبذب الإضاءة المزعج
   const renderFrame = (idx: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const img = imagesRef.current[idx - 1];
-    if (!img || !img.complete || img.naturalWidth === 0) return;
+    let img = imagesRef.current[idx - 1];
+
+    // حماية تامة ضد القفزات والإضاءة الغريبة عند أول فتح: إذا كانت الصورة قيد التحميل عبر الشريكة، حافظ على الإطار السابق بسلاسة
+    if (img && img.complete && img.naturalWidth > 0) {
+      lastValidImgRef.current = img;
+    } else if (lastValidImgRef.current) {
+      img = lastValidImgRef.current;
+    } else {
+      return;
+    }
 
     const width = canvas.width;
     const height = canvas.height;
