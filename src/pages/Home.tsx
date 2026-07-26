@@ -541,7 +541,7 @@ export default function Home() {
               const showText = isFinished || currentFrame >= 185;
 
               return (
-                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-end pb-8 sm:pb-12 md:pb-14 z-10 px-4">
+                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center pt-6 sm:pt-10 md:pt-14 z-10 px-4">
                   <AnimatePresence>
                     {showText && (
                       <motion.div 

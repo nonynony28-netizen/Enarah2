@@ -202,11 +202,14 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   }, [totalFrames, startDelay]);
 
   return (
-    <div className={`relative h-screen w-full overflow-hidden bg-[#060d19] ${className}`}>
+    <div className={`relative h-screen w-full overflow-hidden bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] ${className}`}>
+      {/* توهج إضاءة دافئة سينمائية خلف الكانفاس لتنسيق كافة الفراغات بدون أي لون أسود أو داكن */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.22)_0%,rgba(245,158,11,0.1)_45%,transparent_75%)] pointer-events-none" />
+
       {/* كانفاس الصورة التلقائي المزود بالتسريع العتادي */}
       <canvas
         ref={canvasRef}
-        className="h-full w-full object-cover pointer-events-none will-change-transform transform-gpu"
+        className="h-full w-full object-cover pointer-events-none will-change-transform transform-gpu relative z-0"
       />
 
       {/* محتوى النصوص والترحيب الذي يظهر تلقائياً بعد توهج اللمبة */}
