@@ -194,7 +194,8 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     let startTimer: ReturnType<typeof setTimeout>;
     let lastTime = performance.now();
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    const fps = isMobile ? 35 : 42; // سرعة متناسقة ومستقرة للأجهزة المحمولة القديمة والحديثة
+    // سرعة 30FPS على الهواتف تتطابق 100% مع تردد معالج اللمس بالهاتف وتلغي الثقل أثناء التمرير نهائياً
+    const fps = isMobile ? 30 : 42;
     const interval = 1000 / fps;
 
     let current = 1;
@@ -239,14 +240,14 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   }, [totalFrames, startDelay, replayCount]);
 
   return (
-    <div className={`relative h-[55vh] sm:h-[65vh] md:h-screen w-full overflow-hidden bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] ${className}`}>
+    <div className={`relative h-[55vh] sm:h-[65vh] md:h-screen w-full overflow-hidden bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] touch-pan-y pointer-events-none select-none ${className}`}>
       {/* توهج إضاءة دافئة سينمائية خلف الكانفاس لتنسيق كافة الفراغات بدون أي لون أسود أو داكن */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.22)_0%,rgba(245,158,11,0.1)_45%,transparent_75%)] pointer-events-none" />
 
-      {/* كانفاس الصورة التلقائي المزود بالتسريع العتادي */}
+      {/* كانفاس الصورة التلقائي المزود بالتسريع العتادي المباشر بالـ GPU والمنفصل عن إيماءات اللمس */}
       <canvas
         ref={canvasRef}
-        className="h-full w-full object-cover pointer-events-none will-change-transform transform-gpu relative z-0"
+        className="h-full w-full object-cover pointer-events-none will-change-transform transform-gpu relative z-0 [transform:translate3d(0,0,0)] [backface-visibility:hidden]"
       />
 
       {/* محتوى النصوص والترحيب الذي يظهر تلقائياً بعد توهج اللمبة */}
