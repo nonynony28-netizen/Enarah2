@@ -140,7 +140,9 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     ctx.drawImage(img, cropX, cropY, cropW, cropH, offsetX, offsetY, renderW, renderH);
   };
 
-  // 3. ضبط أبعاد الكانفاس بآلية تسريع خارقة مخصصة للهواتف القديمة
+  const currentFrameRef = useRef(1);
+
+  // 3. ضبط أبعاد الكانفاس بآلية تسريع خارقة مخصصة للهواتف القديمة وبدون إعادة بناء المكون
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
@@ -152,13 +154,13 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
 
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-      renderFrame(frameIndex);
+      renderFrame(currentFrameRef.current);
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
     return () => window.removeEventListener("resize", handleResize);
-  }, [frameIndex]);
+  }, []);
 
   const hasScrolledDownRef = useRef(false);
   const [replayCount, setReplayCount] = useState(0);
@@ -173,6 +175,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
         hasScrolledDownRef.current = false;
         setIsFinished(false);
         setFrameIndex(1);
+        currentFrameRef.current = 1;
         setReplayCount((prev) => prev + 1);
       }
     };
@@ -181,7 +184,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 5. تشغيل الحركة تلقائياً وتكرارها فور العودة لأعلى الصفحة حتى الإطار 192 ثم التوقف وإظهار النص
+  // 5. تشغيل الحركة تلقائياً مستقلاً عن الـ React State بإنسيابية حريرية مطلقة غير مقيدة بالتمرير
   useEffect(() => {
     let animationFrameId: number;
     let startTimer: ReturnType<typeof setTimeout>;
@@ -191,7 +194,8 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     const interval = 1000 / fps;
 
     let current = 1;
-    setFrameIndex(1);
+    currentFrameRef.current = 1;
+    renderFrame(1);
 
     const animate = (now: number) => {
       const delta = now - lastTime;
@@ -201,10 +205,15 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
 
         if (current < totalFrames) {
           current++;
-          setFrameIndex(current);
+          currentFrameRef.current = current;
           renderFrame(current);
+          if (current >= 185) {
+            setIsFinished(true);
+            setFrameIndex(current);
+          }
         } else {
           setIsFinished(true);
+          setFrameIndex(totalFrames);
           renderFrame(totalFrames);
           return; // التوقف عند الإطار الأخير (لمعة اللمبة)
         }
