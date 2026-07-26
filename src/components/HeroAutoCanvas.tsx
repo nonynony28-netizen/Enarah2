@@ -119,10 +119,14 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     let offsetY = 0;
 
     if (isMobile) {
-      // مقاس عرضي حقيقي كامل (100% True Landscape Ratio) متمركز في منتصف شاشة الهاتف
-      renderW = width;
-      renderH = width / imgAspect;
-      offsetX = 0;
+      // ملء أبعاد الكانفاس لتغطية المشهد بالكامل وتنسيق الفراغات بالكامل بدون حواف داكنة
+      renderH = height * 1.02;
+      renderW = renderH * imgAspect;
+      if (renderW < width) {
+        renderW = width;
+        renderH = width / imgAspect;
+      }
+      offsetX = (width - renderW) / 2;
       offsetY = (height - renderH) / 2;
     } else {
       if (canvasAspect > imgAspect) {
