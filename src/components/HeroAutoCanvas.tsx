@@ -119,14 +119,10 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     let offsetY = 0;
 
     if (isMobile) {
-      // ملء أبعاد الكانفاس لتغطية المشهد بالكامل وتنسيق الفراغات بالكامل بدون حواف داكنة
-      renderH = height * 1.02;
-      renderW = renderH * imgAspect;
-      if (renderW < width) {
-        renderW = width;
-        renderH = width / imgAspect;
-      }
-      offsetX = (width - renderW) / 2;
+      // عرض اللقطة بالعرض كاملاً بنفس مقاسها الأصلي الحقيقي (100% True Widescreen Landscape Ratio)
+      renderW = width;
+      renderH = width / imgAspect;
+      offsetX = 0;
       offsetY = (height - renderH) / 2;
     } else {
       if (canvasAspect > imgAspect) {
@@ -230,7 +226,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   }, [totalFrames, startDelay, replayCount]);
 
   return (
-    <div className={`relative h-screen w-full overflow-hidden bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] ${className}`}>
+    <div className={`relative h-[55vh] sm:h-[65vh] md:h-screen w-full overflow-hidden bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] ${className}`}>
       {/* توهج إضاءة دافئة سينمائية خلف الكانفاس لتنسيق كافة الفراغات بدون أي لون أسود أو داكن */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.22)_0%,rgba(245,158,11,0.1)_45%,transparent_75%)] pointer-events-none" />
 
