@@ -104,8 +104,8 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     const height = canvas.height;
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
-    // على الهواتف: لا نقوم بأي زوم أو قص عريض، بل نستخدم كامل الصورة لإظهار اللمبة والغرفة بارتياح
-    const cropPercent = isMobile ? 0.005 : 0.035;
+    // تجربة العرض بالأبعاد الحقيقية الأصلية 100% بدون أي زوم أو قص إطلاقاً على الهواتف (True 16:9 Aspect Ratio)
+    const cropPercent = isMobile ? 0 : 0.035;
     const cropX = img.naturalWidth * cropPercent;
     const cropY = img.naturalHeight * cropPercent;
     const cropW = img.naturalWidth * (1 - cropPercent * 2);
@@ -119,10 +119,10 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     let offsetY = 0;
 
     if (isMobile) {
-      // ضبط أبعاد مريحة وغير مكبرة للهواتف لتظهر كامل معالم المشهد واللمبة بالمنتصف
-      renderW = width * 1.04;
-      renderH = renderW / imgAspect;
-      offsetX = (width - renderW) / 2;
+      // مقاس عرضي حقيقي كامل (100% True Landscape Ratio) متمركز في منتصف شاشة الهاتف
+      renderW = width;
+      renderH = width / imgAspect;
+      offsetX = 0;
       offsetY = (height - renderH) / 2;
     } else {
       if (canvasAspect > imgAspect) {
