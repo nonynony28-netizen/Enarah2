@@ -1,7 +1,7 @@
-# Project Rules & Design Standards
+# Project Security Rules (قواعد أمان الموقع)
 
-- **Design System:** Use the `ui-ux-pro-design` skill for all UI components, pages, and styling.
-- **Color Theme:** Royal Sapphire Blue palette (`from-blue-400 via-sky-300 to-indigo-400`), Midnight Navy background (`#0a192f`), and glassmorphism.
-- **Typography:** **Cairo** font for Arabic text and headings, **Outfit** for English labels and numbers.
-- **Performance:** Hardware-accelerated CSS animations (`transform: translateZ(0)`), lazy-loaded WebP images, and instant preloading for video assets.
-- **Language & Direction:** RTL native orientation for Arabic, responsive full-width layout for all mobile and desktop devices.
+## Security Hardening Directives:
+1. **Sanitize Inputs:** All user input parameters in API endpoints must be sanitized with `sanitizeString()` to prevent XSS and NoSQL injection attacks.
+2. **Rate Limiting:** Protect form submission endpoints against spam and DoS with `checkRateLimit()`.
+3. **Security Headers:** Enforce `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Strict-Transport-Security` on API responses.
+4. **Environment Isolation:** Keep database connection strings (`MONGODB_URI`) and cloud storage keys isolated in server environment variables.
