@@ -270,7 +270,13 @@ export default function Products() {
       if (cached) {
         try {
           const parsed = JSON.parse(cached)
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map((p: any) => ({
+              ...p,
+              name: String(p.name || '').replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد'),
+              description: String(p.description || '').replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+            }))
+          }
         } catch {}
       }
     }
@@ -319,6 +325,9 @@ export default function Products() {
                 const nameObj = JSON.parse(nameText)
                 nameText = isAr ? (nameObj.ar || nameObj.en || nameText) : (nameObj.en || nameObj.ar || nameText)
               } catch {}
+
+              nameText = nameText.replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+              descText = descText.replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
 
               return {
                 id: item._id || String(index),
