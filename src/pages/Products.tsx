@@ -91,27 +91,71 @@ const CATEGORIES_LIST = [
 
 // 🛒 المنتجات الافتراضية الموزعة حسب الأقسام
 const defaultFallbackProducts: ProductItem[] = [
-  // الأسلاك والكوابل
+  // الأسلاك والكوابل الإيطالية والتركية المعتمدة (جميع القياسات)
   {
-    id: 'wire-italy-25',
-    name: 'سلك كهربائي إيطالي معتمد 2.5 مم',
-    description: 'أسلاك إيطالية معتمدة وموصلات نحاسية فائقة النقاء عازلة للحرارة والكهرباء 100%.',
+    id: 'wire-size-15',
+    name: 'سلك كهربائي إيطالي / تركي معتمد 1.5 مم (لفة 100 متر)',
+    description: 'نحاس صافي 100% عالي النقاء مستورد مباشرة من إيطاليا وتركيا، مناسب للإنارة والإضاءة العامة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
-    price: 185,
-    discountPrice: 165,
+    price: 245,
+    discountPrice: 230,
+    stockStatus: 'available',
+    stockQty: 150,
+    category: 'الأسلاك والكوابل'
+  },
+  {
+    id: 'wire-size-25',
+    name: 'سلك كهربائي إيطالي / تركي معتمد 2.5 مم (لفة 100 متر)',
+    description: 'نحاس صافي 100% عازل للحرارة والكهرباء، مخصص للتأسيس المنزلي والأحمال المتوسطة والبرايز.',
+    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
+    price: 375,
+    discountPrice: 350,
+    stockStatus: 'available',
+    stockQty: 200,
+    category: 'الأسلاك والكوابل'
+  },
+  {
+    id: 'wire-size-40',
+    name: 'سلك كهربائي إيطالي / تركي معتمد 4.0 مم (لفة 100 متر)',
+    description: 'نحاس إلكتروليتي صافي 100%، مخصص للمكيفات والأجهزة الكبيرة والأحمال الكهربائية الثقيلة.',
+    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
+    price: 585,
+    discountPrice: 550,
     stockStatus: 'available',
     stockQty: 100,
     category: 'الأسلاك والكوابل'
   },
   {
-    id: 'wire-italy-40',
-    name: 'سلك كهربائي إيطالي معتمد 4.0 مم',
-    description: 'لفة سلك إيطالي 100 متر للتأسيس الكهربائي الثقيل والأحمال العالية.',
+    id: 'wire-size-60',
+    name: 'سلك كهربائي إيطالي / تركي معتمد 6.0 مم (لفة 100 متر)',
+    description: 'سلك نحاسي إيطالي تركي فائق القوة للخطوط المغذية الرئيسية والفرعية والأحمال العالية.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
-    price: 245,
-    discountPrice: 220,
+    price: 845,
+    discountPrice: 810,
     stockStatus: 'available',
-    stockQty: 50,
+    stockQty: 80,
+    category: 'الأسلاك والكوابل'
+  },
+  {
+    id: 'wire-size-100',
+    name: 'كابل / سلك كهربائي معتمد 10.0 مم (لفة 100 متر)',
+    description: 'موصلات نحاسية وألومنيوم صافي 100% معتمدة للوحات التوزيع والعدادات الرئيسية.',
+    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
+    price: 1350,
+    discountPrice: 1290,
+    stockStatus: 'available',
+    stockQty: 40,
+    category: 'الأسلاك والكوابل'
+  },
+  {
+    id: 'wire-size-160',
+    name: 'كابل / سلك كهربائي معتمد 16.0 مم (لفة 100 متر)',
+    description: 'كوابل ثقيلة فائقة النقاء عازلة للضغط العالي مخصصة للتأسيس الصناعي والمباني الضخمة.',
+    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
+    price: 1980,
+    discountPrice: 1900,
+    stockStatus: 'available',
+    stockQty: 25,
     category: 'الأسلاك والكوابل'
   },
   // سبوت لايت

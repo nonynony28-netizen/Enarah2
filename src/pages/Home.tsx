@@ -822,6 +822,125 @@ export default function Home() {
           </div>
         </section>
 
+        {/* =========================================================
+            قسم الجودة والاستيراد المباشر للأسلاك والكوابل (إيطاليا وتركيا والنحاس الصافي)
+            ========================================================= */}
+        <section id="wires-import-showcase" className="py-20 md:py-28 relative overflow-hidden bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#0a192f] border-t border-sky-500/20">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.18)_0%,transparent_70%)] pointer-events-none" />
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <span className="px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-sky-400 text-xs font-bold inline-flex items-center gap-2 mb-4">
+                <Zap className="w-4 h-4" />
+                {isAr ? 'الاستيراد المباشر والجودة المعتمدة' : 'Direct Import & Certified Quality'}
+              </span>
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+                {isAr ? (
+                  <>أسلاك وكوابل إيطالية وتركية <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 drop-shadow-[0_4px_25px_rgba(245,158,11,0.5)]">من المصنع مباشرة</span></>
+                ) : (
+                  <>Italian & Turkish Wires <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 drop-shadow-[0_4px_25px_rgba(245,158,11,0.5)]">Direct from Source</span></>
+                )}
+              </h2>
+              <p className="text-slate-300 max-w-3xl mx-auto text-base md:text-xl font-medium leading-relaxed">
+                {isAr
+                  ? 'نوفر لكم أجود أنواع الأسلاك والكوابل النحاسية والألومنيوم الصافي 100% المستوردة مباشرة من إيطاليا وتركيا لضمان أعلى مستويات الأمان وتحمل الأحمال الكهربائية العالية دون أي هدر أو تسريب حراري.'
+                  : 'We directly import 100% pure copper and aluminum wires from Italy & Turkey, engineered for maximum safety, zero heat loss, and extreme electrical durability.'
+                }
+              </p>
+            </div>
+
+            {/* Showcase Stage Grid: Video/Motion & Credentials */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-16">
+              
+              {/* Video / Motion Loop Stage Container (7 Cols) */}
+              <div className="lg:col-span-7 relative rounded-3xl overflow-hidden bg-[#0a192f] border border-amber-500/30 shadow-[0_0_50px_rgba(245,158,11,0.2)] group">
+                <div className="relative aspect-video w-full overflow-hidden flex items-center justify-center bg-black">
+                  <video
+                    src="/bg-video.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    webkit-playsinline="true"
+                    poster="/poster.jpg"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-black/40" />
+
+                  {/* Dynamic Badges Overlay */}
+                  <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+                    <span className="px-3 py-1.5 rounded-full bg-amber-500/90 text-slate-950 text-xs font-black shadow-lg flex items-center gap-1.5">
+                      <span>🇮🇹 🇹🇷 {isAr ? 'استيراد إيطاليا وتركيا' : 'Italy & Turkey Import'}</span>
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 p-4 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-white/10">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-amber-400 animate-ping" />
+                      <span className="text-white text-xs font-bold">{isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}</span>
+                    </div>
+                    <span className="text-amber-400 text-xs font-black">{isAr ? 'معتمد ومضمون 100%' : '100% Certified'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* High Spec Feature Cards (5 Cols) */}
+              <div className="lg:col-span-5 space-y-4">
+                
+                <div className="p-6 rounded-2xl bg-[#0f213a] border border-amber-500/20 hover:border-amber-500/50 transition-all duration-300 shadow-xl flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+                    <span className="text-xl font-black">🇮🇹</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white mb-1">{isAr ? 'استيراد إيطالي تركي مباشر' : 'Direct Italian & Turkish Import'}</h3>
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
+                      {isAr ? 'شحن وتوريد مباشر من مصانع إيطاليا وتركيا المعتمدة بدون وسطاء لضمان الجودة والأسعار المنافسة.' : 'Direct shipments from original certified factories in Italy & Turkey ensuring best pricing and authenticity.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-[#0f213a] border border-blue-500/20 hover:border-blue-500/50 transition-all duration-300 shadow-xl flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 flex-shrink-0">
+                    <Zap className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white mb-1">{isAr ? 'نحاس إلكتروليتي وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}</h3>
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
+                      {isAr ? 'وصلات نحاسية عالية النقاوة تمنع الفقد الحراري وتوفر أقصى طاقة استيعابية للأحمال الكبيرة.' : 'High-purity conductors delivering maximum electrical conductivity with zero thermal leakage.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-[#0f213a] border border-emerald-500/20 hover:border-emerald-500/50 transition-all duration-300 shadow-xl flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                    <Check className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white mb-1">{isAr ? 'عزل متعدد الأمان لجميع المقاسات' : 'Multi-layer Certified Insulation'}</h3>
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
+                      {isAr ? 'مغطاة بطبقات عزل مقاومة للحرارة العالية والمطابقة للمواصفات الأوروبية لمقاسات من 1.5 مم وحتى 16 مم.' : 'Fire-retardant multi-layer PVC insulation covering wire gauges from 1.5mm to 16mm.'}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* CTA Button Link */}
+            <div className="text-center">
+              <Link 
+                to="/products"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-slate-950 font-black text-sm md:text-base shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:scale-105 transition-all duration-300"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                <span>{isAr ? 'تسوق أسلاك النحاس والألومنيوم بالمتجر الإلكتروني ←' : 'Shop Copper & Aluminum Wires in Store ←'}</span>
+              </Link>
+            </div>
+
+          </div>
+        </section>
+
         {/* 2.5 مُحاكي الإضاءة التفاعلي المبتكر */}
         <section id="simulator" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
