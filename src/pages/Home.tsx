@@ -1314,7 +1314,7 @@ export default function Home() {
                         className="snap-start snap-always min-w-[280px] xs:min-w-[310px] w-[80vw] bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden flex flex-col hover:border-blue-500/50 transition-all duration-300 cursor-pointer shadow-lg"
                       >
                         <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f] border-b border-white/5">
-                          <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                          <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/95 via-[#0a192f]/40 to-transparent opacity-95 z-10" />
                           
                           <div className="absolute top-3 right-3 z-20">
@@ -1354,7 +1354,7 @@ export default function Home() {
                       className="group relative bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/50 hover:shadow-[0_10px_35px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
                     >
                       <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f] border-b border-white/5">
-                        <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                        <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/95 via-[#0a192f]/40 to-transparent opacity-95 z-10" />
                         
                         <div className="absolute top-3 right-3 z-20">

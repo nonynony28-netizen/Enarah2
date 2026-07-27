@@ -239,7 +239,7 @@ export default function Projects() {
                   }`}
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
-                    <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                    <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-90 z-10" />
                     
                     {/* شارة التصنيف */}

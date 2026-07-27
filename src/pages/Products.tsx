@@ -322,6 +322,8 @@ export default function Products() {
                       <img 
                         src={cat.image} 
                         alt={cat.name} 
+                        loading="lazy"
+                        decoding="async"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                         onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} 
                       />
@@ -432,7 +434,7 @@ export default function Products() {
                   <div className="relative overflow-hidden aspect-[4/3] bg-[#0a192f] flex items-center justify-center">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-transparent to-transparent opacity-85 z-10" />
                     <ImageIcon className="absolute w-12 h-12 text-white/5" />
-                    <img src={product.image} alt={displayName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 relative" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                    <img src={product.image} alt={displayName} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 relative" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                     
                     {/* شارة حالة التوفر والكمية */}
                     {product.stockStatus === 'out_of_stock' || (product.stockQty !== undefined && product.stockQty <= 0) ? (
