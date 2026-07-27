@@ -158,6 +158,17 @@ const defaultFallbackProducts: ProductItem[] = [
     stockQty: 25,
     category: 'الأسلاك والكوابل'
   },
+  {
+    id: 'wire-size-250',
+    name: 'سلك كهربائي إيطالي معتمد 25.0 مم (لفة 100 متر)',
+    description: 'أسلاك نحاسية إيطالية فائقة النقاء للأحمال والمصانع والعدادات الرئيسية الضخمة.',
+    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
+    price: 2950,
+    discountPrice: 2850,
+    stockStatus: 'available',
+    stockQty: 20,
+    category: 'الأسلاك والكوابل'
+  },
   // سبوت لايت
   {
     id: 'spot-antiglare-7w',
