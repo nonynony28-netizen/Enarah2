@@ -138,7 +138,7 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-100',
-    name: 'كابل / سلك كهربائي إيطالي معتمد 10.0 مم (لفة 100 متر)',
+    name: 'سلك كهربائي إيطالي معتمد 10.0 مم (لفة 100 متر)',
     description: 'موصلات نحاسية إيطالية صافية 100% معتمدة للوحات التوزيع والعدادات الرئيسية.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 1350,
@@ -149,8 +149,8 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-160',
-    name: 'كابل / سلك كهربائي إيطالي معتمد 16.0 مم (لفة 100 متر)',
-    description: 'كوابل إيطالية ثقيلة فائقة النقاء عازلة للضغط العالي مخصصة للتأسيس الصناعي والمباني الضخمة.',
+    name: 'سلك كهربائي إيطالي معتمد 16.0 مم (لفة 100 متر)',
+    description: 'أسلاك إيطالية ثقيلة فائقة النقاء عازلة للضغط العالي مخصصة للتأسيس الصناعي والمباني الضخمة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 1980,
     discountPrice: 1900,
@@ -326,8 +326,16 @@ export default function Products() {
                 nameText = isAr ? (nameObj.ar || nameObj.en || nameText) : (nameObj.en || nameObj.ar || nameText)
               } catch {}
 
-              nameText = nameText.replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
-              descText = descText.replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+              nameText = nameText
+                .replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+                .replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+                .replace(/كابل\s*\/\s*سلك/gi, 'سلك')
+                .replace(/كوابل/gi, 'أسلاك')
+              descText = descText
+                .replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+                .replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+                .replace(/كابل\s*\/\s*سلك/gi, 'سلك')
+                .replace(/كوابل/gi, 'أسلاك')
 
               return {
                 id: item._id || String(index),
