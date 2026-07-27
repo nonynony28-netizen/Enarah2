@@ -195,10 +195,11 @@ export default function Products() {
                   return false;
                 }
                 if (itemEmail.includes('admin_wire_prices')) return false;
+                if (itemEmail.includes('hero_video') || itemEmail.includes('video') || itemName.includes('فيديو') || itemName.includes('تحديث فيديو') || itemName.includes('خلفية')) return false;
 
                 try {
                   const phoneData = item.phone ? JSON.parse(item.phone) : {}
-                  if (phoneData.type === 'project') return false;
+                  if (phoneData.type === 'project' || phoneData.type === 'hero_video' || phoneData.type === 'video') return false;
                 } catch {}
                 
                 return true;
@@ -250,7 +251,12 @@ export default function Products() {
   }, [isAr])
 
   // تصنيف الأقسام المرفوعة في قاعدة البيانات (حيث حقل القسم فارغ أو غير موجود)
-  const dynamicCategories = products.filter(p => !p.category || p.category.trim() === '')
+  const dynamicCategories = products
+    .filter(p => !p.category || p.category.trim() === '')
+    .filter(p => {
+      const name = String(p.name || '').toLowerCase();
+      return !name.includes('فيديو') && !name.includes('video') && !name.includes('خلفية') && !name.includes('hero');
+    })
 
   // المنتجات الحقيقية المرفوعة تحت الأقسام
   const actualProducts = products.filter(p => p.category && p.category.trim() !== '')
