@@ -101,13 +101,8 @@ export default function Layout() {
 
       if (scrollTop > 40) {
         setIsScrollActivated(true)
-        if (!hasPlayedSwitchSound) {
-          playClickSound(true)
-          setHasPlayedSwitchSound(true)
-        }
       } else {
         setIsScrollActivated(false)
-        setHasPlayedSwitchSound(false)
       }
     }
 
