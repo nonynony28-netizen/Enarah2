@@ -919,7 +919,7 @@ export default function Home() {
                   <div>
                     <h3 className="text-lg font-black text-white mb-1">{isAr ? 'عزل متعدد الأمان لجميع المقاسات' : 'Multi-layer Certified Insulation'}</h3>
                     <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
-                      {isAr ? 'مغطاة بطبقات عزل مقاومة للحرارة العالية والمطابقة للمواصفات الأوروبية لمقاسات من 1.5 مم وحتى 16 مم.' : 'Fire-retardant multi-layer PVC insulation covering wire gauges from 1.5mm to 16mm.'}
+                      {isAr ? 'مغطاة بطبقات عزل مقاومة للحرارة العالية والمطابقة للمواصفات الأوروبية لكافة المقاسات واحتياجات التأسيس.' : 'Fire-retardant multi-layer PVC insulation covering all wire gauges and installation needs.'}
                     </p>
                   </div>
                 </div>
