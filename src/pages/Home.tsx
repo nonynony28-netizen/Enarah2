@@ -5,6 +5,7 @@ import { useShake } from '../hooks/use-shake'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
 import HeroAutoCanvas from '../components/HeroAutoCanvas'
+import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
@@ -853,24 +854,15 @@ export default function Home() {
             {/* Showcase Stage Grid: Video/Motion & Credentials */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-16">
               
-              {/* Video / Motion Loop Stage Container (7 Cols) */}
+              {/* Video / 3D Motion Canvas Stage Container (7 Cols) */}
               <div className="lg:col-span-7 relative rounded-3xl overflow-hidden bg-[#0a192f] border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.25)] group">
-                <div className="relative aspect-video w-full overflow-hidden flex items-center justify-center bg-black">
-                  <video
-                    src="/bg-video.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    webkit-playsinline="true"
-                    poster="/poster.jpg"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-black/40" />
+                <div className="relative aspect-video w-full overflow-hidden flex items-center justify-center bg-[#0a192f]">
+                  <WiresAutoCanvas totalFrames={240} fps={30} className="w-full h-full" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-black/40 pointer-events-none" />
 
                   {/* Dynamic Badges Overlay */}
                   <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-                    <span className="px-3 py-1.5 rounded-full bg-blue-600/90 text-white text-xs font-black shadow-lg flex items-center gap-1.5 border border-blue-400/30">
+                    <span className="px-3 py-1.5 rounded-full bg-blue-600/90 text-white text-xs font-black shadow-lg flex items-center gap-1.5 border border-blue-400/30 backdrop-blur-md">
                       <span>🇮🇹 🇹🇷 {isAr ? 'استيراد إيطاليا وتركيا' : 'Italy & Turkey Import'}</span>
                     </span>
                   </div>
