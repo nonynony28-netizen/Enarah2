@@ -837,9 +837,9 @@ export default function Home() {
               </span>
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
                 {isAr ? (
-                  <>أسلاك وكوابل إيطالية وتركية <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 drop-shadow-[0_4px_25px_rgba(245,158,11,0.5)]">من المصنع مباشرة</span></>
+                  <>أسلاك وكوابل إيطالية وتركية <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_25px_rgba(59,130,246,0.5)]">من المصنع مباشرة</span></>
                 ) : (
-                  <>Italian & Turkish Wires <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 drop-shadow-[0_4px_25px_rgba(245,158,11,0.5)]">Direct from Source</span></>
+                  <>Italian & Turkish Wires <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_25px_rgba(59,130,246,0.5)]">Direct from Source</span></>
                 )}
               </h2>
               <p className="text-slate-300 max-w-3xl mx-auto text-base md:text-xl font-medium leading-relaxed">
@@ -854,7 +854,7 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-16">
               
               {/* Video / Motion Loop Stage Container (7 Cols) */}
-              <div className="lg:col-span-7 relative rounded-3xl overflow-hidden bg-[#0a192f] border border-amber-500/30 shadow-[0_0_50px_rgba(245,158,11,0.2)] group">
+              <div className="lg:col-span-7 relative rounded-3xl overflow-hidden bg-[#0a192f] border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.25)] group">
                 <div className="relative aspect-video w-full overflow-hidden flex items-center justify-center bg-black">
                   <video
                     src="/bg-video.mp4"
@@ -870,17 +870,17 @@ export default function Home() {
 
                   {/* Dynamic Badges Overlay */}
                   <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-                    <span className="px-3 py-1.5 rounded-full bg-amber-500/90 text-slate-950 text-xs font-black shadow-lg flex items-center gap-1.5">
+                    <span className="px-3 py-1.5 rounded-full bg-blue-600/90 text-white text-xs font-black shadow-lg flex items-center gap-1.5 border border-blue-400/30">
                       <span>🇮🇹 🇹🇷 {isAr ? 'استيراد إيطاليا وتركيا' : 'Italy & Turkey Import'}</span>
                     </span>
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 p-4 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-white/10">
                     <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-amber-400 animate-ping" />
+                      <span className="w-3 h-3 rounded-full bg-sky-400 animate-ping" />
                       <span className="text-white text-xs font-bold">{isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}</span>
                     </div>
-                    <span className="text-amber-400 text-xs font-black">{isAr ? 'معتمد ومضمون 100%' : '100% Certified'}</span>
+                    <span className="text-sky-400 text-xs font-black">{isAr ? 'معتمد ومضمون 100%' : '100% Certified'}</span>
                   </div>
                 </div>
               </div>
@@ -888,8 +888,8 @@ export default function Home() {
               {/* High Spec Feature Cards (5 Cols) */}
               <div className="lg:col-span-5 space-y-4">
                 
-                <div className="p-6 rounded-2xl bg-[#0f213a] border border-amber-500/20 hover:border-amber-500/50 transition-all duration-300 shadow-xl flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+                <div className="p-6 rounded-2xl bg-[#0f213a] border border-blue-500/20 hover:border-blue-500/50 transition-all duration-300 shadow-xl flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 flex-shrink-0">
                     <span className="text-xl font-black">🇮🇹</span>
                   </div>
                   <div>
@@ -931,7 +931,7 @@ export default function Home() {
             <div className="text-center">
               <Link 
                 to="/products"
-                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-slate-950 font-black text-sm md:text-base shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:scale-105 transition-all duration-300"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-black text-sm md:text-base shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:shadow-[0_0_40px_rgba(59,130,246,0.7)] hover:scale-105 transition-all duration-300 border border-sky-400/30"
               >
                 <ShoppingCart className="w-5 h-5" />
                 <span>{isAr ? 'تسوق أسلاك النحاس والألومنيوم بالمتجر الإلكتروني ←' : 'Shop Copper & Aluminum Wires in Store ←'}</span>
