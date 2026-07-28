@@ -823,29 +823,29 @@ export default function Home() {
           </div>
         </section>
         {/* =========================================================
-            قسم مسرح الأسلاك الـ 3D التفاعلي: عريض للكمبيوتر وطولي للهواتف مع إظهار النصوص بأنيميشن بعد ظهور الفيديو بقليل
+            قسم مسرح الأسلاك الـ 3D التفاعلي: عريض للكمبيوتر وطولي للهواتف على كامل العرض مع إعادة الأنيميشن عند كل سكرول
             ========================================================= */}
         <section id="wires-import-showcase" className="py-6 md:py-10 relative overflow-hidden bg-[#0a192f] border-t border-sky-500/20">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 relative z-10">
             
-            {/* 🎬 مسرح موشن الأسلاك: رأسي طولي (aspect-[9/16]) للجوال، وعريض سينمائي (md:aspect-[16/9]) للشاشات الكبيرة */}
-            <div className="relative w-full max-w-[340px] sm:max-w-md md:max-w-5xl aspect-[9/16] md:aspect-[16/9] max-h-[82vh] mx-auto rounded-3xl overflow-hidden bg-[#0a192f] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.35)] group">
+            {/* 🎬 مسرح موشن الأسلاك: رأسي طولي كامل العرض (aspect-[9/16] min-h-[75vh]) للجوال، وعريض سينمائي (md:aspect-[16/9]) للكمبيوتر */}
+            <div className="relative w-full aspect-[9/16] md:aspect-[16/9] min-h-[72vh] sm:min-h-[80vh] md:max-h-[82vh] mx-auto rounded-3xl overflow-hidden bg-[#0a192f] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.35)] group">
               
-              {/* 1. موشن الأسلاك الأصلي 240 إطار */}
-              <WiresAutoCanvas totalFrames={240} fps={30} fitMode="contain" className="w-full h-full" />
+              {/* 1. موشن الأسلاك الأصلي الـ 240 إطار (fitMode="cover" ليغطي كامل المساحة بدون قص حواف أو فراغات) */}
+              <WiresAutoCanvas totalFrames={240} fps={30} fitMode="cover" className="w-full h-full" />
               
               {/* 2. تظليل زجاجي سُفلي وعلوي خفيف للتمييز البصري */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-transparent to-slate-950/40 z-10 pointer-events-none" />
 
-              {/* 3. النصوص والشارات الطافية بحركة أنيميشن سينمائية تظهر داخل الفيديو بعد ظهوره بقليل (Delay 1.0s to 1.5s) */}
+              {/* 3. النصوص والشارات الطافية بحركة أنيميشن سينمائية تظهر بعد ظهور الفيديو وتتكرر عند كل عودة (once: false) */}
               <div className="absolute inset-0 z-20 p-4 sm:p-6 md:p-10 flex flex-col justify-between items-center text-center">
                 
-                {/* شارة علوية طافية تظهر أنيميشن بعد ظهور الفيديو بقليل */}
+                {/* شارة علوية طافية تظهر وتتكرر عند العودة للقسم */}
                 <motion.div 
                   initial={{ opacity: 0, y: -20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 1.0 }}
-                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.8 }}
+                  viewport={{ once: false, amount: 0.2 }}
                   className="w-full flex items-center justify-between gap-2"
                 >
                   <span className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-blue-600/90 text-white text-[11px] sm:text-xs font-black shadow-lg border border-blue-400/30 backdrop-blur-md">
@@ -858,12 +858,12 @@ export default function Home() {
                   </span>
                 </motion.div>
 
-                {/* المحتوى والمواصفات المصغرة تظهر بعد ظهور الفيديو بقليل بأناقة ورقي */}
+                {/* المحتوى والمواصفات المصغرة تظهر بعد الفيديو وتتكرر في كل مرة يتم التصفح والعودة فيها للقسم */}
                 <motion.div 
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, delay: 1.3 }}
-                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, delay: 1.1 }}
+                  viewport={{ once: false, amount: 0.2 }}
                   className="mt-auto mb-2 w-full max-w-xl"
                 >
                   <h3 className="text-xl sm:text-3xl md:text-4xl font-black text-white mb-2 leading-tight drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">
@@ -881,12 +881,12 @@ export default function Home() {
                     <span className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 backdrop-blur-md">🛡️ {isAr ? 'عزل معتمد' : 'Certified PVC'}</span>
                   </div>
 
-                  {/* زر التسوق بالمتجر الإلكتروني يظهر بأنيميشن جذاب بعد النصوص */}
+                  {/* زر التسوق بالمتجر الإلكتروني يتكرر ظهوره بأنيميشن عند العودة */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.85 }}
                     whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 1.6 }}
-                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 1.4 }}
+                    viewport={{ once: false, amount: 0.2 }}
                     className="mt-4"
                   >
                     <Link 
