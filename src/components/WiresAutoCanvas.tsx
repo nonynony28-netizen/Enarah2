@@ -4,12 +4,14 @@ interface WiresAutoCanvasProps {
   totalFrames?: number
   fps?: number
   className?: string
+  fitMode?: 'contain' | 'cover'
 }
 
 export default function WiresAutoCanvas({
   totalFrames = 240,
   fps = 30,
-  className = ''
+  className = '',
+  fitMode = 'contain'
 }: WiresAutoCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const imagesRef = useRef<HTMLImageElement[]>([])
@@ -72,7 +74,6 @@ export default function WiresAutoCanvas({
       ctx.save()
       ctx.scale(dpr, dpr)
 
-      // حظر أي مسافات فارغة وضبط أبعاد العرض
       const imgRatio = img.naturalWidth / img.naturalHeight
       const containerRatio = width / height
 
@@ -81,14 +82,26 @@ export default function WiresAutoCanvas({
       let offsetX = 0
       let offsetY = 0
 
-      if (containerRatio > imgRatio) {
-        renderW = width
-        renderH = width / imgRatio
-        offsetY = (height - renderH) / 2
+      if (fitMode === 'contain') {
+        if (containerRatio > imgRatio) {
+          renderH = height
+          renderW = height * imgRatio
+          offsetX = (width - renderW) / 2
+        } else {
+          renderW = width
+          renderH = width / imgRatio
+          offsetY = (height - renderH) / 2
+        }
       } else {
-        renderH = height
-        renderW = height * imgRatio
-        offsetX = (width - renderW) / 2
+        if (containerRatio > imgRatio) {
+          renderW = width
+          renderH = width / imgRatio
+          offsetY = (height - renderH) / 2
+        } else {
+          renderH = height
+          renderW = height * imgRatio
+          offsetX = (width - renderW) / 2
+        }
       }
 
       ctx.fillStyle = '#0a192f'

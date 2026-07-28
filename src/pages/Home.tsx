@@ -824,75 +824,119 @@ export default function Home() {
         </section>
 
         {/* =========================================================
-            قسم الجودة والاستيراد المباشر للأسلاك والكوابل بعرض الفيديو الأصلي والنصوص بداخله
+            قسم الجودة والاستيراد المباشر للأسلاك بموزونة الفيديو الرأسي الطولي الأصلية (Vertical Portrait 3D Wires Stage)
             ========================================================= */}
         <section id="wires-import-showcase" className="py-16 md:py-24 relative overflow-hidden bg-[#0a192f] border-t border-sky-500/20">
-          
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {/* 🎬 مسرح موشن الأسلاك الـ 3D بمقاسه الأصلي ومحتواه التفاعلي بداخله بالكامل */}
-            <div className="relative w-full aspect-video md:aspect-[16/9] max-h-[80vh] rounded-3xl overflow-hidden bg-[#0a192f] border border-blue-500/40 shadow-[0_0_60px_rgba(59,130,246,0.35)] group">
-              
-              {/* 1. موشن الأسلاك الأصلي الـ 240 إطار */}
-              <WiresAutoCanvas totalFrames={240} fps={30} className="w-full h-full object-cover" />
-              
-              {/* 2. طبقة التظليل العازل للتصميم الإبداعي */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-slate-950/40 z-10 pointer-events-none" />
+            {/* الهيدر العلوي للقسم */}
+            <div className="text-center mb-12">
+              <span className="px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-sky-400 text-xs font-bold inline-flex items-center gap-2 mb-4">
+                <Zap className="w-4 h-4 text-amber-400 animate-pulse" />
+                {isAr ? 'الاستيراد المباشر والجودة المعتمدة' : 'Direct Import & Certified Quality'}
+              </span>
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">
+                {isAr ? (
+                  <>أسلاك وكوابل إيطالية وتركية <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_25px_rgba(59,130,246,0.5)]">من المصنع مباشرة</span></>
+                ) : (
+                  <>Italian & Turkish Wires <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_25px_rgba(59,130,246,0.5)]">Direct from Source</span></>
+                )}
+              </h2>
+              <p className="text-slate-300 max-w-2xl mx-auto text-sm md:text-base font-medium leading-relaxed">
+                {isAr
+                  ? 'نوفر لكم أجود أنواع الأسلاك والنحاس الصافي 100% المستوردة مباشرة من إيطاليا وتركيا لضمان أعلى مستويات الأمان وتحمل الأحمال الكهربائية العالية.'
+                  : 'We directly import 100% pure copper wires from Italy & Turkey, engineered for maximum safety and extreme electrical durability.'
+                }
+              </p>
+            </div>
 
-              {/* 3. النصوص والشارات والزر طافية بالكامل داخل كادر الفيديو */}
-              <div className="absolute inset-0 z-20 p-5 sm:p-8 md:p-12 flex flex-col justify-between items-center text-center">
-                
-                {/* الشريط العلوي للشارات داخل الفيديو */}
-                <div className="w-full flex items-center justify-between gap-2">
-                  <span className="px-3.5 py-1.5 rounded-full bg-blue-600/90 text-white text-xs font-black shadow-lg border border-blue-400/40 backdrop-blur-md">
-                    🇮🇹 🇹🇷 {isAr ? 'استيراد إيطاليا وتركيا المباشر' : 'Direct Italy & Turkey Import'}
-                  </span>
+            {/* المسرح الرأسي الطولي للفيديو + كروت المواصفات المجاورة */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* 🎬 1. مسرح الفيديو الرأسي الطولي بمقاسه الأصلي الكامل (Portrait Video Stage Container) */}
+              <div className="lg:col-span-6 flex justify-center">
+                <div className="relative w-full max-w-sm sm:max-w-md aspect-[9/16] min-h-[480px] max-h-[75vh] rounded-3xl overflow-hidden bg-[#0a192f] border border-blue-500/40 shadow-[0_0_60px_rgba(59,130,246,0.35)] group">
+                  
+                  {/* موشن الأسلاك الأصلي الرأسي 240 إطار */}
+                  <WiresAutoCanvas totalFrames={240} fps={30} fitMode="contain" className="w-full h-full" />
+                  
+                  {/* التظليل الزجاجي الواقي للنصوص */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-slate-950/30 z-10 pointer-events-none" />
 
-                  <span className="px-3.5 py-1.5 rounded-full bg-slate-900/80 text-sky-400 text-xs font-bold border border-sky-500/40 backdrop-blur-md hidden sm:inline-flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
-                    <span>{isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}</span>
-                  </span>
+                  {/* النصوص والشارات الطافية بالكامل داخل الفيديو الرأسي */}
+                  <div className="absolute inset-0 z-20 p-6 flex flex-col justify-between items-center text-center">
+                    
+                    {/* شارة رأسية داخل الفيديو */}
+                    <span className="px-3.5 py-1.5 rounded-full bg-blue-600/90 text-white text-xs font-black shadow-lg border border-blue-400/40 backdrop-blur-md">
+                      🇮🇹 🇹🇷 {isAr ? 'استيراد إيطاليا وتركيا المباشر' : 'Direct Italy & Turkey Import'}
+                    </span>
+
+                    {/* المحتوى المركزي داخل كادر الفيديو */}
+                    <div className="my-auto py-4">
+                      <h3 className="text-xl sm:text-2xl font-black text-white mb-2 leading-snug drop-shadow-md">
+                        {isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}
+                      </h3>
+                      <p className="text-slate-200 text-xs sm:text-sm font-medium leading-relaxed drop-shadow-sm">
+                        {isAr ? 'مقاومة قصوى للحرارة وعزل متعدد الأمان مطابق للمواصفات القياسية.' : 'High thermal resistance with multi-layer certified PVC insulation.'}
+                      </p>
+
+                      <div className="flex flex-wrap justify-center gap-2 mt-4 text-[11px] font-bold text-sky-300">
+                        <span className="px-2.5 py-1 rounded-lg bg-slate-900/80 border border-white/10 backdrop-blur-md">⚡ نحاس إلكتروليتي</span>
+                        <span className="px-2.5 py-1 rounded-lg bg-slate-900/80 border border-white/10 backdrop-blur-md">🛡️ عزل معتمد</span>
+                      </div>
+                    </div>
+
+                    {/* زر التسوق المباشر داخل الفيديو */}
+                    <Link 
+                      to="/products"
+                      className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:scale-105 transition-all duration-300 border border-sky-400/40 backdrop-blur-md flex items-center justify-center gap-2"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      <span>{isAr ? 'تسوق بالمتجر الإلكتروني ←' : 'Shop Wires in Store ←'}</span>
+                    </Link>
+
+                  </div>
+
                 </div>
+              </div>
 
-                {/* المحتوى والنصوص المركزية داخل كادر الفيديو */}
-                <div className="my-auto py-2 max-w-3xl">
-                  <span className="px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-500/40 text-sky-300 text-xs font-extrabold inline-flex items-center gap-2 mb-3 backdrop-blur-md">
-                    <Zap className="w-4 h-4 text-amber-400 animate-pulse" />
-                    {isAr ? 'الاستيراد المباشر والجودة المعتمدة' : 'Direct Import & Certified Quality'}
-                  </span>
-
-                  <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 md:mb-4 leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
-                    {isAr ? (
-                      <>أسلاك وكوابل إيطالية وتركية <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_25px_rgba(59,130,246,0.8)]">من المصنع مباشرة</span></>
-                    ) : (
-                      <>Italian & Turkish Wires <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_25px_rgba(59,130,246,0.8)]">Direct from Source</span></>
-                    )}
-                  </h2>
-
-                  <p className="text-slate-200 text-xs sm:text-base md:text-lg font-medium leading-relaxed drop-shadow-lg hidden xs:block">
-                    {isAr
-                      ? 'أجود أنواع الأسلاك والنحاس الصافي 100% المستوردة مباشرة من إيطاليا وتركيا لضمان أقصى درجات الأمان وتحمل الأحمال العالية دون أي هدر حراري.'
-                      : 'High-purity 100% copper wires directly imported from Italy & Turkey for maximum safety and extreme durability.'
-                    }
-                  </p>
-
-                  {/* شريحة الميزات المصغرة داخل الفيديو */}
-                  <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mt-4 text-xs font-bold text-slate-200">
-                    <span className="px-3 py-1 rounded-xl bg-slate-900/70 border border-white/10 backdrop-blur-md">🇮🇹 {isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
-                    <span className="px-3 py-1 rounded-xl bg-slate-900/70 border border-white/10 backdrop-blur-md">⚡ {isAr ? 'نحاس إلكتروليتي 100%' : '100% Electrolytic Copper'}</span>
-                    <span className="px-3 py-1 rounded-xl bg-slate-900/70 border border-white/10 backdrop-blur-md">🛡️ {isAr ? 'عزل متعدد الأمان' : 'Certified Insulation'}</span>
+              {/* 2. كروت المواصفات المجاورة لتوازن الصفحة */}
+              <div className="lg:col-span-6 space-y-4">
+                
+                <div className="p-6 rounded-3xl bg-slate-900/80 border border-blue-500/30 backdrop-blur-xl hover:border-sky-400 transition-all duration-300 shadow-xl flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-sky-400 flex-shrink-0">
+                    <span className="text-2xl font-black">🇮🇹</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white mb-1">{isAr ? 'استيراد إيطالي تركي مباشر' : 'Direct Italian & Turkish Import'}</h3>
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
+                      {isAr ? 'شحن وتوريد مباشر من مصانع إيطاليا وتركيا المعتمدة بدون وسطاء لضمان الجودة والأسعار المنافسة.' : 'Direct shipments from original certified factories in Italy & Turkey ensuring best pricing and authenticity.'}
+                    </p>
                   </div>
                 </div>
 
-                {/* زر الشراء والتسوق المباشر أسفل كادر الفيديو */}
-                <div className="w-full pt-2">
-                  <Link 
-                    to="/products"
-                    className="inline-flex items-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-black text-xs sm:text-sm md:text-base shadow-[0_0_30px_rgba(59,130,246,0.6)] hover:shadow-[0_0_45px_rgba(59,130,246,0.9)] hover:scale-105 transition-all duration-300 border border-sky-400/40 backdrop-blur-md"
-                  >
-                    <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span>{isAr ? 'تسوق أسلاك النحاس والألومنيوم بالمتجر الإلكتروني ←' : 'Shop Copper & Aluminum Wires in Store ←'}</span>
-                  </Link>
+                <div className="p-6 rounded-3xl bg-slate-900/80 border border-blue-500/30 backdrop-blur-xl hover:border-sky-400 transition-all duration-300 shadow-xl flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-sky-400 flex-shrink-0">
+                    <Zap className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white mb-1">{isAr ? 'نحاس إلكتروليتي وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}</h3>
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
+                      {isAr ? 'وصلات نحاسية عالية النقاوة تمنع الفقد الحراري وتوفر أقصى طاقة استيعابية للأحمال الكبيرة.' : 'High-purity conductors delivering maximum electrical conductivity with zero thermal leakage.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-3xl bg-slate-900/80 border border-emerald-500/30 backdrop-blur-xl hover:border-emerald-400 transition-all duration-300 shadow-xl flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                    <Check className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white mb-1">{isAr ? 'عزل متعدد الأمان لجميع المقاسات' : 'Multi-layer Certified Insulation'}</h3>
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
+                      {isAr ? 'مغطاة بطبقات عزل مقاومة للحرارة العالية والمطابقة للمواصفات الأوروبية لكافة المقاسات واحتياجات التأسيس.' : 'Fire-retardant multi-layer PVC insulation covering all wire gauges and installation needs.'}
+                    </p>
+                  </div>
                 </div>
 
               </div>
