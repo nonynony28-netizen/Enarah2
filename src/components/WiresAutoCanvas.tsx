@@ -138,9 +138,7 @@ export default function WiresAutoCanvas({
         style={{ touchAction: 'pan-y' }}
       />
       {!isReady && (
-        <div className="absolute inset-0 bg-[#0a192f] flex items-center justify-center text-sky-400 text-xs font-bold animate-pulse">
-          جاري تحميل موشن الأسلاك الإيطالية...
-        </div>
+        <div className="absolute inset-0 bg-[#0a192f] transition-opacity duration-500" />
       )}
     </div>
   )
