@@ -14,6 +14,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* تحسين استهلاك المعالج مع تسريع معالجة الإطارات الخفيفة جداً للجوال */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+
 @layer base {
   :root {
     --background: 220 60% 4%;
