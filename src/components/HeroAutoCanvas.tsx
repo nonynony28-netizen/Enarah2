@@ -16,7 +16,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
   totalFrames = 192,
   folderPath = "/hero-sequence",
   className = "",
-  startDelay = 2400,
+  startDelay = 0,
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -252,14 +252,6 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
 
       {/* محتوى النصوص والترحيب الذي يظهر تلقائياً بعد توهج اللمبة */}
       {children && children({ isFinished, currentFrame: frameIndex })}
-
-      {/* مؤشر تحميل خفيف في البداية */}
-      {!isReady && loadedCount < totalFrames && (
-        <div className="absolute bottom-6 right-6 z-20 flex items-center gap-3 rounded-full bg-slate-900/80 px-4 py-2 text-xs text-sky-400 backdrop-blur border border-sky-500/20">
-          <span className="h-2 w-2 rounded-full bg-sky-400 animate-ping" />
-          <span>جاري فتح المشهد... {Math.round((loadedCount / totalFrames) * 100)}%</span>
-        </div>
-      )}
     </div>
   );
 };
