@@ -273,7 +273,7 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState('')
   const [addingId, setAddingId] = useState<string | null>(null)
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const [products, setProducts] = useState<ProductItem[]>(() => {
     if (typeof window !== 'undefined') {

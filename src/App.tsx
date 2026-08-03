@@ -38,12 +38,23 @@ const PageLoader = () => (
 function App() {
   const [loading, setLoading] = useState(true)
 
-  // 1. شاشة البداية السينمائية الفاخرة والانسيابية
+  // 1. شاشة البداية السينمائية الفاخرة وتحميل كود الصفحات مسبقاً في الذاكرة (Route Prefetching)
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
     }, 2400)
-    return () => clearTimeout(timer)
+
+    // التحميل المسبق لصفحة المنتجات وباقي الصفحات لفتحها فوراً بـ 0 ثانية بدلاً من التأخير
+    const prefetchTimer = setTimeout(() => {
+      import('./pages/Products')
+      import('./pages/Projects')
+      import('./pages/Contact')
+    }, 500)
+
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(prefetchTimer)
+    }
   }, [])
 
   // 2. عداد الزوار 
