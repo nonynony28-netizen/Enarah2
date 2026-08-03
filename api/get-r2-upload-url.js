@@ -55,9 +55,15 @@ export default async function handler(req, res) {
       } catch (e) {}
     }
 
-    const fileType = typeof body.fileType === "string" ? body.fileType : "video/mp4";
-    const ext = fileType.includes("webm") ? "webm" : "mp4";
-    const fileKey = `videos/${uuidv4()}.${ext}`;
+    const fileType = typeof body.fileType === "string" ? body.fileType : "image/webp";
+    let ext = "webp";
+    let folder = "images";
+    if (fileType.includes("jpeg") || fileType.includes("jpg")) ext = "jpg";
+    else if (fileType.includes("png")) ext = "png";
+    else if (fileType.includes("mp4")) { ext = "mp4"; folder = "videos"; }
+    else if (fileType.includes("webm")) { ext = "webm"; folder = "videos"; }
+
+    const fileKey = `${folder}/${uuidv4()}.${ext}`;
 
     const command = new PutObjectCommand({
       Bucket: R2_BUCKET_NAME,
