@@ -78,7 +78,10 @@ export default async function handler(req, res) {
   }
 
   // Admin Password Check
-  const adminPassword = process.env.ADMIN_PASSWORD || "23127";
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) {
+    return res.status(500).json({ success: false, error: "Server error: ADMIN_PASSWORD environment variable is missing" });
+  }
   const clientPassword = req.headers["x-admin-password"];
   if (clientPassword !== adminPassword) {
     return res.status(401).json({
