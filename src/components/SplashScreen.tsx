@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import { useLanguage } from "../hooks/useLanguage";
 
 export default function SplashScreen() {
@@ -50,7 +49,7 @@ export default function SplashScreen() {
             transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
             className="absolute bottom-[-8px] md:bottom-[-10px] w-5 h-5 md:w-6 md:h-6 rounded-full bg-sky-100 border border-sky-300"
             style={{
-              boxShadow: "0 0 20px #38bdf8, 0 0 45px #38bdf8"
+              boxShadow: "0 0 20px #3b82f6, 0 0 45px #3b82f6"
             }}
           />
         </div>
@@ -67,16 +66,16 @@ export default function SplashScreen() {
           <defs>
             <linearGradient id="lampBeamGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#e0f2fe" stopOpacity={0.85} />
-              <stop offset="30%" stopColor="#38bdf8" stopOpacity={0.5} />
-              <stop offset="70%" stopColor="#38bdf8" stopOpacity={0.12} />
-              <stop offset="100%" stopColor="#38bdf8" stopOpacity={0} />
+              <stop offset="30%" stopColor="#3b82f6" stopOpacity={0.5} />
+              <stop offset="70%" stopColor="#3b82f6" stopOpacity={0.12} />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
             </linearGradient>
           </defs>
           <polygon points="234,0 266,0 450,340 50,340" fill="url(#lampBeamGrad)" />
         </svg>
       </motion.div>
 
-      {/* 3. الشعار يظهر بارتقاء سينمائي متألق بالأزرق الناصع مع نجمة تلمع عابرة على الجملة */}
+      {/* 3. الشعار يظهر بارتقاء سينمائي متألق باللون الأزرق الفاخر مع لمعة عابرة ناعمة */}
       <div className="absolute top-[270px] md:top-[350px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full text-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
@@ -84,48 +83,39 @@ export default function SplashScreen() {
           transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
         >
-          {/* اسم الشعار بالأزرق الناصع الفائق التوهج مع النجمة العابرة */}
-          <div className="relative inline-block px-8 py-3">
+          {/* اسم الشعار باللون الأزرق الفاخر المتوهج */}
+          <div className="relative overflow-hidden inline-block px-6 py-2">
             <h1
-              className="text-4xl md:text-7xl font-black tracking-widest font-cairo !text-[#67e8f9]"
+              className="text-4xl md:text-7xl font-black tracking-widest font-cairo !text-[#3b82f6]"
               style={{
-                color: "#67e8f9",
-                textShadow: "0 0 25px rgba(103,232,249,0.95), 0 0 55px rgba(56,189,248,0.8), 0 0 85px rgba(2,132,199,0.6)"
+                color: "#3b82f6",
+                textShadow: "0 0 25px rgba(59,130,246,0.95), 0 0 50px rgba(37,99,235,0.8), 0 0 75px rgba(29,78,216,0.6)"
               }}
             >
               {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
             </h1>
 
-            {/* النجمة الصغيرة المضيئة التي تلمع وتتحرك عبر كامل الجملة */}
+            {/* اللمعة الضوئية النحيفة الأنيقة العابرة على الكلمة */}
             <motion.div
-              initial={{ left: "-10%", opacity: 0, scale: 0.5 }}
-              animate={{ 
-                left: ["-5%", "105%"],
-                opacity: [0, 1, 1, 0],
-                scale: [0.6, 1.3, 1.3, 0.6]
-              }}
-              transition={{ delay: 0.8, duration: 1.3, ease: "easeInOut" }}
-              className="absolute top-1/2 -translate-y-1/2 pointer-events-none z-30 flex items-center justify-center"
-            >
-              <div className="relative flex items-center justify-center">
-                <Sparkles className="w-7 h-7 md:w-10 md:h-10 text-white fill-white drop-shadow-[0_0_25px_#ffffff] animate-spin [animation-duration:3s]" />
-                <div className="absolute w-10 h-10 rounded-full bg-cyan-200/50 blur-md -z-10 animate-ping" />
-              </div>
-            </motion.div>
+              initial={{ x: "-150%" }}
+              animate={{ x: "450%" }}
+              transition={{ delay: 0.8, duration: 1.0, ease: "easeInOut" }}
+              className="absolute inset-y-0 w-12 md:w-16 h-full bg-gradient-to-r from-transparent via-white/80 to-transparent skew-x-[-20deg] pointer-events-none mix-blend-overlay"
+            />
           </div>
 
-          {/* خط الفاصل المتوهج بالأزرق الناصع */}
-          <div className="h-0.5 w-[140px] md:w-[220px] bg-gradient-to-r from-transparent via-[#67e8f9] to-transparent mt-3 md:mt-4 opacity-95 shadow-[0_0_20px_#67e8f9]" />
+          {/* خط الفاصل المتوهج باللون الأزرق */}
+          <div className="h-0.5 w-[140px] md:w-[220px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-3 md:mt-4 opacity-95 shadow-[0_0_20px_#3b82f6]" />
 
-          {/* الجملة الترحيبية بالأزرق الناصع */}
+          {/* الجملة الترحيبية باللون الأزرق الملكي الخالي من أي نجوم برتقالية */}
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.9, ease: "easeOut" }}
-            className="text-base md:text-xl font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 !text-[#67e8f9] drop-shadow-[0_0_20px_rgba(103,232,249,0.9)]"
-            style={{ color: "#67e8f9" }}
+            className="text-base md:text-xl font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 !text-[#3b82f6] drop-shadow-[0_0_20px_rgba(59,130,246,0.9)]"
+            style={{ color: "#3b82f6" }}
           >
-            {isAr ? '✨ نضيء عالمك ✨' : '✨ Lighting Your World ✨'}
+            {isAr ? 'نضيء عالمك' : 'Lighting Your World'}
           </motion.p>
         </motion.div>
       </div>
