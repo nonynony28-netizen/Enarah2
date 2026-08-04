@@ -83,26 +83,16 @@ export default function SplashScreen() {
           transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
         >
-          {/* اسم الشعار باللون الأزرق الفاخر المتوهج */}
-          <div className="relative overflow-hidden inline-block px-6 py-2">
-            <h1
-              className="text-4xl md:text-7xl font-black tracking-widest font-cairo !text-[#3b82f6]"
-              style={{
-                color: "#3b82f6",
-                textShadow: "0 0 25px rgba(59,130,246,0.95), 0 0 50px rgba(37,99,235,0.8), 0 0 75px rgba(29,78,216,0.6)"
-              }}
-            >
-              {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
-            </h1>
-
-            {/* اللمعة الضوئية النحيفة الأنيقة العابرة على الكلمة */}
-            <motion.div
-              initial={{ x: "-150%" }}
-              animate={{ x: "450%" }}
-              transition={{ delay: 0.8, duration: 1.0, ease: "easeInOut" }}
-              className="absolute inset-y-0 w-12 md:w-16 h-full bg-gradient-to-r from-transparent via-white/80 to-transparent skew-x-[-20deg] pointer-events-none mix-blend-overlay"
-            />
-          </div>
+          {/* اسم الشعار باللون الأزرق الفاخر المتوهج المباشر بدون أي شريط أو مستطيل حول الجملة */}
+          <h1
+            className="text-4xl md:text-7xl font-black tracking-widest font-cairo !text-[#3b82f6]"
+            style={{
+              color: "#3b82f6",
+              textShadow: "0 0 25px rgba(59,130,246,0.95), 0 0 50px rgba(37,99,235,0.8), 0 0 75px rgba(29,78,216,0.6)"
+            }}
+          >
+            {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
+          </h1>
 
           {/* خط الفاصل المتوهج باللون الأزرق */}
           <div className="h-0.5 w-[140px] md:w-[220px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-3 md:mt-4 opacity-95 shadow-[0_0_20px_#3b82f6]" />
