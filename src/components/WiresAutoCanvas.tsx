@@ -104,7 +104,7 @@ export default function WiresAutoCanvas({
         }
       }
 
-      ctx.fillStyle = '#0a192f'
+      ctx.fillStyle = '#061122'
       ctx.fillRect(0, 0, width, height)
       ctx.drawImage(img, offsetX, offsetY, renderW, renderH)
       ctx.restore()
