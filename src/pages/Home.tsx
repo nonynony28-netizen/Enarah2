@@ -319,7 +319,6 @@ export default function Home() {
     }
   })
 
-
   useEffect(() => {
     setPaintFlicker(true)
     const t = setTimeout(() => setPaintFlicker(false), 80)
@@ -327,39 +326,7 @@ export default function Home() {
   }, [paintColorTemp, selectedPaintId])
 
   useEffect(() => {
-    const startTime = Date.now();
-
-    const hideLoader = () => {
-      const elapsedTime = Date.now() - startTime;
-      const minDuration = 1200; // وقت أدنى 1.2 ثانية لتظهر شاشة التحميل بشكل أنيق
-
-      if (elapsedTime >= minDuration) {
-        setPageLoading(false);
-      } else {
-        setTimeout(() => {
-          setPageLoading(false);
-        }, minDuration - elapsedTime);
-      }
-    };
-
-    if (document.readyState === 'complete') {
-      hideLoader();
-    } else {
-      const handleLoad = () => {
-        hideLoader();
-      };
-      window.addEventListener('load', handleLoad);
-
-      // احتياطياً في حال تعطل أي عنصر أو استغرق طويلاً، يختفي بعد ثانيتين
-      const backupTimeout = setTimeout(() => {
-        setPageLoading(false);
-      }, 2000);
-
-      return () => {
-        window.removeEventListener('load', handleLoad);
-        clearTimeout(backupTimeout);
-      };
-    }
+    setPageLoading(false)
   }, [])
 
   useEffect(() => {

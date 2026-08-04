@@ -38,11 +38,11 @@ const PageLoader = () => (
 function App() {
   const [loading, setLoading] = useState(true)
 
-  // 1. شاشة البداية السينمائية الفاخرة وتحميل كود الصفحات مسبقاً في الذاكرة (Route Prefetching)
+  // 1. شاشة البداية السريعة والتحميل المسبق بكود الصفحات مسبقاً في الذاكرة (Route Prefetching)
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 2400)
+    }, 400)
 
     // التحميل المسبق لصفحة المنتجات وباقي الصفحات لفتحها فوراً بـ 0 ثانية بدلاً من التأخير
     const prefetchTimer = setTimeout(() => {
