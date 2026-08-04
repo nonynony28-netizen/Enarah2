@@ -107,13 +107,18 @@ export default function SplashScreen() {
           {/* خط الفاصل المتوهج باللون الأزرق */}
           <div className="h-0.5 w-[140px] md:w-[220px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-3 md:mt-4 opacity-95 shadow-[0_0_20px_#3b82f6]" />
 
-          {/* الجملة الترحيبية باللون الأزرق الملكي الخالي من أي نجوم برتقالية */}
+          {/* الجملة الترحيبية باللون الفضي المعدني الفاخر بشكل مميز ومبتكر */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.9, ease: "easeOut" }}
-            className="text-base md:text-xl font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 !text-[#3b82f6] drop-shadow-[0_0_20px_rgba(59,130,246,0.9)]"
-            style={{ color: "#3b82f6" }}
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.95, ease: "easeOut" }}
+            className="text-lg md:text-2xl font-extrabold tracking-[0.25em] uppercase font-cairo mt-5 md:mt-6 text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-slate-300 to-slate-400 drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]"
+            style={{
+              backgroundImage: "linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              filter: "drop-shadow(0 0 12px rgba(226, 232, 240, 0.75))"
+            }}
           >
             {isAr ? 'نضيء عالمك' : 'Lighting Your World'}
           </motion.p>
