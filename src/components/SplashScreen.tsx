@@ -9,9 +9,9 @@ export default function SplashScreen() {
       initial={{ opacity: 1 }}
       exit={{ 
         opacity: 0, 
-        scale: 1.03,
-        filter: "blur(8px)",
-        transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
+        scale: 1.02,
+        filter: "blur(10px)",
+        transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } 
       }}
       className="fixed inset-0 bg-[#02050c] flex flex-col items-center justify-start overflow-hidden z-[9999] pt-0 select-none transform-gpu"
     >
@@ -20,7 +20,7 @@ export default function SplashScreen() {
       <motion.div
         initial={{ y: -180, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         className="relative flex flex-col items-center z-20 pointer-events-none"
       >
         {/* قاعدة التثبيت في السقف */}
@@ -43,9 +43,9 @@ export default function SplashScreen() {
 
           {/* اللمبة المتوهجة تتوهج تدريجياً بأسلوب سينمائي */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
             className="absolute bottom-[-8px] md:bottom-[-10px] w-5 h-5 md:w-6 md:h-6 rounded-full bg-sky-100 border border-sky-300"
             style={{
               boxShadow: "0 0 20px #3b82f6, 0 0 40px #3b82f6"
@@ -56,9 +56,9 @@ export default function SplashScreen() {
 
       {/* 2. مخروط الضوء الأزرق يتوسع وينشر الضوء بنعومة بالغة */}
       <motion.div
-        initial={{ opacity: 0, scaleY: 0.9 }}
+        initial={{ opacity: 0, scaleY: 0.8 }}
         animate={{ opacity: 0.85, scaleY: 1 }}
-        transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="absolute top-[136px] md:top-[190px] left-0 right-0 mx-auto w-[320px] md:w-[500px] h-[240px] md:h-[320px] pointer-events-none mix-blend-screen origin-top z-10 overflow-visible"
       >
         <svg width="100%" height="100%" viewBox="0 0 500 340" preserveAspectRatio="none">
@@ -77,9 +77,9 @@ export default function SplashScreen() {
       {/* 3. الشعار يظهر بارتقاء سينمائي متألق وواضح */}
       <div className="absolute top-[270px] md:top-[350px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full text-center px-4">
         <motion.div
-          initial={{ opacity: 0, y: 25, filter: "blur(6px)" }}
+          initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.9, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
         >
           {/* اسم الشعار */}
@@ -97,9 +97,9 @@ export default function SplashScreen() {
 
           {/* الجملة الترحيبية */}
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.2, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: 0.9, ease: "easeOut" }}
             className="text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 text-sky-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.5)]"
           >
             {isAr ? 'نضيء عالمك' : 'Lighting Your World'}
