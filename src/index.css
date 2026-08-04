@@ -258,6 +258,14 @@ html {
   color: #0f172a !important;
 }
 
+/* إزالة جميع ظلال النص والتوهجات الضوئية والنيون في الوضع المضيء لتكون النصوص ناصعة وواضحة */
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6,
+.light p, .light span, .light a, .light div, .light label,
+.light *, .light *::before, .light *::after {
+  text-shadow: none !important;
+  filter: none !important;
+}
+
 /* التجاوزات العامة للعناصر والبطاقات في الوضع المضيء */
 .light .fixed.-z-50,
 .light [class*="bg-[#050b14]"],
@@ -320,13 +328,13 @@ html {
 .light [class*="bg-slate-900"],
 .light [class*="bg-[#0a192f]/"],
 .light [class*="bg-[#0f213a]/"] {
-  background-color: rgba(255, 255, 255, 0.92) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
   color: #0f172a !important;
   border-color: #e2e8f0 !important;
   backdrop-filter: blur(12px) !important;
 }
 
-/* نصوص الواجهة والقوائم في الوضع المضيء */
+/* نصوص الواجهة والقوائم في الوضع المضيء بدقة عالية وتباين فائق */
 .light .text-white,
 .light nav .text-white,
 .light footer .text-white,
@@ -334,22 +342,25 @@ html {
   color: #0f172a !important;
 }
 
+/* ضبط ألوان النصوص الفرعية والوصفية في الوضع المضيء لتكون داكنة وواضحة جداً */
 .light .text-slate-300,
 .light .text-slate-400,
 .light .text-slate-200,
-.light .text-blue-100,
-.light .text-blue-200,
+.light .text-slate-500,
 .light .text-white\/70,
 .light nav .text-slate-300,
 .light footer .text-white\/70,
-.light footer .text-slate-400 {
-  color: #475569 !important;
+.light footer .text-slate-400,
+.light [class*="text-blue-100"],
+.light [class*="text-blue-200"],
+.light [class*="text-blue-50"] {
+  color: #334155 !important;
 }
 
-.light .text-blue-300,
-.light .text-blue-400,
-.light .text-sky-400,
-.light .text-sky-300 {
+.light [class*="text-blue-300"],
+.light [class*="text-blue-400"],
+.light [class*="text-sky-400"],
+.light [class*="text-sky-300"] {
   color: #2563eb !important;
 }
 
@@ -367,17 +378,6 @@ html {
 .light .border-sky-500\/20,
 .light .border-sky-500\/30 {
   border-color: #e2e8f0 !important;
-}
-
-/* إلغاء الظلال الداكنة للنصوص والتحكم في توهج النيون */
-.light h1 span,
-.light h2 span,
-.light h3 span,
-.light nav span,
-.light footer span,
-.light [class*="drop-shadow"] {
-  text-shadow: none !important;
-  filter: none !important;
 }
 
 .light .text-transparent.bg-clip-text {
