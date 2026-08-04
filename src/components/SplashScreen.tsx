@@ -82,36 +82,36 @@ export default function SplashScreen() {
           transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
         >
-          {/* اسم الشعار مع لمعه ساطعة عابرة */}
+          {/* اسم الشعار بالأزرق الفاتح مع لمعة صغيرة أنيقة */}
           <div className="relative overflow-hidden inline-block px-4 py-2">
             <h1
               className="text-4xl md:text-7xl font-black tracking-widest font-cairo"
               style={{
-                color: "#38bdf8",
-                textShadow: "0 0 20px rgba(56,189,248,0.9), 0 0 45px rgba(14,165,233,0.7), 0 0 70px rgba(2,132,199,0.5)"
+                color: "#7dd3fc",
+                textShadow: "0 0 25px rgba(125,211,252,0.85), 0 0 50px rgba(56,189,248,0.5)"
               }}
             >
               {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
             </h1>
 
-            {/* اللمعة الضوئية المتوهجة العابرة الساطعة على النص */}
+            {/* اللمعة الضوئية الصغيرة النحيفة العابرة بأسلوب أنيق */}
             <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: "200%" }}
-              transition={{ delay: 0.9, duration: 1.2, ease: "easeInOut" }}
-              className="absolute inset-0 w-2/3 h-full bg-gradient-to-r from-transparent via-white/90 to-transparent skew-x-[-25deg] pointer-events-none mix-blend-overlay"
+              initial={{ x: "-150%" }}
+              animate={{ x: "450%" }}
+              transition={{ delay: 0.8, duration: 1.0, ease: "easeInOut" }}
+              className="absolute inset-y-0 w-12 md:w-16 h-full bg-gradient-to-r from-transparent via-white/80 to-transparent skew-x-[-20deg] pointer-events-none mix-blend-overlay"
             />
           </div>
 
-          {/* خط الفاصل المتوهج بالأزرق الناصع */}
-          <div className="h-0.5 w-[140px] md:w-[200px] bg-gradient-to-r from-transparent via-[#38bdf8] to-transparent mt-3 md:mt-4 opacity-90 shadow-[0_0_15px_#38bdf8]" />
+          {/* خط الفاصل المتوهج بالأزرق الفاتح */}
+          <div className="h-0.5 w-[140px] md:w-[200px] bg-gradient-to-r from-transparent via-[#7dd3fc] to-transparent mt-3 md:mt-4 opacity-90 shadow-[0_0_15px_#7dd3fc]" />
 
-          {/* الجملة الترحيبية بالأزرق المضيء مع لمعة متوهجة */}
+          {/* الجملة الترحيبية بالأزرق الفاتح */}
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.0, ease: "easeOut" }}
-            className="text-base md:text-xl font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 text-[#38bdf8] drop-shadow-[0_0_15px_rgba(56,189,248,0.9)]"
+            transition={{ duration: 0.5, delay: 0.9, ease: "easeOut" }}
+            className="text-base md:text-xl font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 text-[#7dd3fc] drop-shadow-[0_0_15px_rgba(125,211,252,0.8)]"
           >
             {isAr ? '✨ نضيء عالمك ✨' : '✨ Lighting Your World ✨'}
           </motion.p>
