@@ -131,14 +131,14 @@ export default function WiresAutoCanvas({
   }, [totalFrames, fps])
 
   return (
-    <div className={`relative w-full h-full overflow-hidden bg-[#0a192f] ${className}`}>
+    <div className={`relative w-full h-full overflow-hidden bg-[#061122] ${className}`}>
       <canvas
         ref={canvasRef}
         className="w-full h-full object-cover block [transform:translate3d(0,0,0)] [backface-visibility:hidden]"
         style={{ touchAction: 'pan-y' }}
       />
       {!isReady && (
-        <div className="absolute inset-0 bg-[#0a192f] transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-[#061122] transition-opacity duration-500" />
       )}
     </div>
   )

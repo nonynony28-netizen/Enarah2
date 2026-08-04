@@ -359,13 +359,19 @@ html {
   backdrop-filter: blur(12px) !important;
 }
 
-/* الاستثناء الصارم والنهائي لمسرح الأسلاك الـ 3D ليبقى كحلي داكن استوديو 100% بدون أي تفتيح */
+/* الاستثناء الصارم والنهائي لمسرح الأسلاك الـ 3D ليبقى كحلي داكن استوديو 100% بدون إخفاء الأنيميشن */
 .light #wires-import-showcase,
-.light #wires-import-showcase div,
+.light #wires-import-showcase .group,
 .light #wires-import-showcase canvas,
-.light #wires-import-showcase .group {
+.light #wires-import-showcase [class*="bg-[#061122]"],
+.light #wires-import-showcase [class*="bg-[#0a192f]"] {
   background-color: #061122 !important;
   color: #ffffff !important;
+}
+
+/* عدم إعطاء خلفية معتمة لطبقات التدرج فوق الأنيميشن لتبقى لفة السلك ظاهرة بوضوح تام */
+.light #wires-import-showcase [class*="bg-gradient-to-"] {
+  background-color: transparent !important;
 }
 
 .light #wires-import-showcase h3,
@@ -376,13 +382,13 @@ html {
 }
 
 .light #wires-import-showcase [class*="from-slate-950"] {
-  --tw-gradient-from: rgba(6, 17, 34, 0.95) var(--tw-gradient-from-position) !important;
+  --tw-gradient-from: rgba(6, 17, 34, 0.85) var(--tw-gradient-from-position) !important;
   --tw-gradient-to: rgba(6, 17, 34, 0) var(--tw-gradient-to-position) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
 .light #wires-import-showcase [class*="to-slate-950"] {
-  --tw-gradient-to: rgba(6, 17, 34, 0.95) var(--tw-gradient-to-position) !important;
+  --tw-gradient-to: rgba(6, 17, 34, 0.85) var(--tw-gradient-to-position) !important;
 }
 
 /* نصوص الواجهة والقوائم في الوضع المضيء بدقة عالية وتباين فائق */
