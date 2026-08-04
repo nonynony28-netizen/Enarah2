@@ -38,11 +38,11 @@ const PageLoader = () => (
 function App() {
   const [loading, setLoading] = useState(true)
 
-  // 1. شاشة البداية السينمائية السلسة المكتملة
+  // 1. شاشة البداية السينمائية المتوهجة السلسة
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 1800)
+    }, 2200)
 
     // التحميل المسبق لصفحة المنتجات وباقي الصفحات لفتحها فوراً بـ 0 ثانية بدلاً من التأخير
     const prefetchTimer = setTimeout(() => {

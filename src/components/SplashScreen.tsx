@@ -74,7 +74,7 @@ export default function SplashScreen() {
         </svg>
       </motion.div>
 
-      {/* 3. الشعار يظهر بارتقاء سينمائي متألق وواضح */}
+      {/* 3. الشعار يظهر بارتقاء سينمائي متألق مع لمعة ساطعة عابرة باللون الأزرق المضيء */}
       <div className="absolute top-[270px] md:top-[350px] left-0 right-0 mx-auto flex flex-col items-center z-20 w-full text-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
@@ -82,27 +82,38 @@ export default function SplashScreen() {
           transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
         >
-          {/* اسم الشعار */}
-          <h1
-            className="text-4xl md:text-7xl font-black tracking-widest font-cairo text-blue-500"
-            style={{
-              textShadow: "0 0 25px rgba(59,130,246,0.85)"
-            }}
-          >
-            {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
-          </h1>
+          {/* اسم الشعار مع لمعه ساطعة عابرة */}
+          <div className="relative overflow-hidden inline-block px-4 py-2">
+            <h1
+              className="text-4xl md:text-7xl font-black tracking-widest font-cairo"
+              style={{
+                color: "#38bdf8",
+                textShadow: "0 0 20px rgba(56,189,248,0.9), 0 0 45px rgba(14,165,233,0.7), 0 0 70px rgba(2,132,199,0.5)"
+              }}
+            >
+              {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
+            </h1>
 
-          {/* خط الفاصل المتوهج */}
-          <div className="h-0.5 w-[140px] md:w-[180px] bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent mt-3 md:mt-4 opacity-80" />
+            {/* اللمعة الضوئية المتوهجة العابرة الساطعة على النص */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: "200%" }}
+              transition={{ delay: 0.9, duration: 1.2, ease: "easeInOut" }}
+              className="absolute inset-0 w-2/3 h-full bg-gradient-to-r from-transparent via-white/90 to-transparent skew-x-[-25deg] pointer-events-none mix-blend-overlay"
+            />
+          </div>
 
-          {/* الجملة الترحيبية */}
+          {/* خط الفاصل المتوهج بالأزرق الناصع */}
+          <div className="h-0.5 w-[140px] md:w-[200px] bg-gradient-to-r from-transparent via-[#38bdf8] to-transparent mt-3 md:mt-4 opacity-90 shadow-[0_0_15px_#38bdf8]" />
+
+          {/* الجملة الترحيبية بالأزرق المضيء مع لمعة متوهجة */}
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.9, ease: "easeOut" }}
-            className="text-base md:text-lg font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 text-sky-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.5)]"
+            transition={{ duration: 0.5, delay: 1.0, ease: "easeOut" }}
+            className="text-base md:text-xl font-bold tracking-widest uppercase font-cairo mt-4 md:mt-5 text-[#38bdf8] drop-shadow-[0_0_15px_rgba(56,189,248,0.9)]"
           >
-            {isAr ? 'نضيء عالمك' : 'Lighting Your World'}
+            {isAr ? '✨ نضيء عالمك ✨' : '✨ Lighting Your World ✨'}
           </motion.p>
         </motion.div>
       </div>
