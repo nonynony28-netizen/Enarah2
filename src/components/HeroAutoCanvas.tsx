@@ -45,8 +45,11 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
 
     const loadedImages: HTMLImageElement[] = [];
     let count = 0;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const step = isMobile ? 2 : 1;
+    const targetCount = Math.ceil(totalFrames / step);
 
-    for (let i = 1; i <= totalFrames; i++) {
+    for (let i = 1; i <= totalFrames; i += step) {
       const img = new Image();
       // فك ضغط الصور خارج المعالج الرئيسي لتجنب الثقل والتهنيج عند أول فتح للموقع
       img.decoding = "async";
@@ -60,7 +63,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
         if (count === 1) {
           lastValidImgRef.current = img;
         }
-        if (count === totalFrames) {
+        if (count >= targetCount) {
           setIsReady(true);
           globalImageCache.set(folderPath, loadedImages);
         }

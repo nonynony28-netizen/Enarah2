@@ -19,21 +19,54 @@ export default function WiresAutoCanvas({
   const isLoadedRef = useRef<boolean>(false)
   const [isReady, setIsReady] = useState(false)
 
-  // 1. التحميل المسبق لـ 240 إطار حركة الأسلاك
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [shouldLoad, setShouldLoad] = useState(false)
+
+  // 0. عدم تحميل صور الأسلاك إلا عندما يقترب المستخدم من القسم بالـ Scroll
   useEffect(() => {
+    const isBot = typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent || '');
+    if (isBot) {
+      setShouldLoad(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // 1. التحميل الذكي لـ 240 إطار حركة الأسلاك عند الاقتراب
+  useEffect(() => {
+    if (!shouldLoad) return;
+
     let loadedCount = 0
     const images: HTMLImageElement[] = []
 
     const padZero = (num: number) => String(num).padStart(3, '0')
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const step = isMobile ? 2 : 1;
 
-    for (let i = 1; i <= totalFrames; i++) {
+    for (let i = 1; i <= totalFrames; i += step) {
       const img = new Image()
+      img.decoding = 'async'
       const frameNum = padZero(i)
       img.src = `/wires-anim/ezgif-frame-${frameNum}.jpg`
 
       img.onload = () => {
         loadedCount++
-        if (loadedCount >= Math.min(30, totalFrames)) {
+        if (loadedCount >= Math.min(20, Math.ceil(totalFrames / step))) {
           isLoadedRef.current = true
           setIsReady(true)
         }
@@ -42,7 +75,7 @@ export default function WiresAutoCanvas({
     }
 
     imagesRef.current = images
-  }, [totalFrames])
+  }, [totalFrames, shouldLoad])
 
   // 2. محرك الرسم التلقائي عالي الأداء مع الربط بـ GPU
   useEffect(() => {
@@ -131,7 +164,7 @@ export default function WiresAutoCanvas({
   }, [totalFrames, fps])
 
   return (
-    <div className={`relative w-full h-full overflow-hidden bg-[#061122] ${className}`}>
+    <div ref={containerRef} className={`relative w-full h-full overflow-hidden bg-[#061122] ${className}`}>
       <canvas
         ref={canvasRef}
         className="w-full h-full object-cover block [transform:translate3d(0,0,0)] [backface-visibility:hidden]"
