@@ -594,12 +594,12 @@ export default function Home() {
                       'منتجات أصلية من شركات عالمية نحن وكلائها الحصريون.',
                       'استيراد وتوريد مباشر من المصانع العالمية المعتمده.',
                       'تنوع واسع في العلامات التجارية يلبي كافة المشاريع.',
-                      'أسعار تفضيلية وضمانات مصنع مباشرة لجميع العملاء.'
+                      'شفافية كاملة ومواصفات موثوقة ودقيقة لكافة بيانات المنتجات.'
                     ] : [
                       'Original products from global brands with exclusive agency.',
                       'Direct import from certified international factories.',
                       'Wide diversity of world-class brands for all projects.',
-                      'Exclusive pricing and direct factory warranties.'
+                      'Complete transparency and accurate technical specifications for all product data.'
                     ]).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
                         <div className="p-1 rounded-full bg-sky-500/20 text-sky-400 shrink-0 border border-sky-400/30 mt-0.5">
