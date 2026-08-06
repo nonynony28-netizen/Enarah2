@@ -7,7 +7,7 @@ import { useCart } from '../hooks/useCart'
 import HeroAutoCanvas from '../components/HeroAutoCanvas'
 import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
-  Award, Shield, Sparkles, Zap, ArrowLeft, Loader2,
+  Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
   Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video
 } from 'lucide-react'
@@ -566,43 +566,43 @@ export default function Home() {
             {/* شبكة البطاقات الثلاث الموحدة في عرض واحد بدون شرائح أو أسهم */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
               
-              {/* البطاقة الأولى: جودة معتمدة */}
-              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-blue-400/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
+              {/* البطاقة الأولى: وكلاء حصريون لشركات عالمية */}
+              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-sky-400/50 hover:shadow-[0_0_30px_rgba(56,189,248,0.2)]">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/10 rounded-full blur-[80px] pointer-events-none" />
                 <div className="relative z-10">
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3.5 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-black shadow-sm flex items-center gap-1">
-                      <span>{isAr ? 'مواد أصلية 🛡️' : 'Original Materials 🛡️'}</span>
+                    <span className="px-3.5 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-black shadow-sm flex items-center gap-1">
+                      <span>{isAr ? 'وكلاء حصريون 🌐' : 'Exclusive Agents 🌐'}</span>
                     </span>
-                    <div className="w-12 h-12 rounded-2xl bg-blue-500/15 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-md">
-                      <Award className="w-6 h-6 animate-pulse" />
+                    <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-sky-400 shadow-md">
+                      <Globe className="w-6 h-6 animate-pulse" />
                     </div>
                   </div>
 
                   <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-snug">
-                    {isAr ? 'جودة عالية ومواصفات إيطالية' : 'Certified Quality & Italian Standards'}
+                    {isAr ? 'وكلاء حصريون لشركات عالمية' : 'Exclusive Agents for Global Brands'}
                   </h3>
 
                   <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
                     {isAr 
-                      ? 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والسلامة العالمية لتدوم طويلاً.' 
-                      : 'We select all installation and lighting materials with extreme care to meet top international safety standards.'}
+                      ? 'منتجات من شركات عالمية مختلفة نحن وكلائها الحصريون لضمان أعلى معايير الجودة والأصالة.' 
+                      : 'Products from leading global brands for which we serve as exclusive agents.'}
                   </p>
 
                   <div className="space-y-3 mb-6">
                     {(isAr ? [
-                      'منتجات أصلية معتمدة وفق أعلى معايير الجودة.',
-                      'عزل حراري وكهربائي ممتاز يدوم لسنوات طويلة.',
-                      'ضمان حقيقي واختبار قياسي قبل التوريد.',
-                      'حماية كاملة للمبنى والأسلاك من الحرارة.'
+                      'منتجات أصلية من شركات عالمية نحن وكلائها الحصريون.',
+                      'استيراد وتوريد مباشر من المصانع العالمية المعتمده.',
+                      'تنوع واسع في العلامات التجارية يلبي كافة المشاريع.',
+                      'أسعار تفضيلية وضمانات مصنع مباشرة لجميع العملاء.'
                     ] : [
-                      'Certified original products meeting top standards.',
-                      'Superior thermal and electrical insulation.',
-                      'Real warranty and comprehensive pre-delivery testing.',
-                      'Complete building and wiring heat protection.'
+                      'Original products from global brands with exclusive agency.',
+                      'Direct import from certified international factories.',
+                      'Wide diversity of world-class brands for all projects.',
+                      'Exclusive pricing and direct factory warranties.'
                     ]).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
-                        <div className="p-1 rounded-full bg-blue-500/20 text-blue-400 shrink-0 border border-blue-400/30 mt-0.5">
+                        <div className="p-1 rounded-full bg-sky-500/20 text-sky-400 shrink-0 border border-sky-400/30 mt-0.5">
                           <CheckCircle className="w-3.5 h-3.5" />
                         </div>
                         <span className="text-xs text-slate-200 font-bold">{feat}</span>
@@ -611,8 +611,8 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-blue-300 relative z-10">
-                  <span>{isAr ? 'ضمان واعتماد 100%' : '100% Guaranteed Quality'}</span>
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-sky-300 relative z-10">
+                  <span>{isAr ? 'وكالة رسمية وحصرية' : 'Official Exclusive Agency'}</span>
                   <span className="text-white text-lg font-black">100%</span>
                 </div>
               </div>
