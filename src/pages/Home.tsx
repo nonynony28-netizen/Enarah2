@@ -563,27 +563,27 @@ export default function Home() {
               </div>
             </div>
 
-            {/* شبكة البطاقات الثلاث الموحدة في عرض واحد بدون شرائح أو أسهم */}
+            {/* شبكة البطاقات الثلاث الموحدة بتصميم احترافي رفيع المستوى بدون أيموجي */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
               
               {/* البطاقة الأولى: وكلاء حصريون لشركات عالمية */}
-              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-sky-400/50 hover:shadow-[0_0_30px_rgba(56,189,248,0.2)]">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/10 rounded-full blur-[80px] pointer-events-none" />
-                <div className="relative z-10">
+              <div className="relative p-7 sm:p-8 rounded-3xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)]">
+                <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3.5 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-black shadow-sm flex items-center gap-1">
-                      <span>{isAr ? 'وكلاء حصريون 🌐' : 'Exclusive Agents 🌐'}</span>
+                    <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                      <span>{isAr ? 'وكالة رسمية' : 'Official Agency'}</span>
                     </span>
-                    <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-sky-400 shadow-md">
-                      <Globe className="w-6 h-6 animate-pulse" />
+                    <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
+                      <Globe className="w-5 h-5" />
                     </div>
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-snug">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug">
                     {isAr ? 'وكلاء حصريون لشركات عالمية' : 'Exclusive Agents for Global Brands'}
                   </h3>
 
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
                     {isAr 
                       ? 'منتجات من شركات عالمية مختلفة نحن وكلائها الحصريون لضمان أعلى معايير الجودة والأصالة.' 
                       : 'Products from leading global brands for which we serve as exclusive agents.'}
@@ -592,7 +592,7 @@ export default function Home() {
                   <div className="space-y-3 mb-6">
                     {(isAr ? [
                       'منتجات أصلية من شركات عالمية نحن وكلائها الحصريون.',
-                      'استيراد وتوريد مباشر من المصانع العالمية المعتمده.',
+                      'استيراد وتوريد مباشر من المصانع العالمية المعتمدة.',
                       'تنوع واسع في العلامات التجارية يلبي كافة المشاريع.',
                       'شفافية كاملة ومواصفات موثوقة ودقيقة لكافة بيانات المنتجات.'
                     ] : [
@@ -601,40 +601,38 @@ export default function Home() {
                       'Wide diversity of world-class brands for all projects.',
                       'Complete transparency and accurate technical specifications for all product data.'
                     ]).map((feat, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5">
-                        <div className="p-1 rounded-full bg-sky-500/20 text-sky-400 shrink-0 border border-sky-400/30 mt-0.5">
-                          <CheckCircle className="w-3.5 h-3.5" />
-                        </div>
-                        <span className="text-xs text-slate-200 font-bold">{feat}</span>
+                      <div key={idx} className="flex items-start gap-3">
+                        <CheckCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-sky-300 relative z-10">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-slate-400">
                   <span>{isAr ? 'وكالة رسمية وحصرية' : 'Official Exclusive Agency'}</span>
-                  <span className="text-white text-lg font-black">100%</span>
+                  <span className="text-blue-400 font-bold text-sm">100%</span>
                 </div>
               </div>
 
               {/* البطاقة الثانية: حلول متكاملة */}
-              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-amber-400/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.2)]">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none" />
-                <div className="relative z-10">
+              <div className="relative p-7 sm:p-8 rounded-3xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-sky-500/40 hover:shadow-[0_10px_30px_rgba(56,189,248,0.15)]">
+                <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-black shadow-sm flex items-center gap-1">
-                      <span>{isAr ? 'شامل ومتكامل 📦' : 'All-in-One 📦'}</span>
+                    <span className="px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                      <span>{isAr ? 'حلول متكاملة' : 'Integrated Solutions'}</span>
                     </span>
-                    <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-md">
-                      <Shield className="w-6 h-6 animate-pulse" />
+                    <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-sky-400 group-hover:border-sky-500/30 transition-colors">
+                      <ShieldCheck className="w-5 h-5" />
                     </div>
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-snug">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug">
                     {isAr ? 'حلول تأسيس وإنارة شاملة' : 'Integrated Electrical & Lighting'}
                   </h3>
 
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
                     {isAr 
                       ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك إيطالية، ومفاتيح ذكية في مكان واحد.' 
                       : 'We provide everything you need to set up your home or project, from cables and Italian wires to smart switches.'}
@@ -652,40 +650,38 @@ export default function Home() {
                       'Complete project provisioning at competitive prices.',
                       'Integrated decorative lighting solutions.'
                     ]).map((feat, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5">
-                        <div className="p-1 rounded-full bg-amber-500/20 text-amber-400 shrink-0 border border-amber-400/30 mt-0.5">
-                          <CheckCircle className="w-3.5 h-3.5" />
-                        </div>
-                        <span className="text-xs text-slate-200 font-bold">{feat}</span>
+                      <div key={idx} className="flex items-start gap-3">
+                        <CheckCircle className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-amber-300 relative z-10">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-slate-400">
                   <span>{isAr ? 'تغطية شاملة للمشاريع' : 'Full Project Provisioning'}</span>
-                  <span className="text-white text-lg font-black">100%</span>
+                  <span className="text-sky-400 font-bold text-sm">100%</span>
                 </div>
               </div>
 
               {/* البطاقة الثالثة: دعم فني واسع */}
-              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-emerald-400/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
-                <div className="relative z-10">
+              <div className="relative p-7 sm:p-8 rounded-3xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-indigo-500/40 hover:shadow-[0_10px_30px_rgba(99,102,241,0.15)]">
+                <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-black shadow-sm flex items-center gap-1">
-                      <span>{isAr ? 'دعم مبيعات 📞' : 'Sales Support 📞'}</span>
+                    <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                      <span>{isAr ? 'استشارات ودعم' : 'Technical Support'}</span>
                     </span>
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shadow-md">
-                      <Sparkles className="w-6 h-6 animate-pulse" />
+                    <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:border-indigo-500/30 transition-colors">
+                      <Sparkles className="w-5 h-5" />
                     </div>
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-snug">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug">
                     {isAr ? 'دعم فني واستشارات مجاناً' : 'Fast Sales Support & Consultations'}
                   </h3>
 
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
                     {isAr 
                       ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات وحساب أحمال الكهرباء بدقة.' 
                       : 'Our team is available to help you select products, request custom volumes, and calculate electrical loads accurately.'}
@@ -703,19 +699,17 @@ export default function Home() {
                       'Continuous order tracking and coordination.',
                       'Fast and guaranteed delivery to all project sites.'
                     ]).map((feat, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5">
-                        <div className="p-1 rounded-full bg-emerald-500/20 text-emerald-400 shrink-0 border border-emerald-400/30 mt-0.5">
-                          <CheckCircle className="w-3.5 h-3.5" />
-                        </div>
-                        <span className="text-xs text-slate-200 font-bold">{feat}</span>
+                      <div key={idx} className="flex items-start gap-3">
+                        <CheckCircle className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-emerald-300 relative z-10">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-slate-400">
                   <span>{isAr ? 'استجابة واستشارات فورية' : '24/7 Support & Response'}</span>
-                  <span className="text-white text-lg font-black">24/7</span>
+                  <span className="text-indigo-400 font-bold text-sm">24/7</span>
                 </div>
               </div>
 
