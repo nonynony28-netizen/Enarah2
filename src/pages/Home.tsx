@@ -535,17 +535,19 @@ export default function Home() {
           </HeroAutoCanvas>
         </section>
 
-        {/* 2. لماذا نحن - شريحة ميزات تفاعلية عالمية (World-Class Interactive Feature Showcase) */}
+        {/* 2. لماذا نحن - الميزات الموحدة في شبكة 3 بطاقات فاخرة في صفحة واحدة (Unified 3-Card Feature Grid) */}
         <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
           {/* بقع توهج نيونية خفيفة عائمة */}
           <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-sky-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
           <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-10 md:mb-14">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            
+            {/* عنوان قسم لماذا نحن */}
+            <div className="text-center mb-12 md:mb-16">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
                 {isAr ? 'لماذا' : 'Why'}{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500 drop-shadow-[0_2px_10px_rgba(56,189,248,0.4)]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 drop-shadow-[0_2px_10px_rgba(56,189,248,0.4)]">
                   {isAr ? 'نحن؟' : 'Choose Us?'}
                 </span>
               </h2>
@@ -561,200 +563,164 @@ export default function Home() {
               </div>
             </div>
 
-            {/* مفاتيح التنقل بين الشرائح (Interactive Harmonized Tab Segmented Control) */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-3 max-w-xl mx-auto mb-4 p-1.5 rounded-2xl bg-[#0a192f] border border-blue-500/30 shadow-2xl">
-              {[
-                { id: 0, icon: Award, label: isAr ? 'جودة معتمدة' : 'Certified Quality', badge: '🛡️' },
-                { id: 1, icon: Shield, label: isAr ? 'حلول متكاملة' : 'All-in-One', badge: '📦' },
-                { id: 2, icon: Sparkles, label: isAr ? 'دعم فني' : 'Sales Support', badge: '📞' }
-              ].map((tab) => {
-                const isActive = activeWhySlide === tab.id
-                const TabIcon = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveWhySlide(tab.id)}
-                    className={`relative px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-300 flex items-center justify-center gap-1.5 flex-1 cursor-pointer outline-none text-center ${
-                      isActive ? 'text-white' : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeWhyTab"
-                        className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl border border-blue-400/40 shadow-[0_0_20px_rgba(59,130,246,0.6)] -z-10"
-                        transition={{ type: 'spring', stiffness: 450, damping: 30 }}
-                      />
-                    )}
-                    <TabIcon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                    <span className="truncate">{tab.label}</span>
-                    <span className="text-xs hidden md:inline">{tab.badge}</span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* مؤشر حركي توضيحي يدعو للتنقل بين اللقطات */}
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <span className="text-[11px] font-bold text-blue-300 bg-blue-500/10 px-3.5 py-1.5 rounded-full border border-blue-400/25 shadow-sm animate-pulse flex items-center gap-1.5">
-                <span>{isAr ? 'انقر الأسهم أو التبويبات لرؤية اللقطة التالية 👈' : 'Click arrows or tabs to view next slide 👈'}</span>
-              </span>
-            </div>
-
-            {/* مسرح الشريحة التفاعلية (World-Class Interactive Showcase Stage) */}
-            <div className="relative max-w-5xl mx-auto">
-
-              {/* أسهم تنقل بارزة عائمة على جانبي البطاقة للتنقل الفوري (Floating Side Navigation Arrows) */}
-              <button
-                onClick={() => setActiveWhySlide((prev) => (prev - 1 + 3) % 3)}
-                className="absolute top-1/2 -translate-y-1/2 -right-3 sm:-right-6 z-30 p-3 sm:p-3.5 rounded-full bg-[#0a192f] hover:bg-blue-600 border border-blue-400/40 text-white transition-all duration-300 active:scale-95 cursor-pointer shadow-[0_0_25px_rgba(59,130,246,0.4)] group"
-                title={isAr ? 'الشريحة السابقة (انقر لرؤية اللقطة الأخرى)' : 'Previous Slide'}
-              >
-                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
-              </button>
-
-              <button
-                onClick={() => setActiveWhySlide((prev) => (prev + 1) % 3)}
-                className="absolute top-1/2 -translate-y-1/2 -left-3 sm:-left-6 z-30 p-3 sm:p-3.5 rounded-full bg-[#0a192f] hover:bg-blue-600 border border-blue-400/40 text-white transition-all duration-300 active:scale-95 cursor-pointer shadow-[0_0_25px_rgba(59,130,246,0.4)] group"
-                title={isAr ? 'الشريحة التالية (انقر لرؤية اللقطة الأخرى)' : 'Next Slide'}
-              >
-                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
-              </button>
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeWhySlide}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.35, ease: 'easeOut' }}
-                  className="relative p-6 sm:p-10 md:p-12 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
-                >
-                  {/* لمسات الضوء النيونية الجانبية */}
-                  <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
-                  <div className="absolute inset-0 bg-animated-grid opacity-[0.04] pointer-events-none" />
-
-                  {/* القسم الأيسر: التفاصيل والنقاط البارزة */}
-                  <div className="lg:col-span-7 flex flex-col justify-between h-full relative z-10 text-right">
-                    <div>
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="px-3.5 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-black shadow-sm">
-                          {activeWhySlide === 0 
-                            ? (isAr ? 'مواد أصلية 🛡️' : 'Original Materials 🛡️')
-                            : activeWhySlide === 1
-                            ? (isAr ? 'شامل ومتكامل 📦' : 'All-in-One 📦')
-                            : (isAr ? 'دعم مبيعات 📞' : 'Sales Support 📞')}
-                        </span>
-                      </div>
-
-                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 leading-snug tracking-wide">
-                        {activeWhySlide === 0
-                          ? (isAr ? 'جودة عالية ومواصفات إيطالية معتمدة' : 'High Certified Quality & Italian Standards')
-                          : activeWhySlide === 1
-                          ? (isAr ? 'حلول تأسيسية كهربائية وإنارة شاملة' : 'Integrated Electrical & Lighting Solutions')
-                          : (isAr ? 'دعم فني واستشارات متخصصة مجاناً' : 'Fast Sales Support & Free Consultations')}
-                      </h3>
-
-                      <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed mb-6 font-medium">
-                        {activeWhySlide === 0
-                          ? (isAr ? 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والسلامة العالمية لتدوم طويلاً دون مشاكل.' : 'We select all electrical installation and lighting materials with extreme care to meet top international safety and quality standards.')
-                          : activeWhySlide === 1
-                          ? (isAr ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك إيطالية، مفاتيح ذكية، وسبوتات إنارة في مكان واحد دون عناء.' : 'We provide everything you need to set up your home or project, from cables and Italian wires to smart switches and spotlights in one stop.')
-                          : (isAr ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات المطلوبة وحساب أحمال الكهرباء بدقة لتجنب أي هدر.' : 'Our specialized team is always available to help you select products, request custom volumes, and calculate electrical loads accurately.')}
-                      </p>
-
-                      {/* قائمة المميزات الممتدة (Extended Feature List) */}
-                      <div className="space-y-3.5 mb-2">
-                        {(activeWhySlide === 0
-                          ? (isAr ? [
-                              'منتجات أصلية معتمدة وفق أعلى معايير الجودة والسلامة العالمية.',
-                              'عزل حراري وكهربائي ممتاز يدوم لسنوات طويلة دون تلف.',
-                              'ضمان حقيقي وااختبار قياسي شامل قبل التوريد لجميع العملاء.',
-                              'حماية كاملة للمبنى والأسلاك من أخطار التماس والحرارة.'
-                            ] : [
-                              'Certified original products meeting top international safety standards.',
-                              'Superior thermal and electrical insulation built to last without decay.',
-                              'Real warranty and comprehensive testing prior to customer delivery.',
-                              'Complete building and wiring protection from electrical hazards.'
-                            ])
-                          : activeWhySlide === 1
-                          ? (isAr ? [
-                              'توفير كافة مستلزمات التأسيس والإنارة من مكان واحد بدون عناء.',
-                              'كابلات، أسلاك إيطالية، مفاتيح ذكية وسبوتات بأحدث التقنيات.',
-                              'تجهيز كامل للكميات والمشاريع بأسعار معتمدة ومنافسة.',
-                              'حلول ديكورية وإنارية متكاملة تناسب جميع التصاميم والمعايير.'
-                            ] : [
-                              'All electrical and lighting requirements provided effortlessly in one place.',
-                              'Italian wires, smart switches, and spotlights with modern tech.',
-                              'Complete project volume provisioning at competitive standard prices.',
-                              'Integrated decorative lighting solutions tailored to all designs.'
-                            ])
-                          : (isAr ? [
-                              'فريق مهندسين وفنيين متخصصين لإجابة كافة استفساراتك.',
-                              'حساب الأحمال والتكلفة والكميات المطلوبة بدقة بدون هدر.',
-                              'متابعة مستمرة وتنسيق كامل حتى وصول طلبك بأمان.',
-                              'توصيل سريع ومضمون لكافة المدن والمشاريع والمناطق.'
-                            ] : [
-                              'Dedicated engineers and specialists to answer all your queries.',
-                              'Accurate calculation of loads, quantities, and budgets without waste.',
-                              'Continuous tracking and coordination until safe order arrival.',
-                              'Fast and guaranteed delivery to all cities and project sites.'
-                            ])
-                        ).map((feat, idx) => (
-                          <div key={idx} className="flex items-center gap-3">
-                            <div className="p-1 rounded-full bg-blue-500/20 text-blue-400 shrink-0 border border-blue-400/30">
-                              <CheckCircle className="w-4.5 h-4.5" />
-                            </div>
-                            <span className="text-xs sm:text-sm text-slate-200 font-bold">{feat}</span>
-                          </div>
-                        ))}
-                      </div>
+            {/* شبكة البطاقات الثلاث الموحدة في عرض واحد بدون شرائح أو أسهم */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
+              
+              {/* البطاقة الأولى: جودة معتمدة */}
+              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-blue-400/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between gap-2 mb-6">
+                    <span className="px-3.5 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-black shadow-sm flex items-center gap-1">
+                      <span>{isAr ? 'مواد أصلية 🛡️' : 'Original Materials 🛡️'}</span>
+                    </span>
+                    <div className="w-12 h-12 rounded-2xl bg-blue-500/15 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-md">
+                      <Award className="w-6 h-6 animate-pulse" />
                     </div>
                   </div>
 
-                  {/* القسم الأيمن: بطاقة عرض ثلاثية الأبعاد تفاعلية */}
-                  <div className="lg:col-span-5 flex flex-col items-center justify-center relative z-10">
-                    <div className="relative w-full max-w-xs p-6 sm:p-8 rounded-[2rem] bg-[#0a192f] border border-blue-400/25 shadow-2xl flex flex-col items-center text-center group transition-all duration-500 hover:border-blue-400/50">
-                      {/* هالة ضوئية متوهجة */}
-                      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-blue-500/20 via-indigo-500/10 to-blue-600/20 border border-blue-400/40 flex items-center justify-center mb-6 shadow-[0_0_35px_rgba(59,130,246,0.3)]">
-                        {activeWhySlide === 0 && <Award className="w-12 h-12 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.85)] animate-pulse" />}
-                        {activeWhySlide === 1 && <Shield className="w-12 h-12 text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.85)] animate-pulse" />}
-                        {activeWhySlide === 2 && <Sparkles className="w-12 h-12 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.85)] animate-pulse" />}
+                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-snug">
+                    {isAr ? 'جودة عالية ومواصفات إيطالية' : 'Certified Quality & Italian Standards'}
+                  </h3>
+
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
+                    {isAr 
+                      ? 'نختار كافة مواد التأسيس والإنارة بعناية فائقة لتطابق أعلى معايير الجودة والسلامة العالمية لتدوم طويلاً.' 
+                      : 'We select all installation and lighting materials with extreme care to meet top international safety standards.'}
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    {(isAr ? [
+                      'منتجات أصلية معتمدة وفق أعلى معايير الجودة.',
+                      'عزل حراري وكهربائي ممتاز يدوم لسنوات طويلة.',
+                      'ضمان حقيقي واختبار قياسي قبل التوريد.',
+                      'حماية كاملة للمبنى والأسلاك من الحرارة.'
+                    ] : [
+                      'Certified original products meeting top standards.',
+                      'Superior thermal and electrical insulation.',
+                      'Real warranty and comprehensive pre-delivery testing.',
+                      'Complete building and wiring heat protection.'
+                    ]).map((feat, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5">
+                        <div className="p-1 rounded-full bg-blue-500/20 text-blue-400 shrink-0 border border-blue-400/30 mt-0.5">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-xs text-slate-200 font-bold">{feat}</span>
                       </div>
-
-                      <span className="text-3xl sm:text-4xl font-black text-white block mb-1">
-                        {activeWhySlide === 0 ? '100%' : activeWhySlide === 1 ? '100%' : '24/7'}
-                      </span>
-                      <span className="text-xs sm:text-sm font-black text-blue-300 block mb-4">
-                        {activeWhySlide === 0 
-                          ? (isAr ? 'منتجات أصلية معتمدة' : 'Certified Original Products')
-                          : activeWhySlide === 1
-                          ? (isAr ? 'تأسيس وإنارة شاملة' : 'Full Installation & Lighting')
-                          : (isAr ? 'استشارات واستجابة فورية' : 'Instant Consultations & Support')}
-                      </span>
-                      <span className="inline-block w-full py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-[11px] font-bold text-slate-400">
-                        {isAr ? 'اعتمادات ومواصفات عالمية 2026' : 'Global Certified Standards 2026'}
-                      </span>
-                    </div>
+                    ))}
                   </div>
-                </motion.div>
-              </AnimatePresence>
+                </div>
 
-              {/* مؤشرات التصفح السفلية */}
-              <div className="flex items-center justify-center gap-2 mt-6">
-                {[0, 1, 2].map((idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveWhySlide(idx)}
-                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                      activeWhySlide === idx
-                        ? 'w-8 bg-blue-500 shadow-[0_0_12px_#3b82f6]'
-                        : 'w-2.5 bg-white/20 hover:bg-white/40'
-                    }`}
-                    title={isAr ? `انقل للشريحة ${idx + 1}` : `Go to slide ${idx + 1}`}
-                  />
-                ))}
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-blue-300 relative z-10">
+                  <span>{isAr ? 'ضمان واعتماد 100%' : '100% Guaranteed Quality'}</span>
+                  <span className="text-white text-lg font-black">100%</span>
+                </div>
               </div>
+
+              {/* البطاقة الثانية: حلول متكاملة */}
+              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-amber-400/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between gap-2 mb-6">
+                    <span className="px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-black shadow-sm flex items-center gap-1">
+                      <span>{isAr ? 'شامل ومتكامل 📦' : 'All-in-One 📦'}</span>
+                    </span>
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-md">
+                      <Shield className="w-6 h-6 animate-pulse" />
+                    </div>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-snug">
+                    {isAr ? 'حلول تأسيس وإنارة شاملة' : 'Integrated Electrical & Lighting'}
+                  </h3>
+
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
+                    {isAr 
+                      ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك إيطالية، ومفاتيح ذكية في مكان واحد.' 
+                      : 'We provide everything you need to set up your home or project, from cables and Italian wires to smart switches.'}
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    {(isAr ? [
+                      'توفير كافة مستلزمات التأسيس والإنارة بدون عناء.',
+                      'كابلات وأسلاك إيطالية بأحدث التقنيات.',
+                      'تجهيز كامل للمشاريع بأسعار منافسة.',
+                      'حلول ديكورية تناسب جميع التصاميم.'
+                    ] : [
+                      'All electrical and lighting needs in one stop.',
+                      'Italian wires and smart switches with modern tech.',
+                      'Complete project provisioning at competitive prices.',
+                      'Integrated decorative lighting solutions.'
+                    ]).map((feat, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5">
+                        <div className="p-1 rounded-full bg-amber-500/20 text-amber-400 shrink-0 border border-amber-400/30 mt-0.5">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-xs text-slate-200 font-bold">{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-amber-300 relative z-10">
+                  <span>{isAr ? 'تغطية شاملة للمشاريع' : 'Full Project Provisioning'}</span>
+                  <span className="text-white text-lg font-black">100%</span>
+                </div>
+              </div>
+
+              {/* البطاقة الثالثة: دعم فني واسع */}
+              <div className="relative p-6 sm:p-8 rounded-[2.5rem] bg-[#0c1e38] border border-blue-500/25 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:border-emerald-400/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between gap-2 mb-6">
+                    <span className="px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-black shadow-sm flex items-center gap-1">
+                      <span>{isAr ? 'دعم مبيعات 📞' : 'Sales Support 📞'}</span>
+                    </span>
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shadow-md">
+                      <Sparkles className="w-6 h-6 animate-pulse" />
+                    </div>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-snug">
+                    {isAr ? 'دعم فني واستشارات مجاناً' : 'Fast Sales Support & Consultations'}
+                  </h3>
+
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
+                    {isAr 
+                      ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات وحساب أحمال الكهرباء بدقة.' 
+                      : 'Our team is available to help you select products, request custom volumes, and calculate electrical loads accurately.'}
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    {(isAr ? [
+                      'فريق مهندسين وفنيين لإجابة كافة استفساراتك.',
+                      'حساب الأحمال والكميات المطلوبة بدقة بدون هدر.',
+                      'متابعة مستمرة حتى وصول طلبك بأمان.',
+                      'توصيل سريع ومضمون لكافة المشاريع.'
+                    ] : [
+                      'Dedicated specialists to answer all your queries.',
+                      'Accurate calculation of loads and quantities.',
+                      'Continuous order tracking and coordination.',
+                      'Fast and guaranteed delivery to all project sites.'
+                    ]).map((feat, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5">
+                        <div className="p-1 rounded-full bg-emerald-500/20 text-emerald-400 shrink-0 border border-emerald-400/30 mt-0.5">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-xs text-slate-200 font-bold">{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black text-emerald-300 relative z-10">
+                  <span>{isAr ? 'استجابة واستشارات فورية' : '24/7 Support & Response'}</span>
+                  <span className="text-white text-lg font-black">24/7</span>
+                </div>
+              </div>
+
             </div>
+
           </div>
         </section>
 
