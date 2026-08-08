@@ -9,7 +9,7 @@ import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
-  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video
+  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone
 } from 'lucide-react'
 
 // نمط الوهج
