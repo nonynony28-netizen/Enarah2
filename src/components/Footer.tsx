@@ -4,7 +4,8 @@ import {
   Phone,
   Mail,
   MapPin,
-  Facebook
+  Facebook,
+  Video
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 
@@ -40,8 +41,8 @@ export default function Footer() {
               }
             </p>
 
-            {/* Facebook Social Link */}
-            <div className="pt-2">
+            {/* Social Links (Facebook & TikTok) */}
+            <div className="pt-2 flex flex-wrap items-center gap-2">
               <a
                 href="https://www.facebook.com/enarahadetha"
                 target="_blank"
@@ -49,7 +50,17 @@ export default function Footer() {
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600 border border-blue-500/30 text-blue-300 hover:text-white text-xs font-semibold transition-all duration-300 shadow-sm"
               >
                 <Facebook className="w-4 h-4" />
-                <span>صفحتنا على فيسبوك</span>
+                <span>فيسبوك</span>
+              </a>
+
+              <a
+                href="https://www.tiktok.com/@modernenara"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-500/15 hover:bg-gradient-to-r hover:from-pink-600 hover:to-sky-500 border border-pink-500/30 text-pink-300 hover:text-white text-xs font-semibold transition-all duration-300 shadow-sm"
+              >
+                <Video className="w-4 h-4" />
+                <span>تيك توك</span>
               </a>
             </div>
           </div>
