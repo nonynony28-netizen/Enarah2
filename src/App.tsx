@@ -1,5 +1,5 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 
 import SplashScreen from './components/SplashScreen'
@@ -36,6 +36,20 @@ const PageLoader = () => (
 )
 
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 0. إعادة التوجيه الفوري للصفحة الرئيسية عند فتح جَلسة تصفح جديدة (بعد إغلاق الموقع وإعادة فتحه)
+  useEffect(() => {
+    const isSessionActive = sessionStorage.getItem('enarah_session_active');
+    if (!isSessionActive) {
+      sessionStorage.setItem('enarah_session_active', 'true');
+      if (location.pathname !== '/') {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [location.pathname, navigate]);
+
   const [loading, setLoading] = useState(() => {
     if (typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent || '')) {
       return false;
