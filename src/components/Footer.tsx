@@ -4,6 +4,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  Facebook
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 
@@ -38,6 +39,19 @@ export default function Footer() {
                 : 'Your premier destination for all lighting and electrical needs. We offer high-quality integrated solutions with professional expertise.'
               }
             </p>
+
+            {/* Facebook Social Link */}
+            <div className="pt-2">
+              <a
+                href="https://www.facebook.com/enarahadetha"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600 border border-blue-500/30 text-blue-300 hover:text-white text-xs font-semibold transition-all duration-300 shadow-sm"
+              >
+                <Facebook className="w-4 h-4" />
+                <span>صفحتنا على فيسبوك</span>
+              </a>
+            </div>
           </div>
 
           {/* Quick Links */}
