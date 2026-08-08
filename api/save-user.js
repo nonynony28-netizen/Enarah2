@@ -54,6 +54,25 @@ export const config = {
   },
 };
 
+// In-memory rate limiting per IP address (Protects MongoDB Atlas from Spam & Rate-Limit Attacks)
+const ipCache = new Map();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 20;
+
+function isRateLimited(clientIp) {
+  const now = Date.now();
+  const userRequests = ipCache.get(clientIp) || [];
+  const validRequests = userRequests.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+
+  if (validRequests.length >= MAX_REQUESTS_PER_WINDOW) {
+    return true;
+  }
+
+  validRequests.push(now);
+  ipCache.set(clientIp, validRequests);
+  return false;
+}
+
 // =====================================
 // API Handler
 // =====================================
@@ -67,6 +86,14 @@ export default async function handler(req, res) {
     "Access-Control-Allow-Headers",
     "Content-Type, x-admin-password"
   );
+
+  const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+  if (req.method === "POST" && isRateLimited(clientIp)) {
+    return res.status(429).json({
+      success: false,
+      error: "Too Many Requests. Please wait a minute before trying again."
+    });
+  }
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
