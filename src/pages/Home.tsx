@@ -567,14 +567,13 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
               
               {/* البطاقة الأولى: وكلاء حصريون لشركات عالمية */}
-              <div className="relative p-7 sm:p-8 rounded-3xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)]">
+              <div className="relative p-7 sm:p-8 rounded-2xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.12)]">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                      <span>{isAr ? 'وكالة رسمية' : 'Official Agency'}</span>
+                    <span className="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                      {isAr ? 'وكالة رسمية' : 'Official Agency'}
                     </span>
-                    <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
                       <Globe className="w-5 h-5" />
                     </div>
                   </div>
@@ -616,14 +615,13 @@ export default function Home() {
               </div>
 
               {/* البطاقة الثانية: حلول متكاملة */}
-              <div className="relative p-7 sm:p-8 rounded-3xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-sky-500/40 hover:shadow-[0_10px_30px_rgba(56,189,248,0.15)]">
+              <div className="relative p-7 sm:p-8 rounded-2xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.12)]">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-                      <span>{isAr ? 'حلول متكاملة' : 'Integrated Solutions'}</span>
+                    <span className="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                      {isAr ? 'حلول متكاملة' : 'Integrated Solutions'}
                     </span>
-                    <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-sky-400 group-hover:border-sky-500/30 transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                   </div>
@@ -651,7 +649,7 @@ export default function Home() {
                       'Integrated decorative lighting solutions.'
                     ]).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-3">
-                        <CheckCircle className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                        <CheckCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                         <span className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{feat}</span>
                       </div>
                     ))}
@@ -660,20 +658,19 @@ export default function Home() {
 
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-slate-400">
                   <span>{isAr ? 'تغطية شاملة للمشاريع' : 'Full Project Provisioning'}</span>
-                  <span className="text-sky-400 font-bold text-sm">100%</span>
+                  <span className="text-blue-400 font-bold text-sm">100%</span>
                 </div>
               </div>
 
               {/* البطاقة الثالثة: دعم فني واسع */}
-              <div className="relative p-7 sm:p-8 rounded-3xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-indigo-500/40 hover:shadow-[0_10px_30px_rgba(99,102,241,0.15)]">
+              <div className="relative p-7 sm:p-8 rounded-2xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.12)]">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                      <span>{isAr ? 'استشارات ودعم' : 'Technical Support'}</span>
+                    <span className="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                      {isAr ? 'استشارات ودعم' : 'Technical Support'}
                     </span>
-                    <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:border-indigo-500/30 transition-colors">
-                      <Sparkles className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
+                      <Phone className="w-5 h-5" />
                     </div>
                   </div>
 
@@ -1608,39 +1605,6 @@ export default function Home() {
             )
           })()}
         </AnimatePresence>
-
-        {/* 🚀 الأيقونات الاجتماعية العائمة */}
-        <div className="fixed left-6 bottom-24 z-40 hidden md:flex flex-col gap-3 animate-fade-in">
-          <a 
-            href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-blue-400 hover:text-white hover:bg-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
-            title="تابعنا على فيسبوك"
-          >
-            <Facebook className="w-5 h-5" />
-          </a>
-          <a 
-            href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(236,72,153,0.1)] hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]"
-            title="تابعنا على إنستغرام"
-          >
-            <Instagram className="w-5 h-5" />
-          </a>
-          <a 
-            href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="w-11 h-11 rounded-xl bg-[#0f213a]/90 backdrop-blur-md border border-blue-500/20 text-slate-300 hover:text-white hover:bg-black flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-            title="تابعنا على تيك توك"
-          >
-            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-              <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
-            </svg>
-          </a>
-        </div>
 
       </div>
     </>

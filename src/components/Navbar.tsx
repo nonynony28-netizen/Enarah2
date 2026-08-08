@@ -304,11 +304,11 @@ export default function Navbar() {
               <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
                 <button
                   onClick={toggleLanguage}
-                  className="relative px-3.5 py-1.5 h-9 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-600/25 to-indigo-600/20 hover:from-blue-600 hover:to-indigo-600 text-cyan-300 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.25)] border border-cyan-400/30 text-xs font-black"
+                  className="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-blue-600/20 border border-white/10 hover:border-blue-500/30 text-slate-200 hover:text-blue-300 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-bold shrink-0"
                   title={isAr ? 'Switch to English' : 'التغيير للعربية'}
                 >
-                  <Globe className="w-3.5 h-3.5" />
-                  <span>{isAr ? 'English' : 'العربية'}</span>
+                  <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <span className="whitespace-nowrap">{isAr ? 'EN' : 'العربية'}</span>
                 </button>
               </div>
 
@@ -319,11 +319,11 @@ export default function Navbar() {
             <div className="flex md:hidden items-center gap-2">
               <button
                 onClick={toggleLanguage}
-                className="relative px-3.5 py-1.5 h-9 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-600/25 to-indigo-600/20 text-cyan-300 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-95 shadow-[0_0_12px_rgba(6,182,212,0.25)] border border-cyan-400/30 text-xs font-black"
+                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-bold shrink-0"
                 title={isAr ? 'Switch to English' : 'التغيير للعربية'}
               >
-                <Globe className="w-3.5 h-3.5" />
-                <span>{isAr ? 'EN' : 'AR'}</span>
+                <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <span className="whitespace-nowrap">{isAr ? 'EN' : 'AR'}</span>
               </button>
 
               <button
