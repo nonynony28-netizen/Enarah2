@@ -519,11 +519,11 @@ export default function Home() {
                         className="max-w-4xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
                       >
                         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
-                          <span className="text-white drop-shadow-[0_4px_25px_rgba(0,0,0,0.95)]">{t('hero.title.part1')}</span>{' '}
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 drop-shadow-[0_0_40px_rgba(56,189,248,0.8)]">{t('hero.title.part2')}</span>
+                          <span className="text-white drop-shadow-md">{t('hero.title.part1')}</span>{' '}
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200 drop-shadow-sm">{t('hero.title.part2')}</span>
                         </h1>
                         
-                        <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-0 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_4px_20px_rgba(0,0,0,0.95)]">
+                        <p className="text-xs sm:text-base md:text-xl text-slate-200 mb-0 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-sm">
                           {t('hero.subtitle')}
                         </p>
                       </motion.div>
@@ -537,17 +537,13 @@ export default function Home() {
 
         {/* 2. لماذا نحن - الميزات الموحدة في شبكة 3 بطاقات فاخرة في صفحة واحدة (Unified 3-Card Feature Grid) */}
         <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
-          {/* بقع توهج نيونية خفيفة عائمة */}
-          <div className="hidden md:block absolute top-1/4 left-0 w-72 h-72 bg-sky-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-          <div className="hidden md:block absolute bottom-1/4 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
             {/* عنوان قسم لماذا نحن */}
             <div className="text-center mb-12 md:mb-16">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
                 {isAr ? 'لماذا' : 'Why'}{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 drop-shadow-[0_2px_10px_rgba(56,189,248,0.4)]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">
                   {isAr ? 'نحن؟' : 'Choose Us?'}
                 </span>
               </h2>
@@ -557,9 +553,9 @@ export default function Home() {
                   : 'An integrated experience combining certified quality, competitive pricing, and fast technical support'}
               </p>
               <div className="flex items-center justify-center gap-1.5 mt-4">
-                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+                <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-blue-500/50" />
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-blue-500/50" />
               </div>
             </div>
 
