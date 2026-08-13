@@ -171,7 +171,14 @@ export default function WiresAutoCanvas({
         style={{ touchAction: 'pan-y' }}
       />
       {!isReady && (
-        <div className="absolute inset-0 bg-[#061122] transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-[#061122] transition-opacity duration-500 flex items-center justify-center">
+          <img
+            src="/poster.jpg"
+            alt="الأسلاك الإيطالية المعتمدة"
+            className="w-full h-full object-cover opacity-80"
+            onError={(e) => { e.currentTarget.src = '/images/cat-cables.jpg' }}
+          />
+        </div>
       )}
     </div>
   )
