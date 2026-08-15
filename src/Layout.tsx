@@ -170,16 +170,16 @@ export default function Layout() {
 
   return (
     <div className="relative min-h-screen text-white">
-      {/* الخلفية الزرقاء الملكية الفاخرة (Deep Luxury Blue Background) */}
-      <div className="fixed inset-0 -z-50 w-full h-full bg-[#0a192f] overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f] via-[#0d2342] to-[#071325]"></div>
-        <div className="absolute inset-0 bg-animated-grid opacity-[0.06]"></div>
+      {/* الخلفية المعمارية الفاخرة المطفأة (Architectural Luxury Dark Background) */}
+      <div className="fixed inset-0 -z-50 w-full h-full bg-[#09090b] overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#09090b] via-[#0d0d11] to-[#09090b]"></div>
+        <div className="absolute inset-0 bg-animated-grid opacity-[0.03]"></div>
       </div>
 
       {/* 2. حبل السحب العائم التفاعلي لتعديل وتعتيم الضوء وسحب المفتاح */}
       <div className="fixed top-0 left-16 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
         <motion.div 
-          className="w-[1px] md:w-[2px] bg-gradient-to-b from-[#111] via-[#444] to-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
+          className="w-[1px] md:w-[2px] bg-gradient-to-b from-[#333] via-[#666] to-amber-500/70"
           style={{ height: cordHeight }}
         />
         <motion.div 
@@ -192,16 +192,16 @@ export default function Layout() {
           className="w-12 h-12 flex items-center justify-center cursor-grab active:cursor-grabbing pointer-events-auto -mt-5"
           title={isAr ? 'اسحب لتغيير وضع الإضاءة' : 'Pull to change lighting mode'}
         >
-          <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-[1.5px] border-white shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(245,158,11,0.8)] flex items-center justify-center transition-shadow duration-300">
+          <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 border-[1.5px] border-white shadow-[0_2px_8px_rgba(0,0,0,0.5),0_0_8px_rgba(245,158,11,0.5)] flex items-center justify-center transition-shadow duration-300">
             <div className="w-[4px] h-[4px] bg-white rounded-full opacity-90" />
           </div>
         </motion.div>
 
         {/* مؤشر الإرشاد العائم */}
-        <div className={`absolute top-full mt-3 text-[9px] md:text-[10px] font-black tracking-tight px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border transition-all duration-300 whitespace-nowrap shadow-md pointer-events-none ${
+        <div className={`absolute top-full mt-3 text-[9px] md:text-[10px] font-semibold tracking-tight px-3 py-1 rounded-full border transition-all duration-300 whitespace-nowrap shadow-sm pointer-events-none ${
           theme === 'light'
-            ? 'bg-white/90 text-slate-800 border-slate-200/50 shadow-slate-200/20'
-            : 'bg-slate-900/90 text-blue-400 border-white/10 shadow-black/40'
+            ? 'bg-white/95 text-zinc-800 border-zinc-200/80 shadow-sm'
+            : 'bg-zinc-900/90 text-zinc-300 border-zinc-800 shadow-sm'
         }`}>
           {isDragging 
             ? (isAr ? 'اترك الحبل الآن...' : 'Release now...') 

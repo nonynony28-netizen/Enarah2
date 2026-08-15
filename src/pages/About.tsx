@@ -47,8 +47,8 @@ export default function About() {
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className={`mb-6 flex ${isAr ? 'justify-start' : 'justify-start'}`}>
-            <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-              <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all">
+              <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
               {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
           </div>
@@ -57,43 +57,43 @@ export default function About() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-white">
               {isAr ? (
-                <>من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">نحن</span></>
+                <>من <span className="text-blue-400">نحن</span></>
               ) : (
-                <>About <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">Us</span></>
+                <>About <span className="text-blue-400">Us</span></>
               )}
             </h1>
 
-            <div className="flex items-center justify-center gap-1.5 mt-6">
-              <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-              <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+            <div className="flex items-center justify-center gap-1.5 mt-5">
+              <div className="w-16 h-[1px] bg-zinc-800" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              <div className="w-16 h-[1px] bg-zinc-800" />
             </div>
           </div>
         </FadeIn>
 
         {/* بطاقة من نحن الأساسية */}
         <FadeIn delay={0.2}>
-          <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-8 md:p-12 mb-12 shadow-2xl hover:border-blue-500/30 transition-colors">
+          <div className="bg-[#111215] border border-white/[0.08] rounded-2xl p-8 md:p-12 mb-12 shadow-sm">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.15)]">
-                <Lightbulb className="w-7 h-7 text-blue-400" />
+              <div className="w-12 h-12 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center text-blue-400">
+                <Lightbulb className="w-6 h-6" />
               </div>
 
-              <h2 className="text-3xl font-bold text-white">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white">
                 {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
               </h2>
             </div>
 
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed mb-6">
+            <p className="text-zinc-300 text-base md:text-lg leading-relaxed mb-6 font-normal">
               {isAr 
                 ? 'نحن وجهتك الأولى والموثوقة لجميع احتياجات الإضاءة والمواد الكهربائية في ليبيا. منذ تأسيسنا، نسعى دائماً لتقديم أجود المنتجات العالمية بأسعار تنافسية، مع التركيز على تقديم تجربة عملاء استثنائية وحلول احترافية متكاملة.'
                 : 'We are your primary and trusted destination for all lighting and electrical needs in Libya. Since our establishment, we have always strived to offer the highest quality global products at competitive prices, with a focus on providing an exceptional customer experience and integrated professional solutions.'
               }
             </p>
 
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
+            <p className="text-zinc-300 text-base md:text-lg leading-relaxed font-normal">
               {isAr
                 ? 'نختار منتجاتنا بعناية فائقة من أفضل المصادر والماركات العالمية، ونحرص على توفير حلول متكاملة تناسب كافة المشاريع السكنية والتجارية داخل ليبيا بأعلى معايير الجودة والموثوقية.'
                 : 'We select our products with extreme care from the best global sources and brands, ensuring the provision of integrated solutions suitable for all residential and commercial projects in Libya with the highest quality and reliability standards.'
@@ -103,7 +103,7 @@ export default function About() {
         </FadeIn>
 
         {/* القيم والرؤية والرسالة */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
             {
               icon: Target,
@@ -128,16 +128,16 @@ export default function About() {
             },
           ].map((item, i) => (
             <FadeIn key={item.title} delay={0.3 + (i * 0.1)}>
-              <div className="bg-[#0f213a] border border-white/5 rounded-[1.5rem] p-8 hover:border-blue-500/30 transition-all duration-300 h-full shadow-lg hover:-translate-y-2">
-                <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-                  <item.icon className="w-7 h-7 text-blue-400" />
+              <div className="bg-[#111215] border border-white/[0.08] hover:border-white/[0.18] rounded-2xl p-7 transition-all duration-200 h-full shadow-sm">
+                <div className="w-12 h-12 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center mb-6 text-blue-400">
+                  <item.icon className="w-6 h-6" />
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-xl font-bold text-white mb-3">
                   {item.title}
                 </h3>
 
-                <p className="text-slate-400 text-base leading-relaxed">
+                <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                   {item.desc}
                 </p>
               </div>
@@ -147,13 +147,13 @@ export default function About() {
 
         {/* لماذا نحن الخيار الأمثل */}
         <FadeIn delay={0.5}>
-          <div className="bg-gradient-to-br from-[#0f213a] to-[#0a192f] border border-blue-500/20 rounded-[2rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
-            <h3 className="text-3xl font-bold text-white mb-8 relative z-10 flex items-center gap-3">
-              <span className="w-1.5 h-8 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+          <div className="bg-[#111215] border border-white/[0.08] rounded-2xl p-8 md:p-12 shadow-sm relative overflow-hidden">
+            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-8 relative z-10 flex items-center gap-3">
+              <span className="w-1.5 h-6 bg-blue-500 rounded-full" />
               {isAr ? 'لماذا نحن الخيار الأمثل؟' : 'Why Choose Us?'}
             </h3>
 
-            <ul className="space-y-5 relative z-10">
+            <ul className="space-y-4 relative z-10">
               {(isAr 
                 ? [
                     'منتجات أصلية 100% من ماركات عالمية موثوقة',
@@ -172,9 +172,9 @@ export default function About() {
               ).map((point) => (
                 <li
                   key={point}
-                  className="flex items-center gap-4 text-slate-300 text-lg"
+                  className="flex items-center gap-3 text-zinc-300 text-sm md:text-base font-normal"
                 >
-                  <div className="w-2.5 h-2.5 bg-blue-400 rounded-full shrink-0 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                  <div className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />
                   {point}
                 </li>
               ))}

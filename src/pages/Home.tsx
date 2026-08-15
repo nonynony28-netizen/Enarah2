@@ -520,10 +520,10 @@ export default function Home() {
                       >
                         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
                           <span className="text-white drop-shadow-md">{t('hero.title.part1')}</span>{' '}
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200 drop-shadow-sm">{t('hero.title.part2')}</span>
+                          <span className="text-blue-400 drop-shadow-sm">{t('hero.title.part2')}</span>
                         </h1>
                         
-                        <p className="text-xs sm:text-base md:text-xl text-slate-200 mb-0 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-sm">
+                        <p className="text-xs sm:text-base md:text-xl text-zinc-300 mb-0 max-w-2xl mx-auto leading-relaxed font-normal drop-shadow-sm">
                           {t('hero.subtitle')}
                         </p>
                       </motion.div>
@@ -536,40 +536,40 @@ export default function Home() {
         </section>
 
         {/* 2. لماذا نحن - الميزات الموحدة في شبكة 3 بطاقات فاخرة في صفحة واحدة (Unified 3-Card Feature Grid) */}
-        <section id="about" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
+        <section id="about" className="py-20 md:py-28 relative overflow-hidden border-t border-zinc-800/80 bg-transparent">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
             {/* عنوان قسم لماذا نحن */}
-            <div className="text-center mb-12 md:mb-16">
+            <div className="text-center mb-14 md:mb-20">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
                 {isAr ? 'لماذا' : 'Why'}{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">
+                <span className="text-blue-400">
                   {isAr ? 'نحن؟' : 'Choose Us?'}
                 </span>
               </h2>
-              <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-medium">
+              <p className="text-zinc-400 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal">
                 {isAr 
                   ? 'تجربة متكاملة تجمع بين الجودة المعتمدة، الأسعار المنافسة، والدعم الفني السريع' 
                   : 'An integrated experience combining certified quality, competitive pricing, and fast technical support'}
               </p>
-              <div className="flex items-center justify-center gap-1.5 mt-4">
-                <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-blue-500/50" />
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-blue-500/50" />
+              <div className="flex items-center justify-center gap-1.5 mt-5">
+                <div className="w-16 h-[1px] bg-zinc-800" />
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <div className="w-16 h-[1px] bg-zinc-800" />
               </div>
             </div>
 
-            {/* شبكة البطاقات الثلاث الموحدة بتصميم احترافي رفيع المستوى بدون أيموجي */}
+            {/* شبكة البطاقات الثلاث الموحدة بتصميم معماري فاخر */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
               
               {/* البطاقة الأولى: وكلاء حصريون لشركات عالمية */}
-              <div className="relative p-7 sm:p-8 rounded-2xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.12)]">
+              <div className="relative p-8 rounded-2xl bg-[#111215] border border-white/[0.08] hover:border-white/[0.18] shadow-sm flex flex-col justify-between group transition-all duration-300">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                    <span className="px-3 py-1 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 text-xs font-semibold tracking-wider">
                       {isAr ? 'وكالة رسمية' : 'Official Agency'}
                     </span>
-                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-blue-400 group-hover:border-zinc-700 transition-colors">
                       <Globe className="w-5 h-5" />
                     </div>
                   </div>
@@ -578,7 +578,7 @@ export default function Home() {
                     {isAr ? 'وكلاء حصريون لشركات عالمية' : 'Exclusive Agents for Global Brands'}
                   </h3>
 
-                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
                     {isAr 
                       ? 'منتجات من شركات عالمية مختلفة نحن وكلائها الحصريون لضمان أعلى معايير الجودة والأصالة.' 
                       : 'Products from leading global brands for which we serve as exclusive agents.'}
@@ -597,27 +597,27 @@ export default function Home() {
                       'Complete transparency and accurate technical specifications for all product data.'
                     ]).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-3">
-                        <CheckCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                        <span className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{feat}</span>
+                        <CheckCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm text-zinc-300 font-normal leading-snug">{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-slate-400">
+                <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between text-xs font-semibold text-zinc-400">
                   <span>{isAr ? 'وكالة رسمية وحصرية' : 'Official Exclusive Agency'}</span>
                   <span className="text-blue-400 font-bold text-sm">100%</span>
                 </div>
               </div>
 
               {/* البطاقة الثانية: حلول متكاملة */}
-              <div className="relative p-7 sm:p-8 rounded-2xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.12)]">
+              <div className="relative p-8 rounded-2xl bg-[#111215] border border-white/[0.08] hover:border-white/[0.18] shadow-sm flex flex-col justify-between group transition-all duration-300">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                    <span className="px-3 py-1 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 text-xs font-semibold tracking-wider">
                       {isAr ? 'حلول متكاملة' : 'Integrated Solutions'}
                     </span>
-                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-blue-400 group-hover:border-zinc-700 transition-colors">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                   </div>
@@ -626,7 +626,7 @@ export default function Home() {
                     {isAr ? 'حلول تأسيس وإنارة شاملة' : 'Integrated Electrical & Lighting'}
                   </h3>
 
-                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
                     {isAr 
                       ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك إيطالية، ومفاتيح ذكية في مكان واحد.' 
                       : 'We provide everything you need to set up your home or project, from cables and Italian wires to smart switches.'}
@@ -645,27 +645,27 @@ export default function Home() {
                       'Integrated decorative lighting solutions.'
                     ]).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-3">
-                        <CheckCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                        <span className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{feat}</span>
+                        <CheckCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm text-zinc-300 font-normal leading-snug">{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-slate-400">
+                <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between text-xs font-semibold text-zinc-400">
                   <span>{isAr ? 'تغطية شاملة للمشاريع' : 'Full Project Provisioning'}</span>
                   <span className="text-blue-400 font-bold text-sm">100%</span>
                 </div>
               </div>
 
               {/* البطاقة الثالثة: دعم فني واسع */}
-              <div className="relative p-7 sm:p-8 rounded-2xl bg-[#0a172c]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col justify-between group transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_10px_30px_rgba(59,130,246,0.12)]">
+              <div className="relative p-8 rounded-2xl bg-[#111215] border border-white/[0.08] hover:border-white/[0.18] shadow-sm flex flex-col justify-between group transition-all duration-300">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
-                    <span className="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                    <span className="px-3 py-1 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 text-xs font-semibold tracking-wider">
                       {isAr ? 'استشارات ودعم' : 'Technical Support'}
                     </span>
-                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:border-blue-500/30 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-blue-400 group-hover:border-zinc-700 transition-colors">
                       <Phone className="w-5 h-5" />
                     </div>
                   </div>
@@ -674,7 +674,7 @@ export default function Home() {
                     {isAr ? 'دعم فني واستشارات مجاناً' : 'Fast Sales Support & Consultations'}
                   </h3>
 
-                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
                     {isAr 
                       ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات وحساب أحمال الكهرباء بدقة.' 
                       : 'Our team is available to help you select products, request custom volumes, and calculate electrical loads accurately.'}
@@ -693,16 +693,16 @@ export default function Home() {
                       'Fast and guaranteed delivery to all project sites.'
                     ]).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-3">
-                        <CheckCircle className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                        <span className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{feat}</span>
+                        <CheckCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm text-zinc-300 font-normal leading-snug">{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-slate-400">
+                <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between text-xs font-semibold text-zinc-400">
                   <span>{isAr ? 'استجابة واستشارات فورية' : '24/7 Support & Response'}</span>
-                  <span className="text-indigo-400 font-bold text-sm">24/7</span>
+                  <span className="text-blue-400 font-bold text-sm">24/7</span>
                 </div>
               </div>
 
@@ -714,7 +714,7 @@ export default function Home() {
         {/* =========================================================
             قسم عرض الفيديو الثاني (بعرض الشاشة الكاملة على جميع الأجهزة)
             ========================================================= */}
-        <section id="showcase-video" className="w-full py-6 md:py-10 relative overflow-hidden bg-transparent border-y border-blue-500/20">
+        <section id="showcase-video" className="w-full py-8 md:py-14 relative overflow-hidden bg-transparent border-y border-zinc-800/80">
           <div className="w-full relative z-10">
             
             {/* مسرح الفيديو الثاني بعرض الشاشة الكاملة 100% بدون أي حواف جانبية */}
@@ -744,24 +744,24 @@ export default function Home() {
         </section>
 
         {/* 2.5 مُحاكي الإضاءة التفاعلي المبتكر */}
-        <section id="simulator" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
+        <section id="simulator" className="py-20 md:py-28 relative overflow-hidden border-t border-zinc-800/80 bg-transparent">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            <div className="text-center mb-12">
+            <div className="text-center mb-14 md:mb-18">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
-                {t('sim.title.part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">{t('sim.title.part2')}</span>
+                {t('sim.title.part1')} <span className="text-blue-400">{t('sim.title.part2')}</span>
               </h2>
-              <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+              <p className="text-zinc-400 text-sm md:text-base max-w-2xl mx-auto font-normal">
                 {t('sim.desc')}
               </p>
-              <div className="flex items-center justify-center gap-1.5 mt-4">
-                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+              <div className="flex items-center justify-center gap-1.5 mt-5">
+                <div className="w-16 h-[1px] bg-zinc-800" />
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <div className="w-16 h-[1px] bg-zinc-800" />
               </div>
             </div>
 
-            <div className={`flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border border-white/5 p-6 md:p-8 rounded-[2.5rem] shadow-xl ${
+            <div className={`flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#111215] border border-white/[0.08] p-6 md:p-10 rounded-2xl shadow-sm ${
               isAr ? 'flex-col lg:flex-row' : 'flex-col lg:flex-row-reverse'
             }`}>
               
@@ -843,10 +843,10 @@ export default function Home() {
                 )}
 
                 {/* نص توضيحي داخلي */}
-                <div className={`absolute bottom-4 z-20 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/5 ${
+                <div className={`absolute bottom-4 z-20 bg-black/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 ${
                   isAr ? 'right-4' : 'left-4'
                 }`}>
-                  <span className="text-[11px] font-bold text-blue-200">
+                  <span className="text-[11px] font-semibold text-zinc-300">
                     {!simSpot && !simLed ? (isAr ? 'الإنارة مطفأة 🌑' : 'Lights Off 🌑') : `${isAr ? 'حرارة اللون:' : 'Color Temp:'} ${
                       simColor === 'warm' ? (isAr ? 'أصفر دافئ (3000K)' : 'Warm Yellow (3000K)') : 
                       simColor === 'natural' ? (isAr ? 'شمسي طبيعي (4000K)' : 'Natural Sun (4000K)') : 
@@ -861,20 +861,20 @@ export default function Home() {
                 
                 {/* 1. اختيار حرارة ولون الضوء */}
                 <div>
-                  <h4 className={`text-base font-bold text-slate-300 mb-3 font-sans ${isAr ? 'text-right' : 'text-left'}`}>{t('sim.opt1')}</h4>
+                  <h4 className={`text-base font-bold text-zinc-200 mb-3 font-sans ${isAr ? 'text-right' : 'text-left'}`}>{t('sim.opt1')}</h4>
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { key: 'warm', name: isAr ? 'أصفر 3000K' : 'Warm 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
-                      { key: 'natural', name: isAr ? 'شمسي 4000K' : 'Natural 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
-                      { key: 'cool', name: isAr ? 'أبيض 6000K' : 'White 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
+                      { key: 'warm', name: isAr ? 'أصفر 3000K' : 'Warm 3000K', activeCls: 'bg-amber-500/10 border-amber-500/50 text-amber-300' },
+                      { key: 'natural', name: isAr ? 'شمسي 4000K' : 'Natural 4000K', activeCls: 'bg-yellow-500/10 border-yellow-500/50 text-yellow-200' },
+                      { key: 'cool', name: isAr ? 'أبيض 6000K' : 'White 6000K', activeCls: 'bg-blue-500/10 border-blue-500/50 text-blue-300' },
                     ].map((btn) => (
                       <button
                         key={btn.key}
                         onClick={() => setSimColor(btn.key as any)}
-                        className={`py-3 px-2 rounded-xl text-xs font-bold border transition-all duration-300 ${
+                        className={`py-3 px-2 rounded-xl text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                           simColor === btn.key 
-                            ? `${btn.bg} ring-2 ring-blue-500/50 scale-105 shadow-[0_0_15px_rgba(59,130,246,0.15)]` 
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                            ? `${btn.activeCls} ring-1 ring-white/20 scale-[1.02]` 
+                            : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white'
                         }`}
                       >
                         {btn.name}
@@ -885,43 +885,43 @@ export default function Home() {
 
                 {/* 2. تشغيل مصادر الإضاءة المختلفة */}
                 <div>
-                  <h4 className={`text-base font-bold text-slate-300 mb-3 font-sans ${isAr ? 'text-right' : 'text-left'}`}>{t('sim.opt2')}</h4>
+                  <h4 className={`text-base font-bold text-zinc-200 mb-3 font-sans ${isAr ? 'text-right' : 'text-left'}`}>{t('sim.opt2')}</h4>
                   <div className={`flex flex-col sm:flex-row gap-4 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
                     {/* زر السبوت لايت */}
                     <button
                       onClick={() => setSimSpot(!simSpot)}
-                      className={`flex-1 py-4 px-5 rounded-2xl border font-bold flex items-center justify-between transition-all duration-300 ${
+                      className={`flex-1 py-3.5 px-4 rounded-xl border font-semibold flex items-center justify-between transition-all duration-200 cursor-pointer ${
                         simSpot
-                          ? 'bg-blue-600/20 border-blue-500/50 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]'
-                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                          ? 'bg-blue-600/10 border-blue-500/50 text-white'
+                          : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white'
                       }`}
                     >
                       <span className="text-sm">{isAr ? 'السبوت لايت (Spotlight)' : 'Spotlight'}</span>
-                      <span className={`w-3.5 h-3.5 rounded-full border ${simSpot ? 'bg-blue-500 border-blue-400 animate-pulse' : 'border-slate-500'}`} />
+                      <span className={`w-3 h-3 rounded-full border ${simSpot ? 'bg-blue-500 border-blue-400' : 'border-zinc-600'}`} />
                     </button>
                     
                     {/* زر الإنارة المخفية */}
                     <button
                       onClick={() => setSimLed(!simLed)}
-                      className={`flex-1 py-4 px-5 rounded-2xl border font-bold flex items-center justify-between transition-all duration-300 ${
+                      className={`flex-1 py-3.5 px-4 rounded-xl border font-semibold flex items-center justify-between transition-all duration-200 cursor-pointer ${
                         simLed
-                          ? 'bg-blue-600/20 border-blue-500/50 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]'
-                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                          ? 'bg-blue-600/10 border-blue-500/50 text-white'
+                          : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white'
                       }`}
                     >
                       <span className="text-sm">{isAr ? 'الإنارة المخفية (LED Strip)' : 'Cove Light (LED Strip)'}</span>
-                      <span className={`w-3.5 h-3.5 rounded-full border ${simLed ? 'bg-blue-500 border-blue-400 animate-pulse' : 'border-slate-500'}`} />
+                      <span className={`w-3 h-3 rounded-full border ${simLed ? 'bg-blue-500 border-blue-400' : 'border-zinc-600'}`} />
                     </button>
                   </div>
                 </div>
 
                 {/* نصيحة الخبراء الهندسية */}
-                <div className={`bg-[#0a192f] border border-blue-500/15 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300 ${
+                <div className={`bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4 flex gap-3 text-xs leading-relaxed text-zinc-300 ${
                   isAr ? 'text-right flex-row' : 'text-left flex-row-reverse'
                 }`}>
-                  <div className="text-xl">💡</div>
+                  <div className="text-lg">💡</div>
                   <div className="flex-grow">
-                    <span className="font-bold text-blue-300 block mb-0.5">{t('sim.tip')}</span>
+                    <span className="font-semibold text-white block mb-0.5">{t('sim.tip')}</span>
                     {simColor === 'warm' && (isAr ? 'الإنارة الصفراء (3000K) تضفي حميمية ودفئاً، وهي مثالية لغرف النوم والمجالس لتعزز الشعور بالاسترخاء.' : 'Yellow lighting (3000K) adds intimacy and warmth, ideal for bedrooms and living rooms to promote relaxation.')}
                     {simColor === 'natural' && (isAr ? 'الإنارة الشمسية (4000K) هي الأقرب لضوء النهار، وهي مناسبة جداً للمطابخ، الممرات، والمنطقة التي تحتاج لألوان حقيقية.' : 'Natural lighting (4000K) is closest to daylight, perfect for kitchens, corridors, and areas needing true colors.')}
                     {simColor === 'cool' && (isAr ? 'الإنارة البيضاء (6000K) تمنح نشاطاً ووضوحاً عالياً، وهي خيار رائع للمكاتب، أماكن القراءة والدراسة.' : 'White lighting (6000K) provides high activity and clarity, an excellent choice for offices, reading, and study areas.')}
@@ -932,51 +932,43 @@ export default function Home() {
 
             </div>
 
-
-
           </div>
         </section>
 
         {/* دليل تطابق طلاء الجدران والإضاءة */}
-        <section id="paint-matching" className="py-16 md:py-20 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
-          {/* بقعة توهج نيونية خفيفة */}
-          <div className="hidden md:block absolute top-1/2 left-0 w-80 h-80 bg-blue-500/5 rounded-full blur-[150px] pointer-events-none z-0" />
-          
+        <section id="paint-matching" className="py-20 md:py-28 relative overflow-hidden border-t border-zinc-800/80 bg-transparent">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight font-sans text-white">
+            <div className="text-center mb-14 md:mb-18">
+              <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
                 {isAr ? (
-                  <>دليل تطابق <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">الطلاء والإضاءة</span></>
+                  <>دليل تطابق <span className="text-blue-400">الطلاء والإضاءة</span></>
                 ) : (
-                  <>Paint & Lighting <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">Matching Guide</span></>
+                  <>Paint & Lighting <span className="text-blue-400">Matching Guide</span></>
                 )}
               </h2>
-              <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+              <p className="text-zinc-400 text-sm md:text-base max-w-2xl mx-auto font-normal">
                 {isAr 
                   ? 'اكتشف كيف يتأثر لون طلاء جدران بيتك بحرارة لون الإضاءة المختلفة لتتجنب الأخطاء الشائعة في التصميم الداخلي'
                   : 'Discover how your home wall paint color is affected by different lighting color temperatures to avoid common interior design mistakes'
                 }
               </p>
-              <div className="flex items-center justify-center gap-1.5 mt-4">
-                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+              <div className="flex items-center justify-center gap-1.5 mt-5">
+                <div className="w-16 h-[1px] bg-zinc-800" />
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <div className="w-16 h-[1px] bg-zinc-800" />
               </div>
             </div>
 
             <motion.div 
-              initial={{ borderColor: "rgba(255,255,255,0.05)", boxShadow: "none" }}
-              whileInView={{ 
-                borderColor: "rgba(59,130,246,0.2)", 
-                boxShadow: "0 0 40px rgba(59, 130, 246, 0.12)" 
-              }}
-              viewport={{ once: false, amount: 0.15 }}
-              transition={{ duration: 0.7 }}
-              className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#0f213a] border p-6 md:p-8 rounded-[2.5rem] relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col lg:flex-row items-center justify-center gap-8 bg-[#111215] border border-white/[0.08] p-6 md:p-10 rounded-2xl relative shadow-sm"
             >
               {/* شاشة العرض - زاوية ثلاثية الأبعاد 3D Room Corner */}
               <div className="w-full lg:w-[38%] max-w-[360px] flex flex-col gap-4">
-                <div className="w-full aspect-[4/3] rounded-2xl relative overflow-hidden bg-[#080d1a] shadow-2xl border border-white/10 transition-all duration-500">
+                <div className="w-full aspect-[4/3] rounded-2xl relative overflow-hidden bg-[#09090b] shadow-2xl border border-white/10 transition-all duration-500">
                   {/* Left Wall */}
                   <div 
                     className="absolute inset-0 transition-all duration-500"
@@ -1070,21 +1062,21 @@ export default function Home() {
 
                   {/* Spotlight Physical Fixture */}
                   <div className="absolute top-[3%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none">
-                    <div className="w-10 h-2 bg-slate-800 rounded-full border border-slate-700/50 shadow-inner" />
-                    <div className="w-1.5 h-3 bg-gradient-to-r from-slate-600 to-slate-500" />
-                    <div className="w-7 h-7 bg-slate-900 border border-slate-700 rounded-t-sm rounded-b-md flex items-center justify-center shadow-lg relative">
+                    <div className="w-10 h-2 bg-zinc-800 rounded-full border border-zinc-700/50 shadow-inner" />
+                    <div className="w-1.5 h-3 bg-gradient-to-r from-zinc-600 to-zinc-500" />
+                    <div className="w-7 h-7 bg-zinc-900 border border-zinc-700 rounded-t-sm rounded-b-md flex items-center justify-center shadow-lg relative">
                       <div className={`w-5 h-2 rounded-full blur-[1px] transition-all duration-300 ${
-                        paintColorTemp === 'warm' ? 'bg-amber-300 shadow-[0_0_12px_#f59e0b]' :
-                        paintColorTemp === 'natural' ? 'bg-yellow-100 shadow-[0_0_12px_#fef08a]' :
-                        'bg-sky-200 shadow-[0_0_12px_#38bdf8]'
+                        paintColorTemp === 'warm' ? 'bg-amber-300' :
+                        paintColorTemp === 'natural' ? 'bg-yellow-100' :
+                        'bg-sky-200'
                       }`} />
                     </div>
                   </div>
 
                   {/* 3D Indicator Badge */}
-                  <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-md border border-white/5 pointer-events-none">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                    <span className="text-[9px] text-white/60 font-bold font-sans">{isAr ? 'عرض ثلاثي الأبعاد 3D' : '3D View'}</span>
+                  <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 pointer-events-none">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="text-[9px] text-zinc-300 font-semibold">{isAr ? 'عرض ثلاثي الأبعاد 3D' : '3D View'}</span>
                   </div>
 
                   {/* Shake Toggle Permission Button on Mobile */}
@@ -1097,16 +1089,16 @@ export default function Home() {
                         alert(isAr ? "لم نتمكن من تفعيل مستشعرات الحركة بجهازك أو تصفحك عبر جهاز لا يدعمها." : "Could not activate motion sensors on your device or your device does not support them.");
                       }
                     }}
-                    className="absolute bottom-4 right-4 z-20 flex md:hidden items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-600/80 hover:bg-blue-600 border border-blue-500 text-[9px] text-white font-bold transition-all shadow-[0_0_10px_rgba(59,130,246,0.3)] active:scale-95 cursor-pointer"
+                    className="absolute bottom-4 right-4 z-20 flex md:hidden items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-600 border border-blue-500 text-[9px] text-white font-semibold transition-all active:scale-95 cursor-pointer"
                   >
                     <span>{isAr ? 'تفعيل هز الهاتف 📱' : 'Enable Phone Shake 📱'}</span>
                   </button>
                 </div>
 
                 {/* مؤشر اللون الحالي */}
-                <div className="flex items-center justify-between bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/5 text-xs text-slate-300">
+                <div className="flex items-center justify-between bg-zinc-900/60 backdrop-blur-md px-4 py-2.5 rounded-xl border border-zinc-800 text-xs text-zinc-300">
                   <span>{isAr ? 'الطلاء:' : 'Paint:'} <strong className="text-white">{(paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).name}</strong></span>
-                  <span>{isAr ? 'الضوء:' : 'Light:'} <strong className="text-blue-300">
+                  <span>{isAr ? 'الضوء:' : 'Light:'} <strong className="text-blue-400">
                     {paintColorTemp === 'warm' ? (isAr ? 'أصفر (3000K)' : 'Yellow (3000K)') : 
                      paintColorTemp === 'natural' ? (isAr ? 'شمسي (4000K)' : 'Natural (4000K)') : 
                      (isAr ? 'أبيض (6000K)' : 'White (6000K)')}
@@ -1119,7 +1111,7 @@ export default function Home() {
                 
                 {/* 1. اختيار لون صبغ الجدار */}
                 <div>
-                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">
+                  <h4 className="text-base font-bold text-zinc-200 mb-3 font-sans">
                     {isAr ? '1. اختر لون طلاء الجدار:' : '1. Choose Wall Paint Color:'}
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -1127,10 +1119,10 @@ export default function Home() {
                       <button
                         key={color.id}
                         onClick={() => setSelectedPaintId(color.id)}
-                        className={`py-3 px-2 rounded-xl text-xs font-bold border transition-all duration-300 flex flex-col items-center gap-2 ${
+                        className={`py-3 px-2 rounded-xl text-xs font-semibold border transition-all duration-200 flex flex-col items-center gap-2 cursor-pointer ${
                           selectedPaintId === color.id
-                            ? 'bg-blue-600/10 border-blue-500 text-white ring-2 ring-blue-500/30'
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                            ? 'bg-zinc-800 border-zinc-600 text-white ring-1 ring-white/30'
+                            : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white'
                         }`}
                       >
                         <span 
@@ -1145,22 +1137,22 @@ export default function Home() {
 
                 {/* 2. اختيار لون الإضاءة */}
                 <div>
-                  <h4 className="text-base font-bold text-slate-300 mb-3 font-sans">
+                  <h4 className="text-base font-bold text-zinc-200 mb-3 font-sans">
                     {isAr ? '2. اختر حرارة لون الإضاءة:' : '2. Choose Light Color Temp:'}
                   </h4>
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { key: 'warm', name: isAr ? 'أصفر 3000K' : 'Yellow 3000K', bg: 'bg-[#eab308]/20 border-[#eab308]/40 text-[#fde047]' },
-                      { key: 'natural', name: isAr ? 'شمسي 4000K' : 'Natural 4000K', bg: 'bg-[#fef08a]/10 border-[#fef08a]/30 text-[#fef08a]' },
-                      { key: 'cool', name: isAr ? 'أبيض 6000K' : 'White 6000K', bg: 'bg-blue-500/10 border-blue-500/30 text-blue-300' },
+                      { key: 'warm', name: isAr ? 'أصفر 3000K' : 'Yellow 3000K', activeCls: 'bg-amber-500/10 border-amber-500/50 text-amber-300' },
+                      { key: 'natural', name: isAr ? 'شمسي 4000K' : 'Natural 4000K', activeCls: 'bg-yellow-500/10 border-yellow-500/50 text-yellow-200' },
+                      { key: 'cool', name: isAr ? 'أبيض 6000K' : 'White 6000K', activeCls: 'bg-blue-500/10 border-blue-500/50 text-blue-300' },
                     ].map((btn) => (
                       <button
                         key={btn.key}
                         onClick={() => setPaintColorTemp(btn.key as any)}
-                        className={`py-3 px-2 rounded-xl text-xs font-bold border transition-all duration-300 ${
+                        className={`py-3 px-2 rounded-xl text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                           paintColorTemp === btn.key
-                            ? `${btn.bg} ring-2 ring-blue-500/50 scale-105 shadow-[0_0_15px_rgba(59,130,246,0.15)]`
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                            ? `${btn.activeCls} ring-1 ring-white/20 scale-[1.02]`
+                            : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white'
                         }`}
                       >
                         {btn.name}
@@ -1170,10 +1162,10 @@ export default function Home() {
                 </div>
 
                 {/* النصيحة الهندسية الذكية */}
-                <div className="bg-[#0a192f] border border-blue-500/15 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300">
-                  <div className="text-xl">📐</div>
+                <div className="bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4 flex gap-3 text-xs leading-relaxed text-zinc-300">
+                  <div className="text-lg">📐</div>
                   <div>
-                    <span className="font-bold text-blue-300 block mb-1">
+                    <span className="font-semibold text-white block mb-1">
                       {isAr ? 'رأي مهندس الديكور والتصميم الداخلي:' : 'Interior Designer & Decorator Advice:'}
                     </span>
                     {(paintColors.find(p => p.id === selectedPaintId) || paintColors[0]).advice[paintColorTemp]}
@@ -1188,58 +1180,54 @@ export default function Home() {
         </section>
 
         {/* 3. جزء من مشاريعنا */}
-        <section id="featured-projects" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
-          {/* بقع توهج نيونية خفيفة عائمة */}
-          <div className="hidden md:block absolute top-1/3 right-0 w-80 h-80 bg-blue-50/5 rounded-full blur-[150px] pointer-events-none z-0 animate-float-2" />
-          <div className="hidden md:block absolute bottom-1/3 left-0 w-80 h-80 bg-blue-400/10 rounded-full blur-[150px] pointer-events-none z-0 animate-float-1" />
-
+        <section id="featured-projects" className="py-20 md:py-28 relative overflow-hidden border-t border-zinc-800/80 bg-transparent">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 md:mb-18 gap-6">
               <div>
                 <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
                   {isAr ? (
-                    <>جزء من <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">مشاريعنا</span></>
+                    <>جزء من <span className="text-blue-400">مشاريعنا</span></>
                   ) : (
-                    <>Part of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_10px_rgba(59,130,246,0.3)]">Our Projects</span></>
+                    <>Part of <span className="text-blue-400">Our Projects</span></>
                   )}
                 </h2>
-                <div className="w-20 h-[3px] bg-gradient-to-l from-blue-500 to-indigo-500 rounded-full mt-3 shadow-[0_1px_5px_rgba(59,130,246,0.3)]" />
+                <div className="w-16 h-[2px] bg-blue-500 rounded-full mt-3" />
               </div>
-              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
-                {isAr ? 'شاهد كل المشاريع' : 'View All Projects'} <ArrowLeft className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+              <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-white font-semibold transition-all">
+                {isAr ? 'شاهد كل المشاريع' : 'View All Projects'} <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
               </Link>
             </div>
 
             {loadingProjects ? (
                <div className="flex flex-col items-center justify-center py-20">
-                 <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
-                 <p className="text-blue-200 mt-4">{isAr ? 'جاري جلب المشاريع...' : 'Fetching projects...'}</p>
+                 <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
+                 <p className="text-zinc-400 mt-4 text-sm">{isAr ? 'جاري جلب المشاريع...' : 'Fetching projects...'}</p>
                </div>
             ) : (
               <>
                 {/* Mobile/Tablet Horizontal Snap Slider */}
                 <div className="md:hidden flex flex-col gap-4">
                   {/* Swipe Help Note */}
-                  <div className="flex items-center justify-center gap-1.5 text-blue-400 text-xs font-bold animate-pulse">
+                  <div className="flex items-center justify-center gap-1.5 text-zinc-400 text-xs font-medium">
                     <span>↔</span>
                     <span>{isAr ? 'اسحب لليمين واليسار لرؤية باقي المشاريع' : 'Swipe left/right to see other projects'}</span>
                     <span>↔</span>
                   </div>
 
                   {/* Horizontal Scroll Area */}
-                  <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-6 px-4 scrollbar-none -mx-4">
+                  <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 px-4 scrollbar-none -mx-4">
                     {featuredProjects.map((project) => (
                       <div 
-                        key={project.id}
+                        key={project.id} 
                         onClick={() => openGallery(project)}
-                        className="snap-start snap-always min-w-[280px] xs:min-w-[310px] w-[80vw] bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden flex flex-col hover:border-blue-500/50 transition-all duration-300 cursor-pointer shadow-lg"
+                        className="snap-start snap-always min-w-[280px] xs:min-w-[310px] w-[80vw] bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col hover:border-white/[0.18] transition-all duration-200 cursor-pointer shadow-sm"
                       >
-                        <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f] border-b border-white/5">
+                        <div className="relative aspect-[4/3] overflow-hidden bg-zinc-900 border-b border-zinc-800">
                           <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/95 via-[#0a192f]/40 to-transparent opacity-95 z-10" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-transparent to-transparent z-10" />
                           
                           <div className="absolute top-3 right-3 z-20">
-                            <span className="px-3.5 py-1 bg-[#0a192f]/90 border border-blue-500/30 text-blue-300 text-[10px] font-bold rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                            <span className="px-3 py-1 bg-zinc-900/90 border border-zinc-700 text-zinc-300 text-[10px] font-semibold rounded-full">
                               {project.category}
                             </span>
                           </div>
@@ -1247,14 +1235,14 @@ export default function Home() {
                         
                         <div className="p-5 relative z-20 flex-grow flex flex-col justify-between">
                           <div>
-                            <h3 className="text-base font-extrabold text-white mb-2 line-clamp-1">{project.name}</h3>
-                            <p className="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">{project.description}</p>
+                            <h3 className="text-base font-bold text-white mb-2 line-clamp-1">{project.name}</h3>
+                            <p className="text-zinc-400 text-xs leading-relaxed line-clamp-2 mb-4 font-normal">{project.description}</p>
                           </div>
                           
-                          <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-3">
+                          <div className="flex items-center justify-between text-[11px] text-blue-400 font-semibold border-t border-zinc-800/80 pt-3">
                             <span>{isAr ? 'عرض تفاصيل المعرض ←' : 'View Gallery Details ←'}</span>
                             {project.image.includes(',') && (
-                              <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
+                              <span className="px-2 py-0.5 bg-zinc-800 text-zinc-300 rounded-md">
                                 +{project.image.split(',').length - 1} {isAr ? 'صور' : 'Photos'}
                               </span>
                             )}
@@ -1266,42 +1254,42 @@ export default function Home() {
                 </div>
 
                 {/* Desktop Grid Layout */}
-                <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {featuredProjects.map((project) => (
                     <motion.div 
                       key={project.id} 
                       onClick={() => openGallery(project)}
-                      whileHover={{ y: -6, scale: 1.01 }}
-                      className="group relative bg-[#0f213a] border border-white/10 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-blue-500/50 hover:shadow-[0_10px_35px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-pointer"
+                      whileHover={{ y: -4 }}
+                      className="group relative bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col h-full hover:border-white/[0.18] transition-all duration-200 cursor-pointer shadow-sm"
                     >
-                      <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f] border-b border-white/5">
-                        <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/95 via-[#0a192f]/40 to-transparent opacity-95 z-10" />
+                      <div className="relative aspect-[4/3] overflow-hidden bg-zinc-900 border-b border-zinc-800">
+                        <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-transparent to-transparent z-10" />
                         
                         <div className="absolute top-3 right-3 z-20">
-                          <span className="px-3.5 py-1 bg-[#0a192f]/90 border border-blue-500/30 text-blue-300 text-[10px] font-bold rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                          <span className="px-3 py-1 bg-zinc-900/90 border border-zinc-700 text-zinc-300 text-[10px] font-semibold rounded-full">
                             {project.category}
                           </span>
                         </div>
                         
                         {project.video && (
-                          <div className="absolute top-3 left-3 z-20 bg-[#0a192f]/90 border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                          <div className="absolute top-3 left-3 z-20 bg-zinc-900/90 border border-zinc-700 px-2.5 py-1 rounded-full flex items-center gap-1">
                             <PlayCircle className="w-3.5 h-3.5 text-blue-400" />
-                            <span className="text-white text-[10px] font-bold">{isAr ? 'فيديو' : 'Video'}</span>
+                            <span className="text-white text-[10px] font-semibold">{isAr ? 'فيديو' : 'Video'}</span>
                           </div>
                         )}
                       </div>
                       
                       <div className="p-5 relative z-20 flex-grow flex flex-col justify-between">
                         <div>
-                          <h3 className="text-base font-extrabold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-1">{project.name}</h3>
-                          <p className="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">{project.description}</p>
+                          <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors mb-2 line-clamp-1">{project.name}</h3>
+                          <p className="text-zinc-400 text-xs leading-relaxed line-clamp-2 mb-4 font-normal">{project.description}</p>
                         </div>
                         
-                        <div className="flex items-center justify-between text-[11px] text-blue-400 font-bold border-t border-white/5 pt-3">
+                        <div className="flex items-center justify-between text-[11px] text-blue-400 font-semibold border-t border-zinc-800/80 pt-3">
                           <span>{isAr ? 'عرض تفاصيل المعرض ←' : 'View Gallery Details ←'}</span>
                           {project.image.includes(',') && (
-                            <span className="px-2 py-0.5 bg-blue-500/10 rounded-md">
+                            <span className="px-2 py-0.5 bg-zinc-800 text-zinc-300 rounded-md">
                               +{project.image.split(',').length - 1} {isAr ? 'صور' : 'Photos'}
                             </span>
                           )}
@@ -1318,78 +1306,72 @@ export default function Home() {
         {/* =========================================================
             قسم مسرح الأسلاك الـ 3D التفاعلي: يقع مباشرة فوق قسم "ابدأ مشروعك معنا اليوم"
             ========================================================= */}
-        <section id="wires-import-showcase" className="py-6 md:py-10 relative overflow-hidden bg-[#061122] border-t border-sky-500/20">
-          <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 relative z-10">
+        <section id="wires-import-showcase" className="py-8 md:py-14 relative overflow-hidden bg-transparent border-t border-zinc-800/80">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {/* 🎬 مسرح موشن الأسلاك: رأسي طولي كامل العرض (aspect-[9/16] min-h-[75vh]) للجوال، وعريض سينمائي (md:aspect-[16/9]) للكمبيوتر */}
-            <div className="relative w-full aspect-[9/16] md:aspect-[16/9] min-h-[72vh] sm:min-h-[80vh] md:max-h-[82vh] mx-auto rounded-3xl overflow-hidden bg-[#061122] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.35)] group">
+            {/* 🎬 مسرح موشن الأسلاك */}
+            <div className="relative w-full aspect-[9/16] md:aspect-[16/9] min-h-[70vh] sm:min-h-[78vh] md:max-h-[80vh] mx-auto rounded-3xl overflow-hidden bg-zinc-950 border border-white/[0.08] shadow-md group">
               
-              {/* 1. موشن الأسلاك الأصلي الـ 240 إطار (fitMode="cover" ليغطي كامل المساحة بدون قص حواف أو فراغات) */}
+              {/* 1. موشن الأسلاك الأصلي الـ 240 إطار */}
               <WiresAutoCanvas totalFrames={240} fps={30} fitMode="cover" className="w-full h-full" />
               
-              {/* 2. تظليل زجاجي سُفلي وعلوي خفيف للتمييز البصري */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-transparent to-slate-950/40 z-10 pointer-events-none" />
+              {/* 2. تظليل سُفلي وعلوي خفيف للتمييز البصري */}
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-transparent to-zinc-950/50 z-10 pointer-events-none" />
 
-              {/* 3. النصوص والشارات الطافية بحركة أنيميشن سينمائية تظهر بعد ظهور الفيديو وتتكرر عند كل عودة (once: false) */}
-              <div className="absolute inset-0 z-20 p-4 sm:p-6 md:p-10 flex flex-col justify-between items-center text-center">
+              {/* 3. النصوص والشارات الطافية */}
+              <div className="absolute inset-0 z-20 p-5 sm:p-8 md:p-12 flex flex-col justify-between items-center text-center">
                 
-                {/* شارة علوية طافية تظهر وتتكرر عند العودة للقسم */}
+                {/* شارة علوية طافية */}
                 <motion.div 
                   initial={{ opacity: 0, y: -20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.8 }}
-                  viewport={{ once: false, amount: 0.2 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  viewport={{ once: true }}
                   className="w-full flex items-center justify-between gap-2"
                 >
-                  <span className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-blue-600/90 text-white text-[11px] sm:text-xs font-black shadow-lg border border-blue-400/30 backdrop-blur-md">
+                  <span className="px-3.5 py-1.5 rounded-full bg-zinc-900/90 text-white text-[11px] sm:text-xs font-semibold border border-zinc-700 backdrop-blur-md">
                     🇮🇹 🇹🇷 {isAr ? 'استيراد إيطاليا وتركيا المباشر' : 'Direct Italy & Turkey Import'}
                   </span>
 
-                  <span className="px-3 py-1 rounded-full bg-slate-900/80 text-sky-400 text-[10px] sm:text-xs font-bold border border-sky-500/30 backdrop-blur-md hidden xs:inline-flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+                  <span className="px-3.5 py-1.5 rounded-full bg-zinc-900/90 text-zinc-300 text-[10px] sm:text-xs font-semibold border border-zinc-700 backdrop-blur-md hidden xs:inline-flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
                     <span>{isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}</span>
                   </span>
                 </motion.div>
 
-                {/* المحتوى والمواصفات المصغرة تظهر بعد الفيديو وتتكرر في كل مرة يتم التصفح والعودة فيها للقسم */}
+                {/* المحتوى والمواصفات المصغرة */}
                 <motion.div 
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, delay: 1.1 }}
-                  viewport={{ once: false, amount: 0.2 }}
+                  transition={{ duration: 0.7, delay: 0.6 }}
+                  viewport={{ once: true }}
                   className="mt-auto mb-2 w-full max-w-xl"
                 >
-                  <h3 className="text-xl sm:text-3xl md:text-4xl font-black text-white mb-2 leading-tight drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">
+                  <h3 className="text-xl sm:text-3xl md:text-4xl font-black text-white mb-2 leading-tight">
                     {isAr ? (
-                      <>أسلاك وكوابل إيطالية وتركية <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_20px_rgba(59,130,246,0.8)]">من المصنع مباشرة</span></>
+                      <>أسلاك وكوابل إيطالية وتركية <span className="text-blue-400">من المصنع مباشرة</span></>
                     ) : (
-                      <>Italian & Turkish Wires <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_2px_20px_rgba(59,130,246,0.8)]">Direct from Source</span></>
+                      <>Italian & Turkish Wires <span className="text-blue-400">Direct from Source</span></>
                     )}
                   </h3>
 
-                  {/* شريحة الميزات المصغرة والقليلة جدًا */}
-                  <div className="flex flex-wrap items-center justify-center gap-2 mt-2.5 text-[10px] sm:text-xs font-bold text-slate-200">
-                    <span className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 backdrop-blur-md">🇮🇹 {isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
-                    <span className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 backdrop-blur-md">⚡ {isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}</span>
-                    <span className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 backdrop-blur-md">🛡️ {isAr ? 'عزل معتمد' : 'Certified PVC'}</span>
+                  {/* شريحة الميزات المصغرة */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-[10px] sm:text-xs font-semibold text-zinc-300">
+                    <span className="px-3 py-1 rounded-lg bg-zinc-900/90 border border-zinc-800 backdrop-blur-md">🇮🇹 {isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
+                    <span className="px-3 py-1 rounded-lg bg-zinc-900/90 border border-zinc-800 backdrop-blur-md">⚡ {isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}</span>
+                    <span className="px-3 py-1 rounded-lg bg-zinc-900/90 border border-zinc-800 backdrop-blur-md">🛡️ {isAr ? 'عزل معتمد' : 'Certified PVC'}</span>
                   </div>
 
-                  {/* زر التسوق بالمتجر الإلكتروني يتكرر ظهوره بأنيميشن عند العودة */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 1.4 }}
-                    viewport={{ once: false, amount: 0.2 }}
-                    className="mt-4"
-                  >
+                  {/* زر التسوق بالمتجر الإلكتروني */}
+                  <div className="mt-5">
                     <Link 
                       to="/products"
-                      className="inline-flex items-center justify-center gap-2.5 px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-black text-xs sm:text-sm md:text-base shadow-[0_0_30px_rgba(59,130,246,0.6)] hover:scale-105 transition-all duration-300 border border-sky-400/40 backdrop-blur-md"
+                      className="inline-flex items-center justify-center gap-2.5 px-6 py-3 sm:px-8 sm:py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm md:text-base transition-all duration-200 border border-blue-400/20 active:scale-95"
                     >
                       <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span>{isAr ? 'تسوق أسلاك النحاس والألومنيوم بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
                     </Link>
-                  </motion.div>
+                  </div>
                 </motion.div>
 
               </div>
@@ -1400,73 +1382,68 @@ export default function Home() {
         </section>
 
         {/* 5. ابدأ مشروعك */}
-        <section id="start" className="py-16 md:py-24 relative overflow-hidden border-t border-white/[0.05] bg-transparent">
+        <section id="start" className="py-20 md:py-28 relative overflow-hidden border-t border-zinc-800/80 bg-transparent">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <motion.div
-              initial={{ scale: 0.98, borderColor: 'rgba(59, 130, 246, 0.2)', boxShadow: '0 0 0px rgba(59, 130, 246, 0)' }}
-              whileInView={{
-                scale: 1,
-                borderColor: 'rgba(59, 130, 246, 0.45)',
-                boxShadow: '0 0 35px rgba(59, 130, 246, 0.2)',
-              }}
-              viewport={{ once: false, amount: 0.25 }}
-              transition={{ duration: 0.8 }}
-              className="relative bg-[#0f213a] border rounded-[2rem] p-8 md:p-16 text-center overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.6 }}
+              className="relative bg-[#111215] border border-white/[0.08] rounded-3xl p-8 md:p-16 text-center overflow-hidden shadow-sm"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_60%)] pointer-events-none animate-pulse [animation-duration:8s]" />
-              <h2 className="relative z-10 text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6" style={glowingTitleStyle}>
+              <h2 className="relative z-10 text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight">
                 {isAr ? (
-                  <>ابدأ مشروعك معنا <span className="text-blue-300">اليوم</span></>
+                  <>ابدأ مشروعك معنا <span className="text-blue-400">اليوم</span></>
                 ) : (
-                  <>Start Your Project With Us <span className="text-blue-300">Today</span></>
+                  <>Start Your Project With Us <span className="text-blue-400">Today</span></>
                 )}
               </h2>
-              <p className="relative z-10 text-blue-100/80 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
+              <p className="relative z-10 text-zinc-300 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
                 {isAr 
                   ? 'نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك، أو لطلب فواتير المواد وعروض الأسعار المتكاملة لمشروعك الكهربائي.'
                   : 'We are here to help you transform your vision into a stunning reality. Contact our experts for engineering and technical consultations, or to request material invoices and comprehensive quotes for your electrical project.'
                 }
               </p>
-              <Link to="/contact" className="relative z-10 inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-slate-100 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.15)]">
-                <Zap className="w-6 h-6" />
+              <Link to="/contact" className="relative z-10 inline-flex items-center gap-2.5 px-8 py-4 bg-white text-zinc-950 font-bold text-base md:text-lg rounded-xl hover:bg-zinc-100 transition-colors active:scale-95">
+                <Zap className="w-5 h-5 text-amber-500" />
                 {isAr ? 'تواصل معنا الآن' : 'Contact Us Now'}
               </Link>
 
               {/* روابط التواصل الاجتماعي للفيسبوك وتيك توك وإنستغرام */}
-              <div className="flex justify-center mt-12 animate-fade-in relative z-10">
-                <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a192f]/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
+              <div className="flex justify-center mt-12 relative z-10">
+                <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 ${
                   isAr ? 'flex-row' : 'flex-row-reverse'
                 }`}>
-                  <span className={`text-slate-400 text-xs font-bold font-sans ${isAr ? 'pl-3 border-l' : 'pr-3 border-r'} border-white/10`}>
+                  <span className={`text-zinc-400 text-xs font-semibold ${isAr ? 'pl-3 border-l' : 'pr-3 border-r'} border-zinc-800`}>
                     {isAr ? 'تابع صفحاتنا:' : 'Follow us:'}
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     <a 
                       href="https://www.facebook.com/share/1BxjvUxxvG/?mibextid=wwXIfr" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="p-2.5 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 hover:text-white hover:bg-blue-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                      className="p-2 rounded-lg bg-zinc-800 border border-zinc-700/60 text-zinc-300 hover:text-white hover:bg-blue-600 transition-all duration-200 flex items-center justify-center"
                       title="فيسبوك"
                     >
-                      <Facebook className="w-5 h-5" />
+                      <Facebook className="w-4 h-4" />
                     </a>
                     <a 
                       href="https://www.instagram.com/enara_hadetha?igsh=MXVqaGlqdHN5cnM5OQ==" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="p-2.5 rounded-xl bg-pink-600/10 border border-pink-500/20 text-pink-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(236,72,153,0.1)]"
+                      className="p-2 rounded-lg bg-zinc-800 border border-zinc-700/60 text-zinc-300 hover:text-white hover:bg-pink-600 transition-all duration-200 flex items-center justify-center"
                       title="إنستغرام"
                     >
-                      <Instagram className="w-5 h-5" />
+                      <Instagram className="w-4 h-4" />
                     </a>
                     <a 
                       href="https://www.tiktok.com/@modernenara?_r=1&_t=ZS-96dCObkuFUK" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="p-2.5 rounded-xl bg-slate-200/10 border border-white/10 text-slate-200 hover:text-white hover:bg-black hover:border-slate-800 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                      className="p-2 rounded-lg bg-zinc-800 border border-zinc-700/60 text-zinc-300 hover:text-white hover:bg-black transition-all duration-200 flex items-center justify-center"
                       title="تيك توك"
                     >
-                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.97 1.2 2.27 2.01 3.7 2.37v3.83c-1.39-.09-2.74-.61-3.87-1.48a7.25 7.25 0 0 1-2.47-3.08v8.66c0 1.25-.26 2.5-.77 3.66a7.56 7.56 0 0 1-4.8 4.41c-1.25.38-2.57.44-3.85.17a7.66 7.66 0 0 1-5.18-4.47 7.7 7.7 0 0 1 .15-5.06c.55-1.42 1.56-2.65 2.87-3.48a7.84 7.84 0 0 1 7.21-.57v4.02a3.79 3.79 0 0 0-2.31 1.09 3.73 3.73 0 0 0-1.12 2.3c-.09.78.11 1.57.55 2.2a3.78 3.78 0 0 0 4.14 1.48c.88-.23 1.66-.78 2.2-1.52.54-.75.82-1.65.79-2.57V.02z"/>
                       </svg>
                     </a>

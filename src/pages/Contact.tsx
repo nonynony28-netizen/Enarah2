@@ -97,10 +97,10 @@ export default function Contact() {
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className="mb-6 flex justify-start">
-            <Link to="/" className={`inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] ${
+            <Link to="/" className={`inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all ${
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
-              <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+              <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
               {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
           </div>
@@ -109,60 +109,55 @@ export default function Contact() {
         {/* Header */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tight text-white">
-              {isAr ? 'تواصل' : 'Contact'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">{isAr ? 'معنا' : 'Us'}</span>
+            <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight tracking-tight text-white">
+              {isAr ? 'تواصل' : 'Contact'} <span className="text-blue-400">{isAr ? 'معنا' : 'Us'}</span>
             </h1>
 
-            <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg">
+            <p className="text-zinc-400 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
               {isAr 
                 ? 'نحن هنا لخدمتك. تواصل معنا للاستفسارات، الطلبات، أو التعاقد على المشاريع بكل سهولة'
                 : 'We are here to help. Contact us for any inquiries, orders, or projects collaboration with ease'
               }
             </p>
 
-            <div className="flex items-center justify-center gap-1.5 mt-6">
-              <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-              <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+            <div className="flex items-center justify-center gap-1.5 mt-5">
+              <div className="w-16 h-[1px] bg-zinc-800" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              <div className="w-16 h-[1px] bg-zinc-800" />
             </div>
           </div>
         </FadeIn>
 
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 ${
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 ${
           isAr ? 'text-right' : 'text-left'
         }`}>
           
           {/* Contact Form */}
           <FadeIn delay={0.2}>
-            <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-8 md:p-10 shadow-2xl relative overflow-hidden group">
+            <div className="bg-[#111215] border border-white/[0.08] rounded-2xl p-7 md:p-9 shadow-sm relative overflow-hidden group">
               
-              <h2 className={`text-2xl font-bold text-white mb-8 flex items-center gap-3 ${
+              <h2 className={`text-xl font-bold text-white mb-6 flex items-center gap-3 ${
                 isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
               }`}>
-                <span className="w-2 h-8 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                <span className="w-1.5 h-6 bg-blue-500 rounded-full" />
                 {isAr ? 'أرسل رسالتك' : 'Send Message'}
               </h2>
 
               {submitted ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-blue-500/10 border border-blue-400/20 rounded-3xl p-10 text-center flex flex-col items-center justify-center min-h-[350px]"
+                  className="bg-zinc-950/80 border border-zinc-800 rounded-2xl p-8 text-center flex flex-col items-center justify-center min-h-[320px]"
                 >
-                  <motion.div
-                    initial={{ scale: 0, rotate: -45 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
-                    className="w-20 h-20 bg-gradient-to-br from-green-400/20 to-blue-500/20 border border-green-400/30 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(74,222,128,0.2)]"
-                  >
-                    <CheckCircle className="w-10 h-10 text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
-                  </motion.div>
+                  <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mb-5 text-emerald-400">
+                    <CheckCircle className="w-8 h-8" />
+                  </div>
 
-                  <h3 className="text-transparent bg-clip-text bg-gradient-to-r from-white to-green-400 font-bold text-2xl mb-3">
+                  <h3 className="text-white font-bold text-xl mb-2">
                     {isAr ? 'تم الإرسال بنجاح!' : 'Sent Successfully!'}
                   </h3>
 
-                  <p className="text-slate-300 text-base leading-relaxed">
+                  <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                     {isAr 
                       ? 'شكراً لتواصلك معنا. لقد تم استلام رسالتك وسنقوم بالرد عليك في أقرب وقت ممكن.'
                       : 'Thank you for reaching out. We have received your message and will get back to you shortly.'
@@ -170,10 +165,10 @@ export default function Contact() {
                   </p>
                 </motion.div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
                   {/* Name */}
-                  <div className="group/input relative">
-                    <label className="block text-slate-300 font-semibold text-sm mb-2 transition-colors duration-300 group-focus-within/input:text-blue-400">
+                  <div className="space-y-1.5">
+                    <label className="block text-zinc-300 font-semibold text-xs mb-1">
                       {isAr ? 'الاسم الكامل' : 'Full Name'}
                     </label>
                     <input
@@ -181,7 +176,7 @@ export default function Contact() {
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className={`w-full px-5 py-4 bg-[#0a192f] border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 focus:bg-[#06152b] focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 ${
+                      className={`w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-white/20 transition-all text-sm ${
                         isAr ? 'text-right' : 'text-left'
                       }`}
                       placeholder={isAr ? 'أدخل اسمك هنا' : 'Enter your name here'}
@@ -189,8 +184,8 @@ export default function Contact() {
                   </div>
 
                   {/* Phone */}
-                  <div className="group/input relative">
-                    <label className="block text-slate-300 font-semibold text-sm mb-2 transition-colors duration-300 group-focus-within/input:text-blue-400">
+                  <div className="space-y-1.5">
+                    <label className="block text-zinc-300 font-semibold text-xs mb-1">
                       {isAr ? 'رقم الهاتف' : 'Phone Number'}
                     </label>
                     <input
@@ -198,7 +193,7 @@ export default function Contact() {
                       required
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className={`w-full px-5 py-4 bg-[#0a192f] border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 focus:bg-[#06152b] focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 ${
+                      className={`w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-white/20 transition-all text-sm ${
                         isAr ? 'text-right' : 'text-left'
                       }`}
                       placeholder="09X XXX XXXX"
@@ -206,8 +201,8 @@ export default function Contact() {
                   </div>
 
                   {/* Message */}
-                  <div className="group/input relative">
-                    <label className="block text-slate-300 font-semibold text-sm mb-2 transition-colors duration-300 group-focus-within/input:text-blue-400">
+                  <div className="space-y-1.5">
+                    <label className="block text-zinc-300 font-semibold text-xs mb-1">
                       {isAr ? 'الرسالة' : 'Message'}
                     </label>
                     <textarea
@@ -215,7 +210,7 @@ export default function Contact() {
                       rows={5}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className={`w-full px-5 py-4 bg-[#0a192f] border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 focus:bg-[#06152b] focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 resize-none ${
+                      className={`w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-white/20 transition-all resize-none text-sm leading-relaxed ${
                         isAr ? 'text-right' : 'text-left'
                       }`}
                       placeholder={isAr ? 'كيف يمكننا مساعدتك؟' : 'How can we help you?'}
@@ -224,22 +219,21 @@ export default function Contact() {
 
                   {/* Submit Button */}
                   <motion.button
-                    whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     type="submit"
                     disabled={loading}
-                    className={`w-full px-6 py-4 bg-blue-600 text-white font-bold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] hover:bg-blue-500 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed group/btn overflow-hidden relative ${
+                    className={`w-full px-6 py-3.5 bg-blue-600 text-white font-bold text-base rounded-xl transition-all duration-200 hover:bg-blue-500 flex items-center justify-center gap-2.5 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer ${
                       isAr ? 'flex-row' : 'flex-row-reverse'
                     }`}
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         {isAr ? 'جاري الإرسال...' : 'Sending...'}
                       </span>
                     ) : (
                       <>
-                        <Send className="w-5 h-5 transition-transform" />
+                        <Send className="w-4 h-4" />
                         <span>{isAr ? 'إرسال الرسالة' : 'Send Message'}</span>
                       </>
                     )}
@@ -251,53 +245,53 @@ export default function Contact() {
 
           {/* Contact Info */}
           <FadeIn delay={0.3}>
-            <div className="space-y-8 h-full flex flex-col">
+            <div className="space-y-6 h-full flex flex-col">
               
-              <div className="bg-[#0f213a] border border-white/5 rounded-[2rem] p-8 md:p-10 shadow-2xl flex-1">
-                <h2 className={`text-2xl font-bold text-white mb-8 flex items-center gap-3 ${
+              <div className="bg-[#111215] border border-white/[0.08] rounded-2xl p-7 md:p-9 shadow-sm flex-1">
+                <h2 className={`text-xl font-bold text-white mb-6 flex items-center gap-3 ${
                   isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
                 }`}>
-                  <span className="w-2 h-8 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                  <span className="w-1.5 h-6 bg-blue-500 rounded-full" />
                   {isAr ? 'معلومات التواصل' : 'Contact Details'}
                 </h2>
 
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {/* Phone */}
-                  <a href="tel:+218916580068" className={`flex items-center gap-5 p-4 rounded-2xl hover:bg-[#0a192f] border border-transparent hover:border-white/5 transition-all duration-300 group cursor-pointer shadow-inner ${
+                  <a href="tel:+218916580068" className={`flex items-center gap-4 p-3.5 rounded-xl bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800/80 transition-all duration-200 group cursor-pointer ${
                     isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
                   }`}>
-                    <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.1)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]">
-                      <Phone className="w-6 h-6 text-blue-400" />
+                    <div className="w-11 h-11 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center shrink-0 text-blue-400 group-hover:text-blue-300 transition-all">
+                      <Phone className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-slate-400 text-sm mb-1">{isAr ? 'الهاتف المحمول' : 'Mobile Phone'}</p>
-                      <p className="text-white font-bold text-lg group-hover:text-blue-300 transition-colors" dir="ltr">+218 91 658 0068</p>
+                      <p className="text-zinc-500 text-xs mb-0.5">{isAr ? 'الهاتف المحمول' : 'Mobile Phone'}</p>
+                      <p className="text-white font-bold text-base group-hover:text-blue-300 transition-colors" dir="ltr">+218 91 658 0068</p>
                     </div>
                   </a>
 
                   {/* Email */}
-                  <a href="mailto:info@enarahmodern.com" className={`flex items-center gap-5 p-4 rounded-2xl hover:bg-[#0a192f] border border-transparent hover:border-white/5 transition-all duration-300 group cursor-pointer shadow-inner ${
+                  <a href="mailto:info@enarahmodern.com" className={`flex items-center gap-4 p-3.5 rounded-xl bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800/80 transition-all duration-200 group cursor-pointer ${
                     isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
                   }`}>
-                    <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.1)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]">
-                      <Mail className="w-6 h-6 text-blue-400" />
+                    <div className="w-11 h-11 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center shrink-0 text-blue-400 group-hover:text-blue-300 transition-all">
+                      <Mail className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-slate-400 text-sm mb-1">{isAr ? 'البريد الإلكتروني' : 'Email Address'}</p>
-                      <p className="text-white font-bold group-hover:text-blue-300 transition-colors break-all">info@enarahmodern.com</p>
+                      <p className="text-zinc-500 text-xs mb-0.5">{isAr ? 'البريد الإلكتروني' : 'Email Address'}</p>
+                      <p className="text-white font-bold text-sm group-hover:text-blue-300 transition-colors break-all">info@enarahmodern.com</p>
                     </div>
                   </a>
 
                   {/* Address */}
-                  <div className={`flex items-start gap-5 p-4 rounded-2xl hover:bg-[#0a192f] border border-transparent hover:border-white/5 transition-all duration-300 group shadow-inner ${
+                  <div className={`flex items-start gap-4 p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800/80 ${
                     isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
                   }`}>
-                    <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.1)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.3)] mt-1">
-                      <MapPin className="w-6 h-6 text-blue-400" />
+                    <div className="w-11 h-11 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center shrink-0 text-blue-400 mt-0.5">
+                      <MapPin className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-slate-400 text-sm mb-1">{isAr ? 'المقر الرئيسي' : 'Headquarters'}</p>
-                      <p className="text-white font-medium leading-relaxed group-hover:text-blue-100 transition-colors">
+                      <p className="text-zinc-500 text-xs mb-0.5">{isAr ? 'المقر الرئيسي' : 'Headquarters'}</p>
+                      <p className="text-white text-xs sm:text-sm font-normal leading-relaxed">
                         {isAr 
                           ? 'بنغازي، الليثي مقابل مدرسة العيد الفضي وبجانب عيادة المستقبل لطب الأسنان'
                           : 'Benghazi, Al-Laythi, opposite Silver Jubilee School, next to Al-Mustaqbal Dental Clinic'
@@ -307,15 +301,15 @@ export default function Contact() {
                   </div>
 
                   {/* Hours */}
-                  <div className={`flex items-center gap-5 p-4 rounded-2xl hover:bg-[#0a192f] border border-transparent hover:border-white/5 transition-all duration-300 group shadow-inner ${
+                  <div className={`flex items-center gap-4 p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800/80 ${
                     isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
                   }`}>
-                    <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.1)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]">
-                      <Clock className="w-6 h-6 text-blue-400" />
+                    <div className="w-11 h-11 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center shrink-0 text-blue-400">
+                      <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-slate-400 text-sm mb-1">{isAr ? 'ساعات العمل' : 'Working Hours'}</p>
-                      <p className="text-white font-bold group-hover:text-blue-100 transition-colors">
+                      <p className="text-zinc-500 text-xs mb-0.5">{isAr ? 'ساعات العمل' : 'Working Hours'}</p>
+                      <p className="text-white font-bold text-xs sm:text-sm">
                         {isAr ? 'يومياً من 8:00 صباحاً حتي 8:00 مساءً' : 'Daily from 8:00 AM to 8:00 PM'}
                       </p>
                     </div>
@@ -324,17 +318,13 @@ export default function Contact() {
               </div>
 
               {/* Quick Help Card */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f213a] to-[#0a192f] border border-blue-500/30 rounded-[2rem] p-8 md:p-10 shadow-2xl group text-center">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl" />
-                <h3 className={`text-xl font-bold text-white mb-3 flex items-center gap-2 relative z-10 justify-center`}>
-                  <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                  </span>
+              <div className="relative overflow-hidden bg-[#111215] border border-white/[0.08] rounded-2xl p-7 text-center">
+                <h3 className={`text-lg font-bold text-white mb-2 flex items-center gap-2 justify-center`}>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   <span>{isAr ? 'مساعدة فورية؟' : 'Need Immediate Help?'}</span>
                 </h3>
                 
-                <p className="text-slate-300 text-base mb-6 leading-relaxed relative z-10">
+                <p className="text-zinc-400 text-xs sm:text-sm mb-5 leading-relaxed font-normal">
                   {isAr 
                     ? 'فريق الدعم الفني جاهز للرد على جميع استفساراتك وتقديم الدعم الكامل لك بأسرع وقت ممكن. لا تتردد في الاتصال بنا الآن.'
                     : 'Our technical support team is ready to answer all your inquiries and provide full assistance as quickly as possible. Do not hesitate to call us.'
@@ -343,9 +333,9 @@ export default function Contact() {
 
                 <a
                   href="tel:+218916580068"
-                  className="relative z-10 inline-flex items-center justify-center gap-3 w-full px-8 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] transition-all duration-300 font-extrabold text-lg"
+                  className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all duration-200 font-semibold text-sm active:scale-95 cursor-pointer"
                 >
-                  <Phone className="w-5 h-5" />
+                  <Phone className="w-4 h-4" />
                   {isAr ? 'اتصل بنا الآن' : 'Call Us Now'}
                 </a>
               </div>

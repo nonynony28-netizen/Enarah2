@@ -127,8 +127,8 @@ export default function Blog() {
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className="mb-6 flex justify-start">
-            <Link to="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-[#0f213a] border border-white/10 hover:border-blue-500/50 rounded-xl text-slate-300 hover:text-blue-400 font-bold transition-all shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-              <ArrowRight className={`w-5 h-5 ${isAr ? '' : 'rotate-180'}`} />
+            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all">
+              <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
               {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
           </div>
@@ -137,56 +137,56 @@ export default function Blog() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight tracking-tight text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-white">
               {isAr ? (
-                <>مدونة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">الإنارة</span></>
+                <>مدونة <span className="text-blue-400">الإنارة</span></>
               ) : (
-                <>ENARAH <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 drop-shadow-[0_4px_15px_rgba(59,130,246,0.4)]">Blog</span></>
+                <>ENARAH <span className="text-blue-400">Blog</span></>
               )}
             </h1>
-            <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed text-lg md:text-xl shadow-sm">
+            <p className="text-zinc-400 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
               {isAr 
                 ? 'نصائح هندسية، أفكار تصميمية، وأحدث صيحات عالم الإضاءة لنجعل مساحتك أكثر إشراقاً'
                 : 'Engineering tips, design ideas, and the latest trends in the lighting world to make your space brighter'
               }
             </p>
-            <div className="flex items-center justify-center gap-1.5 mt-6">
-              <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-blue-500 rounded-full" />
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-              <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-blue-500 rounded-full" />
+            <div className="flex items-center justify-center gap-1.5 mt-5">
+              <div className="w-16 h-[1px] bg-zinc-800" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              <div className="w-16 h-[1px] bg-zinc-800" />
             </div>
           </div>
         </FadeIn>
 
         {/* شبكة كروت المقالات */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogPosts.map((post, i) => (
-            <FadeIn key={post.id} delay={i * 0.1}>
+            <FadeIn key={post.id} delay={i * 0.08}>
               <div 
                 onClick={() => setSelectedPost(post)}
-                style={{ willChange: "transform, opacity" }} // لتسريع الكروت
-                className="group cursor-pointer relative bg-[#0f213a] border border-white/5 rounded-[2rem] overflow-hidden hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-2 shadow-xl flex flex-col h-full"
+                style={{ willChange: "transform, opacity" }} 
+                className="group cursor-pointer relative bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden hover:border-white/[0.18] transition-all duration-200 shadow-sm flex flex-col h-full"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#0a192f]">
-                  <img src={post.coverImage} alt={post.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f213a] via-[#0f213a]/40 to-transparent opacity-90" />
+                <div className="relative aspect-[4/3] overflow-hidden bg-zinc-900 border-b border-zinc-800">
+                  <img src={post.coverImage} alt={post.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111215] via-[#111215]/30 to-transparent opacity-80" />
                   
-                  <div className="absolute top-4 right-4 bg-[#0a192f]/80 border border-blue-500/30 text-blue-300 text-xs font-bold px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                  <div className="absolute top-3.5 right-3.5 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 text-zinc-300 text-xs font-semibold px-3 py-1 rounded-md">
                     {post.badge}
                   </div>
                 </div>
                 
-                <div className="p-6 md:p-8 flex-grow flex flex-col relative z-20">
-                  <div className="flex items-center gap-4 text-xs font-bold text-slate-400 mb-4">
-                    <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {post.date}</span>
-                    <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {post.readTime}</span>
+                <div className="p-6 flex-grow flex flex-col relative z-20">
+                  <div className="flex items-center gap-3 text-xs font-semibold text-zinc-400 mb-3">
+                    <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {post.date}</span>
+                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {post.readTime}</span>
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">{post.title}</h3>
-                  <p className="text-slate-400 text-sm md:text-base leading-relaxed flex-grow line-clamp-3 mb-6">{post.summary}</p>
+                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">{post.title}</h3>
+                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed font-normal flex-grow line-clamp-3 mb-5">{post.summary}</p>
                   
-                  <span className="mt-auto inline-flex items-center gap-2 text-blue-400 font-bold group-hover:text-blue-300 transition-colors">
+                  <span className="mt-auto inline-flex items-center gap-1.5 text-xs text-blue-400 font-semibold group-hover:text-blue-300 transition-colors">
                     {isAr ? 'اقرأ المقال كاملاً' : 'Read full article'}
-                    <ArrowLeft className={`w-4 h-4 group-hover:-translate-x-1 transition-transform ${isAr ? '' : 'rotate-180 group-hover:translate-x-1'}`} />
+                    <ArrowLeft className={`w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform ${isAr ? '' : 'rotate-180 group-hover:translate-x-1'}`} />
                   </span>
                 </div>
               </div>
@@ -204,72 +204,72 @@ export default function Blog() {
               className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
             >
               {/* الخلفية المعتمة */}
-              <div className="absolute inset-0 bg-[#06152b]/95" onClick={() => setSelectedPost(null)} />
+              <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedPost(null)} />
               
               {/* نافذة المقال */}
               <motion.div
-                initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                initial={{ opacity: 0, y: 30, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                transition={{ duration: 0.3, ease: "easeOut" }} 
-                className="relative w-full max-w-4xl max-h-[90vh] bg-[#0d2342] border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col"
+                exit={{ opacity: 0, y: 20, scale: 0.96 }}
+                transition={{ duration: 0.25, ease: "easeOut" }} 
+                className="relative w-full max-w-4xl max-h-[90vh] bg-[#111215] border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
               >
                 {/* زر الإغلاق */}
                 <button
                   onClick={() => setSelectedPost(null)}
-                  className="absolute top-4 left-4 z-50 p-2.5 bg-[#0a192f]/80 hover:bg-red-500 text-white border border-white/10 rounded-full transition-all duration-300 hover:scale-110 shadow-lg"
+                  className="absolute top-4 left-4 z-50 p-2 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 rounded-xl transition-all duration-200 shadow-md"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
 
                 {/* صورة المقال الرئيسية */}
-                <div className="relative w-full h-64 md:h-96 flex-shrink-0">
+                <div className="relative w-full h-56 md:h-80 flex-shrink-0">
                   <img src={selectedPost.coverImage} alt={selectedPost.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d2342] via-[#0d2342]/40 to-transparent opacity-95" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111215] via-[#111215]/40 to-transparent opacity-95" />
                 </div>
 
                 {/* محتوى المقال (قابل للتمرير) */}
-                <div className="flex-grow overflow-y-auto p-6 md:p-12 custom-scrollbar bg-[#0d2342]">
+                <div className="flex-grow overflow-y-auto p-6 md:p-10 custom-scrollbar bg-[#111215]">
                   <div className="max-w-3xl mx-auto">
-                    <div className="flex items-center justify-center gap-6 text-sm font-bold text-blue-400 mb-8">
-                      <span className="flex items-center gap-2 bg-[#0a192f] px-4 py-2 rounded-full border border-blue-500/20 shadow-sm"><Calendar className="w-5 h-5" /> {selectedPost.date}</span>
-                      <span className="flex items-center gap-2 bg-[#0a192f] px-4 py-2 rounded-full border border-blue-500/20 shadow-sm"><Clock className="w-5 h-5" /> {selectedPost.readTime}</span>
+                    <div className="flex items-center justify-center gap-4 text-xs font-semibold text-zinc-400 mb-6">
+                      <span className="flex items-center gap-1.5 bg-zinc-900 px-3.5 py-1.5 rounded-lg border border-zinc-800"><Calendar className="w-4 h-4 text-blue-400" /> {selectedPost.date}</span>
+                      <span className="flex items-center gap-1.5 bg-zinc-900 px-3.5 py-1.5 rounded-lg border border-zinc-800"><Clock className="w-4 h-4 text-blue-400" /> {selectedPost.readTime}</span>
                     </div>
                     
-                    <h2 className="text-3xl md:text-5xl font-extrabold text-white text-center mb-10 leading-tight">
+                    <h2 className="text-2xl md:text-4xl font-bold text-white text-center mb-8 leading-tight">
                       {selectedPost.title}
                     </h2>
 
-                    <p className="text-xl text-slate-300 leading-relaxed text-center mb-12 font-medium bg-[#0a192f] p-8 rounded-3xl border border-white/5 shadow-inner">
-                      <span className="text-blue-400 text-4xl leading-none">"</span>
+                    <p className="text-base text-zinc-300 leading-relaxed text-center mb-10 font-normal bg-zinc-950/80 p-6 rounded-2xl border border-zinc-800">
+                      <span className="text-blue-400 text-3xl leading-none">"</span>
                       {selectedPost.summary}
-                      <span className="text-blue-400 text-4xl leading-none">"</span>
+                      <span className="text-blue-400 text-3xl leading-none">"</span>
                     </p>
 
-                    <div className="w-24 h-1.5 bg-blue-500 mx-auto mb-14 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                    <div className="w-16 h-1 bg-blue-500 mx-auto mb-10 rounded-full" />
 
                     {/* الأقسام الداخلية والصور */}
                     {selectedPost.sections.map((sec, idx) => (
-                      <div key={idx} className="mb-14">
-                        <h3 className="text-2xl font-bold text-blue-300 mb-6 flex items-center gap-3">
-                          <span className="w-2 h-8 bg-blue-500 rounded-full inline-block shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
+                      <div key={idx} className="mb-10">
+                        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2.5">
+                          <span className="w-1.5 h-5 bg-blue-500 rounded-full inline-block"></span>
                           {sec.heading}
                         </h3>
-                        <p className="text-slate-300 text-lg leading-relaxed mb-8">{sec.text}</p>
+                        <p className="text-zinc-300 text-sm sm:text-base leading-relaxed mb-6 font-normal">{sec.text}</p>
                         
                         {sec.image && (
-                          <div className="rounded-[2rem] overflow-hidden border border-white/5 shadow-xl">
-                            <img src={sec.image} alt={sec.heading} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                          <div className="rounded-xl overflow-hidden border border-zinc-800 shadow-md">
+                            <img src={sec.image} alt={sec.heading} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                           </div>
                         )}
                       </div>
                     ))}
                     
-                    <div className="text-center pt-8 border-t border-white/10 mt-12">
-                      <p className="text-slate-400 font-bold mb-4">
+                    <div className="text-center pt-6 border-t border-zinc-800 mt-10">
+                      <p className="text-zinc-400 text-xs font-semibold mb-4">
                         {isAr ? 'هل أعجبك المقال؟ شاركه الآن' : 'Did you like the article? Share it now'}
                       </p>
-                      <button onClick={() => setSelectedPost(null)} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                      <button onClick={() => setSelectedPost(null)} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors cursor-pointer active:scale-95 text-xs sm:text-sm">
                         {isAr ? 'العودة للمدونة' : 'Back to Blog'}
                       </button>
                     </div>

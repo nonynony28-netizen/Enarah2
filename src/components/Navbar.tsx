@@ -129,7 +129,7 @@ export default function Navbar() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'bg-[#060d19]/90 backdrop-blur-xl shadow-lg border-b border-sky-500/15 py-2'
+            ? 'bg-zinc-950/85 backdrop-blur-xl shadow-lg border-b border-white/[0.08] py-2.5'
             : 'bg-transparent py-4'
         }`}
       >
@@ -140,21 +140,21 @@ export default function Navbar() {
             <div className="flex items-center gap-4 flex-row">
               <Link to="/" className="flex items-center gap-3 group">
                 <motion.div
-                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  whileHover={{ rotate: 15, scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+                  <Lightbulb className="w-7 h-7 text-amber-400 drop-shadow-sm" />
                 </motion.div>
-                <span className="font-extrabold text-xl md:text-2xl tracking-wide">
+                <span className="font-extrabold text-xl md:text-2xl tracking-tight">
                   {isAr ? (
                     <>
-                      <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">الإنارة</span>{' '}
-                      <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">الحديثة</span>
+                      <span className="text-white">الإنارة</span>{' '}
+                      <span className="text-blue-400">الحديثة</span>
                     </>
                   ) : (
                     <>
-                      <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">ENARAH</span>{' '}
-                      <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">MODERN</span>
+                      <span className="text-white">ENARAH</span>{' '}
+                      <span className="text-blue-400">MODERN</span>
                     </>
                   )}
                 </span>
@@ -164,17 +164,17 @@ export default function Navbar() {
               <div className="md:hidden flex items-center">
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="relative h-11 w-11 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 active:scale-95 transition-all flex items-center justify-center shadow-lg shadow-blue-500/5 cursor-pointer"
+                  className="relative h-10 w-10 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:border-zinc-700"
                   title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
                 >
-                  <ShoppingCart className="w-5.5 h-5.5" />
+                  <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: [0, 1.4, 1] }}
                       transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                       key={cartCount}
-                      className="absolute -top-1 -right-1 w-5.5 h-5.5 rounded-full bg-red-600 border-2 border-[#0a192f] text-[11px] font-black text-white flex items-center justify-center shadow-[0_0_10px_#ef4444]"
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-zinc-900 text-[10px] font-bold text-white flex items-center justify-center"
                     >
                       {cartCount}
                     </motion.span>
@@ -184,21 +184,14 @@ export default function Navbar() {
             </div>
 
             {/* Desktop Nav قائمة الكمبيوتر */}
-            <div className="hidden md:flex items-center gap-1.5 relative flex-row">
+            <div className="hidden md:flex items-center gap-1 relative flex-row">
               {/* الرئيسية */}
               <Link
                 to="/"
-                className={`relative px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 z-10 hover:scale-[1.02] active:scale-[0.98] ${
-                  location.pathname === '/' ? 'text-white' : 'text-slate-300 hover:text-white'
+                className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 ${
+                  location.pathname === '/' ? 'text-white bg-zinc-800/80 border border-zinc-700/60 shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                 }`}
               >
-                {location.pathname === '/' && (
-                  <motion.div
-                    layoutId="active-desktop-nav"
-                    className="absolute inset-0 bg-blue-500/20 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-full -z-10"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
                 {t('nav.home')}
               </Link>
 
@@ -209,24 +202,24 @@ export default function Navbar() {
                 onMouseLeave={() => setIsDropdownOpen(false)}
               >
                 <button
-                  className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 z-10 outline-none hover:scale-[1.02] ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 outline-none ${
                     servicesDropdownItems.some(item => location.pathname === item.path)
-                      ? 'text-white bg-blue-500/20 border border-blue-400/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
-                      : 'text-slate-300 hover:text-white'
+                      ? 'text-white bg-zinc-800/80 border border-zinc-700/60 shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                   }`}
                 >
                   {servicesDropdownLabel}
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
                 </button>
 
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
-                      className={`absolute top-full mt-2 w-[480px] bg-[#0a192f] border border-blue-500/20 rounded-[1.5rem] p-4 shadow-2xl z-50 grid grid-cols-2 gap-3 ${
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className={`absolute top-full mt-2 w-[480px] bg-zinc-950/95 border border-zinc-800/90 rounded-2xl p-4 shadow-2xl z-50 grid grid-cols-2 gap-2 backdrop-blur-2xl ${
                         isAr ? 'right-0' : 'left-0'
                       }`}
                     >
@@ -236,16 +229,16 @@ export default function Navbar() {
                           <Link
                             key={item.path}
                             to={item.path}
-                            className={`flex items-start gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-blue-500/10 hover:translate-y-[-2px] border border-transparent hover:border-blue-500/25 ${
-                              isSubActive ? 'bg-blue-500/5 border-blue-500/10' : ''
+                            className={`flex items-start gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 ${
+                              isSubActive ? 'bg-zinc-900 border-zinc-800' : ''
                             }`}
                           >
-                            <div className={`p-2.5 rounded-xl ${isSubActive ? 'bg-blue-500/20 text-blue-300' : 'bg-white/5 text-blue-400'}`}>
-                              <item.icon className="w-5 h-5" />
+                            <div className={`p-2 rounded-lg ${isSubActive ? 'bg-blue-600/20 text-blue-400' : 'bg-zinc-900 text-zinc-400'}`}>
+                              <item.icon className="w-4 h-4" />
                             </div>
                             <div className={`flex-grow ${isAr ? 'text-right' : 'text-left'}`}>
-                              <h4 className="text-sm font-bold text-white mb-0.5">{item.label}</h4>
-                              <p className="text-xs text-slate-400 leading-relaxed font-normal">{item.desc}</p>
+                              <h4 className="text-sm font-semibold text-white mb-0.5">{item.label}</h4>
+                              <p className="text-xs text-zinc-400 leading-relaxed font-normal">{item.desc}</p>
                             </div>
                           </Link>
                         )
@@ -262,37 +255,30 @@ export default function Navbar() {
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`relative px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 z-10 hover:scale-[1.02] active:scale-[0.98] ${
-                      isActive ? 'text-white' : 'text-slate-300 hover:text-white'
+                    className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 ${
+                      isActive ? 'text-white bg-zinc-800/80 border border-zinc-700/60 shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                     }`}
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="active-desktop-nav"
-                        className="absolute inset-0 bg-blue-500/20 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-full -z-10"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
                     {link.label}
                   </Link>
                 )
               })}
 
               {/* Shopping Cart Button (Desktop) */}
-              <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
+              <div className="ml-1.5 pl-1.5 border-l border-zinc-800 flex items-center justify-center">
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="relative p-2.5 rounded-full bg-white/5 hover:bg-blue-500/10 text-slate-300 hover:text-blue-400 border border-white/5 hover:border-blue-500/30 transition-all duration-300 active:scale-95 shadow-sm cursor-pointer"
+                  className="relative p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 hover:border-zinc-700 transition-all duration-200 active:scale-95 cursor-pointer"
                   title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
                 >
-                  <ShoppingCart className="w-5.5 h-5.5" />
+                  <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: [0, 1.4, 1] }}
                       transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                       key={cartCount}
-                      className="absolute -top-1 -right-1 w-5.5 h-5.5 rounded-full bg-red-600 border-2 border-[#0a192f] text-[11px] font-black text-white flex items-center justify-center shadow-[0_0_10px_#ef4444]"
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-zinc-900 text-[10px] font-bold text-white flex items-center justify-center"
                     >
                       {cartCount}
                     </motion.span>
@@ -301,34 +287,33 @@ export default function Navbar() {
               </div>
 
               {/* Language Switcher */}
-              <div className="ml-1.5 pl-1.5 border-l border-white/10 flex items-center justify-center">
+              <div className="ml-1.5 pl-1.5 border-l border-zinc-800 flex items-center justify-center">
                 <button
                   onClick={toggleLanguage}
-                  className="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-blue-600/20 border border-white/10 hover:border-blue-500/30 text-slate-200 hover:text-blue-300 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-bold shrink-0"
+                  className="px-3 py-1.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
                   title={isAr ? 'Switch to English' : 'التغيير للعربية'}
                 >
-                  <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <Globe className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                   <span className="whitespace-nowrap">{isAr ? 'EN' : 'العربية'}</span>
                 </button>
               </div>
 
-
             </div>
 
-            {/* Mobile Actions & Menu Button زر الجوال مع مفتاح الإنارة */}
+            {/* Mobile Actions & Menu Button */}
             <div className="flex md:hidden items-center gap-2">
               <button
                 onClick={toggleLanguage}
-                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-bold shrink-0"
+                className="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
                 title={isAr ? 'Switch to English' : 'التغيير للعربية'}
               >
-                <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <Globe className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                 <span className="whitespace-nowrap">{isAr ? 'EN' : 'AR'}</span>
               </button>
 
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 rounded-full text-slate-300 hover:text-white hover:bg-blue-500/20 active:scale-95 transition-all duration-300"
+                className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-zinc-800 active:scale-95 transition-all"
               >
                 {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -348,26 +333,23 @@ export default function Navbar() {
             className="fixed inset-0 z-40 md:hidden"
           >
             {/* الخلفية المظلمة الشفافة السريعة */}
-            <div className="absolute inset-0 bg-black/75" onClick={() => setIsOpen(false)} />
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
             
             <motion.div
               initial={{ x: isAr ? '100%' : '-100%' }} 
               animate={{ x: 0 }} 
               exit={{ x: isAr ? '100%' : '-100%' }}
               transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
-              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-[#0a192f] shadow-2xl overflow-y-auto flex flex-col justify-between ${
-                isAr ? 'right-0 border-l border-blue-500/20' : 'left-0 border-r border-blue-500/20'
+              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-zinc-950 shadow-2xl overflow-y-auto flex flex-col justify-between ${
+                isAr ? 'right-0 border-l border-zinc-800' : 'left-0 border-r border-zinc-800'
               }`}
             >
-              {/* نقوش الخلفية الثابتة للأداء العالي */}
-              <div className="absolute inset-0 z-0 bg-animated-grid opacity-20 pointer-events-none" />
-
               <div className="relative z-10">
                 {/* رأس المنيو الجانبي */}
-                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/5">
+                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-zinc-800">
                   <div className="flex items-center gap-2">
-                    <Lightbulb className="w-6 h-6 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse" />
-                    <span className="font-black text-lg text-white">
+                    <Lightbulb className="w-6 h-6 text-amber-400" />
+                    <span className="font-extrabold text-lg text-white">
                       {isAr ? (
                         <>الإنارة <span className="text-blue-400">الحديثة</span></>
                       ) : (
@@ -377,23 +359,23 @@ export default function Navbar() {
                   </div>
                   <button 
                     onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-full bg-white/5 text-slate-300 hover:text-white active:scale-95 transition-all"
+                    className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-white active:scale-95 transition-all"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
 
                 {/* روابط القائمة */}
-                <div className="flex flex-col px-5 pt-6 gap-3">
+                <div className="flex flex-col px-5 pt-6 gap-2">
                   {/* الرئيسية */}
                   <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 }}>
                     <Link
                       to="/"
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl text-base font-bold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold transition-all ${
                         location.pathname === '/' 
-                          ? 'text-white bg-blue-500/15 border border-blue-400/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]' 
-                          : 'text-slate-300 hover:text-white hover:bg-white/5'
+                          ? 'text-white bg-zinc-900 border border-zinc-800' 
+                          : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                       }`}
                     >
                       <Home className="w-5 h-5 text-blue-400" />
@@ -403,22 +385,22 @@ export default function Navbar() {
 
                   {/* قائمة الأكورديون للجوال (الأقسام والأسعار) */}
                   <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-                    <div className="border border-white/5 rounded-2xl bg-white/[0.02] p-2 transition-all duration-300">
+                    <div className="border border-zinc-800/80 rounded-xl bg-zinc-900/40 p-2 transition-all">
                       <button
                         onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                        className="w-full flex items-center justify-between px-3 py-2.5 text-base font-bold text-slate-300 outline-none hover:text-white"
+                        className="w-full flex items-center justify-between px-3 py-2 text-base font-semibold text-zinc-300 outline-none hover:text-white"
                       >
                         <div className="flex items-center gap-3">
                           <Award className="w-5 h-5 text-blue-400" />
                           <span>{servicesDropdownLabel}</span>
                         </div>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isMobileDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMobileDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
                       </button>
 
                       <div 
-                        className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-1.5 px-2 ${
+                        className={`overflow-hidden transition-all duration-200 ease-in-out flex flex-col gap-1 px-1 ${
                           isMobileDropdownOpen 
-                            ? 'max-h-[300px] opacity-100 border-t border-white/5 pt-2 mt-1' 
+                            ? 'max-h-[300px] opacity-100 border-t border-zinc-800 pt-2 mt-1' 
                             : 'max-h-0 opacity-0 pointer-events-none border-transparent pt-0 mt-0'
                         }`}
                       >
@@ -429,11 +411,11 @@ export default function Navbar() {
                               key={item.path}
                               to={item.path}
                               onClick={() => setIsOpen(false)}
-                              className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all hover:translate-x-[-4px] ${
-                                isSubActive ? 'text-white bg-blue-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                isSubActive ? 'text-white bg-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                               }`}
                             >
-                              <item.icon className="w-4.5 h-4.5 text-blue-400" />
+                              <item.icon className="w-4 h-4 text-blue-400" />
                               <span>{item.label}</span>
                             </Link>
                           )
@@ -454,10 +436,10 @@ export default function Navbar() {
                         <Link
                           to={link.path}
                           onClick={() => setIsOpen(false)}
-                          className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl text-base font-bold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold transition-all ${
                             isActive
-                              ? 'text-white bg-blue-500/15 border border-blue-400/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
-                              : 'text-slate-300 hover:text-white hover:bg-white/5'
+                              ? 'text-white bg-zinc-900 border border-zinc-800'
+                              : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                           }`}
                         >
                           <link.icon className="w-5 h-5 text-blue-400" />
@@ -470,9 +452,9 @@ export default function Navbar() {
               </div>
 
               {/* ذيل القائمة الجانبية (بيانات التواصل والروابط الاجتماعية) */}
-              <div className="relative z-10 p-6 border-t border-white/5 bg-white/[0.01] flex flex-col gap-4">
+              <div className="relative z-10 p-6 border-t border-zinc-800 bg-zinc-950 flex flex-col gap-4">
                 <div className={isAr ? 'text-right' : 'text-left'}>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1">
+                  <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-500 block mb-1">
                     {isAr ? 'مركز الاتصال' : 'Call Center'}
                   </span>
                   <a 
