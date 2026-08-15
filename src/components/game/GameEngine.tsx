@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { sound } from './audio'
-import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart } from 'lucide-react'
+import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart, Medal, Star, Send, X, User } from 'lucide-react'
 
 export interface Hazard {
   id: number
@@ -53,7 +53,7 @@ export interface BossData {
   vx: number
   vy: number
   radius: number
-  hp: number // 0 - 100
+  hp: number
   maxHp: number
   isDefeated: boolean
   nameAr: string
@@ -67,6 +67,7 @@ export interface LevelData {
   subtitleAr: string
   difficultyBadge: string
   heroSkinName: string
+  trailColor: string
   locationDescription: string
   stars: number
   theme: 'street' | 'villa' | 'tower' | 'showroom'
@@ -86,6 +87,23 @@ export interface LevelData {
   initialLight: number
 }
 
+export interface LeaderboardEntry {
+  id: string
+  name: string
+  city: string
+  score: number
+  timeTakenSec: number
+  date: string
+}
+
+const DEFAULT_LEADERBOARD: LeaderboardEntry[] = [
+  { id: '1', name: 'م. سفيان العريبي', city: 'بنغازي - الليثي', score: 4850, timeTakenSec: 82, date: 'اليوم' },
+  { id: '2', name: 'أحمد الفيتوري', city: 'بنغازي - الحميضة', score: 4620, timeTakenSec: 94, date: 'اليوم' },
+  { id: '3', name: 'طارق الورفلي', city: 'بنغازي - فينيسيا', score: 4380, timeTakenSec: 108, date: 'أمس' },
+  { id: '4', name: 'محمد بوعجيله', city: 'طبرق', score: 4120, timeTakenSec: 115, date: 'أمس' },
+  { id: '5', name: 'علي المجبري', city: 'المرج', score: 3950, timeTakenSec: 126, date: 'منذ يومين' },
+]
+
 const LEVELS: LevelData[] = [
   // =========================================================================
   // LEVEL 1: شوارع حي الليثي بنغازي
@@ -97,6 +115,7 @@ const LEVELS: LevelData[] = [
     subtitleAr: 'احذر الشحنات المتحركة في الشارع! اجمع كابلات النحاس لكسب (+5 ثوانٍ) وأنر كافة الأعمدة قبل انتهاء الوقت.',
     difficultyBadge: 'سهل ومثير',
     heroSkinName: 'لمبة LED الكلاسيكية 💡',
+    trailColor: '#facc15',
     locationDescription: 'شوارع معبدة، أرصفة حجرية، أعمدة إنارة عامة، وممرات مشاة',
     stars: 1,
     timeLimit: 55,
@@ -159,6 +178,7 @@ const LEVELS: LevelData[] = [
     subtitleAr: 'احذر دوامات تفريغ الطاقة وأشعة الليزر المتقطعة! أنر 3 ثريات لفتح البوابة قبل نفاد الوقت.',
     difficultyBadge: 'متوسط حماسي',
     heroSkinName: 'اللمبة الكريستالية الملكية 💎',
+    trailColor: '#38bdf8',
     locationDescription: 'أرضيات خشبية باركيه، صالونات راقية، سجاد تركي، وغرفة طعام فخمة',
     stars: 2,
     timeLimit: 48,
@@ -233,6 +253,7 @@ const LEVELS: LevelData[] = [
     subtitleAr: 'المؤقت يتناقص بسرعة (42 ثانية)! تفادَ 4 شحنات كهربائية سريعة وأشعة السيرفرات لإنارة البرج.',
     difficultyBadge: 'تحدي قوي وسريع',
     heroSkinName: 'اللمبة الذكية السايبر ⚡',
+    trailColor: '#00f0ff',
     locationDescription: 'شبكة دوائر إلكترونية نيون، كبائن سيرفرات متقدمة، وأجهزة تحكم ذكية IoT',
     stars: 3,
     timeLimit: 42,
@@ -296,7 +317,7 @@ const LEVELS: LevelData[] = [
   },
 
   // =========================================================================
-  // LEVEL 4: معركة زعيم المعرض الرئيسي (وحش الحمل الزائد الكهربائي Overload Boss)
+  // LEVEL 4: معركة زعيم المعرض الرئيسي (وحش الحمل الزائد Overload Boss)
   // =========================================================================
   {
     id: 4,
@@ -305,9 +326,10 @@ const LEVELS: LevelData[] = [
     subtitleAr: 'ظهر وحش الحمل الزائد الكهربائي في المعرض! شغّل قواطع الأمان الأربعة في الأركان لحبسه وتأمين المعرض!',
     difficultyBadge: 'معركة الزعيم الأسطورية 👾🔥',
     heroSkinName: 'اللمبة الذهبية الملكية VIP 👑',
+    trailColor: '#f59e0b',
     locationDescription: 'معرض فخم بأرضيات سوداء وذهبية، أجنحة عرض زجاجية، وقواطع أمان الزعيم الأربعة',
     stars: 4,
-    timeLimit: 55, // 55 seconds for epic boss fight
+    timeLimit: 55,
     theme: 'showroom',
     width: 1050,
     height: 720,
@@ -318,7 +340,6 @@ const LEVELS: LevelData[] = [
       { x: 0, y: 700, w: 1050, h: 20 },
       { x: 0, y: 0, w: 20, h: 720 },
       { x: 1030, y: 0, w: 20, h: 720 },
-      // حواجز المعرض
       { x: 220, y: 160, w: 40, h: 140, type: 'showcase' },
       { x: 220, y: 420, w: 40, h: 140, type: 'showcase' },
       { x: 790, y: 160, w: 40, h: 140, type: 'showcase' },
@@ -327,7 +348,6 @@ const LEVELS: LevelData[] = [
     decorations: [
       { type: 'reception', x: 460, y: 610, w: 130, h: 30, label: 'استقبال المعرض الرئيسي' },
     ],
-    // قواطع الأمان الذكية الأربعة لهزيمة الزعيم
     boss: {
       x: 525,
       y: 320,
@@ -381,6 +401,13 @@ interface Particle {
   maxLife: number
 }
 
+interface TrailNode {
+  x: number
+  y: number
+  alpha: number
+  color: string
+}
+
 export const GameEngine: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   
@@ -390,6 +417,7 @@ export const GameEngine: React.FC = () => {
   const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(1)
   const [timeLeft, setTimeLeft] = useState(55)
+  const [totalPlayTimeSec, setTotalPlayTimeSec] = useState(0)
   const [lightPower, setLightPower] = useState(140)
   const [isMuted, setIsMuted] = useState(false)
   const [lampsLitCount, setLampsLitCount] = useState(0)
@@ -399,11 +427,25 @@ export const GameEngine: React.FC = () => {
   const [bossHp, setBossHp] = useState(100)
   const [bannerAlert, setBannerAlert] = useState<{ msg: string; type: 'info' | 'error' | 'success' } | null>(null)
 
+  // Leaderboard state
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [playerNameInput, setPlayerNameInput] = useState('')
+  const [playerCityInput, setPlayerCityInput] = useState('بنغازي')
+  const [hasSubmittedScore, setHasSubmittedScore] = useState(false)
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(() => {
+    try {
+      const saved = localStorage.getItem('enarah_hero_leaderboard')
+      return saved ? JSON.parse(saved) : DEFAULT_LEADERBOARD
+    } catch {
+      return DEFAULT_LEADERBOARD
+    }
+  })
+
   // Current active level clone
   const levelRef = useRef<LevelData>(JSON.parse(JSON.stringify(LEVELS[0])))
   const timeLeftRef = useRef<number>(55)
 
-  // Hero state
+  // Hero state (including lightweight Trail buffer)
   const heroRef = useRef({
     x: 70,
     y: 530,
@@ -416,6 +458,7 @@ export const GameEngine: React.FC = () => {
     blinkTimer: 0,
     isMoving: false,
     invincibleTimer: 0,
+    trail: [] as TrailNode[],
   })
 
   // Particles
@@ -435,6 +478,7 @@ export const GameEngine: React.FC = () => {
     heroRef.current.vx = 0
     heroRef.current.vy = 0
     heroRef.current.invincibleTimer = 0
+    heroRef.current.trail = []
     setLampsLitCount(0)
     setTotalLampsCount(cloned.lamps.length)
     setCollectedSparksCount(0)
@@ -454,7 +498,11 @@ export const GameEngine: React.FC = () => {
   const startGame = (levelIdx = 0) => {
     setCurrentLevelIdx(levelIdx)
     loadLevel(levelIdx)
-    if (levelIdx === 0) setScore(0)
+    if (levelIdx === 0) {
+      setScore(0)
+      setTotalPlayTimeSec(0)
+      setHasSubmittedScore(false)
+    }
     setCombo(1)
     setBannerAlert(null)
     setGameState('playing')
@@ -502,6 +550,34 @@ export const GameEngine: React.FC = () => {
     setTimeout(() => {
       loadLevel(currentLevelIdx)
     }, 450)
+  }
+
+  // Submit player score to Leaderboard
+  const handleSubmitLeaderboard = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!playerNameInput.trim()) return
+
+    const newEntry: LeaderboardEntry = {
+      id: Date.now().toString(),
+      name: playerNameInput.trim(),
+      city: playerCityInput.trim() || 'بنغازي',
+      score: score,
+      timeTakenSec: Math.max(totalPlayTimeSec, 45),
+      date: 'الآن',
+    }
+
+    const updated = [newEntry, ...leaderboard]
+      .sort((a, b) => b.score - a.score || a.timeTakenSec - b.timeTakenSec)
+      .slice(0, 10)
+
+    setLeaderboard(updated)
+    setHasSubmittedScore(true)
+    try {
+      localStorage.setItem('enarah_hero_leaderboard', JSON.stringify(updated))
+    } catch {}
+
+    sound.playBonusTime()
+    showAlert('🏆 رائع! تم تسجيل اسمك في لوحة شرف أبطال الإنارة الحديثة!', 'success')
   }
 
   // Spawn visual particles
@@ -578,6 +654,9 @@ export const GameEngine: React.FC = () => {
       const hero = heroRef.current
 
       if (gameState === 'playing') {
+        // Track Total Playtime
+        setTotalPlayTimeSec((prev) => prev + dt)
+
         // Countdown Timer Logic
         timeLeftRef.current -= dt
         setTimeLeft(Math.max(Math.ceil(timeLeftRef.current), 0))
@@ -617,8 +696,29 @@ export const GameEngine: React.FC = () => {
           } else {
             hero.facing = moveY > 0 ? 'down' : 'up'
           }
+
+          // Ultra-Lightweight Neon Light Trail (Max 8 points)
+          if (Math.floor(time * 0.03) % 2 === 0) {
+            hero.trail.unshift({
+              x: hero.x,
+              y: hero.y,
+              alpha: 0.7,
+              color: level.trailColor,
+            })
+            if (hero.trail.length > 8) {
+              hero.trail.pop()
+            }
+          }
         } else {
           hero.isMoving = false
+        }
+
+        // Decay light trail
+        for (let i = hero.trail.length - 1; i >= 0; i--) {
+          hero.trail[i].alpha -= dt * 2.2
+          if (hero.trail[i].alpha <= 0) {
+            hero.trail.splice(i, 1)
+          }
         }
 
         // 2. Collision with Walls and Closed Gates
@@ -669,7 +769,7 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 4. Update Final Boss (Level 4 Overload Surge)
+        // 4. Update Final Boss
         if (level.boss && !level.boss.isDefeated) {
           const boss = level.boss
           boss.x += boss.vx
@@ -684,7 +784,7 @@ export const GameEngine: React.FC = () => {
             return
           }
 
-          // Check Boss Breakers activation
+          // Check Boss Breakers
           for (const brk of boss.breakers) {
             if (!brk.isActivated) {
               const brkDist = Math.hypot(hero.x - brk.x, hero.y - brk.y)
@@ -710,7 +810,7 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 5. Check Cycling Deadly Laser Beams
+        // 5. Check Cycling Laser Beams
         const curSeconds = time * 0.001
         for (const beam of level.laserBeams) {
           const cyclePos = (curSeconds + beam.offset) % beam.period
@@ -735,7 +835,7 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 6. Collect Sparks & Powerups (+5s Bonus)
+        // 6. Collect Sparks & Powerups
         for (const spark of level.sparks) {
           if (!spark.collected) {
             const dist = Math.hypot(hero.x - spark.x, hero.y - spark.y)
@@ -991,7 +1091,6 @@ export const GameEngine: React.FC = () => {
           ctx.stroke()
         }
 
-        // Boss Arena Central Ring
         ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)'
         ctx.lineWidth = 3
         ctx.setLineDash([8, 8])
@@ -1104,13 +1203,10 @@ export const GameEngine: React.FC = () => {
         ctx.restore()
       }
 
-      // ==========================================
-      // DRAW FINAL BOSS & CONTAINMENT BREAKER SWITCHES
-      // ==========================================
+      // Draw Final Boss & Breakers
       if (level.boss) {
         const boss = level.boss
 
-        // 1. Draw 4 Corner Smart Safety Breakers
         for (const brk of boss.breakers) {
           ctx.save()
           ctx.translate(brk.x, brk.y)
@@ -1127,7 +1223,6 @@ export const GameEngine: React.FC = () => {
           ctx.fill()
           ctx.stroke()
 
-          // Inner Icon
           ctx.fillStyle = brk.isActivated ? '#ffffff' : '#38bdf8'
           ctx.font = 'bold 12px sans-serif'
           ctx.textAlign = 'center'
@@ -1135,7 +1230,6 @@ export const GameEngine: React.FC = () => {
 
           ctx.restore()
 
-          // Draw active containment laser beam from breaker to Boss
           if (brk.isActivated && !boss.isDefeated) {
             ctx.save()
             ctx.strokeStyle = '#38bdf8'
@@ -1150,7 +1244,6 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 2. Draw The Overload Boss Sphere (وحش الحمل الزائد)
         ctx.save()
         ctx.translate(boss.x, boss.y)
 
@@ -1158,7 +1251,6 @@ export const GameEngine: React.FC = () => {
           const bossPulse = Math.sin(time * 0.008) * 4
           const bossRad = boss.radius + bossPulse
 
-          // Electric Outer Aura
           const auraGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, bossRad + 20)
           auraGrad.addColorStop(0, '#ef4444')
           auraGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.8)')
@@ -1168,7 +1260,6 @@ export const GameEngine: React.FC = () => {
           ctx.arc(0, 0, bossRad + 20, 0, Math.PI * 2)
           ctx.fill()
 
-          // Main Core
           ctx.beginPath()
           ctx.arc(0, 0, bossRad, 0, Math.PI * 2)
           ctx.fillStyle = '#7f1d1d'
@@ -1179,7 +1270,6 @@ export const GameEngine: React.FC = () => {
           ctx.fill()
           ctx.stroke()
 
-          // Orbiting Lightning Sparks
           for (let i = 0; i < 4; i++) {
             const orbAngle = time * 0.006 + (i * Math.PI) / 2
             const ox = Math.cos(orbAngle) * (bossRad + 14)
@@ -1192,7 +1282,6 @@ export const GameEngine: React.FC = () => {
             ctx.fill()
           }
 
-          // Angry Glowing Eyes
           ctx.fillStyle = '#fef08a'
           ctx.beginPath()
           ctx.arc(-12, -8, 6, 0, Math.PI * 2)
@@ -1205,7 +1294,6 @@ export const GameEngine: React.FC = () => {
           ctx.arc(13, -8, 3, 0, Math.PI * 2)
           ctx.fill()
 
-          // Angry Mouth
           ctx.strokeStyle = '#fef08a'
           ctx.lineWidth = 2.5
           ctx.beginPath()
@@ -1216,7 +1304,6 @@ export const GameEngine: React.FC = () => {
           ctx.lineTo(12, 14)
           ctx.stroke()
 
-          // Boss Health Bar Above Head
           ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'
           ctx.roundRect(-45, -55, 90, 10, 3)
           ctx.fill()
@@ -1230,7 +1317,6 @@ export const GameEngine: React.FC = () => {
           ctx.textAlign = 'center'
           ctx.fillText(`⚡ طاقة الزعيم: ${boss.hp}%`, 0, -60)
         } else {
-          // Defeated Boss: Trapped in Green Energy Capsule
           ctx.beginPath()
           ctx.arc(0, 0, boss.radius - 4, 0, Math.PI * 2)
           ctx.fillStyle = '#064e3b'
@@ -1443,6 +1529,25 @@ export const GameEngine: React.FC = () => {
       ctx.restore()
 
       // ==========================================
+      // FEATURE 4: DRAW NEON LIGHT TRAIL (أثر النيون المتوهج فائق السلاسة)
+      // ==========================================
+      for (let i = 0; i < hero.trail.length; i++) {
+        const node = hero.trail[i]
+        const radius = (hero.radius - i * 1.5) * 0.6
+        if (radius > 2) {
+          ctx.save()
+          ctx.globalAlpha = node.alpha * 0.6
+          ctx.fillStyle = node.color
+          ctx.shadowColor = node.color
+          ctx.shadowBlur = 12
+          ctx.beginPath()
+          ctx.arc(node.x, node.y, radius, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.restore()
+        }
+      }
+
+      // ==========================================
       // DRAW HERO MASCOT
       // ==========================================
       ctx.save()
@@ -1607,9 +1712,7 @@ export const GameEngine: React.FC = () => {
 
       ctx.restore()
 
-      // ==========================================
-      // DRAW PARTICLES
-      // ==========================================
+      // Draw Particles
       for (const p of particlesRef.current) {
         ctx.save()
         ctx.globalAlpha = p.alpha
@@ -1620,9 +1723,7 @@ export const GameEngine: React.FC = () => {
         ctx.restore()
       }
 
-      // ==========================================
-      // DYNAMIC FOG OF WAR (العالم المظلم وشعاع النور)
-      // ==========================================
+      // DYNAMIC FOG OF WAR
       if (gameState === 'playing') {
         ctx.save()
         const darkCanvas = document.createElement('canvas')
@@ -1693,7 +1794,7 @@ export const GameEngine: React.FC = () => {
       {/* Game Top HUD Bar */}
       <div className="w-full bg-[#111215] border border-zinc-800 rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-md">
         
-        {/* Level Name & Badge */}
+        {/* Level Name & Leaderboard Button */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
             <Compass className="w-4 h-4 text-blue-400" />
@@ -1702,9 +1803,14 @@ export const GameEngine: React.FC = () => {
             </span>
           </div>
 
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-semibold">
-            <span>البطل: {LEVELS[currentLevelIdx].heroSkinName}</span>
-          </div>
+          <button
+            onClick={() => setShowLeaderboard(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+            title="لوحة الشرف والمتصدرين"
+          >
+            <Trophy className="w-4 h-4 text-amber-400" />
+            <span>لوحة الشرف</span>
+          </button>
         </div>
 
         {/* 100% Checklist, Boss Bar & Countdown Timer */}
@@ -1805,26 +1911,26 @@ export const GameEngine: React.FC = () => {
               رحلة النور | بطل <span className="text-blue-400">الإنارة الحديثة</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-md leading-relaxed mb-4 font-normal">
-              تحدي الأبطال الحقيقي! مؤقت تنازلي سريع، شحنات كهربائية، ومعركة الزعيم الكبرى (وحش الحمل الزائد) في المرحلة النهائية!
+              تحدي الأبطال الحقيقي! انطلق بالأثر الضوئي المتوهج، نافس على لوحة الشرف، واحبس وحش الحمل الزائد في المعرض الرئيسي!
             </p>
 
-            <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3.5 mb-6 text-xs text-zinc-300 max-w-sm text-right space-y-1.5">
-              <div className="flex items-center gap-2 text-amber-400 font-bold">
-                <AlertTriangle className="w-4 h-4" />
-                <span>قواعد التحدي:</span>
-              </div>
-              <p className="text-zinc-400">⚡ ملامسة الشحنات تعيد المرحلة فوراً.</p>
-              <p className="text-zinc-400">⚡ جمع كابلات النحاس والسبوت لايت يمنحك (+5 ثوانٍ) وقت إضافي.</p>
-              <p className="text-zinc-400">👾 في المرحلة 4: فعّل قواطع الأمان الأربعة في الأركان لحبس الزعيم وتأمين المعرض!</p>
-            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+              <button
+                onClick={() => startGame(0)}
+                className="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-base flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-lg"
+              >
+                <Play className="w-5 h-5 fill-current" />
+                <span>ابدأ التحدي (حي الليثي)</span>
+              </button>
 
-            <button
-              onClick={() => startGame(0)}
-              className="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-base flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-lg"
-            >
-              <Play className="w-5 h-5 fill-current" />
-              <span>ابدأ التحدي (حي الليثي)</span>
-            </button>
+              <button
+                onClick={() => setShowLeaderboard(true)}
+                className="px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 border border-amber-500/40 text-amber-300 rounded-xl font-bold text-sm flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+              >
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>لوحة الشرف والمتصدرين</span>
+              </button>
+            </div>
           </div>
         )}
 
@@ -1863,25 +1969,66 @@ export const GameEngine: React.FC = () => {
         )}
 
         {/* ==========================================
-            SCREEN: FINAL VICTORY & VIP COUPON SCREEN
+            SCREEN: FINAL VICTORY & LEADERBOARD ENTRY SCREEN
         ========================================== */}
         {gameState === 'game_won' && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-30">
-            <div className="w-20 h-20 bg-amber-500/20 border border-amber-500/30 rounded-full flex items-center justify-center mb-4 text-amber-400 animate-pulse">
-              <Trophy className="w-10 h-10" />
+          <div className="absolute inset-0 bg-black/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-30 overflow-y-auto">
+            <div className="w-16 h-16 bg-amber-500/20 border border-amber-500/30 rounded-full flex items-center justify-center mb-3 text-amber-400 animate-pulse">
+              <Trophy className="w-8 h-8" />
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-black text-white mb-2">
+            <h2 className="text-xl sm:text-3xl font-black text-white mb-1">
               🎉 مبروك! هزمت وحش الحمل الزائد وأنرت المعرض والمدينة!
             </h2>
-            <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-5 leading-relaxed">
-              أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.
+            <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-4 leading-relaxed">
+              أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض.
             </p>
 
+            {/* Submit to Leaderboard Form */}
+            {!hasSubmittedScore ? (
+              <form onSubmit={handleSubmitLeaderboard} className="bg-zinc-900/90 border border-amber-500/40 rounded-2xl p-4 mb-4 max-w-sm w-full text-right shadow-xl">
+                <div className="flex items-center gap-2 text-amber-400 font-bold text-xs mb-3">
+                  <Medal className="w-4 h-4" />
+                  <span>سجّل اسمك الآن في لوحة شرف أبطال الإنارة:</span>
+                </div>
+
+                <div className="space-y-2 mb-3">
+                  <input
+                    type="text"
+                    required
+                    placeholder="اكتب اسمك الثلاثي أو اللقب..."
+                    value={playerNameInput}
+                    onChange={(e) => setPlayerNameInput(e.target.value)}
+                    className="w-full bg-black/60 border border-zinc-700 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    placeholder="المدينة / المنطقة (مثال: بنغازي - الليثي)"
+                    value={playerCityInput}
+                    onChange={(e) => setPlayerCityInput(e.target.value)}
+                    className="w-full bg-black/60 border border-zinc-700 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>حفظ في لوحة الشرف الرسمية 🏆</span>
+                </button>
+              </form>
+            ) : (
+              <div className="bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-3.5 mb-4 text-emerald-300 text-xs font-bold flex items-center justify-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                <span>تم تسجيل نتيجتك بنجاح في لوحة الشرف!</span>
+              </div>
+            )}
+
             {/* VIP Promo Coupon Card */}
-            <div className="bg-gradient-to-r from-amber-950/60 via-zinc-950 to-blue-950/60 border border-amber-500/40 rounded-2xl p-5 mb-5 text-center max-w-sm w-full shadow-xl">
+            <div className="bg-gradient-to-r from-amber-950/60 via-zinc-950 to-blue-950/60 border border-amber-500/40 rounded-2xl p-4 mb-4 text-center max-w-sm w-full shadow-xl">
               <div className="text-[11px] text-amber-300 font-bold mb-1">كوبون أبطال الإنارة الذهبي:</div>
-              <div className="font-mono text-xl sm:text-2xl font-black text-amber-400 tracking-widest bg-black/70 py-2 px-4 rounded-xl border border-amber-400/30 mb-2">
+              <div className="font-mono text-lg sm:text-xl font-black text-amber-400 tracking-widest bg-black/70 py-1.5 px-3 rounded-xl border border-amber-400/30 mb-1.5">
                 ENARAH-HERO
               </div>
               <p className="text-[11px] text-emerald-400 font-semibold">
@@ -1889,28 +2036,123 @@ export const GameEngine: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              <button
+                onClick={() => setShowLeaderboard(true)}
+                className="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-amber-500/40 text-amber-300 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>عرض لوحة الشرف</span>
+              </button>
+
               <a
                 href={`https://wa.me/218916580068?text=${encodeURIComponent('مرحباً شركة الإنارة الحديثة، هزمت وحش الحمل الزائد وفزت بلعبة بطل الإنارة وحصلت على كود الخصم: ENARAH-HERO')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all active:scale-95 flex items-center gap-2"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center gap-1.5"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>استخدام الكوبون في الواتساب</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>طلب بالواتساب</span>
               </a>
 
               <button
                 onClick={() => startGame(0)}
-                className="px-5 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white font-semibold text-xs sm:text-sm rounded-xl transition-all cursor-pointer"
+                className="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white font-semibold text-xs rounded-xl transition-all cursor-pointer"
               >
-                إعادة اللعب من البداية
+                إعادة اللعب
               </button>
             </div>
           </div>
         )}
 
       </div>
+
+      {/* ==========================================
+          MODAL: LEADERBOARD / HALL OF FAME (لوحة الشرف)
+      ========================================== */}
+      {showLeaderboard && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#121316] border border-amber-500/40 rounded-3xl w-full max-w-lg p-5 shadow-2xl relative text-right flex flex-col max-h-[85vh]">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-4">
+              <button
+                onClick={() => setShowLeaderboard(false)}
+                className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-white">لوحة شرف أبطال الإنارة الحديثة</h3>
+                <Trophy className="w-5 h-5 text-amber-400" />
+              </div>
+            </div>
+
+            {/* Competitors List */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+              {leaderboard.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
+                    idx === 0
+                      ? 'bg-gradient-to-l from-amber-950/40 to-zinc-900 border-amber-500/50'
+                      : idx === 1
+                      ? 'bg-gradient-to-l from-slate-900 to-zinc-900 border-slate-500/40'
+                      : idx === 2
+                      ? 'bg-gradient-to-l from-amber-950/20 to-zinc-900 border-amber-700/30'
+                      : 'bg-zinc-900/60 border-zinc-800/80'
+                  }`}
+                >
+                  {/* Score & Time */}
+                  <div className="flex items-center gap-3">
+                    <div className="text-left">
+                      <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
+                      <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
+                    </div>
+                  </div>
+
+                  {/* Competitor Name & City */}
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className="text-xs font-bold text-white flex items-center gap-1 justify-end">
+                        <span>{item.name}</span>
+                        {idx === 0 && <span className="text-amber-400">👑</span>}
+                      </div>
+                      <div className="text-[10px] text-zinc-400">{item.city}</div>
+                    </div>
+
+                    {/* Rank Badge */}
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs ${
+                        idx === 0
+                          ? 'bg-amber-500 text-black shadow-md'
+                          : idx === 1
+                          ? 'bg-slate-300 text-black'
+                          : idx === 2
+                          ? 'bg-amber-700 text-white'
+                          : 'bg-zinc-800 text-zinc-400'
+                      }`}
+                    >
+                      {idx + 1}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer Close */}
+            <div className="pt-4 mt-2 border-t border-zinc-800 text-center">
+              <button
+                onClick={() => setShowLeaderboard(false)}
+                className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white rounded-xl font-bold text-xs cursor-pointer transition-all"
+              >
+                إغلاق والعودة للعبة
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Mobile Touch Controls (D-Pad Controller) */}
       <div className="w-full mt-5 flex sm:hidden flex-col items-center justify-center">
