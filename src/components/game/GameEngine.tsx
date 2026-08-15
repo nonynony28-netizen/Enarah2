@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { sound } from './audio'
-import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart, Medal, Star, Send, X, User, Settings, Gift } from 'lucide-react'
-import { getGameRewardConfig, DEFAULT_GAME_REWARD_CONFIG } from '../../utils/gameConfig'
-import type { GameRewardConfig } from '../../utils/gameConfig'
-import { Link } from 'react-router-dom'
+import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart, Medal, Star, Send, X, User } from 'lucide-react'
 
 export interface Hazard {
   id: number
@@ -430,9 +427,6 @@ export const GameEngine: React.FC = () => {
   const [bossHp, setBossHp] = useState(100)
   const [bannerAlert, setBannerAlert] = useState<{ msg: string; type: 'info' | 'error' | 'success' } | null>(null)
 
-  // Reward Config state from Admin Control Panel
-  const [rewardConfig, setRewardConfig] = useState<GameRewardConfig>(DEFAULT_GAME_REWARD_CONFIG)
-
   // Leaderboard state
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [playerNameInput, setPlayerNameInput] = useState('')
@@ -446,16 +440,6 @@ export const GameEngine: React.FC = () => {
       return DEFAULT_LEADERBOARD
     }
   })
-
-  // Load reward config on mount & listen for real-time admin updates
-  useEffect(() => {
-    setRewardConfig(getGameRewardConfig())
-    const handleConfigUpdate = () => {
-      setRewardConfig(getGameRewardConfig())
-    }
-    window.addEventListener('enarah_reward_config_updated', handleConfigUpdate)
-    return () => window.removeEventListener('enarah_reward_config_updated', handleConfigUpdate)
-  }, [])
 
   // Current active level clone
   const levelRef = useRef<LevelData>(JSON.parse(JSON.stringify(LEVELS[0])))
@@ -1883,16 +1867,8 @@ export const GameEngine: React.FC = () => {
           </div>
         </div>
 
-        {/* Controls: Mute, Admin & Restart */}
+        {/* Controls: Mute & Restart */}
         <div className="flex items-center gap-2">
-          <Link
-            to="/admin"
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-amber-400 transition-all cursor-pointer"
-            title="لوحة تحكم المدير وجوائز اللعبة"
-          >
-            <Settings className="w-4 h-4" />
-          </Link>
-
           <button
             onClick={toggleMute}
             className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer"
@@ -2005,7 +1981,7 @@ export const GameEngine: React.FC = () => {
               🎉 مبروك! هزمت وحش الحمل الزائد وأنرت المعرض والمدينة!
             </h2>
             <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-4 leading-relaxed">
-              {rewardConfig.customVictoryMsg || 'أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.'}
+              أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض.
             </p>
 
             {/* Submit to Leaderboard Form */}
@@ -2049,27 +2025,16 @@ export const GameEngine: React.FC = () => {
               </div>
             )}
 
-            {/* DYNAMIC ADMIN-CONFIGURED REWARD CARD */}
-            {rewardConfig.isEnabled && rewardConfig.rewardType === 'coupon' && (
-              <div className="bg-gradient-to-r from-amber-950/60 via-zinc-950 to-blue-950/60 border border-amber-500/40 rounded-2xl p-4 mb-4 text-center max-w-sm w-full shadow-xl">
-                <div className="text-[11px] text-amber-300 font-bold mb-1">{rewardConfig.discountTitle}</div>
-                <div className="font-mono text-lg sm:text-xl font-black text-amber-400 tracking-widest bg-black/70 py-1.5 px-3 rounded-xl border border-amber-400/30 mb-1.5">
-                  {rewardConfig.couponCode}
-                </div>
-                <p className="text-[11px] text-emerald-400 font-semibold">
-                  {rewardConfig.discountDetails}
-                </p>
+            {/* VIP Promo Coupon Card */}
+            <div className="bg-gradient-to-r from-amber-950/60 via-zinc-950 to-blue-950/60 border border-amber-500/40 rounded-2xl p-4 mb-4 text-center max-w-sm w-full shadow-xl">
+              <div className="text-[11px] text-amber-300 font-bold mb-1">كوبون أبطال الإنارة الذهبي:</div>
+              <div className="font-mono text-lg sm:text-xl font-black text-amber-400 tracking-widest bg-black/70 py-1.5 px-3 rounded-xl border border-amber-400/30 mb-1.5">
+                ENARAH-HERO
               </div>
-            )}
-
-            {rewardConfig.isEnabled && rewardConfig.rewardType === 'physical_gift' && (
-              <div className="bg-gradient-to-r from-emerald-950/60 via-zinc-950 to-amber-950/60 border border-emerald-500/40 rounded-2xl p-4 mb-4 text-center max-w-sm w-full shadow-xl">
-                <Gift className="w-6 h-6 text-amber-400 mx-auto mb-1" />
-                <div className="text-[11px] text-amber-300 font-bold mb-0.5">هدية عينية مجانية للأبطال:</div>
-                <div className="text-sm font-black text-white mb-1">{rewardConfig.giftItemName}</div>
-                <p className="text-[11px] text-emerald-300 font-semibold">{rewardConfig.giftPickupInstructions}</p>
-              </div>
-            )}
+              <p className="text-[11px] text-emerald-400 font-semibold">
+                ⚡ خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!
+              </p>
+            </div>
 
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button
@@ -2080,22 +2045,15 @@ export const GameEngine: React.FC = () => {
                 <span>عرض لوحة الشرف</span>
               </button>
 
-              {rewardConfig.isEnabled && rewardConfig.rewardType !== 'no_reward' && (
-                <a
-                  href={`https://wa.me/218916580068?text=${encodeURIComponent(
-                    rewardConfig.whatsappTextTemplate.replace(
-                      '{REWARD}',
-                      rewardConfig.rewardType === 'coupon' ? rewardConfig.couponCode : rewardConfig.giftItemName
-                    )
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{rewardConfig.rewardType === 'coupon' ? 'طلب بالواتساب' : 'استلام الهدية'}</span>
-                </a>
-              )}
+              <a
+                href={`https://wa.me/218916580068?text=${encodeURIComponent('مرحباً شركة الإنارة الحديثة، هزمت وحش الحمل الزائد وفزت بلعبة بطل الإنارة وحصلت على كود الخصم: ENARAH-HERO')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>طلب بالواتساب</span>
+              </a>
 
               <button
                 onClick={() => startGame(0)}
