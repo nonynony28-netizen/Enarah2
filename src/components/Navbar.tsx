@@ -143,7 +143,7 @@ export default function Navbar() {
                   whileHover={{ rotate: 15, scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <Lightbulb className="w-7 h-7 text-amber-400 drop-shadow-sm" />
+                  <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-sm" />
                 </motion.div>
                 <span className="font-extrabold text-xl md:text-2xl tracking-tight">
                   {isAr ? (
@@ -348,7 +348,7 @@ export default function Navbar() {
                 {/* رأس المنيو الجانبي */}
                 <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-zinc-800">
                   <div className="flex items-center gap-2">
-                    <Lightbulb className="w-6 h-6 text-amber-400" />
+                    <Lightbulb className="w-6 h-6 text-blue-400" />
                     <span className="font-extrabold text-lg text-white">
                       {isAr ? (
                         <>الإنارة <span className="text-blue-400">الحديثة</span></>
