@@ -705,26 +705,26 @@ export const GameEngine: React.FC = () => {
       }
 
       // =========================================================================
-      // RICH ENVIRONMENT RENDERING (100% Distinct Environment & Floor per Level)
+      // VIBRANT THEMED ENVIRONMENT RENDERING (100% VISIBLE & DISTINCT WORLD PER LEVEL)
       // =========================================================================
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       if (level.theme === 'street') {
         // ==========================================
-        // LEVEL 1: الشارع وحي الليثي بنغازي
+        // LEVEL 1: شوارع حي الليثي بنغازي
         // ==========================================
-        // 1. Dark Asphalt Road
-        ctx.fillStyle = '#0f131a'
+        // 1. Asphalt Road
+        ctx.fillStyle = '#1e293b'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // 2. Curbs / Pavements Sidewalks (أرصفة الشارع الحجرية)
-        ctx.fillStyle = '#1e2430'
+        // 2. Concrete Pavement Sidewalks (أرصفة الشارع الحجرية الواضحة)
+        ctx.fillStyle = '#334155'
         ctx.fillRect(20, 20, 880, 80) // الرصيف العلوي
         ctx.fillRect(20, 500, 880, 100) // الرصيف السفلي
 
-        // Curb edges line
-        ctx.strokeStyle = '#eab308'
-        ctx.lineWidth = 3
+        // Curb borders (حواف الأرصفة الصفراء والسوداء)
+        ctx.strokeStyle = '#facc15'
+        ctx.lineWidth = 4
         ctx.beginPath()
         ctx.moveTo(20, 100)
         ctx.lineTo(900, 100)
@@ -733,8 +733,8 @@ export const GameEngine: React.FC = () => {
         ctx.stroke()
 
         // 3. Street Lane Center Dividers (خطوط الطريق البيضاء المتقطعة)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'
-        ctx.lineWidth = 3
+        ctx.strokeStyle = '#ffffff'
+        ctx.lineWidth = 3.5
         ctx.setLineDash([25, 20])
         ctx.beginPath()
         ctx.moveTo(20, 300)
@@ -742,12 +742,19 @@ export const GameEngine: React.FC = () => {
         ctx.stroke()
         ctx.setLineDash([])
 
-        // 4. Crosswalks (ممرات المشاة)
+        // 4. Park green lawn
+        ctx.fillStyle = '#166534'
+        ctx.fillRect(420, 140, 140, 320)
+        ctx.strokeStyle = '#22c55e'
+        ctx.lineWidth = 2
+        ctx.strokeRect(420, 140, 140, 320)
+
+        // 5. Crosswalks (ممرات المشاة البيضاء الناصعة)
         for (const dec of level.decorations) {
           if (dec.type === 'crosswalk' && dec.w && dec.h) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'
-            for (let y = dec.y; y < dec.y + dec.h; y += 20) {
-              ctx.fillRect(dec.x, y, dec.w, 10)
+            ctx.fillStyle = '#ffffff'
+            for (let y = dec.y; y < dec.y + dec.h; y += 22) {
+              ctx.fillRect(dec.x, y, dec.w, 12)
             }
           }
         }
@@ -755,41 +762,49 @@ export const GameEngine: React.FC = () => {
         // ==========================================
         // LEVEL 2: الفيلا المعمارية الفاخرة
         // ==========================================
-        // 1. Warm Parquet Wood / Terracotta Floor
-        ctx.fillStyle = '#120f0d'
+        // 1. Warm Golden Oak Parquet Wood Floor
+        ctx.fillStyle = '#78350f'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Wood planks texture
-        ctx.strokeStyle = 'rgba(180, 83, 9, 0.08)'
-        ctx.lineWidth = 1
-        for (let y = 0; y < canvas.height; y += 30) {
+        // Wood planks texture lines
+        ctx.strokeStyle = '#451a03'
+        ctx.lineWidth = 1.5
+        for (let y = 0; y < canvas.height; y += 28) {
           ctx.beginPath()
           ctx.moveTo(0, y)
           ctx.lineTo(canvas.width, y)
           ctx.stroke()
         }
+        for (let x = 0; x < canvas.width; x += 120) {
+          ctx.beginPath()
+          ctx.moveTo(x, 0)
+          ctx.lineTo(x, canvas.height)
+          ctx.stroke()
+        }
 
-        // 2. Carpets & Luxury Furniture Outlines
+        // 2. Carpets & Luxury Furniture
         for (const dec of level.decorations) {
           if (dec.type === 'carpet' && dec.w && dec.h) {
-            // Turkish Royal Rug
-            ctx.fillStyle = '#311018'
+            // Royal Crimson Red Rug with Gold Border
+            ctx.fillStyle = '#881337'
             ctx.fillRect(dec.x, dec.y, dec.w, dec.h)
-            ctx.strokeStyle = '#e11d48'
-            ctx.lineWidth = 2
+            ctx.strokeStyle = '#f59e0b'
+            ctx.lineWidth = 3
             ctx.strokeRect(dec.x, dec.y, dec.w, dec.h)
+            // Inner gold medallion
+            ctx.strokeRect(dec.x + 10, dec.y + 10, dec.w - 20, dec.h - 20)
           } else if (dec.type === 'sofa' && dec.w && dec.h) {
-            ctx.fillStyle = '#1c1917'
-            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 6)
-            ctx.fill()
-            ctx.strokeStyle = '#78716c'
-            ctx.lineWidth = 1.5
-            ctx.stroke()
-          } else if (dec.type === 'dining_table' && dec.w && dec.h) {
-            ctx.fillStyle = '#292524'
+            ctx.fillStyle = '#27272a'
             ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 8)
             ctx.fill()
-            ctx.strokeStyle = '#b45309'
+            ctx.strokeStyle = '#d4af37'
+            ctx.lineWidth = 2
+            ctx.stroke()
+          } else if (dec.type === 'dining_table' && dec.w && dec.h) {
+            ctx.fillStyle = '#92400e'
+            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 10)
+            ctx.fill()
+            ctx.strokeStyle = '#f59e0b'
             ctx.lineWidth = 2
             ctx.stroke()
           }
@@ -798,20 +813,20 @@ export const GameEngine: React.FC = () => {
         // ==========================================
         // LEVEL 3: برج المدينة وغرفة السيرفرات الذكية
         // ==========================================
-        // 1. Cyber Hex & Grid Floor
-        ctx.fillStyle = '#030712'
+        // 1. Deep Cyber Tech Blue Floor
+        ctx.fillStyle = '#082f49'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Cyan Glowing Circuit Tracks
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)'
-        ctx.lineWidth = 1.5
-        for (let x = 0; x < canvas.width; x += 50) {
+        // Vibrant Neon Cyan Circuit Conduits
+        ctx.strokeStyle = '#00f0ff'
+        ctx.lineWidth = 2
+        for (let x = 0; x < canvas.width; x += 55) {
           ctx.beginPath()
           ctx.moveTo(x, 0)
           ctx.lineTo(x, canvas.height)
           ctx.stroke()
         }
-        for (let y = 0; y < canvas.height; y += 50) {
+        for (let y = 0; y < canvas.height; y += 55) {
           ctx.beginPath()
           ctx.moveTo(0, y)
           ctx.lineTo(canvas.width, y)
@@ -821,28 +836,28 @@ export const GameEngine: React.FC = () => {
         // Elevator Pad
         for (const dec of level.decorations) {
           if (dec.type === 'elevator' && dec.w && dec.h) {
-            ctx.fillStyle = '#0c4a6e'
+            ctx.fillStyle = '#0284c7'
             ctx.fillRect(dec.x, dec.y, dec.w, dec.h)
-            ctx.strokeStyle = '#0284c7'
-            ctx.lineWidth = 2
+            ctx.strokeStyle = '#38bdf8'
+            ctx.lineWidth = 3
             ctx.strokeRect(dec.x, dec.y, dec.w, dec.h)
-            ctx.fillStyle = '#38bdf8'
-            ctx.font = 'bold 10px sans-serif'
+            ctx.fillStyle = '#ffffff'
+            ctx.font = 'bold 11px sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText('ELEVATOR / المصعد', dec.x + dec.w / 2, dec.y + dec.h / 2 + 3)
+            ctx.fillText('▲ ELEVATOR / المصعد ▲', dec.x + dec.w / 2, dec.y + dec.h / 2 + 4)
           }
         }
       } else {
         // ==========================================
         // LEVEL 4: المعرض الرئيسي الفاخر للإنارة الحديثة
         // ==========================================
-        // 1. Black Terrazzo & Gold Showroom Floor
-        ctx.fillStyle = '#09090b'
+        // 1. Polished Black & Gold Terrazzo Marble
+        ctx.fillStyle = '#18181b'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Diamond gold floor grid
-        ctx.strokeStyle = 'rgba(217, 119, 6, 0.12)'
-        ctx.lineWidth = 1
+        // Luxury Gold Diamond Tile Grid
+        ctx.strokeStyle = '#d97706'
+        ctx.lineWidth = 1.5
         const sz = 60
         for (let x = 0; x < canvas.width; x += sz) {
           ctx.beginPath()
@@ -857,11 +872,9 @@ export const GameEngine: React.FC = () => {
           ctx.stroke()
         }
 
-        // Reception & Podium Displays
+        // Reception Desk
         for (const dec of level.decorations) {
           if (dec.type === 'reception' && dec.w && dec.h) {
-            ctx.fillStyle = '#1c1917'
-            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 10)
             ctx.fill()
             ctx.strokeStyle = '#f59e0b'
             ctx.lineWidth = 2
@@ -1331,7 +1344,8 @@ export const GameEngine: React.FC = () => {
         const darkCtx = darkCanvas.getContext('2d')
 
         if (darkCtx) {
-          darkCtx.fillStyle = 'rgba(3, 7, 18, 0.94)'
+          // عتمة سينمائية متوازنة (تسمح برؤية تفاصيل أرضية الشارع والباركيه والسيرفرات والمعرض بوضوح)
+          darkCtx.fillStyle = 'rgba(3, 7, 18, 0.52)'
           darkCtx.fillRect(0, 0, darkCanvas.width, darkCanvas.height)
 
           darkCtx.globalCompositeOperation = 'destination-out'
@@ -1339,7 +1353,7 @@ export const GameEngine: React.FC = () => {
           // 1. Hero's Light Circle
           const heroLightGrad = darkCtx.createRadialGradient(hero.x, hero.y, 10, hero.x, hero.y, lightPower)
           heroLightGrad.addColorStop(0, 'rgba(0, 0, 0, 1)')
-          heroLightGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.85)')
+          heroLightGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.9)')
           heroLightGrad.addColorStop(1, 'rgba(0, 0, 0, 0)')
           darkCtx.fillStyle = heroLightGrad
           darkCtx.beginPath()
@@ -1349,13 +1363,13 @@ export const GameEngine: React.FC = () => {
           // 2. Permanent light circles around Lit Lamps
           for (const lamp of level.lamps) {
             if (lamp.isLit) {
-              const lampGrad = darkCtx.createRadialGradient(lamp.x, lamp.y, 5, lamp.x, lamp.y, 115)
+              const lampGrad = darkCtx.createRadialGradient(lamp.x, lamp.y, 5, lamp.x, lamp.y, 125)
               lampGrad.addColorStop(0, 'rgba(0, 0, 0, 1)')
-              lampGrad.addColorStop(0.8, 'rgba(0, 0, 0, 0.8)')
+              lampGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0.9)')
               lampGrad.addColorStop(1, 'rgba(0, 0, 0, 0)')
               darkCtx.fillStyle = lampGrad
               darkCtx.beginPath()
-              darkCtx.arc(lamp.x, lamp.y, 115, 0, Math.PI * 2)
+              darkCtx.arc(lamp.x, lamp.y, 125, 0, Math.PI * 2)
               darkCtx.fill()
             }
           }
