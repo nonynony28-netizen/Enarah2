@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Home, Lightbulb, Zap, Sparkles, MapPin } from 'lucide-react'
+import { Home, Lightbulb, Zap, Sparkles, MapPin, Gamepad2 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 
 export default function BottomNavBar() {
@@ -11,12 +11,13 @@ export default function BottomNavBar() {
     { path: '/', label: isAr ? 'الرئيسية' : 'Home', icon: Home },
     { path: '/products', label: isAr ? 'المنتجات' : 'Products', icon: Lightbulb },
     { path: '/wire-prices', label: isAr ? 'الأسعار' : 'Prices', icon: Zap },
+    { path: '/game', label: isAr ? '🎮 اللعبة' : '🎮 Game', icon: Gamepad2 },
     { path: '/projects', label: isAr ? 'المشاريع' : 'Projects', icon: Sparkles },
     { path: '/branches', label: isAr ? 'الفروع' : 'Branches', icon: MapPin },
   ]
 
   return (
-    <div className="fixed top-[72px] left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] bg-[#0a192f]/70 backdrop-blur-xl border border-blue-500/20 rounded-[2rem] py-2 px-3 shadow-[0_10px_35px_rgba(0,0,0,0.5)] md:hidden z-50 flex items-center justify-around select-none">
+    <div className="fixed top-[72px] left-1/2 -translate-x-1/2 w-[94%] max-w-[440px] bg-zinc-950/85 backdrop-blur-xl border border-white/[0.08] rounded-2xl py-1.5 px-2 shadow-xl md:hidden z-50 flex items-center justify-around select-none">
       {navItems.map((item) => {
         const isActive = location.pathname === item.path
         const Icon = item.icon

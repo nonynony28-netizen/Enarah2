@@ -40,16 +40,10 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 0. إعادة التوجيه الفوري للصفحة الرئيسية عند فتح جَلسة تصفح جديدة (بعد إغلاق الموقع وإعادة فتحه)
+  // 0. تهيئة الجلسة
   useEffect(() => {
-    const isSessionActive = sessionStorage.getItem('enarah_session_active');
-    if (!isSessionActive) {
-      sessionStorage.setItem('enarah_session_active', 'true');
-      if (location.pathname !== '/') {
-        navigate('/', { replace: true });
-      }
-    }
-  }, [location.pathname, navigate]);
+    sessionStorage.setItem('enarah_session_active', 'true');
+  }, []);
 
   const [loading, setLoading] = useState(() => {
     if (typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent || '')) {

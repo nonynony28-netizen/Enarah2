@@ -265,6 +265,19 @@ export default function Navbar() {
                 )
               })}
 
+              {/* زر اللعبة المباشر */}
+              <Link
+                to="/game"
+                className={`relative px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 shadow-sm ${
+                  location.pathname === '/game'
+                    ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.5)]'
+                    : 'bg-blue-600/15 hover:bg-blue-600/25 text-blue-300 border border-blue-500/30'
+                }`}
+              >
+                <Gamepad2 className="w-4 h-4 text-blue-400" />
+                <span>{isAr ? '🎮 رحلة النور' : '🎮 Light Quest'}</span>
+              </Link>
+
               {/* Shopping Cart Button (Desktop) */}
               <div className="ml-1.5 pl-1.5 border-l border-zinc-800 flex items-center justify-center">
                 <button
@@ -381,6 +394,22 @@ export default function Navbar() {
                     >
                       <Home className="w-5 h-5 text-blue-400" />
                       <span>{t('nav.home')}</span>
+                    </Link>
+                  </motion.div>
+
+                  {/* لعبة رحلة النور (بارز للجوال) */}
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 }}>
+                    <Link
+                      to="/game"
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold transition-all ${
+                        location.pathname === '/game' 
+                          ? 'text-white bg-blue-600 shadow-md' 
+                          : 'text-blue-300 bg-blue-600/15 border border-blue-500/30 hover:bg-blue-600/25'
+                      }`}
+                    >
+                      <Gamepad2 className="w-5 h-5 text-blue-400" />
+                      <span>{isAr ? '🎮 رحلة النور (لعبة واكسب خصم)' : '🎮 Light Quest Game'}</span>
                     </Link>
                   </motion.div>
 
