@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
-  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders, Globe, ShoppingCart
+  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders, Globe, ShoppingCart, Gamepad2
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
@@ -23,6 +23,7 @@ export default function Navbar() {
     { path: '/brands', label: t('nav.brands'), desc: isAr ? 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.' : 'Our partners and top certified global brands.', icon: Award },
     { path: '/projects', label: t('nav.projects'), desc: isAr ? 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.' : 'Explore some of our executed electrical and engineering projects.', icon: Sparkles },
     { path: '/contractors', label: t('nav.contractors'), desc: isAr ? 'بوابة مخصصة للمقاولين وشركات التشطيب لطلب عروض أسعار للكميات والتوريدات.' : 'Dedicated portal for contractors and finishing companies to request custom bulk quotes.', icon: Sliders },
+    { path: '/game', label: isAr ? 'رحلة النور (لعبة الأبطال 🎮)' : 'Light Quest (Game 🎮)', desc: isAr ? 'لعبة تفاعلية حصرية: تحكم ببطل الإنارة وأنر المدينة واكسب كود خصم حقيقي!' : 'Exclusive interactive game: Guide our hero to light up the city and win a discount code!', icon: Gamepad2 },
   ];
 
   const localizedOtherLinks = [

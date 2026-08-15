@@ -20,6 +20,7 @@ const Contact = lazy(() => import('./pages/Contact'))
 const Blog = lazy(() => import('./pages/Blog'))
 const WirePrices = lazy(() => import('./pages/WirePrices'))
 const Contractors = lazy(() => import('./pages/Contractors'))
+const Game = lazy(() => import('./pages/Game'))
 
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   return <div className="w-full">{children}</div>
@@ -129,6 +130,9 @@ function App() {
             {/* 👈 مسار صفحة أسعار الأسلاك */}
             <Route path="/wire-prices" element={<PageTransition><WirePrices /></PageTransition>} /> 
             <Route path="/contractors" element={<PageTransition><Contractors /></PageTransition>} /> 
+            
+            {/* 👈 مسار لعبة بطل الإنارة */}
+            <Route path="/game" element={<PageTransition><Game /></PageTransition>} />
 
             <Route path="/about" element={<PageTransition><About /></PageTransition>} />
             <Route path="/branches" element={<PageTransition><Branches /></PageTransition>} />

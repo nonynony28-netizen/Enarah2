@@ -9,7 +9,7 @@ import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
-  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone
+  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone, Gamepad2
 } from 'lucide-react'
 
 // نمط الوهج
@@ -1378,6 +1378,44 @@ export default function Home() {
 
             </div>
 
+          </div>
+        </section>
+
+        {/* قسم اللعبة التفاعلية الحصرية: رحلة النور */}
+        <section id="game-teaser" className="py-12 md:py-16 relative overflow-hidden border-t border-zinc-800/80 bg-transparent">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="relative bg-gradient-to-r from-blue-950/40 via-[#111215] to-zinc-950 border border-blue-500/20 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm overflow-hidden text-right">
+              
+              <div className="flex items-center gap-5 flex-row">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 shadow-lg animate-pulse">
+                  <Gamepad2 className="w-8 h-8 sm:w-10 sm:h-10" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-400 text-[10px] sm:text-xs font-semibold">
+                    <Sparkles className="w-3 h-3" />
+                    <span>{isAr ? 'لعبة تفاعلية حصرية' : 'Exclusive Game'}</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">
+                    {isAr ? 'رحلة النور | بطل الإنارة الحديثة 🎮' : 'Light Quest | Modern Enarah Hero 🎮'}
+                  </h3>
+                  <p className="text-zinc-400 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
+                    {isAr
+                      ? 'عالم مظلم يحتاج إلى شجاعتك! تحكم ببطل اللمبة بالقميص الأزرق، أنر المصابيح وشغل القاطع الرئيسي واكسب كود خصم حقيقي لمشترياتك.'
+                      : 'A dark world awaits! Guide the Lightbulb Hero, bring light to the rooms, and win an exclusive discount coupon.'}
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                to="/game"
+                className="w-full md:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 shadow-md cursor-pointer"
+              >
+                <span>{isAr ? 'العب واكسب الخصم الآن' : 'Play & Win Discount'}</span>
+                <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
+              </Link>
+
+            </div>
           </div>
         </section>
 
