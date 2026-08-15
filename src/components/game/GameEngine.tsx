@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { sound } from './audio'
-import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, ShieldAlert } from 'lucide-react'
+import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle } from 'lucide-react'
 
 export interface Hazard {
   id: number
@@ -35,11 +35,13 @@ export interface LevelData {
   subtitleAr: string
   difficultyBadge: string
   heroSkinName: string
+  locationDescription: string
   stars: number
   theme: 'street' | 'villa' | 'tower' | 'showroom'
   width: number
   height: number
-  walls: { x: number; y: number; w: number; h: number }[]
+  walls: { x: number; y: number; w: number; h: number; type?: string }[]
+  decorations: { type: string; x: number; y: number; w?: number; h?: number; label?: string }[]
   lamps: { id: number; x: number; y: number; isLit: boolean; name: string }[]
   sparks: { id: number; x: number; y: number; collected: boolean; type: 'spark' | 'wire' | 'spotlight' }[]
   hazards: Hazard[]
@@ -50,248 +52,277 @@ export interface LevelData {
 }
 
 const LEVELS: LevelData[] = [
-  // ==========================================
-  // LEVEL 1: الشارع وحي الليثي (اللمبة الكلاسيكية LED)
-  // ==========================================
+  // =========================================================================
+  // LEVEL 1: شوارع حي الليثي بنغازي (أرصفة حجرية، شوارع إسفلتية، وممرات مشاة)
+  // =========================================================================
   {
     id: 1,
-    nameAr: 'المرحلة 1: حي الليثي - بنغازي',
-    nameEn: 'Level 1: Al-Laythi District',
-    subtitleAr: 'اجمع كافة كابلات النحاس والشرارات وأنر جميع أعمدة الشارع لتشغيل القاطع الرئيسي!',
+    nameAr: 'المرحلة 1: شوارع حي الليثي - بنغازي',
+    nameEn: 'Level 1: Al-Laythi Streets',
+    subtitleAr: 'انقطعت الكهرباء عن شوارع الحي! تحرك على الأرصفة وأنر أعمدة الإضاءة لتشغيل القاطع الرئيسي.',
     difficultyBadge: 'سهل',
     heroSkinName: 'لمبة LED الكلاسيكية 💡',
+    locationDescription: 'شوارع معبدة، أرصفة حجرية، أعمدة إنارة عامة، وممرات مشاة',
     stars: 1,
     theme: 'street',
-    width: 900,
-    height: 600,
-    heroStart: { x: 80, y: 300 },
+    width: 920,
+    height: 620,
+    heroStart: { x: 70, y: 530 }, // البداية من الرصيف السفلي الأيسر
     initialLight: 150,
     walls: [
-      { x: 0, y: 0, w: 900, h: 20 },
-      { x: 0, y: 580, w: 900, h: 20 },
-      { x: 0, y: 0, w: 20, h: 600 },
-      { x: 880, y: 0, w: 20, h: 600 },
-      { x: 180, y: 20, w: 30, h: 220 },
-      { x: 180, y: 360, w: 30, h: 220 },
-      { x: 380, y: 150, w: 30, h: 300 },
-      { x: 560, y: 20, w: 30, h: 200 },
-      { x: 560, y: 380, w: 30, h: 200 },
-      { x: 700, y: 200, w: 30, h: 200 },
+      // الحدود الخارجية
+      { x: 0, y: 0, w: 920, h: 20 },
+      { x: 0, y: 600, w: 920, h: 20 },
+      { x: 0, y: 0, w: 20, h: 620 },
+      { x: 900, y: 0, w: 20, h: 620 },
+      // مباني سكنية على جوانب الشارع
+      { x: 140, y: 20, w: 160, h: 180, type: 'building' },
+      { x: 140, y: 380, w: 160, h: 220, type: 'building' },
+      { x: 420, y: 140, w: 140, h: 320, type: 'park' },
+      { x: 680, y: 20, w: 160, h: 200, type: 'building' },
+      { x: 680, y: 400, w: 160, h: 200, type: 'building' },
+    ],
+    decorations: [
+      // ممر المشاة
+      { type: 'crosswalk', x: 330, y: 220, w: 60, h: 160 },
+      { type: 'crosswalk', x: 590, y: 220, w: 60, h: 160 },
+      // لافتة الشارع
+      { type: 'sign', x: 60, y: 480, label: 'شارع الليثي الرئيسي' },
     ],
     lamps: [
-      { id: 1, x: 100, y: 100, isLit: false, name: 'عمود إنارة شارع 1' },
-      { id: 2, x: 100, y: 500, isLit: false, name: 'عمود إنارة شارع 2' },
-      { id: 3, x: 280, y: 300, isLit: false, name: 'كشاف واجهة الليثي' },
-      { id: 4, x: 480, y: 100, isLit: false, name: 'مصباح الحديقة' },
-      { id: 5, x: 480, y: 500, isLit: false, name: 'عمود مدخل المعرض' },
-      { id: 6, x: 780, y: 300, isLit: false, name: 'برج الإنارة الرئيسي' },
+      { id: 1, x: 80, y: 120, isLit: false, name: 'عمود إنارة شارع 1' },
+      { id: 2, x: 80, y: 340, isLit: false, name: 'عمود إنارة شارع 2' },
+      { id: 3, x: 350, y: 100, isLit: false, name: 'مصباح ممر المشاة' },
+      { id: 4, x: 350, y: 520, isLit: false, name: 'كشاف حديقة الحي' },
+      { id: 5, x: 610, y: 100, isLit: false, name: 'عمود مدخل الحي الشرقي' },
+      { id: 6, x: 610, y: 520, isLit: false, name: 'إنارة الواجهة السكنية' },
     ],
     sparks: [
-      { id: 1, x: 120, y: 200, collected: false, type: 'spark' },
-      { id: 2, x: 120, y: 400, collected: false, type: 'spark' },
-      { id: 3, x: 280, y: 120, collected: false, type: 'wire' },
-      { id: 4, x: 280, y: 480, collected: false, type: 'spark' },
-      { id: 5, x: 480, y: 250, collected: false, type: 'wire' },
-      { id: 6, x: 480, y: 350, collected: false, type: 'spotlight' },
-      { id: 7, x: 640, y: 120, collected: false, type: 'spark' },
-      { id: 8, x: 640, y: 480, collected: false, type: 'wire' },
-      { id: 9, x: 780, y: 150, collected: false, type: 'spotlight' },
-      { id: 10, x: 780, y: 450, collected: false, type: 'spark' },
+      { id: 1, x: 80, y: 240, collected: false, type: 'spark' },
+      { id: 2, x: 80, y: 440, collected: false, type: 'spark' },
+      { id: 3, x: 350, y: 220, collected: false, type: 'wire' },
+      { id: 4, x: 350, y: 400, collected: false, type: 'spark' },
+      { id: 5, x: 490, y: 80, collected: false, type: 'wire' },
+      { id: 6, x: 490, y: 530, collected: false, type: 'spotlight' },
+      { id: 7, x: 610, y: 300, collected: false, type: 'wire' },
+      { id: 8, x: 760, y: 260, collected: false, type: 'spark' },
+      { id: 9, x: 760, y: 340, collected: false, type: 'spotlight' },
     ],
     hazards: [],
     gates: [],
-    masterSwitch: { x: 830, y: 300, isActivated: false },
+    masterSwitch: { x: 840, y: 300, isActivated: false },
   },
 
-  // ==========================================
-  // LEVEL 2: الفيلا المعمارية (اللمبة الكريستالية الفاخرة)
-  // ==========================================
+  // =========================================================================
+  // LEVEL 2: الفيلا المعمارية الفاخرة (أرضيات باركيه خشبية، سجاد فاخر، مجالس، وثريات)
+  // =========================================================================
   {
     id: 2,
     nameAr: 'المرحلة 2: الفيلا المعمارية الفاخرة',
     nameEn: 'Level 2: The Luxury Villa',
-    subtitleAr: 'أنر 3 ثريات لفتح بوابة الليزر، واحذر دوامات الطاقة! يجب جمع كل شيء لتشغيل المولد.',
+    subtitleAr: 'البداية من بهو المدخل! تحرك بين الصالونات والمجالس وأنر الثريات لفتح بوابة الليزر.',
     difficultyBadge: 'متوسط',
     heroSkinName: 'اللمبة الكريستالية الملكية 💎',
+    locationDescription: 'أرضيات خشبية باركيه، صالونات راقية، سجاد تركي، وغرفة طعام فخمة',
     stars: 2,
     theme: 'villa',
-    width: 950,
-    height: 650,
-    heroStart: { x: 90, y: 325 },
+    width: 960,
+    height: 660,
+    heroStart: { x: 80, y: 100 }, // البداية من البهو العلوي
     initialLight: 135,
     walls: [
-      { x: 0, y: 0, w: 950, h: 20 },
-      { x: 0, y: 630, w: 950, h: 20 },
-      { x: 0, y: 0, w: 20, h: 650 },
-      { x: 930, y: 0, w: 20, h: 650 },
-      { x: 220, y: 20, w: 20, h: 220 },
-      { x: 220, y: 410, w: 20, h: 220 },
+      { x: 0, y: 0, w: 960, h: 20 },
+      { x: 0, y: 640, w: 960, h: 20 },
+      { x: 0, y: 0, w: 20, h: 660 },
+      { x: 940, y: 0, w: 20, h: 660 },
+      // جدران غرف الفيلا
+      { x: 220, y: 20, w: 20, h: 220 }, // جدار صالون الاستقبال
+      { x: 220, y: 420, w: 20, h: 220 }, // جدار المجلس الرئيسي
       { x: 220, y: 220, w: 220, h: 20 },
-      { x: 220, y: 410, w: 220, h: 20 },
-      { x: 540, y: 120, w: 20, h: 410 },
-      { x: 720, y: 20, w: 20, h: 230 },
-      { x: 720, y: 400, w: 20, h: 230 },
+      { x: 220, y: 420, w: 220, h: 20 },
+      // جدار الممر المركزي
+      { x: 550, y: 140, w: 20, h: 380 },
+      // جدار غرفة الماستر والمكتب
+      { x: 740, y: 20, w: 20, h: 220 },
+      { x: 740, y: 420, w: 20, h: 220 },
+    ],
+    decorations: [
+      // أثاث وسجاد الفيلا
+      { type: 'carpet', x: 60, y: 280, w: 120, h: 180, label: 'سجاد المدخل' },
+      { type: 'sofa', x: 280, y: 80, w: 100, h: 40, label: 'أطقم صالون VIP' },
+      { type: 'dining_table', x: 280, y: 500, w: 120, h: 60, label: 'طاولة طعام ملكية' },
+      { type: 'bed', x: 800, y: 80, w: 90, h: 90, label: 'غرفة النوم الماستر' },
     ],
     lamps: [
-      { id: 1, x: 120, y: 120, isLit: false, name: 'ثريا المدخل الملكي' },
-      { id: 2, x: 120, y: 520, isLit: false, name: 'إنارة المجلس الرئيسي' },
-      { id: 3, x: 380, y: 120, isLit: false, name: 'إضاءة الصالون المخفية' },
-      { id: 4, x: 380, y: 520, isLit: false, name: 'ثريا المائدة الكريستال' },
-      { id: 5, x: 630, y: 325, isLit: false, name: 'سبوت لايت الممر الدائري' },
-      { id: 6, x: 820, y: 140, isLit: false, name: 'إضاءة غرفة الماستر' },
-      { id: 7, x: 820, y: 510, isLit: false, name: 'إنارة التراس والواجهة' },
+      { id: 1, x: 120, y: 80, isLit: false, name: 'ثريا بهو المدخل' },
+      { id: 2, x: 120, y: 540, isLit: false, name: 'إنارة المجلس الأرضي' },
+      { id: 3, x: 330, y: 140, isLit: false, name: 'ثريا الصالون الملكي' },
+      { id: 4, x: 330, y: 510, isLit: false, name: 'ثريا المائدة الكريستال' },
+      { id: 5, x: 640, y: 330, isLit: false, name: 'سبوت لايت الممر الذهبي' },
+      { id: 6, x: 840, y: 140, isLit: false, name: 'إضاءة غرفة الماستر' },
+      { id: 7, x: 840, y: 520, isLit: false, name: 'إنارة التراس والحديقة' },
     ],
     sparks: [
-      { id: 1, x: 120, y: 250, collected: false, type: 'spark' },
-      { id: 2, x: 120, y: 400, collected: false, type: 'wire' },
-      { id: 3, x: 380, y: 325, collected: false, type: 'spotlight' },
-      { id: 4, x: 300, y: 120, collected: false, type: 'spark' },
-      { id: 5, x: 300, y: 520, collected: false, type: 'wire' },
-      { id: 6, x: 460, y: 120, collected: false, type: 'spotlight' },
-      { id: 7, x: 460, y: 520, collected: false, type: 'spark' },
-      { id: 8, x: 630, y: 180, collected: false, type: 'wire' },
-      { id: 9, x: 630, y: 470, collected: false, type: 'spotlight' },
-      { id: 10, x: 770, y: 220, collected: false, type: 'spark' },
-      { id: 11, x: 770, y: 430, collected: false, type: 'wire' },
-      { id: 12, x: 870, y: 325, collected: false, type: 'spotlight' },
+      { id: 1, x: 120, y: 240, collected: false, type: 'spark' },
+      { id: 2, x: 120, y: 380, collected: false, type: 'wire' },
+      { id: 3, x: 330, y: 330, collected: false, type: 'spotlight' },
+      { id: 4, x: 260, y: 140, collected: false, type: 'spark' },
+      { id: 5, x: 410, y: 140, collected: false, type: 'wire' },
+      { id: 6, x: 260, y: 510, collected: false, type: 'spotlight' },
+      { id: 7, x: 410, y: 510, collected: false, type: 'spark' },
+      { id: 8, x: 640, y: 180, collected: false, type: 'wire' },
+      { id: 9, x: 640, y: 480, collected: false, type: 'spotlight' },
+      { id: 10, x: 790, y: 280, collected: false, type: 'spark' },
+      { id: 11, x: 790, y: 380, collected: false, type: 'wire' },
     ],
     gates: [
-      { id: 1, x: 720, y: 250, w: 20, h: 150, isOpen: false, requiredLamps: 3, labelAr: 'مغلقة: أنر 3 ثريات لفتحها' },
+      { id: 1, x: 740, y: 240, w: 20, h: 180, isOpen: false, requiredLamps: 3, labelAr: 'مغلقة: أنر 3 ثريات لفتحها' },
     ],
     hazards: [
-      { id: 1, x: 380, y: 325, vx: 0, vy: 1.2, radius: 24, type: 'vortex', minY: 260, maxY: 390 },
-      { id: 2, x: 630, y: 250, vx: 0, vy: -1.2, radius: 24, type: 'vortex', minY: 150, maxY: 500 },
+      { id: 1, x: 330, y: 330, vx: 0, vy: 1.2, radius: 24, type: 'vortex', minY: 260, maxY: 400 },
+      { id: 2, x: 640, y: 250, vx: 0, vy: -1.4, radius: 24, type: 'vortex', minY: 160, maxY: 500 },
     ],
-    masterSwitch: { x: 880, y: 325, isActivated: false },
+    masterSwitch: { x: 880, y: 330, isActivated: false },
   },
 
-  // ==========================================
-  // LEVEL 3: برج المدينة الذكي (اللمبة السايبر الذكية)
-  // ==========================================
+  // =========================================================================
+  // LEVEL 3: برج المدينة الذكي (أرضيات سيبرانية سداسية، خطوط ليزر نيون، وسيرفرات)
+  // =========================================================================
   {
     id: 3,
-    nameAr: 'المرحلة 3: برج المدينة الذكي',
+    nameAr: 'المرحلة 3: برج المدينة وغرفة السيرفرات الذكية',
     nameEn: 'Level 3: The Smart City Tower',
-    subtitleAr: 'احذر شحنات الحمل الزائد (ملامستها تعيد المرحلة)! اجمع كل المواد لتفعيل النظام المركزي.',
+    subtitleAr: 'البداية من مصعد الطوارئ المركزي! احذر شحنات الحمل الزائد المتحركة وأنر محطات البرج.',
     difficultyBadge: 'تحدي قوي',
     heroSkinName: 'اللمبة الذكية السايبر ⚡',
+    locationDescription: 'شبكة دوائر إلكترونية نيون، كبائن سيرفرات متقدمة، وأجهزة تحكم ذكية IoT',
     stars: 3,
     theme: 'tower',
     width: 1000,
     height: 700,
-    heroStart: { x: 80, y: 350 },
+    heroStart: { x: 500, y: 620 }, // البداية من بوابة المصعد السفلية في المنتصف
     initialLight: 125,
     walls: [
       { x: 0, y: 0, w: 1000, h: 20 },
       { x: 0, y: 680, w: 1000, h: 20 },
       { x: 0, y: 0, w: 20, h: 700 },
       { x: 980, y: 0, w: 20, h: 700 },
-      { x: 180, y: 120, w: 40, h: 200 },
-      { x: 180, y: 380, w: 40, h: 200 },
-      { x: 380, y: 20, w: 40, h: 250 },
-      { x: 380, y: 430, w: 40, h: 250 },
-      { x: 580, y: 160, w: 40, h: 380 },
-      { x: 780, y: 20, w: 40, h: 260 },
-      { x: 780, y: 420, w: 40, h: 260 },
+      // كبائن السيرفرات ومصفوفات الحماية
+      { x: 180, y: 120, w: 50, h: 200, type: 'server' },
+      { x: 180, y: 380, w: 50, h: 200, type: 'server' },
+      { x: 380, y: 20, w: 50, h: 250, type: 'server' },
+      { x: 380, y: 430, w: 50, h: 250, type: 'server' },
+      { x: 580, y: 160, w: 50, h: 360, type: 'server' },
+      { x: 780, y: 20, w: 50, h: 260, type: 'server' },
+      { x: 780, y: 420, w: 50, h: 260, type: 'server' },
+    ],
+    decorations: [
+      { type: 'elevator', x: 450, y: 630, w: 100, h: 40, label: 'مصعد الوصول السريع' },
+      { type: 'hologram', x: 280, y: 350, w: 40, h: 40, label: 'منصة هولوجرام' },
+      { type: 'hologram', x: 680, y: 350, w: 40, h: 40, label: 'منصة هولوجرام' },
     ],
     lamps: [
-      { id: 1, x: 100, y: 120, isLit: false, name: 'سيرفر الطابق 1' },
-      { id: 2, x: 100, y: 580, isLit: false, name: 'سيرفر الطابق 2' },
-      { id: 3, x: 280, y: 350, isLit: false, name: 'إنارة البهو الزجاجي' },
-      { id: 4, x: 480, y: 120, isLit: false, name: 'كشافات الواجهة' },
-      { id: 5, x: 480, y: 580, isLit: false, name: 'مفاتيح اللمس الذكية' },
-      { id: 6, x: 680, y: 350, isLit: false, name: 'منظومة الطاقة المركزية' },
-      { id: 7, x: 880, y: 150, isLit: false, name: 'إنارة مهبط الهليكوبتر' },
-      { id: 8, x: 880, y: 550, isLit: false, name: 'برج البث الضوئي' },
+      { id: 1, x: 100, y: 100, isLit: false, name: 'سيرفر الحماية 1' },
+      { id: 2, x: 100, y: 580, isLit: false, name: 'سيرفر الحماية 2' },
+      { id: 3, x: 280, y: 350, isLit: false, name: 'لوحة التحكم السحابية' },
+      { id: 4, x: 480, y: 100, isLit: false, name: 'كشافات مصفوفة الطاقة' },
+      { id: 5, x: 480, y: 520, isLit: false, name: 'مفاتيح اللمس الذكية' },
+      { id: 6, x: 680, y: 350, isLit: false, name: 'منظومة التغذية المركزية' },
+      { id: 7, x: 880, y: 120, isLit: false, name: 'محطة الرادار والاتصال' },
+      { id: 8, x: 880, y: 580, isLit: false, name: 'برج البث الضوئي' },
     ],
     sparks: [
       { id: 1, x: 100, y: 250, collected: false, type: 'spark' },
       { id: 2, x: 100, y: 450, collected: false, type: 'wire' },
       { id: 3, x: 280, y: 150, collected: false, type: 'spotlight' },
       { id: 4, x: 280, y: 550, collected: false, type: 'spark' },
-      { id: 5, x: 480, y: 250, collected: false, type: 'wire' },
-      { id: 6, x: 480, y: 450, collected: false, type: 'spotlight' },
+      { id: 5, x: 480, y: 260, collected: false, type: 'wire' },
+      { id: 6, x: 480, y: 380, collected: false, type: 'spotlight' },
       { id: 7, x: 680, y: 150, collected: false, type: 'spark' },
       { id: 8, x: 680, y: 550, collected: false, type: 'wire' },
-      { id: 9, x: 880, y: 250, collected: false, type: 'spotlight' },
-      { id: 10, x: 880, y: 450, collected: false, type: 'spark' },
-      { id: 11, x: 940, y: 200, collected: false, type: 'wire' },
-      { id: 12, x: 940, y: 500, collected: false, type: 'spotlight' },
+      { id: 9, x: 880, y: 260, collected: false, type: 'spotlight' },
+      { id: 10, x: 880, y: 440, collected: false, type: 'spark' },
     ],
     gates: [
-      { id: 1, x: 780, y: 280, w: 40, h: 140, isOpen: false, requiredLamps: 4, labelAr: 'مغلقة: أنر 4 محطات لفتحها' },
+      { id: 1, x: 780, y: 280, w: 50, h: 140, isOpen: false, requiredLamps: 4, labelAr: 'مغلقة: أنر 4 محطات لفتحها' },
     ],
     hazards: [
-      { id: 1, x: 280, y: 180, vx: 0, vy: 2.2, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
+      { id: 1, x: 280, y: 180, vx: 0, vy: 2.3, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
       { id: 2, x: 480, y: 520, vx: 0, vy: -2.5, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
       { id: 3, x: 680, y: 200, vx: 0, vy: 2.8, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
     ],
-    masterSwitch: { x: 930, y: 350, isActivated: false },
+    masterSwitch: { x: 920, y: 350, isActivated: false },
   },
 
-  // ==========================================
-  // LEVEL 4: المعرض الرئيسي (اللمبة الذهبية الملكية VIP)
-  // ==========================================
+  // =========================================================================
+  // LEVEL 4: المعرض الرئيسي الفاخر للإنارة الحديثة (أرضيات تيرازو ذهبية، منصات عرض، وأجنحة VIP)
+  // =========================================================================
   {
     id: 4,
-    nameAr: 'المرحلة 4: المعرض الرئيسي للإنارة الحديثة',
+    nameAr: 'المرحلة 4: المعرض الرئيسي للإنارة الحديثة - ليلة الافتتاح',
     nameEn: 'Level 4: Grand Flagship Showroom',
-    subtitleAr: 'المرحلة الأسطورية! اجمع جميع المواد وأنر كافة الثريات لتشغيل الإنارة الشاملة.',
+    subtitleAr: 'البداية من البوابة الزجاجية الكبرى! تجول بين أجنحة الماركات وأنر ثريات المعرض لتشغيل النور الشامل.',
     difficultyBadge: 'مرحلة ذهبية أسطورية',
     heroSkinName: 'اللمبة الذهبية الملكية VIP 👑',
+    locationDescription: 'معرض فخم بأرضيات سوداء وذهبية، أجنحة عرض زجاجية، وثريات عملاقة متدلية',
     stars: 4,
     theme: 'showroom',
     width: 1050,
     height: 720,
-    heroStart: { x: 80, y: 360 },
+    heroStart: { x: 525, y: 640 }, // البداية من المدخل الرئيسي السفلي للمعرض
     initialLight: 120,
     walls: [
       { x: 0, y: 0, w: 1050, h: 20 },
       { x: 0, y: 700, w: 1050, h: 20 },
       { x: 0, y: 0, w: 20, h: 720 },
       { x: 1030, y: 0, w: 20, h: 720 },
-      { x: 200, y: 100, w: 50, h: 180 },
-      { x: 200, y: 440, w: 50, h: 180 },
-      { x: 420, y: 20, w: 40, h: 280 },
-      { x: 420, y: 420, w: 40, h: 280 },
-      { x: 640, y: 120, w: 50, h: 220 },
-      { x: 640, y: 380, w: 50, h: 220 },
-      { x: 850, y: 20, w: 40, h: 260 },
-      { x: 850, y: 440, w: 40, h: 260 },
+      // منصات وأجنحة عرض الماركات (V-TAC, Philips, Fumagalli)
+      { x: 180, y: 80, w: 60, h: 220, type: 'showcase' },
+      { x: 180, y: 420, w: 60, h: 220, type: 'showcase' },
+      { x: 420, y: 20, w: 50, h: 260, type: 'showcase' },
+      { x: 420, y: 440, w: 50, h: 260, type: 'showcase' },
+      { x: 640, y: 80, w: 60, h: 220, type: 'showcase' },
+      { x: 640, y: 420, w: 60, h: 220, type: 'showcase' },
+      { x: 860, y: 20, w: 50, h: 260, type: 'showcase' },
+      { x: 860, y: 440, w: 50, h: 260, type: 'showcase' },
+    ],
+    decorations: [
+      { type: 'reception', x: 460, y: 570, w: 130, h: 40, label: 'استقبال المعرض الرئيسي' },
+      { type: 'logo_podium', x: 50, y: 340, w: 80, h: 80, label: 'شعار الإنارة الحديثة المضيء' },
+      { type: 'wire_display', x: 300, y: 330, w: 80, h: 60, label: 'جناح الكابلات الإيطالية' },
+      { type: 'smart_hub', x: 740, y: 330, w: 80, h: 60, label: 'جناح المنازل الذكية' },
     ],
     lamps: [
-      { id: 1, x: 100, y: 120, isLit: false, name: 'جناح الثريات الإيطالية' },
-      { id: 2, x: 100, y: 600, isLit: false, name: 'منصة مفاتيح اللمس الفاخرة' },
-      { id: 3, x: 310, y: 200, isLit: false, name: 'استوديو الإضاءة الذكية' },
-      { id: 4, x: 310, y: 520, isLit: false, name: 'جناح إنارة الواجهات والحدائق' },
-      { id: 5, x: 530, y: 360, isLit: false, name: 'الثريا الكريستال العملاقة' },
+      { id: 1, x: 90, y: 120, isLit: false, name: 'جناح الثريات الإيطالية' },
+      { id: 2, x: 90, y: 580, isLit: false, name: 'منصة مفاتيح اللمس الفاخرة' },
+      { id: 3, x: 300, y: 180, isLit: false, name: 'استوديو الإضاءة الذكية' },
+      { id: 4, x: 300, y: 520, isLit: false, name: 'جناح إنارة الواجهات والحدائق' },
+      { id: 5, x: 525, y: 350, isLit: false, name: 'الثريا الكريستال العملاقة' },
       { id: 6, x: 740, y: 180, isLit: false, name: 'منظومة الإنترفون المرئي' },
       { id: 7, x: 740, y: 540, isLit: false, name: 'جناح الكابلات المعتمدة' },
-      { id: 8, x: 940, y: 180, isLit: false, name: 'منصة التحكم المركزي VIP' },
-      { id: 9, x: 940, y: 540, isLit: false, name: 'كشافات ليلة الافتتاح' },
+      { id: 8, x: 950, y: 160, isLit: false, name: 'منصة التحكم المركزي VIP' },
+      { id: 9, x: 950, y: 560, isLit: false, name: 'كشافات ليلة الافتتاح' },
     ],
     sparks: [
-      { id: 1, x: 100, y: 260, collected: false, type: 'wire' },
-      { id: 2, x: 100, y: 460, collected: false, type: 'wire' },
-      { id: 3, x: 310, y: 100, collected: false, type: 'spark' },
-      { id: 4, x: 310, y: 360, collected: false, type: 'spotlight' },
-      { id: 5, x: 310, y: 620, collected: false, type: 'spark' },
-      { id: 6, x: 530, y: 180, collected: false, type: 'wire' },
-      { id: 7, x: 530, y: 540, collected: false, type: 'wire' },
-      { id: 8, x: 740, y: 100, collected: false, type: 'spotlight' },
-      { id: 9, x: 740, y: 360, collected: false, type: 'wire' },
-      { id: 10, x: 740, y: 620, collected: false, type: 'spotlight' },
-      { id: 11, x: 940, y: 360, collected: false, type: 'spotlight' },
+      { id: 1, x: 90, y: 240, collected: false, type: 'wire' },
+      { id: 2, x: 90, y: 460, collected: false, type: 'wire' },
+      { id: 3, x: 300, y: 90, collected: false, type: 'spark' },
+      { id: 4, x: 300, y: 620, collected: false, type: 'spark' },
+      { id: 5, x: 525, y: 180, collected: false, type: 'wire' },
+      { id: 6, x: 525, y: 500, collected: false, type: 'wire' },
+      { id: 7, x: 740, y: 90, collected: false, type: 'spotlight' },
+      { id: 8, x: 740, y: 620, collected: false, type: 'spotlight' },
+      { id: 9, x: 950, y: 360, collected: false, type: 'spotlight' },
     ],
     gates: [
-      { id: 1, x: 850, y: 280, w: 40, h: 160, isOpen: false, requiredWires: 4, labelAr: 'مغلقة: اجمع 4 كابلات نحاس' },
+      { id: 1, x: 860, y: 280, w: 50, h: 160, isOpen: false, requiredWires: 4, labelAr: 'مغلقة: اجمع 4 كابلات نحاس' },
     ],
     hazards: [
-      { id: 1, x: 310, y: 360, vx: 1.8, vy: 0, radius: 15, type: 'patrol', minX: 260, maxX: 370 },
-      { id: 2, x: 530, y: 220, vx: 0, vy: 2.2, radius: 15, type: 'patrol', minY: 100, maxY: 620 },
-      { id: 3, x: 740, y: 500, vx: 0, vy: -2.2, radius: 15, type: 'patrol', minY: 100, maxY: 620 },
+      { id: 1, x: 300, y: 360, vx: 1.8, vy: 0, radius: 15, type: 'patrol', minX: 250, maxX: 360 },
+      { id: 2, x: 525, y: 220, vx: 0, vy: 2.2, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
+      { id: 3, x: 740, y: 480, vx: 0, vy: -2.2, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
     ],
-    masterSwitch: { x: 970, y: 360, isActivated: false },
+    masterSwitch: { x: 980, y: 360, isActivated: false },
   },
 ]
 
@@ -328,8 +359,8 @@ export const GameEngine: React.FC = () => {
 
   // Hero state
   const heroRef = useRef({
-    x: 80,
-    y: 300,
+    x: 70,
+    y: 530,
     vx: 0,
     vy: 0,
     radius: 18,
@@ -406,7 +437,7 @@ export const GameEngine: React.FC = () => {
   const handleHeroInjured = () => {
     sound.playShortCircuit()
     spawnParticles(heroRef.current.x, heroRef.current.y, '#ef4444', 35, 3)
-    showAlert('💥 تماس كهربائي شديد! انقطع التيار وأعيدت المرحلة من البداية!', 'error')
+    showAlert('💥 تماس كهربائي شديد! انقطع التيار وأعيدت المرحلة من نقطة البداية!', 'error')
     
     // Quick reload stage
     setTimeout(() => {
@@ -499,13 +530,11 @@ export const GameEngine: React.FC = () => {
         if (keysRef.current['ArrowUp'] || keysRef.current['KeyW']) moveY -= 1
         if (keysRef.current['ArrowDown'] || keysRef.current['KeyS']) moveY += 1
 
-        // Add touch input
         if (touchInputRef.current.x !== 0 || touchInputRef.current.y !== 0) {
           moveX += touchInputRef.current.x
           moveY += touchInputRef.current.y
         }
 
-        // Normalize diagonal speed
         const length = Math.hypot(moveX, moveY)
         if (length > 0) {
           moveX = (moveX / length) * hero.speed
@@ -522,7 +551,7 @@ export const GameEngine: React.FC = () => {
           hero.isMoving = false
         }
 
-        // 2. Collision with Walls and Closed Laser Gates
+        // 2. Collision with Walls and Closed Gates
         const newX = hero.x + moveX
         const newY = hero.y + moveY
         let canMoveX = true
@@ -560,11 +589,9 @@ export const GameEngine: React.FC = () => {
           h.x += h.vx
           h.y += h.vy
 
-          // Bounce within bounds
           if (h.minX !== undefined && (h.x <= h.minX || h.x >= h.maxX!)) h.vx *= -1
           if (h.minY !== undefined && (h.y <= h.minY || h.y >= h.maxY!)) h.vy *= -1
 
-          // Collision with Hero -> RESTART LEVEL!
           const hDist = Math.hypot(hero.x - h.x, hero.y - h.y)
           if (hDist < hero.radius + h.radius && hero.invincibleTimer <= 0) {
             handleHeroInjured()
@@ -584,7 +611,6 @@ export const GameEngine: React.FC = () => {
                 sound.playWire()
                 setScore((prev) => prev + 150 * combo)
                 
-                // Check if any wire-gated doors open
                 const collectedWires = level.sparks.filter((s) => s.type === 'wire' && s.collected).length
                 for (const g of level.gates) {
                   if (!g.isOpen && g.requiredWires && collectedWires >= g.requiredWires) {
@@ -644,14 +670,11 @@ export const GameEngine: React.FC = () => {
           const totalLeft = currentRemainingLamps + currentRemainingSparks
 
           if (totalLeft > 0) {
-            // Can NOT complete level yet!
             sound.playLockedBuzz()
             showAlert(`⚠️ القاطع مقفل! يجب إنارة كافة المصابيح وجمع جميع كابلات النحاس وشرارات الطاقة أولاً! (متبقي: ${totalLeft})`, 'error')
-            // Slight push away so sound does not loop
             hero.x -= moveX * 4
             hero.y -= moveY * 4
           } else {
-            // 100% COMPLETE -> ACTIVATE MASTER SWITCH!
             level.masterSwitch.isActivated = true
             sound.playMasterSwitch()
             setScore((prev) => prev + 1500)
@@ -681,64 +704,146 @@ export const GameEngine: React.FC = () => {
         }
       }
 
-      // ==========================================
-      // CANVAS RENDERING (Theme-Specific Styles)
-      // ==========================================
+      // =========================================================================
+      // RICH ENVIRONMENT RENDERING (100% Distinct Environment & Floor per Level)
+      // =========================================================================
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Theme Backgrounds
       if (level.theme === 'street') {
-        ctx.fillStyle = '#090b10'
+        // ==========================================
+        // LEVEL 1: الشارع وحي الليثي بنغازي
+        // ==========================================
+        // 1. Dark Asphalt Road
+        ctx.fillStyle = '#0f131a'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.strokeStyle = 'rgba(234, 179, 8, 0.15)'
-        ctx.lineWidth = 2
-        ctx.setLineDash([20, 20])
+
+        // 2. Curbs / Pavements Sidewalks (أرصفة الشارع الحجرية)
+        ctx.fillStyle = '#1e2430'
+        ctx.fillRect(20, 20, 880, 80) // الرصيف العلوي
+        ctx.fillRect(20, 500, 880, 100) // الرصيف السفلي
+
+        // Curb edges line
+        ctx.strokeStyle = '#eab308'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.moveTo(20, 100)
+        ctx.lineTo(900, 100)
+        ctx.moveTo(20, 500)
+        ctx.lineTo(900, 500)
+        ctx.stroke()
+
+        // 3. Street Lane Center Dividers (خطوط الطريق البيضاء المتقطعة)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'
+        ctx.lineWidth = 3
+        ctx.setLineDash([25, 20])
         ctx.beginPath()
         ctx.moveTo(20, 300)
-        ctx.lineTo(canvas.width - 20, 300)
+        ctx.lineTo(900, 300)
         ctx.stroke()
         ctx.setLineDash([])
-      } else if (level.theme === 'villa') {
-        ctx.fillStyle = '#0a0d14'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)'
-        ctx.lineWidth = 1
-        const tileSize = 50
-        for (let x = 0; x < canvas.width; x += tileSize) {
-          ctx.beginPath()
-          ctx.moveTo(x, 0)
-          ctx.lineTo(x, canvas.height)
-          ctx.stroke()
+
+        // 4. Crosswalks (ممرات المشاة)
+        for (const dec of level.decorations) {
+          if (dec.type === 'crosswalk' && dec.w && dec.h) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'
+            for (let y = dec.y; y < dec.y + dec.h; y += 20) {
+              ctx.fillRect(dec.x, y, dec.w, 10)
+            }
+          }
         }
-        for (let y = 0; y < canvas.height; y += tileSize) {
+      } else if (level.theme === 'villa') {
+        // ==========================================
+        // LEVEL 2: الفيلا المعمارية الفاخرة
+        // ==========================================
+        // 1. Warm Parquet Wood / Terracotta Floor
+        ctx.fillStyle = '#120f0d'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        // Wood planks texture
+        ctx.strokeStyle = 'rgba(180, 83, 9, 0.08)'
+        ctx.lineWidth = 1
+        for (let y = 0; y < canvas.height; y += 30) {
           ctx.beginPath()
           ctx.moveTo(0, y)
           ctx.lineTo(canvas.width, y)
           ctx.stroke()
+        }
+
+        // 2. Carpets & Luxury Furniture Outlines
+        for (const dec of level.decorations) {
+          if (dec.type === 'carpet' && dec.w && dec.h) {
+            // Turkish Royal Rug
+            ctx.fillStyle = '#311018'
+            ctx.fillRect(dec.x, dec.y, dec.w, dec.h)
+            ctx.strokeStyle = '#e11d48'
+            ctx.lineWidth = 2
+            ctx.strokeRect(dec.x, dec.y, dec.w, dec.h)
+          } else if (dec.type === 'sofa' && dec.w && dec.h) {
+            ctx.fillStyle = '#1c1917'
+            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 6)
+            ctx.fill()
+            ctx.strokeStyle = '#78716c'
+            ctx.lineWidth = 1.5
+            ctx.stroke()
+          } else if (dec.type === 'dining_table' && dec.w && dec.h) {
+            ctx.fillStyle = '#292524'
+            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 8)
+            ctx.fill()
+            ctx.strokeStyle = '#b45309'
+            ctx.lineWidth = 2
+            ctx.stroke()
+          }
         }
       } else if (level.theme === 'tower') {
-        ctx.fillStyle = '#05070c'
+        // ==========================================
+        // LEVEL 3: برج المدينة وغرفة السيرفرات الذكية
+        // ==========================================
+        // 1. Cyber Hex & Grid Floor
+        ctx.fillStyle = '#030712'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)'
+
+        // Cyan Glowing Circuit Tracks
+        ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)'
         ctx.lineWidth = 1.5
-        for (let x = 0; x < canvas.width; x += 60) {
+        for (let x = 0; x < canvas.width; x += 50) {
           ctx.beginPath()
           ctx.moveTo(x, 0)
           ctx.lineTo(x, canvas.height)
           ctx.stroke()
         }
-        for (let y = 0; y < canvas.height; y += 60) {
+        for (let y = 0; y < canvas.height; y += 50) {
           ctx.beginPath()
           ctx.moveTo(0, y)
           ctx.lineTo(canvas.width, y)
           ctx.stroke()
         }
+
+        // Elevator Pad
+        for (const dec of level.decorations) {
+          if (dec.type === 'elevator' && dec.w && dec.h) {
+            ctx.fillStyle = '#0c4a6e'
+            ctx.fillRect(dec.x, dec.y, dec.w, dec.h)
+            ctx.strokeStyle = '#0284c7'
+            ctx.lineWidth = 2
+            ctx.strokeRect(dec.x, dec.y, dec.w, dec.h)
+            ctx.fillStyle = '#38bdf8'
+            ctx.font = 'bold 10px sans-serif'
+            ctx.textAlign = 'center'
+            ctx.fillText('ELEVATOR / المصعد', dec.x + dec.w / 2, dec.y + dec.h / 2 + 3)
+          }
+        }
       } else {
-        ctx.fillStyle = '#08080a'
+        // ==========================================
+        // LEVEL 4: المعرض الرئيسي الفاخر للإنارة الحديثة
+        // ==========================================
+        // 1. Black Terrazzo & Gold Showroom Floor
+        ctx.fillStyle = '#09090b'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.08)'
-        ctx.lineWidth = 1.5
-        const sz = 45
+
+        // Diamond gold floor grid
+        ctx.strokeStyle = 'rgba(217, 119, 6, 0.12)'
+        ctx.lineWidth = 1
+        const sz = 60
         for (let x = 0; x < canvas.width; x += sz) {
           ctx.beginPath()
           ctx.moveTo(x, 0)
@@ -751,15 +856,63 @@ export const GameEngine: React.FC = () => {
           ctx.lineTo(canvas.width, y)
           ctx.stroke()
         }
+
+        // Reception & Podium Displays
+        for (const dec of level.decorations) {
+          if (dec.type === 'reception' && dec.w && dec.h) {
+            ctx.fillStyle = '#1c1917'
+            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 10)
+            ctx.fill()
+            ctx.strokeStyle = '#f59e0b'
+            ctx.lineWidth = 2
+            ctx.stroke()
+            ctx.fillStyle = '#fef08a'
+            ctx.font = 'bold 9px sans-serif'
+            ctx.textAlign = 'center'
+            ctx.fillText('الإنارة الحديثة - RECEPTION', dec.x + dec.w / 2, dec.y + dec.h / 2 + 3)
+          }
+        }
       }
 
-      // Draw Walls / Obstacles
-      ctx.fillStyle = level.theme === 'tower' ? '#0f172a' : level.theme === 'villa' ? '#18181b' : '#111827'
-      ctx.strokeStyle = level.theme === 'tower' ? '#0284c7' : level.theme === 'villa' ? '#3f3f46' : '#374151'
-      ctx.lineWidth = 2
+      // Draw Walls / Architecture
       for (const wall of level.walls) {
-        ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
-        ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
+        if (level.theme === 'street') {
+          // Brick / stone buildings
+          ctx.fillStyle = '#181e29'
+          ctx.strokeStyle = '#334155'
+          ctx.lineWidth = 2
+          ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
+          ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
+        } else if (level.theme === 'villa') {
+          // Luxury plaster partition walls
+          ctx.fillStyle = '#27272a'
+          ctx.strokeStyle = '#52525b'
+          ctx.lineWidth = 2.5
+          ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
+          ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
+        } else if (level.theme === 'tower') {
+          // Server Racks with pulsing server LEDs
+          ctx.fillStyle = '#0f172a'
+          ctx.strokeStyle = '#0284c7'
+          ctx.lineWidth = 2
+          ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
+          ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
+
+          // Server LED blinkers
+          if (wall.w >= 40 && wall.h >= 100) {
+            ctx.fillStyle = Math.floor(time * 0.005) % 2 === 0 ? '#38bdf8' : '#10b981'
+            ctx.fillRect(wall.x + 8, wall.y + 15, 6, 6)
+            ctx.fillStyle = Math.floor(time * 0.003) % 2 === 0 ? '#facc15' : '#ef4444'
+            ctx.fillRect(wall.x + 8, wall.y + 35, 6, 6)
+          }
+        } else {
+          // Glass display showcase counters
+          ctx.fillStyle = '#18181b'
+          ctx.strokeStyle = '#f59e0b'
+          ctx.lineWidth = 2
+          ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
+          ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
+        }
       }
 
       // Draw Laser Security Gates
@@ -869,7 +1022,7 @@ export const GameEngine: React.FC = () => {
         ctx.translate(lamp.x, lamp.y)
 
         if (level.theme === 'street') {
-          // 1. Street Lantern
+          // 1. Street Lantern Post
           ctx.fillStyle = '#1f2937'
           ctx.fillRect(-3, -12, 6, 24)
           ctx.beginPath()
@@ -923,7 +1076,6 @@ export const GameEngine: React.FC = () => {
             ctx.shadowBlur = 24
             ctx.fill()
             ctx.stroke()
-            // Blinking cyan core
             ctx.fillStyle = '#ffffff'
             ctx.beginPath()
             ctx.arc(0, 0, 4, 0, Math.PI * 2)
@@ -987,7 +1139,7 @@ export const GameEngine: React.FC = () => {
       ctx.restore()
 
       // ==========================================
-      // DRAW HERO MASCOT (Evolves & Changes in Each Level!)
+      // DRAW HERO MASCOT (Evolving Appearance Per Level!)
       // ==========================================
       ctx.save()
       ctx.translate(hero.x, hero.y)
@@ -997,9 +1149,7 @@ export const GameEngine: React.FC = () => {
       const lookOffsetY = hero.facing === 'up' ? -2 : hero.facing === 'down' ? 1.5 : 0
 
       if (level.theme === 'street') {
-        // ------------------------------------------
-        // SKIN 1: Classic Warm LED Bulb
-        // ------------------------------------------
+        // 1. Classic Warm LED Bulb
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 15, 0, Math.PI * 2)
         const bulbGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 15)
@@ -1011,7 +1161,6 @@ export const GameEngine: React.FC = () => {
         ctx.shadowBlur = 18
         ctx.fill()
 
-        // Filament
         ctx.strokeStyle = 'rgba(251, 146, 60, 0.8)'
         ctx.lineWidth = 1.2
         ctx.beginPath()
@@ -1021,9 +1170,7 @@ export const GameEngine: React.FC = () => {
         ctx.lineTo(4, -18 + bobbing)
         ctx.stroke()
       } else if (level.theme === 'villa') {
-        // ------------------------------------------
-        // SKIN 2: Crystal Diamond Faceted Bulb (Sapphire / Gold)
-        // ------------------------------------------
+        // 2. Crystal Diamond Faceted Bulb
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 16, 0, Math.PI * 2)
         const crystalGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 16)
@@ -1035,7 +1182,6 @@ export const GameEngine: React.FC = () => {
         ctx.shadowBlur = 22
         ctx.fill()
 
-        // Diamond facets lines
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)'
         ctx.lineWidth = 1
         ctx.beginPath()
@@ -1046,9 +1192,7 @@ export const GameEngine: React.FC = () => {
         ctx.closePath()
         ctx.stroke()
       } else if (level.theme === 'tower') {
-        // ------------------------------------------
-        // SKIN 3: Cyber IoT Bulb with Antenna & Visor
-        // ------------------------------------------
+        // 3. Cyber IoT Bulb with Antenna & Visor
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 15, 0, Math.PI * 2)
         const cyberGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 15)
@@ -1060,7 +1204,6 @@ export const GameEngine: React.FC = () => {
         ctx.shadowBlur = 24
         ctx.fill()
 
-        // Top Wifi Antenna
         ctx.strokeStyle = '#38bdf8'
         ctx.lineWidth = 2
         ctx.beginPath()
@@ -1072,9 +1215,7 @@ export const GameEngine: React.FC = () => {
         ctx.fillStyle = '#fde047'
         ctx.fill()
       } else {
-        // ------------------------------------------
-        // SKIN 4: Golden Royal VIP Crown Bulb
-        // ------------------------------------------
+        // 4. Golden Royal VIP Crown Bulb
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 16, 0, Math.PI * 2)
         const goldGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 16)
@@ -1086,7 +1227,6 @@ export const GameEngine: React.FC = () => {
         ctx.shadowBlur = 28
         ctx.fill()
 
-        // Golden Crown on top of bulb
         ctx.fillStyle = '#f59e0b'
         ctx.strokeStyle = '#78350f'
         ctx.lineWidth = 1
@@ -1105,7 +1245,6 @@ export const GameEngine: React.FC = () => {
 
       // Eyes & Smile
       if (level.theme === 'tower') {
-        // Futuristic Cyber Sunglasses Visor
         ctx.fillStyle = '#09090b'
         ctx.beginPath()
         ctx.roundRect(-9 + lookOffsetX, -16 + bobbing + lookOffsetY, 18, 5, 2)
@@ -1114,7 +1253,6 @@ export const GameEngine: React.FC = () => {
         ctx.lineWidth = 1
         ctx.stroke()
       } else {
-        // Expressive Cartoon Eyes
         ctx.fillStyle = '#0f172a'
         ctx.beginPath()
         ctx.arc(-5 + lookOffsetX, -14 + bobbing + lookOffsetY, 2.2, 0, Math.PI * 2)
@@ -1138,13 +1276,12 @@ export const GameEngine: React.FC = () => {
       ctx.fillStyle = level.theme === 'showroom' ? '#f59e0b' : '#94a3b8'
       ctx.fillRect(-6, 0 + bobbing, 12, 5)
 
-      // Blue Royal Shirt (with Gold details in higher levels)
+      // Blue Royal Shirt
       ctx.fillStyle = '#1d4ed8'
       ctx.beginPath()
       ctx.roundRect(-12, 5 + bobbing, 24, 16, 4)
       ctx.fill()
 
-      // Collar line
       ctx.strokeStyle = level.theme === 'showroom' || level.theme === 'villa' ? '#f59e0b' : '#ffffff'
       ctx.lineWidth = 1.5
       ctx.beginPath()
@@ -1153,7 +1290,6 @@ export const GameEngine: React.FC = () => {
       ctx.lineTo(5, 5 + bobbing)
       ctx.stroke()
 
-      // Logo Text on Shirt
       ctx.fillStyle = '#ffffff'
       ctx.font = 'bold 5.5px sans-serif'
       ctx.textAlign = 'center'
@@ -1346,7 +1482,7 @@ export const GameEngine: React.FC = () => {
               رحلة النور | بطل <span className="text-blue-400">الإنارة الحديثة</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-md leading-relaxed mb-4 font-normal">
-              تطور شكل بطل اللمبة في كل مرحلة! اجمع 100% من المواد والأسلاك، وأنر كافة المصابيح واحذر الشحنات لإكمال التحدي.
+              4 عوالم مختلفة كلياً! تبدأ في شوارع حي الليثي، ثم تنتقل إلى الفيلا المعمارية، ثم برج المدينة، وتختم في المعرض الرئيسي!
             </p>
 
             <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3.5 mb-6 text-xs text-zinc-300 max-w-sm text-right space-y-1.5">
@@ -1384,8 +1520,9 @@ export const GameEngine: React.FC = () => {
               أحسنت! أعدت النور بالكامل إلى {LEVELS[currentLevelIdx].nameAr}
             </p>
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 mb-6 text-xs text-zinc-300 space-y-1">
-              <div>المرحلة القادمة: <span className="text-blue-400 font-bold">{LEVELS[currentLevelIdx + 1]?.nameAr}</span></div>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 mb-6 text-xs text-zinc-300 space-y-1.5 text-right">
+              <div>📍 العالم القادم: <span className="text-blue-400 font-bold">{LEVELS[currentLevelIdx + 1]?.nameAr}</span></div>
+              <div className="text-zinc-400 text-[11px]">بيئة المرحلة: {LEVELS[currentLevelIdx + 1]?.locationDescription}</div>
               <div className="text-amber-400 font-semibold">مظهر البطل الجديد: {LEVELS[currentLevelIdx + 1]?.heroSkinName}</div>
             </div>
 
@@ -1393,7 +1530,7 @@ export const GameEngine: React.FC = () => {
               onClick={nextLevel}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 cursor-pointer transition-all active:scale-95"
             >
-              <span>الانتقال للمظهر والمرحلة التالية</span>
+              <span>الانتقال للعالم والمظهر الجديد</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </button>
           </div>
@@ -1409,10 +1546,10 @@ export const GameEngine: React.FC = () => {
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black text-white mb-2">
-              🎉 مبروك! أتممت التحدي 100% وأعدت النور للجميع!
+              🎉 مبروك! أتممت التحدي 100% وأنرت المعرض والمدينة!
             </h2>
             <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-5 leading-relaxed">
-              أنت بطل أسطوري للإنارة! لقد أتممت جميع المراحل بالكامل بدون أي خطأ.
+              أنت بطل أسطوري للإنارة! لقد أتممت جميع العوالم الأربعة بنجاح واكتشفت كافة المظاهر الملكية.
             </p>
 
             {/* VIP Promo Coupon Card */}
@@ -1454,7 +1591,6 @@ export const GameEngine: React.FC = () => {
         <p className="text-[11px] text-zinc-500 mb-2">لوحة التحكم باللمس للهواتف</p>
         
         <div className="relative w-44 h-44 bg-zinc-950/90 border border-zinc-800 rounded-full p-2 flex items-center justify-center shadow-lg">
-          {/* UP Button */}
           <button
             onTouchStart={() => handleTouchDir(0, -1)}
             onTouchEnd={handleTouchEnd}
@@ -1465,7 +1601,6 @@ export const GameEngine: React.FC = () => {
             ▲
           </button>
 
-          {/* DOWN Button */}
           <button
             onTouchStart={() => handleTouchDir(0, 1)}
             onTouchEnd={handleTouchEnd}
@@ -1476,7 +1611,6 @@ export const GameEngine: React.FC = () => {
             ▼
           </button>
 
-          {/* LEFT Button */}
           <button
             onTouchStart={() => handleTouchDir(-1, 0)}
             onTouchEnd={handleTouchEnd}
@@ -1487,7 +1621,6 @@ export const GameEngine: React.FC = () => {
             ◀
           </button>
 
-          {/* RIGHT Button */}
           <button
             onTouchStart={() => handleTouchDir(1, 0)}
             onTouchEnd={handleTouchEnd}
@@ -1498,7 +1631,6 @@ export const GameEngine: React.FC = () => {
             ▶
           </button>
 
-          {/* Center Mascot Bulb icon */}
           <div className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center text-blue-400 border border-zinc-800">
             <Lightbulb className="w-5 h-5" />
           </div>
