@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { sound } from './audio'
-import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle } from 'lucide-react'
+import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert } from 'lucide-react'
 
 export interface Hazard {
   id: number
@@ -28,6 +28,17 @@ export interface Gate {
   labelAr: string
 }
 
+export interface LaserBeam {
+  id: number
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+  period: number // Total cycle in seconds
+  onTime: number // Active deadly duration
+  offset: number
+}
+
 export interface LevelData {
   id: number
   nameAr: string
@@ -38,6 +49,7 @@ export interface LevelData {
   locationDescription: string
   stars: number
   theme: 'street' | 'villa' | 'tower' | 'showroom'
+  timeLimit: number // In seconds
   width: number
   height: number
   walls: { x: number; y: number; w: number; h: number; type?: string }[]
@@ -45,6 +57,7 @@ export interface LevelData {
   lamps: { id: number; x: number; y: number; isLit: boolean; name: string }[]
   sparks: { id: number; x: number; y: number; collected: boolean; type: 'spark' | 'wire' | 'spotlight' }[]
   hazards: Hazard[]
+  laserBeams: LaserBeam[]
   gates: Gate[]
   masterSwitch: { x: number; y: number; isActivated: boolean }
   heroStart: { x: number; y: number }
@@ -53,29 +66,28 @@ export interface LevelData {
 
 const LEVELS: LevelData[] = [
   // =========================================================================
-  // LEVEL 1: شوارع حي الليثي بنغازي (أرصفة حجرية، شوارع إسفلتية، وممرات مشاة)
+  // LEVEL 1: شوارع حي الليثي بنغازي (مؤقت 55 ثانية + سيارات شحنات متحركة)
   // =========================================================================
   {
     id: 1,
     nameAr: 'المرحلة 1: شوارع حي الليثي - بنغازي',
     nameEn: 'Level 1: Al-Laythi Streets',
-    subtitleAr: 'انقطعت الكهرباء عن شوارع الحي! تحرك على الأرصفة وأنر أعمدة الإضاءة لتشغيل القاطع الرئيسي.',
-    difficultyBadge: 'سهل',
+    subtitleAr: 'احذر الشحنات المتحركة في الشارع! اجمع كابلات النحاس لكسب (+5 ثوانٍ) وأنر كافة الأعمدة قبل انتهاء الوقت.',
+    difficultyBadge: 'سهل ومثير',
     heroSkinName: 'لمبة LED الكلاسيكية 💡',
     locationDescription: 'شوارع معبدة، أرصفة حجرية، أعمدة إنارة عامة، وممرات مشاة',
     stars: 1,
+    timeLimit: 55,
     theme: 'street',
     width: 920,
     height: 620,
-    heroStart: { x: 70, y: 530 }, // البداية من الرصيف السفلي الأيسر
+    heroStart: { x: 70, y: 530 },
     initialLight: 150,
     walls: [
-      // الحدود الخارجية
       { x: 0, y: 0, w: 920, h: 20 },
       { x: 0, y: 600, w: 920, h: 20 },
       { x: 0, y: 0, w: 20, h: 620 },
       { x: 900, y: 0, w: 20, h: 620 },
-      // مباني سكنية على جوانب الشارع
       { x: 140, y: 20, w: 160, h: 180, type: 'building' },
       { x: 140, y: 380, w: 160, h: 220, type: 'building' },
       { x: 420, y: 140, w: 140, h: 320, type: 'park' },
@@ -83,10 +95,8 @@ const LEVELS: LevelData[] = [
       { x: 680, y: 400, w: 160, h: 200, type: 'building' },
     ],
     decorations: [
-      // ممر المشاة
       { type: 'crosswalk', x: 330, y: 220, w: 60, h: 160 },
       { type: 'crosswalk', x: 590, y: 220, w: 60, h: 160 },
-      // لافتة الشارع
       { type: 'sign', x: 60, y: 480, label: 'شارع الليثي الرئيسي' },
     ],
     lamps: [
@@ -108,46 +118,48 @@ const LEVELS: LevelData[] = [
       { id: 8, x: 760, y: 260, collected: false, type: 'spark' },
       { id: 9, x: 760, y: 340, collected: false, type: 'spotlight' },
     ],
-    hazards: [],
+    // 2 شحنات سريعة متحركة في الشارع
+    hazards: [
+      { id: 1, x: 220, y: 300, vx: 2.2, vy: 0, radius: 14, type: 'patrol', minX: 50, maxX: 850 },
+      { id: 2, x: 700, y: 260, vx: -2.4, vy: 0, radius: 14, type: 'patrol', minX: 50, maxX: 850 },
+    ],
+    laserBeams: [],
     gates: [],
     masterSwitch: { x: 840, y: 300, isActivated: false },
   },
 
   // =========================================================================
-  // LEVEL 2: الفيلا المعمارية الفاخرة (أرضيات باركيه خشبية، سجاد فاخر، مجالس، وثريات)
+  // LEVEL 2: الفيلا المعمارية الفاخرة (مؤقت 48 ثانية + أشعة ليزر متقطعة + دوامات)
   // =========================================================================
   {
     id: 2,
     nameAr: 'المرحلة 2: الفيلا المعمارية الفاخرة',
     nameEn: 'Level 2: The Luxury Villa',
-    subtitleAr: 'البداية من بهو المدخل! تحرك بين الصالونات والمجالس وأنر الثريات لفتح بوابة الليزر.',
-    difficultyBadge: 'متوسط',
+    subtitleAr: 'احذر دوامات تفريغ الطاقة وأشعة الليزر المتقطعة! أنر 3 ثريات لفتح البوابة قبل نفاد الوقت.',
+    difficultyBadge: 'متوسط حماسي',
     heroSkinName: 'اللمبة الكريستالية الملكية 💎',
     locationDescription: 'أرضيات خشبية باركيه، صالونات راقية، سجاد تركي، وغرفة طعام فخمة',
     stars: 2,
+    timeLimit: 48,
     theme: 'villa',
     width: 960,
     height: 660,
-    heroStart: { x: 80, y: 100 }, // البداية من البهو العلوي
+    heroStart: { x: 80, y: 100 },
     initialLight: 135,
     walls: [
       { x: 0, y: 0, w: 960, h: 20 },
       { x: 0, y: 640, w: 960, h: 20 },
       { x: 0, y: 0, w: 20, h: 660 },
       { x: 940, y: 0, w: 20, h: 660 },
-      // جدران غرف الفيلا
-      { x: 220, y: 20, w: 20, h: 220 }, // جدار صالون الاستقبال
-      { x: 220, y: 420, w: 20, h: 220 }, // جدار المجلس الرئيسي
+      { x: 220, y: 20, w: 20, h: 220 },
+      { x: 220, y: 420, w: 20, h: 220 },
       { x: 220, y: 220, w: 220, h: 20 },
       { x: 220, y: 420, w: 220, h: 20 },
-      // جدار الممر المركزي
       { x: 550, y: 140, w: 20, h: 380 },
-      // جدار غرفة الماستر والمكتب
       { x: 740, y: 20, w: 20, h: 220 },
       { x: 740, y: 420, w: 20, h: 220 },
     ],
     decorations: [
-      // أثاث وسجاد الفيلا
       { type: 'carpet', x: 60, y: 280, w: 120, h: 180, label: 'سجاد المدخل' },
       { type: 'sofa', x: 280, y: 80, w: 100, h: 40, label: 'أطقم صالون VIP' },
       { type: 'dining_table', x: 280, y: 500, w: 120, h: 60, label: 'طاولة طعام ملكية' },
@@ -178,36 +190,43 @@ const LEVELS: LevelData[] = [
     gates: [
       { id: 1, x: 740, y: 240, w: 20, h: 180, isOpen: false, requiredLamps: 3, labelAr: 'مغلقة: أنر 3 ثريات لفتحها' },
     ],
+    // 3 دوامات طاقة سريعة
     hazards: [
-      { id: 1, x: 330, y: 330, vx: 0, vy: 1.2, radius: 24, type: 'vortex', minY: 260, maxY: 400 },
-      { id: 2, x: 640, y: 250, vx: 0, vy: -1.4, radius: 24, type: 'vortex', minY: 160, maxY: 500 },
+      { id: 1, x: 330, y: 330, vx: 0, vy: 1.8, radius: 20, type: 'vortex', minY: 250, maxY: 410 },
+      { id: 2, x: 640, y: 220, vx: 0, vy: -2.2, radius: 20, type: 'vortex', minY: 150, maxY: 510 },
+      { id: 3, x: 480, y: 330, vx: 1.8, vy: 0, radius: 18, type: 'patrol', minX: 380, maxX: 540 },
+    ],
+    // أشعة ليزر متقطعة في الممر
+    laserBeams: [
+      { id: 1, x1: 550, y1: 220, x2: 740, y2: 220, period: 3.5, onTime: 2.0, offset: 0 },
+      { id: 2, x1: 550, y1: 440, x2: 740, y2: 440, period: 3.5, onTime: 2.0, offset: 1.7 },
     ],
     masterSwitch: { x: 880, y: 330, isActivated: false },
   },
 
   // =========================================================================
-  // LEVEL 3: برج المدينة الذكي (أرضيات سيبرانية سداسية، خطوط ليزر نيون، وسيرفرات)
+  // LEVEL 3: برج المدينة وغرفة السيرفرات الذكية (مؤقت 42 ثانية + 4 روبوتات سريعة)
   // =========================================================================
   {
     id: 3,
     nameAr: 'المرحلة 3: برج المدينة وغرفة السيرفرات الذكية',
     nameEn: 'Level 3: The Smart City Tower',
-    subtitleAr: 'البداية من مصعد الطوارئ المركزي! احذر شحنات الحمل الزائد المتحركة وأنر محطات البرج.',
-    difficultyBadge: 'تحدي قوي',
+    subtitleAr: 'المؤقت يتناقص بسرعة (42 ثانية)! تفادَ 4 شحنات كهربائية سريعة وأشعة السيرفرات لإنارة البرج.',
+    difficultyBadge: 'تحدي قوي وسريع',
     heroSkinName: 'اللمبة الذكية السايبر ⚡',
     locationDescription: 'شبكة دوائر إلكترونية نيون، كبائن سيرفرات متقدمة، وأجهزة تحكم ذكية IoT',
     stars: 3,
+    timeLimit: 42,
     theme: 'tower',
     width: 1000,
     height: 700,
-    heroStart: { x: 500, y: 620 }, // البداية من بوابة المصعد السفلية في المنتصف
+    heroStart: { x: 500, y: 620 },
     initialLight: 125,
     walls: [
       { x: 0, y: 0, w: 1000, h: 20 },
       { x: 0, y: 680, w: 1000, h: 20 },
       { x: 0, y: 0, w: 20, h: 700 },
       { x: 980, y: 0, w: 20, h: 700 },
-      // كبائن السيرفرات ومصفوفات الحماية
       { x: 180, y: 120, w: 50, h: 200, type: 'server' },
       { x: 180, y: 380, w: 50, h: 200, type: 'server' },
       { x: 380, y: 20, w: 50, h: 250, type: 'server' },
@@ -218,8 +237,6 @@ const LEVELS: LevelData[] = [
     ],
     decorations: [
       { type: 'elevator', x: 450, y: 630, w: 100, h: 40, label: 'مصعد الوصول السريع' },
-      { type: 'hologram', x: 280, y: 350, w: 40, h: 40, label: 'منصة هولوجرام' },
-      { type: 'hologram', x: 680, y: 350, w: 40, h: 40, label: 'منصة هولوجرام' },
     ],
     lamps: [
       { id: 1, x: 100, y: 100, isLit: false, name: 'سيرفر الحماية 1' },
@@ -246,37 +263,43 @@ const LEVELS: LevelData[] = [
     gates: [
       { id: 1, x: 780, y: 280, w: 50, h: 140, isOpen: false, requiredLamps: 4, labelAr: 'مغلقة: أنر 4 محطات لفتحها' },
     ],
+    // 4 روبوتات كهربائية سريعة
     hazards: [
-      { id: 1, x: 280, y: 180, vx: 0, vy: 2.3, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
-      { id: 2, x: 480, y: 520, vx: 0, vy: -2.5, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
-      { id: 3, x: 680, y: 200, vx: 0, vy: 2.8, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
+      { id: 1, x: 280, y: 180, vx: 0, vy: 3.2, radius: 15, type: 'patrol', minY: 80, maxY: 620 },
+      { id: 2, x: 480, y: 520, vx: 0, vy: -3.5, radius: 15, type: 'patrol', minY: 80, maxY: 620 },
+      { id: 3, x: 680, y: 200, vx: 0, vy: 3.6, radius: 15, type: 'patrol', minY: 80, maxY: 620 },
+      { id: 4, x: 880, y: 350, vx: 0, vy: -3.0, radius: 15, type: 'patrol', minY: 150, maxY: 550 },
+    ],
+    laserBeams: [
+      { id: 1, x1: 20, y1: 350, x2: 180, y2: 350, period: 3.0, onTime: 1.6, offset: 0 },
+      { id: 2, x1: 780, y1: 350, x2: 980, y2: 350, period: 3.0, onTime: 1.6, offset: 1.5 },
     ],
     masterSwitch: { x: 920, y: 350, isActivated: false },
   },
 
   // =========================================================================
-  // LEVEL 4: المعرض الرئيسي الفاخر للإنارة الحديثة (أرضيات تيرازو ذهبية، منصات عرض، وأجنحة VIP)
+  // LEVEL 4: المعرض الرئيسي الفاخر (مؤقت 36 ثانية + تحدي السرعة الأسطوري)
   // =========================================================================
   {
     id: 4,
     nameAr: 'المرحلة 4: المعرض الرئيسي للإنارة الحديثة - ليلة الافتتاح',
     nameEn: 'Level 4: Grand Flagship Showroom',
-    subtitleAr: 'البداية من البوابة الزجاجية الكبرى! تجول بين أجنحة الماركات وأنر ثريات المعرض لتشغيل النور الشامل.',
-    difficultyBadge: 'مرحلة ذهبية أسطورية',
+    subtitleAr: 'التحدي النهائي الأسطوري (36 ثانية فقط)! تحرك بسرعة فائقة واجمع كابلات النحاس لتمديد الوقت وإنارة المعرض.',
+    difficultyBadge: 'تحدي أسطوري VIP 🔥',
     heroSkinName: 'اللمبة الذهبية الملكية VIP 👑',
     locationDescription: 'معرض فخم بأرضيات سوداء وذهبية، أجنحة عرض زجاجية، وثريات عملاقة متدلية',
     stars: 4,
+    timeLimit: 36,
     theme: 'showroom',
     width: 1050,
     height: 720,
-    heroStart: { x: 525, y: 640 }, // البداية من المدخل الرئيسي السفلي للمعرض
+    heroStart: { x: 525, y: 640 },
     initialLight: 120,
     walls: [
       { x: 0, y: 0, w: 1050, h: 20 },
       { x: 0, y: 700, w: 1050, h: 20 },
       { x: 0, y: 0, w: 20, h: 720 },
       { x: 1030, y: 0, w: 20, h: 720 },
-      // منصات وأجنحة عرض الماركات (V-TAC, Philips, Fumagalli)
       { x: 180, y: 80, w: 60, h: 220, type: 'showcase' },
       { x: 180, y: 420, w: 60, h: 220, type: 'showcase' },
       { x: 420, y: 20, w: 50, h: 260, type: 'showcase' },
@@ -288,9 +311,6 @@ const LEVELS: LevelData[] = [
     ],
     decorations: [
       { type: 'reception', x: 460, y: 570, w: 130, h: 40, label: 'استقبال المعرض الرئيسي' },
-      { type: 'logo_podium', x: 50, y: 340, w: 80, h: 80, label: 'شعار الإنارة الحديثة المضيء' },
-      { type: 'wire_display', x: 300, y: 330, w: 80, h: 60, label: 'جناح الكابلات الإيطالية' },
-      { type: 'smart_hub', x: 740, y: 330, w: 80, h: 60, label: 'جناح المنازل الذكية' },
     ],
     lamps: [
       { id: 1, x: 90, y: 120, isLit: false, name: 'جناح الثريات الإيطالية' },
@@ -317,10 +337,16 @@ const LEVELS: LevelData[] = [
     gates: [
       { id: 1, x: 860, y: 280, w: 50, h: 160, isOpen: false, requiredWires: 4, labelAr: 'مغلقة: اجمع 4 كابلات نحاس' },
     ],
+    // 5 حراس شحنات سريعة
     hazards: [
-      { id: 1, x: 300, y: 360, vx: 1.8, vy: 0, radius: 15, type: 'patrol', minX: 250, maxX: 360 },
-      { id: 2, x: 525, y: 220, vx: 0, vy: 2.2, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
-      { id: 3, x: 740, y: 480, vx: 0, vy: -2.2, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
+      { id: 1, x: 300, y: 360, vx: 2.8, vy: 0, radius: 15, type: 'patrol', minX: 250, maxX: 360 },
+      { id: 2, x: 525, y: 220, vx: 0, vy: 3.4, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
+      { id: 3, x: 740, y: 480, vx: 0, vy: -3.4, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
+      { id: 4, x: 950, y: 240, vx: 0, vy: 3.2, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
+    ],
+    laserBeams: [
+      { id: 1, x1: 240, y1: 360, x2: 420, y2: 360, period: 2.8, onTime: 1.5, offset: 0 },
+      { id: 2, x1: 640, y1: 360, x2: 860, y2: 360, period: 2.8, onTime: 1.5, offset: 1.4 },
     ],
     masterSwitch: { x: 980, y: 360, isActivated: false },
   },
@@ -346,6 +372,7 @@ export const GameEngine: React.FC = () => {
   const [gameState, setGameState] = useState<'intro' | 'playing' | 'level_won' | 'game_won'>('intro')
   const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(1)
+  const [timeLeft, setTimeLeft] = useState(55)
   const [lightPower, setLightPower] = useState(140)
   const [isMuted, setIsMuted] = useState(false)
   const [lampsLitCount, setLampsLitCount] = useState(0)
@@ -356,6 +383,7 @@ export const GameEngine: React.FC = () => {
 
   // Current active level clone
   const levelRef = useRef<LevelData>(JSON.parse(JSON.stringify(LEVELS[0])))
+  const timeLeftRef = useRef<number>(55)
 
   // Hero state
   const heroRef = useRef({
@@ -394,6 +422,8 @@ export const GameEngine: React.FC = () => {
     setCollectedSparksCount(0)
     setTotalSparksCount(cloned.sparks.length)
     setLightPower(cloned.initialLight)
+    setTimeLeft(cloned.timeLimit)
+    timeLeftRef.current = cloned.timeLimit
     particlesRef.current = []
   }, [])
 
@@ -433,16 +463,20 @@ export const GameEngine: React.FC = () => {
     setTimeout(() => setBannerAlert(null), 3500)
   }
 
-  // Reset stage upon injury
-  const handleHeroInjured = () => {
+  // Reset stage upon injury or timeout
+  const handleHeroInjured = (reason = 'hit') => {
     sound.playShortCircuit()
-    spawnParticles(heroRef.current.x, heroRef.current.y, '#ef4444', 35, 3)
-    showAlert('💥 تماس كهربائي شديد! انقطع التيار وأعيدت المرحلة من نقطة البداية!', 'error')
+    spawnParticles(heroRef.current.x, heroRef.current.y, '#ef4444', 40, 3.5)
     
-    // Quick reload stage
+    if (reason === 'timeout') {
+      showAlert('⌛ انتهت طاقة البطارية والوقت! تحرك أسرع واجمع كابلات النحاس لكسب (+5 ثوانٍ)!', 'error')
+    } else {
+      showAlert('💥 تماس كهربائي شديد! انقطع التيار وأعيدت المرحلة من نقطة البداية!', 'error')
+    }
+    
     setTimeout(() => {
       loadLevel(currentLevelIdx)
-    }, 400)
+    }, 450)
   }
 
   // Spawn visual particles
@@ -517,11 +551,20 @@ export const GameEngine: React.FC = () => {
       const hero = heroRef.current
 
       if (gameState === 'playing') {
+        // Countdown Timer Logic
+        timeLeftRef.current -= dt
+        setTimeLeft(Math.max(Math.ceil(timeLeftRef.current), 0))
+
+        if (timeLeftRef.current <= 0) {
+          handleHeroInjured('timeout')
+          return
+        }
+
         if (hero.invincibleTimer > 0) {
           hero.invincibleTimer -= dt
         }
 
-        // 1. Process Input (Keyboard + Touch D-Pad)
+        // 1. Process Input
         let moveX = 0
         let moveY = 0
 
@@ -584,7 +627,7 @@ export const GameEngine: React.FC = () => {
         if (canMoveX) hero.x = newX
         if (canMoveY) hero.y = newY
 
-        // 3. Update Hazards & Trigger Stage Restart on Hit
+        // 3. Check Moving Hazards -> Instant Stage Reset on Collision
         for (const h of level.hazards) {
           h.x += h.vx
           h.y += h.vy
@@ -594,12 +637,38 @@ export const GameEngine: React.FC = () => {
 
           const hDist = Math.hypot(hero.x - h.x, hero.y - h.y)
           if (hDist < hero.radius + h.radius && hero.invincibleTimer <= 0) {
-            handleHeroInjured()
+            handleHeroInjured('hit')
             break
           }
         }
 
-        // 4. Collect Sparks & Powerups
+        // 4. Check Cycling Deadly Laser Beams
+        const curSeconds = time * 0.001
+        for (const beam of level.laserBeams) {
+          const cyclePos = (curSeconds + beam.offset) % beam.period
+          const isLaserDeadly = cyclePos < beam.onTime
+
+          if (isLaserDeadly) {
+            // Distance from point to line segment
+            const x1 = beam.x1, y1 = beam.y1, x2 = beam.x2, y2 = beam.y2
+            const px = hero.x, py = hero.y
+            const l2 = Math.hypot(x2 - x1, y2 - y1) ** 2
+            let t = 0
+            if (l2 > 0) {
+              t = Math.max(0, Math.min(1, ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2))
+            }
+            const projX = x1 + t * (x2 - x1)
+            const projY = y1 + t * (y2 - y1)
+            const distToBeam = Math.hypot(px - projX, py - projY)
+
+            if (distToBeam < hero.radius + 4 && hero.invincibleTimer <= 0) {
+              handleHeroInjured('laser')
+              break
+            }
+          }
+        }
+
+        // 5. Collect Sparks & Powerups (+5 Seconds Bonus on Wires & Spotlights!)
         for (const spark of level.sparks) {
           if (!spark.collected) {
             const dist = Math.hypot(hero.x - spark.x, hero.y - spark.y)
@@ -609,7 +678,12 @@ export const GameEngine: React.FC = () => {
               
               if (spark.type === 'wire') {
                 sound.playWire()
+                sound.playBonusTime()
                 setScore((prev) => prev + 150 * combo)
+                
+                // +5s Bonus Time!
+                timeLeftRef.current = Math.min(timeLeftRef.current + 5, level.timeLimit + 10)
+                showAlert('⚡ كابل نحاس إيطالي أصلي (+5 ثوانٍ وقت إضافي!)', 'success')
                 
                 const collectedWires = level.sparks.filter((s) => s.type === 'wire' && s.collected).length
                 for (const g of level.gates) {
@@ -621,10 +695,16 @@ export const GameEngine: React.FC = () => {
                   }
                 }
                 setLightPower((prev) => Math.min(prev + 22, 280))
-                spawnParticles(spark.x, spark.y, '#f59e0b', 16, 1.2)
+                spawnParticles(spark.x, spark.y, '#f59e0b', 18, 1.3)
               } else if (spark.type === 'spotlight') {
                 sound.playSpark()
+                sound.playBonusTime()
                 setScore((prev) => prev + 200 * combo)
+                
+                // +5s Bonus Time!
+                timeLeftRef.current = Math.min(timeLeftRef.current + 5, level.timeLimit + 10)
+                showAlert('💡 سبوت لايت ذكي (+5 ثوانٍ وقت إضافي!)', 'success')
+
                 setLightPower((prev) => Math.min(prev + 30, 300))
                 spawnParticles(spark.x, spark.y, '#38bdf8', 18, 1.4)
               } else {
@@ -637,7 +717,7 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 5. Light up Dark Lamps
+        // 6. Light up Dark Lamps
         for (const lamp of level.lamps) {
           if (!lamp.isLit) {
             const dist = Math.hypot(hero.x - lamp.x, hero.y - lamp.y)
@@ -662,7 +742,7 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 6. Check Master Switchboard (Only Activates if 100% Collected!)
+        // 7. Check Master Switchboard (100% Items & Lamps Required)
         const masterDist = Math.hypot(hero.x - level.masterSwitch.x, hero.y - level.masterSwitch.y)
         if (masterDist < hero.radius + 32 && !level.masterSwitch.isActivated) {
           const currentRemainingLamps = level.lamps.filter((l) => !l.isLit).length
@@ -671,13 +751,13 @@ export const GameEngine: React.FC = () => {
 
           if (totalLeft > 0) {
             sound.playLockedBuzz()
-            showAlert(`⚠️ القاطع مقفل! يجب إنارة كافة المصابيح وجمع جميع كابلات النحاس وشرارات الطاقة أولاً! (متبقي: ${totalLeft})`, 'error')
+            showAlert(`⚠️ القاطع مقفل! يجب إنارة كافة المصابيح وجمع جميع كابلات النحاس والشرارات أولاً! (متبقي: ${totalLeft})`, 'error')
             hero.x -= moveX * 4
             hero.y -= moveY * 4
           } else {
             level.masterSwitch.isActivated = true
             sound.playMasterSwitch()
-            setScore((prev) => prev + 1500)
+            setScore((prev) => prev + 2000)
             spawnParticles(level.masterSwitch.x, level.masterSwitch.y, '#10b981', 60, 3.5)
 
             setTimeout(() => {
@@ -692,7 +772,7 @@ export const GameEngine: React.FC = () => {
         }
       }
 
-      // 7. Update Particles
+      // 8. Update Particles
       for (let i = particlesRef.current.length - 1; i >= 0; i--) {
         const p = particlesRef.current[i]
         p.x += p.vx
@@ -705,24 +785,19 @@ export const GameEngine: React.FC = () => {
       }
 
       // =========================================================================
-      // VIBRANT THEMED ENVIRONMENT RENDERING (100% VISIBLE & DISTINCT WORLD PER LEVEL)
+      // VIBRANT THEMED ENVIRONMENT RENDERING
       // =========================================================================
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       if (level.theme === 'street') {
-        // ==========================================
-        // LEVEL 1: شوارع حي الليثي بنغازي
-        // ==========================================
-        // 1. Asphalt Road
+        // LEVEL 1: Asphalt Road & Concrete Sidewalks
         ctx.fillStyle = '#1e293b'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // 2. Concrete Pavement Sidewalks (أرصفة الشارع الحجرية الواضحة)
         ctx.fillStyle = '#334155'
-        ctx.fillRect(20, 20, 880, 80) // الرصيف العلوي
-        ctx.fillRect(20, 500, 880, 100) // الرصيف السفلي
+        ctx.fillRect(20, 20, 880, 80)
+        ctx.fillRect(20, 500, 880, 100)
 
-        // Curb borders (حواف الأرصفة الصفراء والسوداء)
         ctx.strokeStyle = '#facc15'
         ctx.lineWidth = 4
         ctx.beginPath()
@@ -732,7 +807,6 @@ export const GameEngine: React.FC = () => {
         ctx.lineTo(900, 500)
         ctx.stroke()
 
-        // 3. Street Lane Center Dividers (خطوط الطريق البيضاء المتقطعة)
         ctx.strokeStyle = '#ffffff'
         ctx.lineWidth = 3.5
         ctx.setLineDash([25, 20])
@@ -742,14 +816,12 @@ export const GameEngine: React.FC = () => {
         ctx.stroke()
         ctx.setLineDash([])
 
-        // 4. Park green lawn
         ctx.fillStyle = '#166534'
         ctx.fillRect(420, 140, 140, 320)
         ctx.strokeStyle = '#22c55e'
         ctx.lineWidth = 2
         ctx.strokeRect(420, 140, 140, 320)
 
-        // 5. Crosswalks (ممرات المشاة البيضاء الناصعة)
         for (const dec of level.decorations) {
           if (dec.type === 'crosswalk' && dec.w && dec.h) {
             ctx.fillStyle = '#ffffff'
@@ -759,14 +831,10 @@ export const GameEngine: React.FC = () => {
           }
         }
       } else if (level.theme === 'villa') {
-        // ==========================================
-        // LEVEL 2: الفيلا المعمارية الفاخرة
-        // ==========================================
-        // 1. Warm Golden Oak Parquet Wood Floor
+        // LEVEL 2: Golden Oak Parquet Wood Floor
         ctx.fillStyle = '#78350f'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Wood planks texture lines
         ctx.strokeStyle = '#451a03'
         ctx.lineWidth = 1.5
         for (let y = 0; y < canvas.height; y += 28) {
@@ -782,16 +850,13 @@ export const GameEngine: React.FC = () => {
           ctx.stroke()
         }
 
-        // 2. Carpets & Luxury Furniture
         for (const dec of level.decorations) {
           if (dec.type === 'carpet' && dec.w && dec.h) {
-            // Royal Crimson Red Rug with Gold Border
             ctx.fillStyle = '#881337'
             ctx.fillRect(dec.x, dec.y, dec.w, dec.h)
             ctx.strokeStyle = '#f59e0b'
             ctx.lineWidth = 3
             ctx.strokeRect(dec.x, dec.y, dec.w, dec.h)
-            // Inner gold medallion
             ctx.strokeRect(dec.x + 10, dec.y + 10, dec.w - 20, dec.h - 20)
           } else if (dec.type === 'sofa' && dec.w && dec.h) {
             ctx.fillStyle = '#27272a'
@@ -810,14 +875,10 @@ export const GameEngine: React.FC = () => {
           }
         }
       } else if (level.theme === 'tower') {
-        // ==========================================
-        // LEVEL 3: برج المدينة وغرفة السيرفرات الذكية
-        // ==========================================
-        // 1. Deep Cyber Tech Blue Floor
+        // LEVEL 3: Deep Cyber Tech Blue Floor with Neon Circuits
         ctx.fillStyle = '#082f49'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Vibrant Neon Cyan Circuit Conduits
         ctx.strokeStyle = '#00f0ff'
         ctx.lineWidth = 2
         for (let x = 0; x < canvas.width; x += 55) {
@@ -833,7 +894,6 @@ export const GameEngine: React.FC = () => {
           ctx.stroke()
         }
 
-        // Elevator Pad
         for (const dec of level.decorations) {
           if (dec.type === 'elevator' && dec.w && dec.h) {
             ctx.fillStyle = '#0284c7'
@@ -848,14 +908,10 @@ export const GameEngine: React.FC = () => {
           }
         }
       } else {
-        // ==========================================
-        // LEVEL 4: المعرض الرئيسي الفاخر للإنارة الحديثة
-        // ==========================================
-        // 1. Polished Black & Gold Terrazzo Marble
+        // LEVEL 4: Polished Black & Gold Terrazzo Marble
         ctx.fillStyle = '#18181b'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Luxury Gold Diamond Tile Grid
         ctx.strokeStyle = '#d97706'
         ctx.lineWidth = 1.5
         const sz = 60
@@ -872,17 +928,18 @@ export const GameEngine: React.FC = () => {
           ctx.stroke()
         }
 
-        // Reception Desk
         for (const dec of level.decorations) {
           if (dec.type === 'reception' && dec.w && dec.h) {
+            ctx.fillStyle = '#27272a'
+            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 10)
             ctx.fill()
             ctx.strokeStyle = '#f59e0b'
-            ctx.lineWidth = 2
+            ctx.lineWidth = 3
             ctx.stroke()
             ctx.fillStyle = '#fef08a'
-            ctx.font = 'bold 9px sans-serif'
+            ctx.font = 'bold 10px sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText('الإنارة الحديثة - RECEPTION', dec.x + dec.w / 2, dec.y + dec.h / 2 + 3)
+            ctx.fillText('الإنارة الحديثة - RECEPTION', dec.x + dec.w / 2, dec.y + dec.h / 2 + 4)
           }
         }
       }
@@ -890,39 +947,45 @@ export const GameEngine: React.FC = () => {
       // Draw Walls / Architecture
       for (const wall of level.walls) {
         if (level.theme === 'street') {
-          // Brick / stone buildings
-          ctx.fillStyle = '#181e29'
-          ctx.strokeStyle = '#334155'
-          ctx.lineWidth = 2
-          ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
-          ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
-        } else if (level.theme === 'villa') {
-          // Luxury plaster partition walls
-          ctx.fillStyle = '#27272a'
-          ctx.strokeStyle = '#52525b'
+          ctx.fillStyle = '#0f172a'
+          ctx.strokeStyle = '#475569'
           ctx.lineWidth = 2.5
           ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
           ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
+
+          if (wall.type === 'building' && wall.w >= 100 && wall.h >= 100) {
+            ctx.fillStyle = '#fef08a'
+            for (let wx = wall.x + 20; wx < wall.x + wall.w - 20; wx += 40) {
+              for (let wy = wall.y + 25; wy < wall.y + wall.h - 25; wy += 45) {
+                ctx.fillRect(wx, wy, 16, 20)
+              }
+            }
+          }
+        } else if (level.theme === 'villa') {
+          ctx.fillStyle = '#292524'
+          ctx.strokeStyle = '#d4af37'
+          ctx.lineWidth = 3
+          ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
+          ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
         } else if (level.theme === 'tower') {
-          // Server Racks with pulsing server LEDs
-          ctx.fillStyle = '#0f172a'
-          ctx.strokeStyle = '#0284c7'
-          ctx.lineWidth = 2
+          ctx.fillStyle = '#0c4a6e'
+          ctx.strokeStyle = '#00f0ff'
+          ctx.lineWidth = 2.5
           ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
           ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
 
-          // Server LED blinkers
-          if (wall.w >= 40 && wall.h >= 100) {
-            ctx.fillStyle = Math.floor(time * 0.005) % 2 === 0 ? '#38bdf8' : '#10b981'
-            ctx.fillRect(wall.x + 8, wall.y + 15, 6, 6)
-            ctx.fillStyle = Math.floor(time * 0.003) % 2 === 0 ? '#facc15' : '#ef4444'
-            ctx.fillRect(wall.x + 8, wall.y + 35, 6, 6)
+          if (wall.type === 'server' && wall.h >= 100) {
+            ctx.fillStyle = '#10b981'
+            ctx.fillRect(wall.x + 8, wall.y + 15, 8, 8)
+            ctx.fillStyle = '#38bdf8'
+            ctx.fillRect(wall.x + 8, wall.y + 35, 8, 8)
+            ctx.fillStyle = '#f59e0b'
+            ctx.fillRect(wall.x + 8, wall.y + 55, 8, 8)
           }
         } else {
-          // Glass display showcase counters
-          ctx.fillStyle = '#18181b'
+          ctx.fillStyle = '#27272a'
           ctx.strokeStyle = '#f59e0b'
-          ctx.lineWidth = 2
+          ctx.lineWidth = 3
           ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
           ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
         }
@@ -955,6 +1018,36 @@ export const GameEngine: React.FC = () => {
         ctx.restore()
       }
 
+      // Draw Cycling Laser Beams (Dangerous Red vs Safe Green)
+      for (const beam of level.laserBeams) {
+        const curSec = time * 0.001
+        const pos = (curSec + beam.offset) % beam.period
+        const isDeadly = pos < beam.onTime
+
+        ctx.save()
+        ctx.lineWidth = isDeadly ? 4 : 1.5
+        ctx.strokeStyle = isDeadly ? '#ef4444' : '#10b981'
+        if (isDeadly) {
+          ctx.shadowColor = '#f87171'
+          ctx.shadowBlur = 16
+        } else {
+          ctx.setLineDash([6, 6])
+        }
+
+        ctx.beginPath()
+        ctx.moveTo(beam.x1, beam.y1)
+        ctx.lineTo(beam.x2, beam.y2)
+        ctx.stroke()
+
+        // Terminal emitters
+        ctx.fillStyle = isDeadly ? '#ef4444' : '#10b981'
+        ctx.beginPath()
+        ctx.arc(beam.x1, beam.y1, 5, 0, Math.PI * 2)
+        ctx.arc(beam.x2, beam.y2, 5, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+      }
+
       // Draw Hazards (Patrol Bots & Vortices)
       for (const h of level.hazards) {
         ctx.save()
@@ -968,7 +1061,7 @@ export const GameEngine: React.FC = () => {
           ctx.fill()
           const orbitAngle = time * 0.008
           ctx.beginPath()
-          ctx.arc(Math.cos(orbitAngle) * (h.radius + 6), Math.sin(orbitAngle) * (h.radius + 6), 3, 0, Math.PI * 2)
+          ctx.arc(Math.cos(orbitAngle) * (h.radius + 6), Math.sin(orbitAngle) * (h.radius + 6), 3.5, 0, Math.PI * 2)
           ctx.fillStyle = '#fef08a'
           ctx.fill()
         } else {
@@ -1029,13 +1122,12 @@ export const GameEngine: React.FC = () => {
         }
       }
 
-      // Draw Environmental Lamps (Distinct Look Per Level!)
+      // Draw Environmental Lamps
       for (const lamp of level.lamps) {
         ctx.save()
         ctx.translate(lamp.x, lamp.y)
 
         if (level.theme === 'street') {
-          // 1. Street Lantern Post
           ctx.fillStyle = '#1f2937'
           ctx.fillRect(-3, -12, 6, 24)
           ctx.beginPath()
@@ -1057,7 +1149,6 @@ export const GameEngine: React.FC = () => {
             ctx.stroke()
           }
         } else if (level.theme === 'villa') {
-          // 2. Crystal Chandelier
           ctx.fillStyle = '#d4af37'
           ctx.fillRect(-2, -18, 4, 12)
           ctx.beginPath()
@@ -1078,7 +1169,6 @@ export const GameEngine: React.FC = () => {
             ctx.stroke()
           }
         } else if (level.theme === 'tower') {
-          // 3. Cyber IoT Smart Sensor Node
           ctx.beginPath()
           ctx.roundRect(-12, -12, 24, 24, 6)
           if (lamp.isLit) {
@@ -1101,7 +1191,6 @@ export const GameEngine: React.FC = () => {
             ctx.stroke()
           }
         } else {
-          // 4. Golden Showroom Multi-Ring Chandelier
           ctx.beginPath()
           ctx.arc(0, 0, 14, 0, Math.PI * 2)
           if (lamp.isLit) {
@@ -1152,7 +1241,7 @@ export const GameEngine: React.FC = () => {
       ctx.restore()
 
       // ==========================================
-      // DRAW HERO MASCOT (Evolving Appearance Per Level!)
+      // DRAW HERO MASCOT
       // ==========================================
       ctx.save()
       ctx.translate(hero.x, hero.y)
@@ -1162,7 +1251,6 @@ export const GameEngine: React.FC = () => {
       const lookOffsetY = hero.facing === 'up' ? -2 : hero.facing === 'down' ? 1.5 : 0
 
       if (level.theme === 'street') {
-        // 1. Classic Warm LED Bulb
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 15, 0, Math.PI * 2)
         const bulbGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 15)
@@ -1183,7 +1271,6 @@ export const GameEngine: React.FC = () => {
         ctx.lineTo(4, -18 + bobbing)
         ctx.stroke()
       } else if (level.theme === 'villa') {
-        // 2. Crystal Diamond Faceted Bulb
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 16, 0, Math.PI * 2)
         const crystalGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 16)
@@ -1205,7 +1292,6 @@ export const GameEngine: React.FC = () => {
         ctx.closePath()
         ctx.stroke()
       } else if (level.theme === 'tower') {
-        // 3. Cyber IoT Bulb with Antenna & Visor
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 15, 0, Math.PI * 2)
         const cyberGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 15)
@@ -1228,7 +1314,6 @@ export const GameEngine: React.FC = () => {
         ctx.fillStyle = '#fde047'
         ctx.fill()
       } else {
-        // 4. Golden Royal VIP Crown Bulb
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 16, 0, Math.PI * 2)
         const goldGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 16)
@@ -1344,7 +1429,6 @@ export const GameEngine: React.FC = () => {
         const darkCtx = darkCanvas.getContext('2d')
 
         if (darkCtx) {
-          // عتمة سينمائية متوازنة (تسمح برؤية تفاصيل أرضية الشارع والباركيه والسيرفرات والمعرض بوضوح)
           darkCtx.fillStyle = 'rgba(3, 7, 18, 0.52)'
           darkCtx.fillRect(0, 0, darkCanvas.width, darkCanvas.height)
 
@@ -1407,7 +1491,7 @@ export const GameEngine: React.FC = () => {
       {/* Game Top HUD Bar */}
       <div className="w-full bg-[#111215] border border-zinc-800 rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-md">
         
-        {/* Level Name & Hero Skin Badge */}
+        {/* Level Name & Badge */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
             <Compass className="w-4 h-4 text-blue-400" />
@@ -1421,8 +1505,23 @@ export const GameEngine: React.FC = () => {
           </div>
         </div>
 
-        {/* 100% Checklist / Progress Meter */}
-        <div className="flex items-center gap-2">
+        {/* 100% Checklist & Countdown Timer */}
+        <div className="flex items-center gap-2.5">
+          
+          {/* Dynamic Countdown Timer */}
+          <div 
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-xs transition-all ${
+              timeLeft <= 10
+                ? 'bg-red-500/20 border-red-500/50 text-red-400 animate-pulse'
+                : timeLeft <= 20
+                ? 'bg-amber-500/15 border-amber-500/30 text-amber-300'
+                : 'bg-zinc-900 border-zinc-800 text-emerald-400'
+            }`}
+          >
+            <Timer className="w-4 h-4" />
+            <span>{timeLeft} ثانية</span>
+          </div>
+
           <div className="flex items-center gap-1.5 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
             <Lightbulb className="w-4 h-4 text-blue-400" />
             <span className="text-[11px] text-zinc-400">المصابيح:</span>
@@ -1448,7 +1547,7 @@ export const GameEngine: React.FC = () => {
             }`}
           >
             {isStage100PercentComplete ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-            <span>{isStage100PercentComplete ? 'القاطع جاهز!' : `متبقي: ${totalRemaining}`}</span>
+            <span>{isStage100PercentComplete ? 'جاهز!' : `متبقي: ${totalRemaining}`}</span>
           </div>
         </div>
 
@@ -1496,16 +1595,17 @@ export const GameEngine: React.FC = () => {
               رحلة النور | بطل <span className="text-blue-400">الإنارة الحديثة</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-md leading-relaxed mb-4 font-normal">
-              4 عوالم مختلفة كلياً! تبدأ في شوارع حي الليثي، ثم تنتقل إلى الفيلا المعمارية، ثم برج المدينة، وتختم في المعرض الرئيسي!
+              تحدي الأبطال الحقيقي! مؤقت تنازلي سريع، شحنات كهربائية سريعة، وأشعة ليزر متقطعة!
             </p>
 
             <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3.5 mb-6 text-xs text-zinc-300 max-w-sm text-right space-y-1.5">
               <div className="flex items-center gap-2 text-amber-400 font-bold">
                 <AlertTriangle className="w-4 h-4" />
-                <span>قوانين التحدي:</span>
+                <span>قواعد التحدي الصارم:</span>
               </div>
-              <p className="text-zinc-400">⚡ ملامسة الشحنات تعيد المرحلة من البداية فوراً.</p>
-              <p className="text-zinc-400">⚡ القاطع الرئيسي لن يفتح حتى تجمع وتنير 100% من كل شيء في الغرفة.</p>
+              <p className="text-zinc-400">⚡ ملامسة الشحنات أو أشعة الليزر تعيد المرحلة فوراً.</p>
+              <p className="text-zinc-400">⚡ جمع كابلات النحاس والسبوت لايت يمنحك (+5 ثوانٍ) وقت إضافي.</p>
+              <p className="text-zinc-400">⚡ القاطع لن يفتح حتى تجمع 100% من كل شيء قبل انتهاء الوقت.</p>
             </div>
 
             <button
@@ -1513,7 +1613,7 @@ export const GameEngine: React.FC = () => {
               className="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-base flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-lg"
             >
               <Play className="w-5 h-5 fill-current" />
-              <span>ابدأ المرحلة 1 (حي الليثي)</span>
+              <span>ابدأ التحدي (حي الليثي)</span>
             </button>
           </div>
         )}
@@ -1536,15 +1636,15 @@ export const GameEngine: React.FC = () => {
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 mb-6 text-xs text-zinc-300 space-y-1.5 text-right">
               <div>📍 العالم القادم: <span className="text-blue-400 font-bold">{LEVELS[currentLevelIdx + 1]?.nameAr}</span></div>
-              <div className="text-zinc-400 text-[11px]">بيئة المرحلة: {LEVELS[currentLevelIdx + 1]?.locationDescription}</div>
               <div className="text-amber-400 font-semibold">مظهر البطل الجديد: {LEVELS[currentLevelIdx + 1]?.heroSkinName}</div>
+              <div className="text-red-400 font-bold">⏱️ الوقت المحدد: {LEVELS[currentLevelIdx + 1]?.timeLimit} ثانية فقط!</div>
             </div>
 
             <button
               onClick={nextLevel}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 cursor-pointer transition-all active:scale-95"
             >
-              <span>الانتقال للعالم والمظهر الجديد</span>
+              <span>الانتقال للمرحلة التالية</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </button>
           </div>
@@ -1560,10 +1660,10 @@ export const GameEngine: React.FC = () => {
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black text-white mb-2">
-              🎉 مبروك! أتممت التحدي 100% وأنرت المعرض والمدينة!
+              🎉 مبروك! أتممت التحدي الأسطوري 100%!
             </h2>
             <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-5 leading-relaxed">
-              أنت بطل أسطوري للإنارة! لقد أتممت جميع العوالم الأربعة بنجاح واكتشفت كافة المظاهر الملكية.
+              أنت بطل حقيقي للإنارة! لقد تغلبت على جميع التحديات والمؤقتات وأعدت النور لكافة المعالم.
             </p>
 
             {/* VIP Promo Coupon Card */}
