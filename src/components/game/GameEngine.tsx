@@ -441,6 +441,54 @@ export const GameEngine: React.FC = () => {
     }
   })
 
+  // Game Reward Configuration (synced with admin-dashboard.html & MongoDB API)
+  const [rewardConfig, setRewardConfig] = useState({
+    isEnabled: true,
+    rewardType: 'coupon' as 'coupon' | 'physical_gift' | 'no_reward',
+    couponCode: 'ENARAH-HERO',
+    discountTitle: 'كوبون أبطال الإنارة الذهبي',
+    discountDetails: 'خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!',
+    giftItemName: 'كشاف سبوت لايت ذكي مجاني أو مفتاح لمس VIP',
+    giftInstructions: 'استلم هديتك من أي فرع للإنارة الحديثة بإبراز هذه الشاشة!',
+    victoryMsg: 'أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.',
+  })
+
+  // Load cloud reward configuration on startup & victory
+  useEffect(() => {
+    // 1. Local storage cache
+    try {
+      const local = localStorage.getItem('enarah_game_reward_config')
+      if (local) {
+        setRewardConfig((prev) => ({ ...prev, ...JSON.parse(local) }))
+      }
+    } catch {}
+
+    // 2. Cloud fetch from backend API
+    const fetchCloudRewards = async () => {
+      try {
+        const res = await fetch('https://enarah2.vercel.app/api/get-users')
+        if (res.ok) {
+          const data = await res.json()
+          if (data && data.success && Array.isArray(data.data)) {
+            const updates = data.data.filter((item: any) => item.email === 'admin_game_rewards@app.local')
+            if (updates.length > 0) {
+              const latest = updates[updates.length - 1] // latest item
+              const parsed = JSON.parse(latest.phone).config
+              if (parsed) {
+                setRewardConfig((prev) => ({ ...prev, ...parsed }))
+                localStorage.setItem('enarah_game_reward_config', JSON.stringify(parsed))
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Cloud rewards sync:', err)
+      }
+    }
+
+    fetchCloudRewards()
+  }, [gameState])
+
   // Current active level clone
   const levelRef = useRef<LevelData>(JSON.parse(JSON.stringify(LEVELS[0])))
   const timeLeftRef = useRef<number>(55)
@@ -1981,7 +2029,7 @@ export const GameEngine: React.FC = () => {
               🎉 مبروك! هزمت وحش الحمل الزائد وأنرت المعرض والمدينة!
             </h2>
             <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-4 leading-relaxed">
-              أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض.
+              {rewardConfig.victoryMsg || 'أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.'}
             </p>
 
             {/* Submit to Leaderboard Form */}
@@ -2025,16 +2073,27 @@ export const GameEngine: React.FC = () => {
               </div>
             )}
 
-            {/* VIP Promo Coupon Card */}
-            <div className="bg-gradient-to-r from-amber-950/60 via-zinc-950 to-blue-950/60 border border-amber-500/40 rounded-2xl p-4 mb-4 text-center max-w-sm w-full shadow-xl">
-              <div className="text-[11px] text-amber-300 font-bold mb-1">كوبون أبطال الإنارة الذهبي:</div>
-              <div className="font-mono text-lg sm:text-xl font-black text-amber-400 tracking-widest bg-black/70 py-1.5 px-3 rounded-xl border border-amber-400/30 mb-1.5">
-                ENARAH-HERO
+            {/* DYNAMIC CLOUD REWARD: COUPON */}
+            {rewardConfig.isEnabled && rewardConfig.rewardType === 'coupon' && (
+              <div className="bg-gradient-to-r from-amber-950/60 via-zinc-950 to-blue-950/60 border border-amber-500/40 rounded-2xl p-4 mb-4 text-center max-w-sm w-full shadow-xl">
+                <div className="text-[11px] text-amber-300 font-bold mb-1">{rewardConfig.discountTitle}</div>
+                <div className="font-mono text-lg sm:text-xl font-black text-amber-400 tracking-widest bg-black/70 py-1.5 px-3 rounded-xl border border-amber-400/30 mb-1.5">
+                  {rewardConfig.couponCode}
+                </div>
+                <p className="text-[11px] text-emerald-400 font-semibold">
+                  {rewardConfig.discountDetails}
+                </p>
               </div>
-              <p className="text-[11px] text-emerald-400 font-semibold">
-                ⚡ خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!
-              </p>
-            </div>
+            )}
+
+            {/* DYNAMIC CLOUD REWARD: PHYSICAL GIFT */}
+            {rewardConfig.isEnabled && rewardConfig.rewardType === 'physical_gift' && (
+              <div className="bg-gradient-to-r from-pink-950/60 via-zinc-950 to-amber-950/60 border border-pink-500/40 rounded-2xl p-4 mb-4 text-center max-w-sm w-full shadow-xl">
+                <div className="text-[11px] text-pink-300 font-bold mb-0.5">🎁 هدية عينية مجانية للأبطال:</div>
+                <div className="text-sm font-black text-white mb-1">{rewardConfig.giftItemName}</div>
+                <p className="text-[11px] text-emerald-300 font-semibold">{rewardConfig.giftInstructions}</p>
+              </div>
+            )}
 
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button
@@ -2045,15 +2104,23 @@ export const GameEngine: React.FC = () => {
                 <span>عرض لوحة الشرف</span>
               </button>
 
-              <a
-                href={`https://wa.me/218916580068?text=${encodeURIComponent('مرحباً شركة الإنارة الحديثة، هزمت وحش الحمل الزائد وفزت بلعبة بطل الإنارة وحصلت على كود الخصم: ENARAH-HERO')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center gap-1.5"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>طلب بالواتساب</span>
-              </a>
+              {rewardConfig.isEnabled && rewardConfig.rewardType !== 'no_reward' && (
+                <a
+                  href={`https://wa.me/218916580068?text=${encodeURIComponent(
+                    `مرحباً شركة الإنارة الحديثة، فزت بلعبة بطل الإنارة وحصلت على ${
+                      rewardConfig.rewardType === 'coupon'
+                        ? `كود الخصم: ${rewardConfig.couponCode}`
+                        : `الهدية المجانية: ${rewardConfig.giftItemName}`
+                    }`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{rewardConfig.rewardType === 'coupon' ? 'طلب بالواتساب' : 'استلام الهدية'}</span>
+                </a>
+              )}
 
               <button
                 onClick={() => startGame(0)}

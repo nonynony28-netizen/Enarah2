@@ -21,6 +21,8 @@
     .filter-project { background: #eab308; color: white; }
     .filter-contact { background: #f43f5e; color: white; }
     .update-prices-btn { background: #f59e0b; color: white; }
+    .game-rewards-btn { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: white; box-shadow: 0 4px 14px rgba(236,72,153,0.3); }
+    .game-rewards-btn:hover { opacity: 0.92; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
     .card { background: #0d2342; border-radius: 15px; padding: 20px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
     .badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
@@ -55,6 +57,7 @@
   </div>
 
   <div class="admin-actions">
+    <button class="game-rewards-btn" onclick="openGameRewardsModal()">🎁 جوائز اللعبة</button>
     <button class="update-prices-btn" onclick="openWireModal()">تحديث أسعار الأسلاك ⚡</button>
     <a href="/media-uploader.html" class="add-btn">إضافة منتج/مشروع +</a>
     <button class="filter-all" onclick="filterType('all')">الكل</button>
@@ -64,6 +67,79 @@
   </div>
 
   <div id="items" class="grid">جاري تحميل البيانات...</div>
+
+  <!-- نافذة إعدادات جوائز اللعبة المنبثقة -->
+  <div id="gameRewardsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; justify-content:center; align-items:center; padding: 20px;">
+    <div style="background:#0d2342; padding:25px; border-radius:20px; width:100%; max-width:480px; border:1px solid rgba(236,72,153,0.4); box-shadow: 0 0 35px rgba(236,72,153,0.25); max-height: 90vh; overflow-y: auto;">
+       <h2 style="margin-top:0; color:white; text-align:center; font-size: 20px;">🎁 إعدادات جوائز لعبة بطل الإنارة</h2>
+       <p style="text-align: center; color: #94a3b8; font-size: 12px; margin-top: -5px; margin-bottom: 20px;">تحكم في الهدايا والكوبونات التي تظهر للزبائن عند الفوز باللعبة</p>
+       
+       <div style="margin-top:15px;">
+         
+         <!-- مفتاح تفعيل/إيقاف الجوائز -->
+         <div style="background:#06152b; padding:15px; border-radius:12px; border:1px solid #1e3a8a; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
+           <div>
+             <div style="font-weight:bold; font-size:14px; color:white;">تفعيل نظام الجوائز بعد الفوز:</div>
+             <div style="font-size:11px; color:#94a3b8; margin-top:2px;">إذا تم الإيقاف، يلعب الزبائن للتسلية والتنافس بالصدارة فقط.</div>
+           </div>
+           <select id="gr_isEnabled" onchange="toggleRewardTypeVisibility()" style="padding:8px 12px; border-radius:8px; border:1px solid #3b82f6; background:#0d2342; color:white; font-weight:bold; cursor:pointer;">
+             <option value="true">مفعل ✅</option>
+             <option value="false">معطل ❌ (بدون جوائز)</option>
+           </select>
+         </div>
+
+         <!-- نوع الجائزة -->
+         <div id="rewardTypeSection" style="margin-bottom:18px;">
+           <label style="display:block; margin-bottom:8px; font-weight:bold; font-size:13px; color:#fbcfe8;">نوع المكافأة عند إنهاء المراحل:</label>
+           <div style="display:flex; gap:8px;">
+             <button type="button" id="btn_type_coupon" onclick="setRewardType('coupon')" style="flex:1; padding:10px 6px; border-radius:10px; border:1px solid #3b82f6; background:#1e3a8a; color:white; font-weight:bold; font-size:12px; cursor:pointer;">🎟️ كود خصم</button>
+             <button type="button" id="btn_type_gift" onclick="setRewardType('physical_gift')" style="flex:1; padding:10px 6px; border-radius:10px; border:1px solid #475569; background:#06152b; color:#94a3b8; font-weight:bold; font-size:12px; cursor:pointer;">🎁 هدية عينية</button>
+             <button type="button" id="btn_type_none" onclick="setRewardType('no_reward')" style="flex:1; padding:10px 6px; border-radius:10px; border:1px solid #475569; background:#06152b; color:#94a3b8; font-weight:bold; font-size:12px; cursor:pointer;">🏆 بدون جوائز</button>
+           </div>
+         </div>
+
+         <!-- حقول الكوبون -->
+         <div id="couponFields" style="background:#06152b; padding:15px; border-radius:12px; border:1px solid #3b82f6; margin-bottom:15px;">
+           <div style="margin-bottom:12px;">
+             <label style="display:block; margin-bottom:4px; font-weight:bold; font-size:12px; color:#93c5fd;">رمز الكوبون (Coupon Code):</label>
+             <input type="text" id="gr_couponCode" style="width:100%; padding:9px; border-radius:8px; border:1px solid #3b82f6; background:#0d2342; color:#facc15; font-family:monospace; font-weight:bold; font-size:16px; box-sizing:border-box;" value="ENARAH-HERO" />
+           </div>
+           <div style="margin-bottom:12px;">
+             <label style="display:block; margin-bottom:4px; font-weight:bold; font-size:12px; color:#93c5fd;">عنوان الكوبون:</label>
+             <input type="text" id="gr_discountTitle" style="width:100%; padding:9px; border-radius:8px; border:1px solid #3b82f6; background:#0d2342; color:white; font-size:13px; box-sizing:border-box;" value="كوبون أبطال الإنارة الذهبي" />
+           </div>
+           <div>
+             <label style="display:block; margin-bottom:4px; font-weight:bold; font-size:12px; color:#93c5fd;">تفاصيل الخصم (يظهر للزبون):</label>
+             <input type="text" id="gr_discountDetails" style="width:100%; padding:9px; border-radius:8px; border:1px solid #3b82f6; background:#0d2342; color:#34d399; font-size:12px; box-sizing:border-box;" value="خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!" />
+           </div>
+         </div>
+
+         <!-- حقول الهدية العينية -->
+         <div id="giftFields" style="display:none; background:#06152b; padding:15px; border-radius:12px; border:1px solid #ec4899; margin-bottom:15px;">
+           <div style="margin-bottom:12px;">
+             <label style="display:block; margin-bottom:4px; font-weight:bold; font-size:12px; color:#fbcfe8;">اسم الهدية المجانية:</label>
+             <input type="text" id="gr_giftItemName" style="width:100%; padding:9px; border-radius:8px; border:1px solid #ec4899; background:#0d2342; color:#facc15; font-weight:bold; font-size:14px; box-sizing:border-box;" value="كشاف سبوت لايت ذكي مجاني أو مفتاح لمس VIP" />
+           </div>
+           <div>
+             <label style="display:block; margin-bottom:4px; font-weight:bold; font-size:12px; color:#fbcfe8;">طريقة وشروط الاستلام من الفرع:</label>
+             <input type="text" id="gr_giftInstructions" style="width:100%; padding:9px; border-radius:8px; border:1px solid #ec4899; background:#0d2342; color:#34d399; font-size:12px; box-sizing:border-box;" value="استلم هديتك من أي فرع للإنارة الحديثة بإبراز هذه الشاشة!" />
+           </div>
+         </div>
+
+         <!-- رسالة التهنئة النهائية -->
+         <div style="margin-bottom:15px;">
+           <label style="display:block; margin-bottom:4px; font-weight:bold; font-size:12px; color:#94a3b8;">رسالة التهنئة النهائية للفائز:</label>
+           <textarea id="gr_victoryMsg" style="width:100%; min-height:60px; padding:9px; border-radius:8px; border:1px solid #3b82f6; background:#06152b; color:white; font-size:12px; box-sizing:border-box; resize:vertical;">أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.</textarea>
+         </div>
+
+       </div>
+
+       <div style="display:flex; gap:10px; margin-top:20px;">
+         <button id="saveRewardsBtn" onclick="saveGameRewards()" style="flex:2; padding:12px; background:linear-gradient(135deg, #10b981, #059669); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:15px; box-shadow:0 4px 12px rgba(16,185,129,0.3);">حفظ وتطبيق فوراً 🚀</button>
+         <button onclick="closeGameRewardsModal()" style="flex:1; padding:12px; background:#f43f5e; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:15px;">إلغاء</button>
+       </div>
+    </div>
+  </div>
 
   <!-- نافذة تحديث الأسعار المنبثقة -->
   <div id="wireModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
@@ -197,7 +273,7 @@
         const visits = allItems.filter(item => item.email && item.email.includes("@analytics.local"));
         document.getElementById("visitorCount").innerText = visits.length;
 
-        const validItems = allItems.filter(item => item.type !== "contact" && (!item.email || !item.email.includes("@analytics.local")) && item.email !== "admin_wire_prices@app.local");
+        const validItems = allItems.filter(item => item.type !== "contact" && (!item.email || !item.email.includes("@analytics.local")) && item.email !== "admin_wire_prices@app.local" && item.email !== "admin_game_rewards@app.local");
         document.getElementById("totalItemsCount").innerText = validItems.length;
 
         renderItems();
@@ -212,7 +288,7 @@
       container.innerHTML = "";
       try {
         const filteredItems = allItems.filter((item) => {
-          if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local")) return false; 
+          if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local" || item.email === "admin_game_rewards@app.local")) return false; 
           
           let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
 
@@ -382,6 +458,153 @@
       btn.innerText = 'حفظ ونشر';
       closeWireModal();
       loadItems();
+    }
+
+    // ==========================================
+    // دوال إدارة جوائز وهدايا اللعبة
+    // ==========================================
+    let currentRewardType = "coupon";
+
+    function setRewardType(type) {
+      currentRewardType = type;
+      const btnCoupon = document.getElementById("btn_type_coupon");
+      const btnGift = document.getElementById("btn_type_gift");
+      const btnNone = document.getElementById("btn_type_none");
+      const couponFields = document.getElementById("couponFields");
+      const giftFields = document.getElementById("giftFields");
+
+      // Active state styling
+      [btnCoupon, btnGift, btnNone].forEach(b => {
+        b.style.background = "#06152b";
+        b.style.color = "#94a3b8";
+        b.style.borderColor = "#475569";
+      });
+
+      if (type === "coupon") {
+        btnCoupon.style.background = "#1e3a8a";
+        btnCoupon.style.color = "white";
+        btnCoupon.style.borderColor = "#3b82f6";
+        couponFields.style.display = "block";
+        giftFields.style.display = "none";
+      } else if (type === "physical_gift") {
+        btnGift.style.background = "#831843";
+        btnGift.style.color = "white";
+        btnGift.style.borderColor = "#ec4899";
+        couponFields.style.display = "none";
+        giftFields.style.display = "block";
+      } else {
+        btnNone.style.background = "#581c87";
+        btnNone.style.color = "white";
+        btnNone.style.borderColor = "#a855f7";
+        couponFields.style.display = "none";
+        giftFields.style.display = "none";
+      }
+    }
+
+    function toggleRewardTypeVisibility() {
+      const isEnabled = document.getElementById("gr_isEnabled").value === "true";
+      document.getElementById("rewardTypeSection").style.display = isEnabled ? "block" : "none";
+      if (!isEnabled) {
+        document.getElementById("couponFields").style.display = "none";
+        document.getElementById("giftFields").style.display = "none";
+      } else {
+        setRewardType(currentRewardType);
+      }
+    }
+
+    function openGameRewardsModal() {
+      document.getElementById("gameRewardsModal").style.display = "flex";
+      
+      const gameUpdates = allItems.filter(item => item.email === "admin_game_rewards@app.local");
+      if (gameUpdates.length > 0) {
+        try {
+          const latest = JSON.parse(gameUpdates[0].phone).config;
+          document.getElementById("gr_isEnabled").value = latest.isEnabled ? "true" : "false";
+          document.getElementById("gr_couponCode").value = latest.couponCode || "ENARAH-HERO";
+          document.getElementById("gr_discountTitle").value = latest.discountTitle || "كوبون أبطال الإنارة الذهبي";
+          document.getElementById("gr_discountDetails").value = latest.discountDetails || "خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!";
+          document.getElementById("gr_giftItemName").value = latest.giftItemName || "كشاف سبوت لايت ذكي مجاني أو مفتاح لمس VIP";
+          document.getElementById("gr_giftInstructions").value = latest.giftInstructions || "استلم هديتك من أي فرع للإنارة الحديثة بإبراز هذه الشاشة!";
+          document.getElementById("gr_victoryMsg").value = latest.victoryMsg || "أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.";
+          setRewardType(latest.rewardType || "coupon");
+          toggleRewardTypeVisibility();
+          return;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // Default values
+      document.getElementById("gr_isEnabled").value = "true";
+      document.getElementById("gr_couponCode").value = "ENARAH-HERO";
+      document.getElementById("gr_discountTitle").value = "كوبون أبطال الإنارة الذهبي";
+      document.getElementById("gr_discountDetails").value = "خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!";
+      document.getElementById("gr_giftItemName").value = "كشاف سبوت لايت ذكي مجاني أو مفتاح لمس VIP";
+      document.getElementById("gr_giftInstructions").value = "استلم هديتك من أي فرع للإنارة الحديثة بإبراز هذه الشاشة!";
+      document.getElementById("gr_victoryMsg").value = "أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.";
+      setRewardType("coupon");
+      toggleRewardTypeVisibility();
+    }
+
+    function closeGameRewardsModal() {
+      document.getElementById("gameRewardsModal").style.display = "none";
+    }
+
+    async function saveGameRewards() {
+      const btn = document.getElementById("saveRewardsBtn");
+      btn.innerText = "جاري النشر في السيرفر...";
+      btn.disabled = true;
+
+      const isEnabled = document.getElementById("gr_isEnabled").value === "true";
+      const config = {
+        isEnabled: isEnabled,
+        rewardType: currentRewardType,
+        couponCode: document.getElementById("gr_couponCode").value.trim().toUpperCase() || "ENARAH-HERO",
+        discountTitle: document.getElementById("gr_discountTitle").value.trim() || "كوبون أبطال الإنارة الذهبي",
+        discountDetails: document.getElementById("gr_discountDetails").value.trim() || "خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!",
+        giftItemName: document.getElementById("gr_giftItemName").value.trim() || "كشاف سبوت لايت ذكي مجاني",
+        giftInstructions: document.getElementById("gr_giftInstructions").value.trim() || "استلم هديتك من أي فرع للإنارة الحديثة بإبراز هذه الشاشة!",
+        victoryMsg: document.getElementById("gr_victoryMsg").value.trim() || "أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.",
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        const pwd = getAdminPassword();
+        const res = await fetch("https://enarah2.vercel.app/api/save-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": pwd
+          },
+          body: JSON.stringify({
+            name: "Game Rewards Update",
+            email: "admin_game_rewards@app.local",
+            phone: JSON.stringify({ type: "game_rewards", config })
+          })
+        });
+
+        if (res.status === 401) {
+          alert("غير مصرح لك بالعملية أو كلمة المرور غير صحيحة!");
+          sessionStorage.removeItem("admin_password");
+          location.reload();
+          return;
+        }
+
+        // Save local backup as well
+        try {
+          localStorage.setItem("enarah_game_reward_config", JSON.stringify(config));
+        } catch {}
+
+        alert("تم تحديث وحفظ جوائز اللعبة بنجاح في الموقع واللعبة!");
+        closeGameRewardsModal();
+        loadItems();
+      } catch (err) {
+        alert("حدث خطأ أثناء حفظ الجوائز.");
+        console.error(err);
+      } finally {
+        btn.innerText = "حفظ وتطبيق فوراً 🚀";
+        btn.disabled = false;
+      }
     }
 
     // دوال تعديل المنتجات والمشاريع
