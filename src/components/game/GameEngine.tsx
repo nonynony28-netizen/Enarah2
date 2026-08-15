@@ -1,38 +1,74 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { sound } from './audio'
-import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame } from 'lucide-react'
+import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, ShieldAlert, Key, Unlock, Lock, Compass } from 'lucide-react'
+
+export interface Hazard {
+  id: number
+  x: number
+  y: number
+  vx: number
+  vy: number
+  radius: number
+  type: 'patrol' | 'vortex'
+  minX?: number
+  maxX?: number
+  minY?: number
+  maxY?: number
+}
+
+export interface Gate {
+  id: number
+  x: number
+  y: number
+  w: number
+  h: number
+  isOpen: boolean
+  requiredLamps?: number
+  requiredWires?: number
+  labelAr: string
+}
 
 export interface LevelData {
   id: number
   nameAr: string
   nameEn: string
   subtitleAr: string
-  theme: 'street' | 'villa' | 'tower'
+  difficultyBadge: string
+  stars: number
+  theme: 'street' | 'villa' | 'tower' | 'showroom'
   width: number
   height: number
   walls: { x: number; y: number; w: number; h: number }[]
   lamps: { id: number; x: number; y: number; isLit: boolean; name: string }[]
   sparks: { id: number; x: number; y: number; collected: boolean; type: 'spark' | 'wire' | 'spotlight' }[]
+  hazards: Hazard[]
+  gates: Gate[]
   masterSwitch: { x: number; y: number; isActivated: boolean }
   heroStart: { x: number; y: number }
+  initialLight: number
 }
 
 const LEVELS: LevelData[] = [
+  // ==========================================
+  // LEVEL 1: الشارع وحي الليثي (سهل وممتع)
+  // ==========================================
   {
     id: 1,
     nameAr: 'المرحلة 1: حي الليثي - بنغازي',
     nameEn: 'Level 1: Al-Laythi District',
-    subtitleAr: 'انقطعت الكهرباء عن الشارع! تحرك لإنارة مصابيح الأعمدة وتشغيل القاطع الرئيسي.',
+    subtitleAr: 'انقطعت الكهرباء عن الشارع! تحرك لإنارة أعمدة الشوارع وتشغيل القاطع الرئيسي.',
+    difficultyBadge: 'سهل',
+    stars: 1,
     theme: 'street',
     width: 900,
     height: 600,
     heroStart: { x: 80, y: 300 },
+    initialLight: 150,
     walls: [
       { x: 0, y: 0, w: 900, h: 20 },
       { x: 0, y: 580, w: 900, h: 20 },
       { x: 0, y: 0, w: 20, h: 600 },
       { x: 880, y: 0, w: 20, h: 600 },
-      // Internal buildings & barriers
       { x: 180, y: 20, w: 30, h: 220 },
       { x: 180, y: 360, w: 30, h: 220 },
       { x: 380, y: 150, w: 30, h: 300 },
@@ -60,104 +96,203 @@ const LEVELS: LevelData[] = [
       { id: 9, x: 780, y: 150, collected: false, type: 'spotlight' },
       { id: 10, x: 780, y: 450, collected: false, type: 'spark' },
     ],
+    hazards: [],
+    gates: [],
     masterSwitch: { x: 830, y: 300, isActivated: false },
   },
+
+  // ==========================================
+  // LEVEL 2: الفيلا المعمارية (متوسط + بوابات أمان ليزر)
+  // ==========================================
   {
     id: 2,
     nameAr: 'المرحلة 2: الفيلا المعمارية الفاخرة',
     nameEn: 'Level 2: The Luxury Villa',
-    subtitleAr: 'أعد الحياة إلى صالات وغرف الفيلا من خلال إشعال الثريات وتركيب السبوت لايت.',
+    subtitleAr: 'أنر 3 ثريات على الأقل لفتح بوابة أمان غرفة القاطع، واحذر دوامات تفريغ الطاقة!',
+    difficultyBadge: 'متوسط',
+    stars: 2,
     theme: 'villa',
     width: 950,
     height: 650,
-    heroStart: { x: 90, y: 320 },
+    heroStart: { x: 90, y: 325 },
+    initialLight: 130,
     walls: [
       { x: 0, y: 0, w: 950, h: 20 },
       { x: 0, y: 630, w: 950, h: 20 },
       { x: 0, y: 0, w: 20, h: 650 },
       { x: 930, y: 0, w: 20, h: 650 },
-      // Villa room partitions
-      { x: 200, y: 20, w: 20, h: 240 },
-      { x: 200, y: 390, w: 20, h: 240 },
-      { x: 200, y: 240, w: 200, h: 20 },
-      { x: 200, y: 390, w: 200, h: 20 },
-      { x: 520, y: 120, w: 20, h: 410 },
-      { x: 680, y: 20, w: 20, h: 250 },
-      { x: 680, y: 380, w: 20, h: 250 },
+      // Villa partitions
+      { x: 220, y: 20, w: 20, h: 220 },
+      { x: 220, y: 410, w: 20, h: 220 },
+      { x: 220, y: 220, w: 220, h: 20 },
+      { x: 220, y: 410, w: 220, h: 20 },
+      { x: 540, y: 120, w: 20, h: 410 },
+      { x: 720, y: 20, w: 20, h: 230 },
+      { x: 720, y: 400, w: 20, h: 230 },
     ],
     lamps: [
-      { id: 1, x: 110, y: 120, isLit: false, name: 'ثريا المدخل الملكي' },
-      { id: 2, x: 110, y: 520, isLit: false, name: 'إنارة المجلس' },
-      { id: 3, x: 350, y: 130, isLit: false, name: 'إضاءة الصالون المخفية' },
-      { id: 4, x: 350, y: 520, isLit: false, name: 'ثريا المائدة الكريستال' },
-      { id: 5, x: 600, y: 325, isLit: false, name: 'سبوت لايت الممر الدائري' },
-      { id: 6, x: 800, y: 140, isLit: false, name: 'إضاءة غرفة الماستر' },
-      { id: 7, x: 800, y: 510, isLit: false, name: 'إنارة التراس والواجهة' },
+      { id: 1, x: 120, y: 120, isLit: false, name: 'ثريا المدخل الملكي' },
+      { id: 2, x: 120, y: 520, isLit: false, name: 'إنارة المجلس الرئيسي' },
+      { id: 3, x: 380, y: 120, isLit: false, name: 'إضاءة الصالون المخفية' },
+      { id: 4, x: 380, y: 520, isLit: false, name: 'ثريا المائدة الكريستال' },
+      { id: 5, x: 630, y: 325, isLit: false, name: 'سبوت لايت الممر الدائري' },
+      { id: 6, x: 820, y: 140, isLit: false, name: 'إضاءة غرفة الماستر' },
+      { id: 7, x: 820, y: 510, isLit: false, name: 'إنارة التراس والواجهة' },
     ],
     sparks: [
-      { id: 1, x: 110, y: 240, collected: false, type: 'spark' },
-      { id: 2, x: 110, y: 400, collected: false, type: 'wire' },
-      { id: 3, x: 350, y: 325, collected: false, type: 'spotlight' },
-      { id: 4, x: 270, y: 130, collected: false, type: 'spark' },
-      { id: 5, x: 270, y: 520, collected: false, type: 'wire' },
-      { id: 6, x: 440, y: 130, collected: false, type: 'spotlight' },
-      { id: 7, x: 440, y: 520, collected: false, type: 'spark' },
-      { id: 8, x: 600, y: 180, collected: false, type: 'wire' },
-      { id: 9, x: 600, y: 470, collected: false, type: 'spotlight' },
-      { id: 10, x: 740, y: 220, collected: false, type: 'spark' },
-      { id: 11, x: 740, y: 430, collected: false, type: 'wire' },
-      { id: 12, x: 860, y: 325, collected: false, type: 'spotlight' },
+      { id: 1, x: 120, y: 250, collected: false, type: 'spark' },
+      { id: 2, x: 120, y: 400, collected: false, type: 'wire' },
+      { id: 3, x: 380, y: 325, collected: false, type: 'spotlight' },
+      { id: 4, x: 300, y: 120, collected: false, type: 'spark' },
+      { id: 5, x: 300, y: 520, collected: false, type: 'wire' },
+      { id: 6, x: 460, y: 120, collected: false, type: 'spotlight' },
+      { id: 7, x: 460, y: 520, collected: false, type: 'spark' },
+      { id: 8, x: 630, y: 180, collected: false, type: 'wire' },
+      { id: 9, x: 630, y: 470, collected: false, type: 'spotlight' },
+      { id: 10, x: 770, y: 220, collected: false, type: 'spark' },
+      { id: 11, x: 770, y: 430, collected: false, type: 'wire' },
+      { id: 12, x: 870, y: 325, collected: false, type: 'spotlight' },
+    ],
+    // Laser security gate blocking master generator room
+    gates: [
+      { id: 1, x: 720, y: 250, w: 20, h: 150, isOpen: false, requiredLamps: 3, labelAr: 'مغلقة: أنر 3 ثريات لفتحها' },
+    ],
+    // 2 Soft rotating energy drain vortices
+    hazards: [
+      { id: 1, x: 380, y: 325, vx: 0, vy: 1.2, radius: 24, type: 'vortex', minY: 260, maxY: 390 },
+      { id: 2, x: 630, y: 250, vx: 0, vy: -1.2, radius: 24, type: 'vortex', minY: 150, maxY: 500 },
     ],
     masterSwitch: { x: 880, y: 325, isActivated: false },
   },
+
+  // ==========================================
+  // LEVEL 3: برج المدينة الذكي (تحدي + شحنات متحركة)
+  // ==========================================
   {
     id: 3,
     nameAr: 'المرحلة 3: برج المدينة الذكي',
-    nameEn: 'Level 3: The Smart Tower',
-    subtitleAr: 'المرحلة النهائية: قم بتشغيل منظومة الإنارة الذكية لبرج المدينة بالكامل!',
+    nameEn: 'Level 3: The Smart City Tower',
+    subtitleAr: 'احذر شحنات الحمل الزائد المتحركة! اجمع الأسلاك وافتح قواطع البرج الذكي.',
+    difficultyBadge: 'تحدي قوي',
+    stars: 3,
     theme: 'tower',
     width: 1000,
     height: 700,
     heroStart: { x: 80, y: 350 },
+    initialLight: 120,
     walls: [
       { x: 0, y: 0, w: 1000, h: 20 },
       { x: 0, y: 680, w: 1000, h: 20 },
       { x: 0, y: 0, w: 20, h: 700 },
       { x: 980, y: 0, w: 20, h: 700 },
-      // Maze grid pillars
+      // Tech pillars
       { x: 180, y: 120, w: 40, h: 200 },
       { x: 180, y: 380, w: 40, h: 200 },
-      { x: 360, y: 20, w: 40, h: 250 },
-      { x: 360, y: 430, w: 40, h: 250 },
-      { x: 540, y: 150, w: 40, h: 400 },
-      { x: 720, y: 20, w: 40, h: 280 },
-      { x: 720, y: 400, w: 40, h: 280 },
+      { x: 380, y: 20, w: 40, h: 250 },
+      { x: 380, y: 430, w: 40, h: 250 },
+      { x: 580, y: 160, w: 40, h: 380 },
+      { x: 780, y: 20, w: 40, h: 260 },
+      { x: 780, y: 420, w: 40, h: 260 },
     ],
     lamps: [
-      { id: 1, x: 100, y: 120, isLit: false, name: 'لوحة تحكم الطابق 1' },
-      { id: 2, x: 100, y: 580, isLit: false, name: 'لوحة تحكم الطابق 2' },
-      { id: 3, x: 270, y: 350, isLit: false, name: 'إنارة البهو الزجاجي' },
-      { id: 4, x: 450, y: 120, isLit: false, name: 'كشافات الواجهة البانورامية' },
-      { id: 5, x: 450, y: 580, isLit: false, name: 'مفاتيح اللمس الذكية' },
-      { id: 6, x: 630, y: 350, isLit: false, name: 'منظومة الطاقة المركزية' },
-      { id: 7, x: 850, y: 150, isLit: false, name: 'إنارة مهبط الهليكوبتر' },
-      { id: 8, x: 850, y: 550, isLit: false, name: 'برج البث الضوئي' },
+      { id: 1, x: 100, y: 120, isLit: false, name: 'سيرفر الطابق 1' },
+      { id: 2, x: 100, y: 580, isLit: false, name: 'سيرفر الطابق 2' },
+      { id: 3, x: 280, y: 350, isLit: false, name: 'إنارة البهو الزجاجي' },
+      { id: 4, x: 480, y: 120, isLit: false, name: 'كشافات الواجهة' },
+      { id: 5, x: 480, y: 580, isLit: false, name: 'مفاتيح اللمس الذكية' },
+      { id: 6, x: 680, y: 350, isLit: false, name: 'منظومة الطاقة المركزية' },
+      { id: 7, x: 880, y: 150, isLit: false, name: 'إنارة مهبط الهليكوبتر' },
+      { id: 8, x: 880, y: 550, isLit: false, name: 'برج البث الضوئي' },
     ],
     sparks: [
       { id: 1, x: 100, y: 250, collected: false, type: 'spark' },
       { id: 2, x: 100, y: 450, collected: false, type: 'wire' },
-      { id: 3, x: 270, y: 150, collected: false, type: 'spotlight' },
-      { id: 4, x: 270, y: 550, collected: false, type: 'spark' },
-      { id: 5, x: 450, y: 250, collected: false, type: 'wire' },
-      { id: 6, x: 450, y: 450, collected: false, type: 'spotlight' },
-      { id: 7, x: 630, y: 150, collected: false, type: 'spark' },
-      { id: 8, x: 630, y: 550, collected: false, type: 'wire' },
-      { id: 9, x: 800, y: 250, collected: false, type: 'spotlight' },
-      { id: 10, x: 800, y: 450, collected: false, type: 'spark' },
-      { id: 11, x: 920, y: 200, collected: false, type: 'wire' },
-      { id: 12, x: 920, y: 500, collected: false, type: 'spotlight' },
+      { id: 3, x: 280, y: 150, collected: false, type: 'spotlight' },
+      { id: 4, x: 280, y: 550, collected: false, type: 'spark' },
+      { id: 5, x: 480, y: 250, collected: false, type: 'wire' },
+      { id: 6, x: 480, y: 450, collected: false, type: 'spotlight' },
+      { id: 7, x: 680, y: 150, collected: false, type: 'spark' },
+      { id: 8, x: 680, y: 550, collected: false, type: 'wire' },
+      { id: 9, x: 880, y: 250, collected: false, type: 'spotlight' },
+      { id: 10, x: 880, y: 450, collected: false, type: 'spark' },
+      { id: 11, x: 940, y: 200, collected: false, type: 'wire' },
+      { id: 12, x: 940, y: 500, collected: false, type: 'spotlight' },
+    ],
+    gates: [
+      { id: 1, x: 780, y: 280, w: 40, h: 140, isOpen: false, requiredLamps: 4, labelAr: 'مغلقة: أنر 4 محطات لفتحها' },
+    ],
+    // 3 Kinetic Electric Patrol Bots
+    hazards: [
+      { id: 1, x: 280, y: 180, vx: 0, vy: 2.2, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
+      { id: 2, x: 480, y: 520, vx: 0, vy: -2.5, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
+      { id: 3, x: 680, y: 200, vx: 0, vy: 2.8, radius: 14, type: 'patrol', minY: 80, maxY: 620 },
     ],
     masterSwitch: { x: 930, y: 350, isActivated: false },
+  },
+
+  // ==========================================
+  // LEVEL 4: المعرض الرئيسي - ليلة الافتتاح (المرحلة الأسطورية)
+  // ==========================================
+  {
+    id: 4,
+    nameAr: 'المرحلة 4: المعرض الرئيسي للإنارة الحديثة',
+    nameEn: 'Level 4: Grand Flagship Showroom',
+    subtitleAr: 'المرحلة الذهبية الكبرى! اجمع كابلات النحاس وأنر ثريات المعرض لتشغيل الإنارة الشاملة.',
+    difficultyBadge: 'مرحلة ذهبية أسطورية',
+    stars: 4,
+    theme: 'showroom',
+    width: 1050,
+    height: 720,
+    heroStart: { x: 80, y: 360 },
+    initialLight: 120,
+    walls: [
+      { x: 0, y: 0, w: 1050, h: 20 },
+      { x: 0, y: 700, w: 1050, h: 20 },
+      { x: 0, y: 0, w: 20, h: 720 },
+      { x: 1030, y: 0, w: 20, h: 720 },
+      // Luxury Display Showcases
+      { x: 200, y: 100, w: 50, h: 180 },
+      { x: 200, y: 440, w: 50, h: 180 },
+      { x: 420, y: 20, w: 40, h: 280 },
+      { x: 420, y: 420, w: 40, h: 280 },
+      { x: 640, y: 120, w: 50, h: 220 },
+      { x: 640, y: 380, w: 50, h: 220 },
+      { x: 850, y: 20, w: 40, h: 260 },
+      { x: 850, y: 440, w: 40, h: 260 },
+    ],
+    lamps: [
+      { id: 1, x: 100, y: 120, isLit: false, name: 'جناح الثريات الإيطالية' },
+      { id: 2, x: 100, y: 600, isLit: false, name: 'منصة مفاتيح اللمس الفاخرة' },
+      { id: 3, x: 310, y: 200, isLit: false, name: 'استوديو الإضاءة الذكية' },
+      { id: 4, x: 310, y: 520, isLit: false, name: 'جناح إنارة الواجهات والحدائق' },
+      { id: 5, x: 530, y: 360, isLit: false, name: 'الثريا الكريستال العملاقة' },
+      { id: 6, x: 740, y: 180, isLit: false, name: 'منظومة الإنترفون المرئي' },
+      { id: 7, x: 740, y: 540, isLit: false, name: 'جناح الكابلات المعتمدة' },
+      { id: 8, x: 940, y: 180, isLit: false, name: 'منصة التحكم المركزي VIP' },
+      { id: 9, x: 940, y: 540, isLit: false, name: 'كشافات ليلة الافتتاح' },
+    ],
+    sparks: [
+      { id: 1, x: 100, y: 260, collected: false, type: 'wire' },
+      { id: 2, x: 100, y: 460, collected: false, type: 'wire' },
+      { id: 3, x: 310, y: 100, collected: false, type: 'spark' },
+      { id: 4, x: 310, y: 360, collected: false, type: 'spotlight' },
+      { id: 5, x: 310, y: 620, collected: false, type: 'spark' },
+      { id: 6, x: 530, y: 180, collected: false, type: 'wire' },
+      { id: 7, x: 530, y: 540, collected: false, type: 'wire' },
+      { id: 8, x: 740, y: 100, collected: false, type: 'spotlight' },
+      { id: 9, x: 740, y: 360, collected: false, type: 'wire' },
+      { id: 10, x: 740, y: 620, collected: false, type: 'spotlight' },
+      { id: 11, x: 940, y: 360, collected: false, type: 'spotlight' },
+    ],
+    gates: [
+      { id: 1, x: 850, y: 280, w: 40, h: 160, isOpen: false, requiredWires: 4, labelAr: 'مغلقة: اجمع 4 كابلات نحاس' },
+    ],
+    hazards: [
+      { id: 1, x: 310, y: 360, vx: 1.8, vy: 0, radius: 15, type: 'patrol', minX: 260, maxX: 370 },
+      { id: 2, x: 530, y: 220, vx: 0, vy: 2.2, radius: 15, type: 'patrol', minY: 100, maxY: 620 },
+      { id: 3, x: 740, y: 500, vx: 0, vy: -2.2, radius: 15, type: 'patrol', minY: 100, maxY: 620 },
+    ],
+    masterSwitch: { x: 970, y: 360, isActivated: false },
   },
 ]
 
@@ -181,11 +316,12 @@ export const GameEngine: React.FC = () => {
   const [gameState, setGameState] = useState<'intro' | 'playing' | 'level_won' | 'game_won'>('intro')
   const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(1)
-  const [lightPower, setLightPower] = useState(140) // Radius of hero's light
+  const [lightPower, setLightPower] = useState(140)
   const [isMuted, setIsMuted] = useState(false)
   const [lampsLitCount, setLampsLitCount] = useState(0)
   const [totalLampsCount, setTotalLampsCount] = useState(0)
-  const [sparksCount, setSparksCount] = useState(0)
+  const [collectedWiresCount, setCollectedWiresCount] = useState(0)
+  const [bannerAlert, setBannerAlert] = useState<string | null>(null)
 
   // Current active level clone
   const levelRef = useRef<LevelData>(JSON.parse(JSON.stringify(LEVELS[0])))
@@ -202,6 +338,7 @@ export const GameEngine: React.FC = () => {
     walkCycle: 0,
     blinkTimer: 0,
     isMoving: false,
+    invincibleTimer: 0,
   })
 
   // Particles
@@ -220,10 +357,12 @@ export const GameEngine: React.FC = () => {
     heroRef.current.y = cloned.heroStart.y
     heroRef.current.vx = 0
     heroRef.current.vy = 0
+    heroRef.current.invincibleTimer = 0
     setLampsLitCount(0)
     setTotalLampsCount(cloned.lamps.length)
-    setSparksCount(0)
-    setLightPower(140)
+    setCollectedWiresCount(0)
+    setLightPower(cloned.initialLight)
+    setBannerAlert(null)
     particlesRef.current = []
   }, [])
 
@@ -231,7 +370,7 @@ export const GameEngine: React.FC = () => {
   const startGame = (levelIdx = 0) => {
     setCurrentLevelIdx(levelIdx)
     loadLevel(levelIdx)
-    setScore(0)
+    if (levelIdx === 0) setScore(0)
     setCombo(1)
     setGameState('playing')
   }
@@ -254,6 +393,12 @@ export const GameEngine: React.FC = () => {
     const nextMuted = !isMuted
     setIsMuted(nextMuted)
     sound.isMuted = nextMuted
+  }
+
+  // Show temporary banner alert (e.g. gate opened)
+  const showAlert = (msg: string) => {
+    setBannerAlert(msg)
+    setTimeout(() => setBannerAlert(null), 3000)
   }
 
   // Spawn visual particles
@@ -322,6 +467,10 @@ export const GameEngine: React.FC = () => {
       const hero = heroRef.current
 
       if (gameState === 'playing') {
+        if (hero.invincibleTimer > 0) {
+          hero.invincibleTimer -= dt
+        }
+
         // 1. Process Input (Keyboard + Touch D-Pad)
         let moveX = 0
         let moveY = 0
@@ -354,14 +503,18 @@ export const GameEngine: React.FC = () => {
           hero.isMoving = false
         }
 
-        // 2. Collision with Walls
+        // 2. Collision with Walls and Closed Laser Gates
         const newX = hero.x + moveX
         const newY = hero.y + moveY
         let canMoveX = true
         let canMoveY = true
 
-        for (const wall of level.walls) {
-          // Check horizontal collision
+        const obstacles = [
+          ...level.walls,
+          ...level.gates.filter((g) => !g.isOpen).map((g) => ({ x: g.x, y: g.y, w: g.w, h: g.h })),
+        ]
+
+        for (const wall of obstacles) {
           if (
             newX + hero.radius > wall.x &&
             newX - hero.radius < wall.x + wall.w &&
@@ -370,7 +523,6 @@ export const GameEngine: React.FC = () => {
           ) {
             canMoveX = false
           }
-          // Check vertical collision
           if (
             hero.x + hero.radius > wall.x &&
             hero.x - hero.radius < wall.x + wall.w &&
@@ -384,35 +536,77 @@ export const GameEngine: React.FC = () => {
         if (canMoveX) hero.x = newX
         if (canMoveY) hero.y = newY
 
-        // 3. Collect Sparks & Powerups
+        // 3. Update & Check Moving Hazards (Patrols & Vortices)
+        for (const h of level.hazards) {
+          h.x += h.vx
+          h.y += h.vy
+
+          // Bounce within bounds
+          if (h.minX !== undefined && (h.x <= h.minX || h.x >= h.maxX!)) h.vx *= -1
+          if (h.minY !== undefined && (h.y <= h.minY || h.y >= h.maxY!)) h.vy *= -1
+
+          // Collision with Hero
+          const hDist = Math.hypot(hero.x - h.x, hero.y - h.y)
+          if (hDist < hero.radius + h.radius && hero.invincibleTimer <= 0) {
+            hero.invincibleTimer = 1.2
+            sound.playShock()
+            spawnParticles(hero.x, hero.y, '#ef4444', 20, 2)
+
+            if (h.type === 'patrol') {
+              // Electric Pushback & Light drain
+              hero.x -= moveX * 8
+              hero.y -= moveY * 8
+              setLightPower((prev) => Math.max(prev - 25, 90))
+              showAlert('⚠️ احذر! ملامسة شحنة الحمل الزائد استنزفت طاقتك!')
+            } else if (h.type === 'vortex') {
+              // Vortex drain
+              setLightPower((prev) => Math.max(prev - 15, 90))
+              showAlert('🌀 دوامة تفريغ الطاقة قلصت شعاع نورك!')
+            }
+          }
+        }
+
+        // 4. Collect Sparks & Powerups
         for (const spark of level.sparks) {
           if (!spark.collected) {
             const dist = Math.hypot(hero.x - spark.x, hero.y - spark.y)
             if (dist < hero.radius + 16) {
               spark.collected = true
-              setSparksCount((prev) => prev + 1)
               
               if (spark.type === 'wire') {
                 sound.playWire()
                 setScore((prev) => prev + 150 * combo)
-                setLightPower((prev) => Math.min(prev + 18, 260))
+                setCollectedWiresCount((prev) => {
+                  const newCount = prev + 1
+                  // Check if any wire-gated doors open
+                  for (const g of level.gates) {
+                    if (!g.isOpen && g.requiredWires && newCount >= g.requiredWires) {
+                      g.isOpen = true
+                      sound.playGateOpen()
+                      spawnParticles(g.x + g.w / 2, g.y + g.h / 2, '#10b981', 30, 2)
+                      showAlert('🔓 رائع! تم فتح بوابة الليزر بعد جمع الكابلات المطلوبة!')
+                    }
+                  }
+                  return newCount
+                })
+                setLightPower((prev) => Math.min(prev + 22, 280))
                 spawnParticles(spark.x, spark.y, '#f59e0b', 16, 1.2)
               } else if (spark.type === 'spotlight') {
                 sound.playSpark()
                 setScore((prev) => prev + 200 * combo)
-                setLightPower((prev) => Math.min(prev + 25, 280))
+                setLightPower((prev) => Math.min(prev + 30, 300))
                 spawnParticles(spark.x, spark.y, '#38bdf8', 18, 1.4)
               } else {
                 sound.playSpark()
                 setScore((prev) => prev + 50 * combo)
-                setLightPower((prev) => Math.min(prev + 8, 250))
+                setLightPower((prev) => Math.min(prev + 10, 260))
                 spawnParticles(spark.x, spark.y, '#fde047', 12, 1)
               }
             }
           }
         }
 
-        // 4. Light up Dark Lamps
+        // 5. Light up Dark Lamps
         for (const lamp of level.lamps) {
           if (!lamp.isLit) {
             const dist = Math.hypot(hero.x - lamp.x, hero.y - lamp.y)
@@ -422,6 +616,15 @@ export const GameEngine: React.FC = () => {
               setScore((prev) => prev + 300 * combo)
               setLampsLitCount((prev) => {
                 const nextCount = prev + 1
+                // Check if any lamp-gated doors open
+                for (const g of level.gates) {
+                  if (!g.isOpen && g.requiredLamps && nextCount >= g.requiredLamps) {
+                    g.isOpen = true
+                    sound.playGateOpen()
+                    spawnParticles(g.x + g.w / 2, g.y + g.h / 2, '#10b981', 30, 2)
+                    showAlert('🔓 تم فك قفل بوابة الأمان بنجاح!')
+                  }
+                }
                 return nextCount
               })
               spawnParticles(lamp.x, lamp.y, '#60a5fa', 24, 1.8)
@@ -429,24 +632,27 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 5. Check Master Switchboard
+        // 6. Check Master Switchboard
         const masterDist = Math.hypot(hero.x - level.masterSwitch.x, hero.y - level.masterSwitch.y)
-        if (masterDist < hero.radius + 30 && !level.masterSwitch.isActivated) {
+        if (masterDist < hero.radius + 32 && !level.masterSwitch.isActivated) {
           level.masterSwitch.isActivated = true
-          // Turn all remaining lamps on
           level.lamps.forEach((l) => (l.isLit = true))
           sound.playMasterSwitch()
-          setScore((prev) => prev + 1000)
-          spawnParticles(level.masterSwitch.x, level.masterSwitch.y, '#10b981', 40, 2.5)
+          setScore((prev) => prev + 1500)
+          spawnParticles(level.masterSwitch.x, level.masterSwitch.y, '#10b981', 50, 3)
 
           setTimeout(() => {
             sound.playVictory()
-            setGameState('level_won')
+            if (currentLevelIdx < LEVELS.length - 1) {
+              setGameState('level_won')
+            } else {
+              setGameState('game_won')
+            }
           }, 800)
         }
       }
 
-      // 6. Update Particles
+      // 7. Update Particles
       for (let i = particlesRef.current.length - 1; i >= 0; i--) {
         const p = particlesRef.current[i]
         p.x += p.vx
@@ -459,37 +665,150 @@ export const GameEngine: React.FC = () => {
       }
 
       // ==========================================
-      // CANVAS RENDERING
+      // CANVAS RENDERING (Theme-Specific Styles)
       // ==========================================
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Background Grid (City Streets / Villa Flooring)
-      ctx.fillStyle = '#060a12'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'
-      ctx.lineWidth = 1
-      const gridSize = 40
-      for (let x = 0; x < canvas.width; x += gridSize) {
+      // Theme Backgrounds
+      if (level.theme === 'street') {
+        // Dark Asphalt with yellow street dividers
+        ctx.fillStyle = '#090b10'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.strokeStyle = 'rgba(234, 179, 8, 0.15)'
+        ctx.lineWidth = 2
+        ctx.setLineDash([20, 20])
         ctx.beginPath()
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, canvas.height)
+        ctx.moveTo(20, 300)
+        ctx.lineTo(canvas.width - 20, 300)
         ctx.stroke()
-      }
-      for (let y = 0; y < canvas.height; y += gridSize) {
-        ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(canvas.width, y)
-        ctx.stroke()
+        ctx.setLineDash([])
+      } else if (level.theme === 'villa') {
+        // Luxury Architectural Marble Grid
+        ctx.fillStyle = '#0a0d14'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)'
+        ctx.lineWidth = 1
+        const tileSize = 50
+        for (let x = 0; x < canvas.width; x += tileSize) {
+          ctx.beginPath()
+          ctx.moveTo(x, 0)
+          ctx.lineTo(x, canvas.height)
+          ctx.stroke()
+        }
+        for (let y = 0; y < canvas.height; y += tileSize) {
+          ctx.beginPath()
+          ctx.moveTo(0, y)
+          ctx.lineTo(canvas.width, y)
+          ctx.stroke()
+        }
+      } else if (level.theme === 'tower') {
+        // High-Tech Cyber Circuitry Floor
+        ctx.fillStyle = '#05070c'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)'
+        ctx.lineWidth = 1.5
+        for (let x = 0; x < canvas.width; x += 60) {
+          ctx.beginPath()
+          ctx.moveTo(x, 0)
+          ctx.lineTo(x, canvas.height)
+          ctx.stroke()
+        }
+        for (let y = 0; y < canvas.height; y += 60) {
+          ctx.beginPath()
+          ctx.moveTo(0, y)
+          ctx.lineTo(canvas.width, y)
+          ctx.stroke()
+        }
+      } else {
+        // Showroom Floor (Golden VIP Aesthetic)
+        ctx.fillStyle = '#08080a'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.08)'
+        ctx.lineWidth = 1.5
+        const sz = 45
+        for (let x = 0; x < canvas.width; x += sz) {
+          ctx.beginPath()
+          ctx.moveTo(x, 0)
+          ctx.lineTo(x, canvas.height)
+          ctx.stroke()
+        }
+        for (let y = 0; y < canvas.height; y += sz) {
+          ctx.beginPath()
+          ctx.moveTo(0, y)
+          ctx.lineTo(canvas.width, y)
+          ctx.stroke()
+        }
       }
 
-      // Draw Walls / Architecture Boundaries
-      ctx.fillStyle = '#111827'
-      ctx.strokeStyle = '#374151'
+      // Draw Walls / Obstacles
+      ctx.fillStyle = level.theme === 'tower' ? '#0f172a' : level.theme === 'villa' ? '#18181b' : '#111827'
+      ctx.strokeStyle = level.theme === 'tower' ? '#0284c7' : level.theme === 'villa' ? '#3f3f46' : '#374151'
       ctx.lineWidth = 2
       for (const wall of level.walls) {
         ctx.fillRect(wall.x, wall.y, wall.w, wall.h)
         ctx.strokeRect(wall.x, wall.y, wall.w, wall.h)
+      }
+
+      // Draw Laser Security Gates
+      for (const gate of level.gates) {
+        ctx.save()
+        if (gate.isOpen) {
+          ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)'
+          ctx.setLineDash([4, 6])
+          ctx.lineWidth = 2
+          ctx.strokeRect(gate.x, gate.y, gate.w, gate.h)
+        } else {
+          // Locked Glowing Red Laser Barrier
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.25)'
+          ctx.fillRect(gate.x, gate.y, gate.w, gate.h)
+          ctx.strokeStyle = '#ef4444'
+          ctx.lineWidth = 3
+          ctx.shadowColor = '#ef4444'
+          ctx.shadowBlur = 12
+          ctx.strokeRect(gate.x, gate.y, gate.w, gate.h)
+
+          // Laser lines inside gate
+          ctx.strokeStyle = '#fca5a5'
+          ctx.lineWidth = 1.5
+          ctx.beginPath()
+          ctx.moveTo(gate.x, gate.y + gate.h / 2)
+          ctx.lineTo(gate.x + gate.w, gate.y + gate.h / 2)
+          ctx.stroke()
+        }
+        ctx.restore()
+      }
+
+      // Draw Hazards (Patrol Bots & Vortices)
+      for (const h of level.hazards) {
+        ctx.save()
+        ctx.translate(h.x, h.y)
+        if (h.type === 'patrol') {
+          // Electric Shock Bot with rotating ring
+          ctx.beginPath()
+          ctx.arc(0, 0, h.radius, 0, Math.PI * 2)
+          ctx.fillStyle = '#ef4444'
+          ctx.shadowColor = '#f87171'
+          ctx.shadowBlur = 15
+          ctx.fill()
+          // Orbiting spark
+          const orbitAngle = time * 0.008
+          ctx.beginPath()
+          ctx.arc(Math.cos(orbitAngle) * (h.radius + 6), Math.sin(orbitAngle) * (h.radius + 6), 3, 0, Math.PI * 2)
+          ctx.fillStyle = '#fef08a'
+          ctx.fill()
+        } else {
+          // Dark Energy Vortex
+          ctx.beginPath()
+          ctx.arc(0, 0, h.radius, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(147, 51, 234, 0.4)'
+          ctx.strokeStyle = '#a855f7'
+          ctx.lineWidth = 2
+          ctx.shadowColor = '#c084fc'
+          ctx.shadowBlur = 16
+          ctx.fill()
+          ctx.stroke()
+        }
+        ctx.restore()
       }
 
       // Draw Sparks & Wire items
@@ -500,7 +819,6 @@ export const GameEngine: React.FC = () => {
           const bounce = Math.sin(time * 0.006 + spark.id) * 3
 
           if (spark.type === 'wire') {
-            // Italian Copper Wire Coil
             ctx.beginPath()
             ctx.arc(0, bounce, 11, 0, Math.PI * 2)
             ctx.fillStyle = '#b45309'
@@ -514,7 +832,6 @@ export const GameEngine: React.FC = () => {
             ctx.fillStyle = '#09090b'
             ctx.fill()
           } else if (spark.type === 'spotlight') {
-            // Spotlight fixture
             ctx.beginPath()
             ctx.arc(0, bounce, 10, 0, Math.PI * 2)
             ctx.fillStyle = '#0284c7'
@@ -522,13 +839,11 @@ export const GameEngine: React.FC = () => {
             ctx.strokeStyle = '#38bdf8'
             ctx.lineWidth = 2.5
             ctx.stroke()
-            // Inner LED star
             ctx.fillStyle = '#ffffff'
             ctx.beginPath()
             ctx.arc(0, bounce, 3, 0, Math.PI * 2)
             ctx.fill()
           } else {
-            // Glowing Energy Spark
             ctx.beginPath()
             ctx.arc(0, bounce, 6, 0, Math.PI * 2)
             ctx.fillStyle = '#fde047'
@@ -545,11 +860,9 @@ export const GameEngine: React.FC = () => {
         ctx.save()
         ctx.translate(lamp.x, lamp.y)
 
-        // Pole / base
         ctx.fillStyle = '#1f2937'
         ctx.fillRect(-3, -12, 6, 24)
 
-        // Light fixture head
         ctx.beginPath()
         ctx.arc(0, -12, 12, 0, Math.PI * 2)
         if (lamp.isLit) {
@@ -557,7 +870,6 @@ export const GameEngine: React.FC = () => {
           ctx.shadowColor = '#3b82f6'
           ctx.shadowBlur = 25
           ctx.fill()
-          // Inner core
           ctx.beginPath()
           ctx.arc(0, -12, 5, 0, Math.PI * 2)
           ctx.fillStyle = '#ffffff'
@@ -581,7 +893,6 @@ export const GameEngine: React.FC = () => {
       ctx.fillRect(-18, -25, 36, 50)
       ctx.strokeRect(-18, -25, 36, 50)
 
-      // Lever handle
       ctx.fillStyle = level.masterSwitch.isActivated ? '#10b981' : '#ef4444'
       if (level.masterSwitch.isActivated) {
         ctx.fillRect(-10, -18, 20, 10)
@@ -600,9 +911,13 @@ export const GameEngine: React.FC = () => {
       ctx.save()
       ctx.translate(hero.x, hero.y)
 
+      if (hero.invincibleTimer > 0 && Math.floor(time * 0.02) % 2 === 0) {
+        ctx.globalAlpha = 0.5
+      }
+
       const bobbing = hero.isMoving ? Math.sin(hero.walkCycle) * 2.5 : Math.sin(time * 0.003) * 1.5
 
-      // 1. Glowing Bulb Head (الرأس الزجاجي المضيء)
+      // 1. Glowing Bulb Head
       ctx.beginPath()
       ctx.arc(0, -14 + bobbing, 15, 0, Math.PI * 2)
       const bulbGrad = ctx.createRadialGradient(0, -14 + bobbing, 2, 0, -14 + bobbing, 15)
@@ -624,7 +939,7 @@ export const GameEngine: React.FC = () => {
       ctx.lineTo(4, -18 + bobbing)
       ctx.stroke()
 
-      // Cute Eyes (العينان الذكيتان)
+      // Cute Eyes
       const lookOffsetX = hero.facing === 'left' ? -2.5 : hero.facing === 'right' ? 2.5 : 0
       const lookOffsetY = hero.facing === 'up' ? -2 : hero.facing === 'down' ? 1.5 : 0
 
@@ -634,28 +949,28 @@ export const GameEngine: React.FC = () => {
       ctx.arc(5 + lookOffsetX, -14 + bobbing + lookOffsetY, 2.2, 0, Math.PI * 2)
       ctx.fill()
 
-      // Eye glints (بريق العين)
+      // Eye glints
       ctx.fillStyle = '#ffffff'
       ctx.beginPath()
       ctx.arc(-6 + lookOffsetX, -15 + bobbing + lookOffsetY, 0.8, 0, Math.PI * 2)
       ctx.arc(4 + lookOffsetX, -15 + bobbing + lookOffsetY, 0.8, 0, Math.PI * 2)
       ctx.fill()
 
-      // Cute Smile (ابتسامة لطيفة)
+      // Cute Smile
       ctx.strokeStyle = '#78350f'
       ctx.lineWidth = 1.5
       ctx.beginPath()
       ctx.arc(0 + lookOffsetX, -10 + bobbing, 3.5, 0.1 * Math.PI, 0.9 * Math.PI)
       ctx.stroke()
 
-      // 2. Metallic Screw Neck (قاعدة اللمبة المعدنية)
+      // 2. Metallic Screw Neck
       ctx.fillStyle = '#94a3b8'
       ctx.fillRect(-6, 0 + bobbing, 12, 5)
       ctx.fillStyle = '#cbd5e1'
       ctx.fillRect(-5, 2 + bobbing, 10, 2)
 
       // 3. Blue Royal Shirt (القميص الأزرق - الإنارة الحديثة)
-      ctx.fillStyle = '#1d4ed8' // Royal Blue Shirt
+      ctx.fillStyle = '#1d4ed8'
       ctx.beginPath()
       ctx.roundRect(-12, 5 + bobbing, 24, 16, 4)
       ctx.fill()
@@ -675,14 +990,12 @@ export const GameEngine: React.FC = () => {
       ctx.textAlign = 'center'
       ctx.fillText('الإنارة', 0, 15 + bobbing)
 
-      // 4. Little Animated Feet (القدمان الصغيرتان)
+      // 4. Little Feet
       const legSwing = hero.isMoving ? Math.sin(hero.walkCycle) * 4 : 0
       ctx.fillStyle = '#0f172a'
-      // Left foot
       ctx.beginPath()
       ctx.roundRect(-8, 20 + bobbing + legSwing, 6, 6, 2)
       ctx.fill()
-      // Right foot
       ctx.beginPath()
       ctx.roundRect(2, 20 + bobbing - legSwing, 6, 6, 2)
       ctx.fill()
@@ -707,18 +1020,15 @@ export const GameEngine: React.FC = () => {
       // ==========================================
       if (gameState === 'playing') {
         ctx.save()
-        // Create an offscreen dark layer
         const darkCanvas = document.createElement('canvas')
         darkCanvas.width = canvas.width
         darkCanvas.height = canvas.height
         const darkCtx = darkCanvas.getContext('2d')
 
         if (darkCtx) {
-          // Fill total darkness
           darkCtx.fillStyle = 'rgba(3, 7, 18, 0.94)'
           darkCtx.fillRect(0, 0, darkCanvas.width, darkCanvas.height)
 
-          // Cut out light circles for Hero and Lit Lamps
           darkCtx.globalCompositeOperation = 'destination-out'
 
           // 1. Hero's Light Circle
@@ -745,7 +1055,6 @@ export const GameEngine: React.FC = () => {
             }
           }
 
-          // Render fog onto main screen
           ctx.drawImage(darkCanvas, 0, 0)
         }
         ctx.restore()
@@ -756,23 +1065,41 @@ export const GameEngine: React.FC = () => {
 
     animationFrameId = requestAnimationFrame(gameLoop)
     return () => cancelAnimationFrame(animationFrameId)
-  }, [gameState, lightPower, combo])
+  }, [gameState, lightPower, combo, currentLevelIdx])
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col items-center select-none">
       
+      {/* Level Banner Header Alert */}
+      {bannerAlert && (
+        <div className="w-full mb-3 py-2 px-4 bg-blue-600/90 border border-blue-400/30 rounded-xl text-center text-xs font-bold text-white shadow-lg animate-bounce">
+          {bannerAlert}
+        </div>
+      )}
+
       {/* Game Top HUD Bar */}
       <div className="w-full bg-[#111215] border border-zinc-800 rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
         
-        {/* Score & Level */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-zinc-900 px-3.5 py-1.5 rounded-xl border border-zinc-800">
+        {/* Level & Stars Indicator */}
+        <div className="flex items-center gap-2 bg-zinc-900 px-3.5 py-1.5 rounded-xl border border-zinc-800">
+          <Compass className="w-4 h-4 text-blue-400" />
+          <span className="text-xs text-zinc-300 font-bold">
+            {LEVELS[currentLevelIdx].nameAr.split(':')[0]}
+          </span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-semibold">
+            {LEVELS[currentLevelIdx].difficultyBadge}
+          </span>
+        </div>
+
+        {/* Score & Lit Lamps Counter */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
             <Award className="w-4 h-4 text-amber-400" />
             <span className="text-xs text-zinc-400">النقاط:</span>
             <span className="text-white font-bold text-sm">{score}</span>
           </div>
 
-          <div className="flex items-center gap-2 bg-zinc-900 px-3.5 py-1.5 rounded-xl border border-zinc-800">
+          <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
             <Lightbulb className="w-4 h-4 text-blue-400" />
             <span className="text-xs text-zinc-400">المصابيح:</span>
             <span className="text-emerald-400 font-bold text-sm">
@@ -787,7 +1114,7 @@ export const GameEngine: React.FC = () => {
           <div className="w-full h-2.5 bg-zinc-900 border border-zinc-800 rounded-full overflow-hidden p-0.5">
             <div 
               className="h-full bg-gradient-to-r from-amber-500 to-blue-500 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min(((lightPower - 100) / 180) * 100, 100)}%` }}
+              style={{ width: `${Math.min(((lightPower - 90) / 190) * 100, 100)}%` }}
             />
           </div>
           <span className="text-[11px] text-zinc-400 whitespace-nowrap">قوة النور</span>
@@ -829,7 +1156,7 @@ export const GameEngine: React.FC = () => {
         ========================================== */}
         {gameState === 'intro' && (
           <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-30">
-            <div className="w-20 h-20 bg-blue-600/20 border border-blue-500/30 rounded-3xl flex items-center justify-center mb-5 shadow-lg text-blue-400 animate-bounce">
+            <div className="w-20 h-20 bg-blue-600/20 border border-blue-500/30 rounded-3xl flex items-center justify-center mb-4 shadow-lg text-blue-400 animate-bounce">
               <Lightbulb className="w-10 h-10" />
             </div>
 
@@ -837,7 +1164,7 @@ export const GameEngine: React.FC = () => {
               رحلة النور | بطل <span className="text-blue-400">الإنارة الحديثة</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-md leading-relaxed mb-6 font-normal">
-              تحكم ببطل اللمبة الذكية بالقميص الأزرق، واجمع شرارات الطاقة والأسلاك لإنارة المصابيح وتشغيل القاطع الرئيسي في عالم مظلم!
+              تحكم ببطل اللمبة الذكية بالقميص الأزرق عبر 4 عوالم متدرجة الصعوبة: حي الشوارع، الفيلا الفاخرة، برج المدينة، والمعرض الرئيسي!
             </p>
 
             <button
@@ -845,7 +1172,7 @@ export const GameEngine: React.FC = () => {
               className="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-base flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-lg"
             >
               <Play className="w-5 h-5 fill-current" />
-              <span>ابدأ المغامرة الآن</span>
+              <span>ابدأ المرحلة 1 (حي الليثي)</span>
             </button>
 
             <div className="mt-6 flex items-center gap-6 text-xs text-zinc-400">
@@ -860,20 +1187,22 @@ export const GameEngine: React.FC = () => {
         ========================================== */}
         {gameState === 'level_won' && (
           <div className="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-30">
-            <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center justify-center mb-4 text-emerald-400">
+            <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center justify-center mb-3 text-emerald-400">
               <CheckCircle className="w-8 h-8" />
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-bold text-white mb-1">
               تمت إنارة المرحلة بنجاح! ⚡
             </h3>
-            <p className="text-zinc-400 text-xs sm:text-sm mb-4">
+            <p className="text-zinc-300 text-xs sm:text-sm mb-4">
               أحسنت! أعدت النور بالكامل إلى {LEVELS[currentLevelIdx].nameAr}
             </p>
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 mb-6 text-xs text-zinc-300">
-              <span>مجموع النقاط: </span>
-              <span className="text-emerald-400 font-bold text-sm">{score} نقطة</span>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-6 text-xs text-zinc-300">
+              <span>المرحلة القادمة: </span>
+              <span className="text-blue-400 font-bold text-sm">
+                {LEVELS[currentLevelIdx + 1]?.nameAr} ({LEVELS[currentLevelIdx + 1]?.difficultyBadge})
+              </span>
             </div>
 
             <button
@@ -887,7 +1216,7 @@ export const GameEngine: React.FC = () => {
         )}
 
         {/* ==========================================
-            SCREEN: FINAL VICTORY & COUPON SCREEN
+            SCREEN: FINAL VICTORY & VIP COUPON SCREEN
         ========================================== */}
         {gameState === 'game_won' && (
           <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-30">
@@ -896,16 +1225,16 @@ export const GameEngine: React.FC = () => {
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black text-white mb-2">
-              🎉 مبروك! أعدت النور للمدينة بالكامل!
+              🎉 مبروك! أعدت النور للمدينة والمعرض بالكامل!
             </h2>
-            <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-6 leading-relaxed">
-              أنت بطل حقيقي للإنارة! تقديراً لشجاعتك، إليك كود خصم حصري لمشترياتك القادمة من شركة الإنارة الحديثة.
+            <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-5 leading-relaxed">
+              أنت بطل أسطوري للإنارة! لقد أتممت جميع المراحل وتغلبت على تحديات العوالم المظلمة.
             </p>
 
-            {/* Promo Coupon Card */}
-            <div className="bg-gradient-to-r from-blue-950/80 to-zinc-950 border border-blue-500/30 rounded-2xl p-5 mb-6 text-center max-w-sm w-full shadow-lg">
-              <div className="text-[11px] text-zinc-400 mb-1">كوبون خصم الأبطال:</div>
-              <div className="font-mono text-xl sm:text-2xl font-black text-blue-400 tracking-widest bg-black/60 py-2 px-4 rounded-xl border border-blue-400/20 mb-3">
+            {/* VIP Promo Coupon Card */}
+            <div className="bg-gradient-to-r from-amber-950/60 via-zinc-950 to-blue-950/60 border border-amber-500/40 rounded-2xl p-5 mb-5 text-center max-w-sm w-full shadow-xl">
+              <div className="text-[11px] text-amber-300 font-bold mb-1">كوبون أبطال الإنارة الذهبي:</div>
+              <div className="font-mono text-xl sm:text-2xl font-black text-amber-400 tracking-widest bg-black/70 py-2 px-4 rounded-xl border border-amber-400/30 mb-2">
                 ENARAH-HERO
               </div>
               <p className="text-[11px] text-emerald-400 font-semibold">
@@ -915,7 +1244,7 @@ export const GameEngine: React.FC = () => {
 
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
-                href={`https://wa.me/218916580068?text=${encodeURIComponent('مرحباً شركة الإنارة الحديثة، فزت في لعبة بطل الإنارة وحصلت على كود الخصم: ENARAH-HERO')}`}
+                href={`https://wa.me/218916580068?text=${encodeURIComponent('مرحباً شركة الإنارة الحديثة، فزت بجميع مراحل لعبة بطل الإنارة وحصلت على كود الخصم: ENARAH-HERO')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all active:scale-95 flex items-center gap-2"
