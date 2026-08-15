@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { sound } from './audio'
-import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert } from 'lucide-react'
+import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart } from 'lucide-react'
 
 export interface Hazard {
   id: number
@@ -34,9 +34,30 @@ export interface LaserBeam {
   y1: number
   x2: number
   y2: number
-  period: number // Total cycle in seconds
-  onTime: number // Active deadly duration
+  period: number
+  onTime: number
   offset: number
+}
+
+export interface BossBreaker {
+  id: number
+  x: number
+  y: number
+  nameAr: string
+  isActivated: boolean
+}
+
+export interface BossData {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  radius: number
+  hp: number // 0 - 100
+  maxHp: number
+  isDefeated: boolean
+  nameAr: string
+  breakers: BossBreaker[]
 }
 
 export interface LevelData {
@@ -49,7 +70,7 @@ export interface LevelData {
   locationDescription: string
   stars: number
   theme: 'street' | 'villa' | 'tower' | 'showroom'
-  timeLimit: number // In seconds
+  timeLimit: number
   width: number
   height: number
   walls: { x: number; y: number; w: number; h: number; type?: string }[]
@@ -59,6 +80,7 @@ export interface LevelData {
   hazards: Hazard[]
   laserBeams: LaserBeam[]
   gates: Gate[]
+  boss?: BossData
   masterSwitch: { x: number; y: number; isActivated: boolean }
   heroStart: { x: number; y: number }
   initialLight: number
@@ -66,7 +88,7 @@ export interface LevelData {
 
 const LEVELS: LevelData[] = [
   // =========================================================================
-  // LEVEL 1: شوارع حي الليثي بنغازي (مؤقت 55 ثانية + سيارات شحنات متحركة)
+  // LEVEL 1: شوارع حي الليثي بنغازي
   // =========================================================================
   {
     id: 1,
@@ -118,7 +140,6 @@ const LEVELS: LevelData[] = [
       { id: 8, x: 760, y: 260, collected: false, type: 'spark' },
       { id: 9, x: 760, y: 340, collected: false, type: 'spotlight' },
     ],
-    // 2 شحنات سريعة متحركة في الشارع
     hazards: [
       { id: 1, x: 220, y: 300, vx: 2.2, vy: 0, radius: 14, type: 'patrol', minX: 50, maxX: 850 },
       { id: 2, x: 700, y: 260, vx: -2.4, vy: 0, radius: 14, type: 'patrol', minX: 50, maxX: 850 },
@@ -129,7 +150,7 @@ const LEVELS: LevelData[] = [
   },
 
   // =========================================================================
-  // LEVEL 2: الفيلا المعمارية الفاخرة (مؤقت 48 ثانية + أشعة ليزر متقطعة + دوامات)
+  // LEVEL 2: الفيلا المعمارية الفاخرة
   // =========================================================================
   {
     id: 2,
@@ -190,13 +211,11 @@ const LEVELS: LevelData[] = [
     gates: [
       { id: 1, x: 740, y: 240, w: 20, h: 180, isOpen: false, requiredLamps: 3, labelAr: 'مغلقة: أنر 3 ثريات لفتحها' },
     ],
-    // 3 دوامات طاقة سريعة
     hazards: [
       { id: 1, x: 330, y: 330, vx: 0, vy: 1.8, radius: 20, type: 'vortex', minY: 250, maxY: 410 },
       { id: 2, x: 640, y: 220, vx: 0, vy: -2.2, radius: 20, type: 'vortex', minY: 150, maxY: 510 },
       { id: 3, x: 480, y: 330, vx: 1.8, vy: 0, radius: 18, type: 'patrol', minX: 380, maxX: 540 },
     ],
-    // أشعة ليزر متقطعة في الممر
     laserBeams: [
       { id: 1, x1: 550, y1: 220, x2: 740, y2: 220, period: 3.5, onTime: 2.0, offset: 0 },
       { id: 2, x1: 550, y1: 440, x2: 740, y2: 440, period: 3.5, onTime: 2.0, offset: 1.7 },
@@ -205,7 +224,7 @@ const LEVELS: LevelData[] = [
   },
 
   // =========================================================================
-  // LEVEL 3: برج المدينة وغرفة السيرفرات الذكية (مؤقت 42 ثانية + 4 روبوتات سريعة)
+  // LEVEL 3: برج المدينة وغرفة السيرفرات الذكية
   // =========================================================================
   {
     id: 3,
@@ -263,7 +282,6 @@ const LEVELS: LevelData[] = [
     gates: [
       { id: 1, x: 780, y: 280, w: 50, h: 140, isOpen: false, requiredLamps: 4, labelAr: 'مغلقة: أنر 4 محطات لفتحها' },
     ],
-    // 4 روبوتات كهربائية سريعة
     hazards: [
       { id: 1, x: 280, y: 180, vx: 0, vy: 3.2, radius: 15, type: 'patrol', minY: 80, maxY: 620 },
       { id: 2, x: 480, y: 520, vx: 0, vy: -3.5, radius: 15, type: 'patrol', minY: 80, maxY: 620 },
@@ -278,77 +296,76 @@ const LEVELS: LevelData[] = [
   },
 
   // =========================================================================
-  // LEVEL 4: المعرض الرئيسي الفاخر (مؤقت 36 ثانية + تحدي السرعة الأسطوري)
+  // LEVEL 4: معركة زعيم المعرض الرئيسي (وحش الحمل الزائد الكهربائي Overload Boss)
   // =========================================================================
   {
     id: 4,
-    nameAr: 'المرحلة 4: المعرض الرئيسي للإنارة الحديثة - ليلة الافتتاح',
-    nameEn: 'Level 4: Grand Flagship Showroom',
-    subtitleAr: 'التحدي النهائي الأسطوري (36 ثانية فقط)! تحرك بسرعة فائقة واجمع كابلات النحاس لتمديد الوقت وإنارة المعرض.',
-    difficultyBadge: 'تحدي أسطوري VIP 🔥',
+    nameAr: 'المرحلة 4: معركة المعرض الكبرى - وحش الحمل الزائد',
+    nameEn: 'Level 4: Boss Battle - Overload Surge Monster',
+    subtitleAr: 'ظهر وحش الحمل الزائد الكهربائي في المعرض! شغّل قواطع الأمان الأربعة في الأركان لحبسه وتأمين المعرض!',
+    difficultyBadge: 'معركة الزعيم الأسطورية 👾🔥',
     heroSkinName: 'اللمبة الذهبية الملكية VIP 👑',
-    locationDescription: 'معرض فخم بأرضيات سوداء وذهبية، أجنحة عرض زجاجية، وثريات عملاقة متدلية',
+    locationDescription: 'معرض فخم بأرضيات سوداء وذهبية، أجنحة عرض زجاجية، وقواطع أمان الزعيم الأربعة',
     stars: 4,
-    timeLimit: 36,
+    timeLimit: 55, // 55 seconds for epic boss fight
     theme: 'showroom',
     width: 1050,
     height: 720,
     heroStart: { x: 525, y: 640 },
-    initialLight: 120,
+    initialLight: 130,
     walls: [
       { x: 0, y: 0, w: 1050, h: 20 },
       { x: 0, y: 700, w: 1050, h: 20 },
       { x: 0, y: 0, w: 20, h: 720 },
       { x: 1030, y: 0, w: 20, h: 720 },
-      { x: 180, y: 80, w: 60, h: 220, type: 'showcase' },
-      { x: 180, y: 420, w: 60, h: 220, type: 'showcase' },
-      { x: 420, y: 20, w: 50, h: 260, type: 'showcase' },
-      { x: 420, y: 440, w: 50, h: 260, type: 'showcase' },
-      { x: 640, y: 80, w: 60, h: 220, type: 'showcase' },
-      { x: 640, y: 420, w: 60, h: 220, type: 'showcase' },
-      { x: 860, y: 20, w: 50, h: 260, type: 'showcase' },
-      { x: 860, y: 440, w: 50, h: 260, type: 'showcase' },
+      // حواجز المعرض
+      { x: 220, y: 160, w: 40, h: 140, type: 'showcase' },
+      { x: 220, y: 420, w: 40, h: 140, type: 'showcase' },
+      { x: 790, y: 160, w: 40, h: 140, type: 'showcase' },
+      { x: 790, y: 420, w: 40, h: 140, type: 'showcase' },
     ],
     decorations: [
-      { type: 'reception', x: 460, y: 570, w: 130, h: 40, label: 'استقبال المعرض الرئيسي' },
+      { type: 'reception', x: 460, y: 610, w: 130, h: 30, label: 'استقبال المعرض الرئيسي' },
     ],
+    // قواطع الأمان الذكية الأربعة لهزيمة الزعيم
+    boss: {
+      x: 525,
+      y: 320,
+      vx: 2.2,
+      vy: 1.8,
+      radius: 38,
+      hp: 100,
+      maxHp: 100,
+      isDefeated: false,
+      nameAr: 'وحش الحمل الزائد الكهربائي (Overload Surge)',
+      breakers: [
+        { id: 1, x: 100, y: 100, nameAr: 'قاطع أمان جناح الثريات (الشمال الغربي)', isActivated: false },
+        { id: 2, x: 950, y: 100, nameAr: 'قاطع أمان جناح المنازل الذكية (الشمال الشرقي)', isActivated: false },
+        { id: 3, x: 100, y: 600, nameAr: 'قاطع أمان جناح الكابلات (الجنوب الغربي)', isActivated: false },
+        { id: 4, x: 950, y: 600, nameAr: 'قاطع أمان جناح كشافات الطاقة (الجنوب الشرقي)', isActivated: false },
+      ],
+    },
     lamps: [
-      { id: 1, x: 90, y: 120, isLit: false, name: 'جناح الثريات الإيطالية' },
-      { id: 2, x: 90, y: 580, isLit: false, name: 'منصة مفاتيح اللمس الفاخرة' },
-      { id: 3, x: 300, y: 180, isLit: false, name: 'استوديو الإضاءة الذكية' },
-      { id: 4, x: 300, y: 520, isLit: false, name: 'جناح إنارة الواجهات والحدائق' },
-      { id: 5, x: 525, y: 350, isLit: false, name: 'الثريا الكريستال العملاقة' },
-      { id: 6, x: 740, y: 180, isLit: false, name: 'منظومة الإنترفون المرئي' },
-      { id: 7, x: 740, y: 540, isLit: false, name: 'جناح الكابلات المعتمدة' },
-      { id: 8, x: 950, y: 160, isLit: false, name: 'منصة التحكم المركزي VIP' },
-      { id: 9, x: 950, y: 560, isLit: false, name: 'كشافات ليلة الافتتاح' },
+      { id: 1, x: 100, y: 350, isLit: false, name: 'ثريا الجناح الغربي' },
+      { id: 2, x: 950, y: 350, isLit: false, name: 'ثريا الجناح الشرقي' },
+      { id: 3, x: 525, y: 100, isLit: false, name: 'ثريا السقف المركزية VIP' },
+      { id: 4, x: 525, y: 520, isLit: false, name: 'كشافات منصة الاستقبال' },
     ],
     sparks: [
-      { id: 1, x: 90, y: 240, collected: false, type: 'wire' },
-      { id: 2, x: 90, y: 460, collected: false, type: 'wire' },
-      { id: 3, x: 300, y: 90, collected: false, type: 'spark' },
-      { id: 4, x: 300, y: 620, collected: false, type: 'spark' },
-      { id: 5, x: 525, y: 180, collected: false, type: 'wire' },
-      { id: 6, x: 525, y: 500, collected: false, type: 'wire' },
-      { id: 7, x: 740, y: 90, collected: false, type: 'spotlight' },
-      { id: 8, x: 740, y: 620, collected: false, type: 'spotlight' },
-      { id: 9, x: 950, y: 360, collected: false, type: 'spotlight' },
+      { id: 1, x: 300, y: 100, collected: false, type: 'wire' },
+      { id: 2, x: 750, y: 100, collected: false, type: 'wire' },
+      { id: 3, x: 300, y: 600, collected: false, type: 'wire' },
+      { id: 4, x: 750, y: 600, collected: false, type: 'wire' },
+      { id: 5, x: 180, y: 350, collected: false, type: 'spotlight' },
+      { id: 6, x: 870, y: 350, collected: false, type: 'spotlight' },
     ],
-    gates: [
-      { id: 1, x: 860, y: 280, w: 50, h: 160, isOpen: false, requiredWires: 4, labelAr: 'مغلقة: اجمع 4 كابلات نحاس' },
-    ],
-    // 5 حراس شحنات سريعة
+    gates: [],
     hazards: [
-      { id: 1, x: 300, y: 360, vx: 2.8, vy: 0, radius: 15, type: 'patrol', minX: 250, maxX: 360 },
-      { id: 2, x: 525, y: 220, vx: 0, vy: 3.4, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
-      { id: 3, x: 740, y: 480, vx: 0, vy: -3.4, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
-      { id: 4, x: 950, y: 240, vx: 0, vy: 3.2, radius: 15, type: 'patrol', minY: 100, maxY: 600 },
+      { id: 1, x: 350, y: 350, vx: 0, vy: 2.8, radius: 14, type: 'patrol', minY: 150, maxY: 550 },
+      { id: 2, x: 700, y: 350, vx: 0, vy: -2.8, radius: 14, type: 'patrol', minY: 150, maxY: 550 },
     ],
-    laserBeams: [
-      { id: 1, x1: 240, y1: 360, x2: 420, y2: 360, period: 2.8, onTime: 1.5, offset: 0 },
-      { id: 2, x1: 640, y1: 360, x2: 860, y2: 360, period: 2.8, onTime: 1.5, offset: 1.4 },
-    ],
-    masterSwitch: { x: 980, y: 360, isActivated: false },
+    laserBeams: [],
+    masterSwitch: { x: 525, y: 220, isActivated: false },
   },
 ]
 
@@ -379,6 +396,7 @@ export const GameEngine: React.FC = () => {
   const [totalLampsCount, setTotalLampsCount] = useState(0)
   const [collectedSparksCount, setCollectedSparksCount] = useState(0)
   const [totalSparksCount, setTotalSparksCount] = useState(0)
+  const [bossHp, setBossHp] = useState(100)
   const [bannerAlert, setBannerAlert] = useState<{ msg: string; type: 'info' | 'error' | 'success' } | null>(null)
 
   // Current active level clone
@@ -425,6 +443,11 @@ export const GameEngine: React.FC = () => {
     setTimeLeft(cloned.timeLimit)
     timeLeftRef.current = cloned.timeLimit
     particlesRef.current = []
+
+    if (cloned.boss) {
+      setBossHp(cloned.boss.hp)
+      sound.playBossRoar()
+    }
   }, [])
 
   // Start game
@@ -460,7 +483,7 @@ export const GameEngine: React.FC = () => {
   // Show temporary banner alert
   const showAlert = (msg: string, type: 'info' | 'error' | 'success' = 'info') => {
     setBannerAlert({ msg, type })
-    setTimeout(() => setBannerAlert(null), 3500)
+    setTimeout(() => setBannerAlert(null), 3800)
   }
 
   // Reset stage upon injury or timeout
@@ -470,6 +493,8 @@ export const GameEngine: React.FC = () => {
     
     if (reason === 'timeout') {
       showAlert('⌛ انتهت طاقة البطارية والوقت! تحرك أسرع واجمع كابلات النحاس لكسب (+5 ثوانٍ)!', 'error')
+    } else if (reason === 'boss') {
+      showAlert('💥 صدمة كهربائية هائلة من وحش الحمل الزائد! أعد المحاولة واستهدف قواطع الأمان!', 'error')
     } else {
       showAlert('💥 تماس كهربائي شديد! انقطع التيار وأعيدت المرحلة من نقطة البداية!', 'error')
     }
@@ -530,8 +555,10 @@ export const GameEngine: React.FC = () => {
   // Calculate remaining uncollected items & unlit lamps
   const remainingLamps = levelRef.current.lamps.filter((l) => !l.isLit).length
   const remainingSparks = levelRef.current.sparks.filter((s) => !s.collected).length
-  const totalRemaining = remainingLamps + remainingSparks
-  const isStage100PercentComplete = totalRemaining === 0
+  const remainingBreakers = levelRef.current.boss ? levelRef.current.boss.breakers.filter((b) => !b.isActivated).length : 0
+  const isBossDefeated = levelRef.current.boss ? levelRef.current.boss.isDefeated : true
+  const totalRemaining = remainingLamps + remainingSparks + remainingBreakers
+  const isStage100PercentComplete = totalRemaining === 0 && isBossDefeated
 
   // Main Canvas Render & Physics Loop
   useEffect(() => {
@@ -627,7 +654,7 @@ export const GameEngine: React.FC = () => {
         if (canMoveX) hero.x = newX
         if (canMoveY) hero.y = newY
 
-        // 3. Check Moving Hazards -> Instant Stage Reset on Collision
+        // 3. Update Hazards
         for (const h of level.hazards) {
           h.x += h.vx
           h.y += h.vy
@@ -642,14 +669,54 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 4. Check Cycling Deadly Laser Beams
+        // 4. Update Final Boss (Level 4 Overload Surge)
+        if (level.boss && !level.boss.isDefeated) {
+          const boss = level.boss
+          boss.x += boss.vx
+          boss.y += boss.vy
+
+          if (boss.x <= 350 || boss.x >= 700) boss.vx *= -1
+          if (boss.y <= 240 || boss.y >= 450) boss.vy *= -1
+
+          const bDist = Math.hypot(hero.x - boss.x, hero.y - boss.y)
+          if (bDist < hero.radius + boss.radius && hero.invincibleTimer <= 0) {
+            handleHeroInjured('boss')
+            return
+          }
+
+          // Check Boss Breakers activation
+          for (const brk of boss.breakers) {
+            if (!brk.isActivated) {
+              const brkDist = Math.hypot(hero.x - brk.x, hero.y - brk.y)
+              if (brkDist < hero.radius + 28) {
+                brk.isActivated = true
+                sound.playBossHit()
+                
+                boss.hp -= 25
+                setBossHp(boss.hp)
+                spawnParticles(brk.x, brk.y, '#38bdf8', 35, 2.5)
+                spawnParticles(boss.x, boss.y, '#ef4444', 40, 3)
+
+                if (boss.hp <= 0) {
+                  boss.isDefeated = true
+                  sound.playVictory()
+                  spawnParticles(boss.x, boss.y, '#10b981', 80, 4)
+                  showAlert('🎉 رائع جداً! تم حبس وحش الحمل الزائد وتأمين المعرض بالكامل!', 'success')
+                } else {
+                  showAlert(`⚡ تم تفعيل ${brk.nameAr.split('(')[0]}! طاقة الزعيم: ${boss.hp}%`, 'success')
+                }
+              }
+            }
+          }
+        }
+
+        // 5. Check Cycling Deadly Laser Beams
         const curSeconds = time * 0.001
         for (const beam of level.laserBeams) {
           const cyclePos = (curSeconds + beam.offset) % beam.period
           const isLaserDeadly = cyclePos < beam.onTime
 
           if (isLaserDeadly) {
-            // Distance from point to line segment
             const x1 = beam.x1, y1 = beam.y1, x2 = beam.x2, y2 = beam.y2
             const px = hero.x, py = hero.y
             const l2 = Math.hypot(x2 - x1, y2 - y1) ** 2
@@ -668,7 +735,7 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 5. Collect Sparks & Powerups (+5 Seconds Bonus on Wires & Spotlights!)
+        // 6. Collect Sparks & Powerups (+5s Bonus)
         for (const spark of level.sparks) {
           if (!spark.collected) {
             const dist = Math.hypot(hero.x - spark.x, hero.y - spark.y)
@@ -681,7 +748,6 @@ export const GameEngine: React.FC = () => {
                 sound.playBonusTime()
                 setScore((prev) => prev + 150 * combo)
                 
-                // +5s Bonus Time!
                 timeLeftRef.current = Math.min(timeLeftRef.current + 5, level.timeLimit + 10)
                 showAlert('⚡ كابل نحاس إيطالي أصلي (+5 ثوانٍ وقت إضافي!)', 'success')
                 
@@ -701,7 +767,6 @@ export const GameEngine: React.FC = () => {
                 sound.playBonusTime()
                 setScore((prev) => prev + 200 * combo)
                 
-                // +5s Bonus Time!
                 timeLeftRef.current = Math.min(timeLeftRef.current + 5, level.timeLimit + 10)
                 showAlert('💡 سبوت لايت ذكي (+5 ثوانٍ وقت إضافي!)', 'success')
 
@@ -717,7 +782,7 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 6. Light up Dark Lamps
+        // 7. Light up Dark Lamps
         for (const lamp of level.lamps) {
           if (!lamp.isLit) {
             const dist = Math.hypot(hero.x - lamp.x, hero.y - lamp.y)
@@ -742,23 +807,24 @@ export const GameEngine: React.FC = () => {
           }
         }
 
-        // 7. Check Master Switchboard (100% Items & Lamps Required)
+        // 8. Check Master Switchboard
         const masterDist = Math.hypot(hero.x - level.masterSwitch.x, hero.y - level.masterSwitch.y)
         if (masterDist < hero.radius + 32 && !level.masterSwitch.isActivated) {
           const currentRemainingLamps = level.lamps.filter((l) => !l.isLit).length
           const currentRemainingSparks = level.sparks.filter((s) => !s.collected).length
-          const totalLeft = currentRemainingLamps + currentRemainingSparks
+          const currentRemainingBreakers = level.boss ? level.boss.breakers.filter((b) => !b.isActivated).length : 0
+          const totalLeft = currentRemainingLamps + currentRemainingSparks + currentRemainingBreakers
 
-          if (totalLeft > 0) {
+          if (totalLeft > 0 || (level.boss && !level.boss.isDefeated)) {
             sound.playLockedBuzz()
-            showAlert(`⚠️ القاطع مقفل! يجب إنارة كافة المصابيح وجمع جميع كابلات النحاس والشرارات أولاً! (متبقي: ${totalLeft})`, 'error')
+            showAlert(`⚠️ القاطع مقفل! يجب إنارة كافة المصابيح وتفعيل قواطع الأمان الأربعة لهزيمة الزعيم! (متبقي: ${totalLeft})`, 'error')
             hero.x -= moveX * 4
             hero.y -= moveY * 4
           } else {
             level.masterSwitch.isActivated = true
             sound.playMasterSwitch()
-            setScore((prev) => prev + 2000)
-            spawnParticles(level.masterSwitch.x, level.masterSwitch.y, '#10b981', 60, 3.5)
+            setScore((prev) => prev + 3000)
+            spawnParticles(level.masterSwitch.x, level.masterSwitch.y, '#10b981', 80, 4)
 
             setTimeout(() => {
               sound.playVictory()
@@ -772,7 +838,7 @@ export const GameEngine: React.FC = () => {
         }
       }
 
-      // 8. Update Particles
+      // Update Particles
       for (let i = particlesRef.current.length - 1; i >= 0; i--) {
         const p = particlesRef.current[i]
         p.x += p.vx
@@ -790,7 +856,6 @@ export const GameEngine: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       if (level.theme === 'street') {
-        // LEVEL 1: Asphalt Road & Concrete Sidewalks
         ctx.fillStyle = '#1e293b'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -831,7 +896,6 @@ export const GameEngine: React.FC = () => {
           }
         }
       } else if (level.theme === 'villa') {
-        // LEVEL 2: Golden Oak Parquet Wood Floor
         ctx.fillStyle = '#78350f'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -875,7 +939,6 @@ export const GameEngine: React.FC = () => {
           }
         }
       } else if (level.theme === 'tower') {
-        // LEVEL 3: Deep Cyber Tech Blue Floor with Neon Circuits
         ctx.fillStyle = '#082f49'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -908,7 +971,7 @@ export const GameEngine: React.FC = () => {
           }
         }
       } else {
-        // LEVEL 4: Polished Black & Gold Terrazzo Marble
+        // LEVEL 4: Showroom Floor
         ctx.fillStyle = '#18181b'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -928,20 +991,14 @@ export const GameEngine: React.FC = () => {
           ctx.stroke()
         }
 
-        for (const dec of level.decorations) {
-          if (dec.type === 'reception' && dec.w && dec.h) {
-            ctx.fillStyle = '#27272a'
-            ctx.roundRect(dec.x, dec.y, dec.w, dec.h, 10)
-            ctx.fill()
-            ctx.strokeStyle = '#f59e0b'
-            ctx.lineWidth = 3
-            ctx.stroke()
-            ctx.fillStyle = '#fef08a'
-            ctx.font = 'bold 10px sans-serif'
-            ctx.textAlign = 'center'
-            ctx.fillText('الإنارة الحديثة - RECEPTION', dec.x + dec.w / 2, dec.y + dec.h / 2 + 4)
-          }
-        }
+        // Boss Arena Central Ring
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)'
+        ctx.lineWidth = 3
+        ctx.setLineDash([8, 8])
+        ctx.beginPath()
+        ctx.arc(525, 340, 220, 0, Math.PI * 2)
+        ctx.stroke()
+        ctx.setLineDash([])
       }
 
       // Draw Walls / Architecture
@@ -1018,7 +1075,7 @@ export const GameEngine: React.FC = () => {
         ctx.restore()
       }
 
-      // Draw Cycling Laser Beams (Dangerous Red vs Safe Green)
+      // Draw Cycling Laser Beams
       for (const beam of level.laserBeams) {
         const curSec = time * 0.001
         const pos = (curSec + beam.offset) % beam.period
@@ -1039,12 +1096,157 @@ export const GameEngine: React.FC = () => {
         ctx.lineTo(beam.x2, beam.y2)
         ctx.stroke()
 
-        // Terminal emitters
         ctx.fillStyle = isDeadly ? '#ef4444' : '#10b981'
         ctx.beginPath()
         ctx.arc(beam.x1, beam.y1, 5, 0, Math.PI * 2)
         ctx.arc(beam.x2, beam.y2, 5, 0, Math.PI * 2)
         ctx.fill()
+        ctx.restore()
+      }
+
+      // ==========================================
+      // DRAW FINAL BOSS & CONTAINMENT BREAKER SWITCHES
+      // ==========================================
+      if (level.boss) {
+        const boss = level.boss
+
+        // 1. Draw 4 Corner Smart Safety Breakers
+        for (const brk of boss.breakers) {
+          ctx.save()
+          ctx.translate(brk.x, brk.y)
+
+          ctx.fillStyle = brk.isActivated ? '#065f46' : '#1e1b4b'
+          ctx.strokeStyle = brk.isActivated ? '#10b981' : '#38bdf8'
+          ctx.lineWidth = 3
+          if (brk.isActivated) {
+            ctx.shadowColor = '#10b981'
+            ctx.shadowBlur = 18
+          }
+          ctx.beginPath()
+          ctx.roundRect(-22, -22, 44, 44, 10)
+          ctx.fill()
+          ctx.stroke()
+
+          // Inner Icon
+          ctx.fillStyle = brk.isActivated ? '#ffffff' : '#38bdf8'
+          ctx.font = 'bold 12px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.fillText(brk.isActivated ? '✓ ON' : '⚡ PULL', 0, 4)
+
+          ctx.restore()
+
+          // Draw active containment laser beam from breaker to Boss
+          if (brk.isActivated && !boss.isDefeated) {
+            ctx.save()
+            ctx.strokeStyle = '#38bdf8'
+            ctx.lineWidth = 3
+            ctx.shadowColor = '#00f0ff'
+            ctx.shadowBlur = 14
+            ctx.beginPath()
+            ctx.moveTo(brk.x, brk.y)
+            ctx.lineTo(boss.x, boss.y)
+            ctx.stroke()
+            ctx.restore()
+          }
+        }
+
+        // 2. Draw The Overload Boss Sphere (وحش الحمل الزائد)
+        ctx.save()
+        ctx.translate(boss.x, boss.y)
+
+        if (!boss.isDefeated) {
+          const bossPulse = Math.sin(time * 0.008) * 4
+          const bossRad = boss.radius + bossPulse
+
+          // Electric Outer Aura
+          const auraGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, bossRad + 20)
+          auraGrad.addColorStop(0, '#ef4444')
+          auraGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.8)')
+          auraGrad.addColorStop(1, 'rgba(239, 68, 68, 0)')
+          ctx.fillStyle = auraGrad
+          ctx.beginPath()
+          ctx.arc(0, 0, bossRad + 20, 0, Math.PI * 2)
+          ctx.fill()
+
+          // Main Core
+          ctx.beginPath()
+          ctx.arc(0, 0, bossRad, 0, Math.PI * 2)
+          ctx.fillStyle = '#7f1d1d'
+          ctx.strokeStyle = '#f87171'
+          ctx.lineWidth = 4
+          ctx.shadowColor = '#ef4444'
+          ctx.shadowBlur = 25
+          ctx.fill()
+          ctx.stroke()
+
+          // Orbiting Lightning Sparks
+          for (let i = 0; i < 4; i++) {
+            const orbAngle = time * 0.006 + (i * Math.PI) / 2
+            const ox = Math.cos(orbAngle) * (bossRad + 14)
+            const oy = Math.sin(orbAngle) * (bossRad + 14)
+            ctx.fillStyle = '#fde047'
+            ctx.shadowColor = '#facc15'
+            ctx.shadowBlur = 10
+            ctx.beginPath()
+            ctx.arc(ox, oy, 4.5, 0, Math.PI * 2)
+            ctx.fill()
+          }
+
+          // Angry Glowing Eyes
+          ctx.fillStyle = '#fef08a'
+          ctx.beginPath()
+          ctx.arc(-12, -8, 6, 0, Math.PI * 2)
+          ctx.arc(12, -8, 6, 0, Math.PI * 2)
+          ctx.fill()
+
+          ctx.fillStyle = '#dc2626'
+          ctx.beginPath()
+          ctx.arc(-11, -8, 3, 0, Math.PI * 2)
+          ctx.arc(13, -8, 3, 0, Math.PI * 2)
+          ctx.fill()
+
+          // Angry Mouth
+          ctx.strokeStyle = '#fef08a'
+          ctx.lineWidth = 2.5
+          ctx.beginPath()
+          ctx.moveTo(-12, 14)
+          ctx.lineTo(-6, 8)
+          ctx.lineTo(0, 14)
+          ctx.lineTo(6, 8)
+          ctx.lineTo(12, 14)
+          ctx.stroke()
+
+          // Boss Health Bar Above Head
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'
+          ctx.roundRect(-45, -55, 90, 10, 3)
+          ctx.fill()
+
+          ctx.fillStyle = boss.hp > 50 ? '#ef4444' : '#f59e0b'
+          ctx.roundRect(-44, -54, (88 * boss.hp) / boss.maxHp, 8, 2)
+          ctx.fill()
+
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 8px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.fillText(`⚡ طاقة الزعيم: ${boss.hp}%`, 0, -60)
+        } else {
+          // Defeated Boss: Trapped in Green Energy Capsule
+          ctx.beginPath()
+          ctx.arc(0, 0, boss.radius - 4, 0, Math.PI * 2)
+          ctx.fillStyle = '#064e3b'
+          ctx.strokeStyle = '#10b981'
+          ctx.lineWidth = 4
+          ctx.shadowColor = '#34d399'
+          ctx.shadowBlur = 25
+          ctx.fill()
+          ctx.stroke()
+
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 10px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.fillText('🔒 الزعيم محبوس', 0, 3)
+        }
+
         ctx.restore()
       }
 
@@ -1505,7 +1707,7 @@ export const GameEngine: React.FC = () => {
           </div>
         </div>
 
-        {/* 100% Checklist & Countdown Timer */}
+        {/* 100% Checklist, Boss Bar & Countdown Timer */}
         <div className="flex items-center gap-2.5">
           
           {/* Dynamic Countdown Timer */}
@@ -1521,6 +1723,14 @@ export const GameEngine: React.FC = () => {
             <Timer className="w-4 h-4" />
             <span>{timeLeft} ثانية</span>
           </div>
+
+          {/* Level 4 Boss HP Bar */}
+          {LEVELS[currentLevelIdx].boss && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-300 text-xs font-bold animate-pulse">
+              <Skull className="w-4 h-4 text-red-400" />
+              <span>الزعيم: {bossHp}%</span>
+            </div>
+          )}
 
           <div className="flex items-center gap-1.5 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
             <Lightbulb className="w-4 h-4 text-blue-400" />
@@ -1595,17 +1805,17 @@ export const GameEngine: React.FC = () => {
               رحلة النور | بطل <span className="text-blue-400">الإنارة الحديثة</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-md leading-relaxed mb-4 font-normal">
-              تحدي الأبطال الحقيقي! مؤقت تنازلي سريع، شحنات كهربائية سريعة، وأشعة ليزر متقطعة!
+              تحدي الأبطال الحقيقي! مؤقت تنازلي سريع، شحنات كهربائية، ومعركة الزعيم الكبرى (وحش الحمل الزائد) في المرحلة النهائية!
             </p>
 
             <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3.5 mb-6 text-xs text-zinc-300 max-w-sm text-right space-y-1.5">
               <div className="flex items-center gap-2 text-amber-400 font-bold">
                 <AlertTriangle className="w-4 h-4" />
-                <span>قواعد التحدي الصارم:</span>
+                <span>قواعد التحدي:</span>
               </div>
-              <p className="text-zinc-400">⚡ ملامسة الشحنات أو أشعة الليزر تعيد المرحلة فوراً.</p>
+              <p className="text-zinc-400">⚡ ملامسة الشحنات تعيد المرحلة فوراً.</p>
               <p className="text-zinc-400">⚡ جمع كابلات النحاس والسبوت لايت يمنحك (+5 ثوانٍ) وقت إضافي.</p>
-              <p className="text-zinc-400">⚡ القاطع لن يفتح حتى تجمع 100% من كل شيء قبل انتهاء الوقت.</p>
+              <p className="text-zinc-400">👾 في المرحلة 4: فعّل قواطع الأمان الأربعة في الأركان لحبس الزعيم وتأمين المعرض!</p>
             </div>
 
             <button
@@ -1637,7 +1847,9 @@ export const GameEngine: React.FC = () => {
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 mb-6 text-xs text-zinc-300 space-y-1.5 text-right">
               <div>📍 العالم القادم: <span className="text-blue-400 font-bold">{LEVELS[currentLevelIdx + 1]?.nameAr}</span></div>
               <div className="text-amber-400 font-semibold">مظهر البطل الجديد: {LEVELS[currentLevelIdx + 1]?.heroSkinName}</div>
-              <div className="text-red-400 font-bold">⏱️ الوقت المحدد: {LEVELS[currentLevelIdx + 1]?.timeLimit} ثانية فقط!</div>
+              {LEVELS[currentLevelIdx + 1]?.boss && (
+                <div className="text-red-400 font-bold animate-pulse">⚠️ تحذير: معركة الزعيم الكبرى (وحش الحمل الزائد)!</div>
+              )}
             </div>
 
             <button
@@ -1660,10 +1872,10 @@ export const GameEngine: React.FC = () => {
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black text-white mb-2">
-              🎉 مبروك! أتممت التحدي الأسطوري 100%!
+              🎉 مبروك! هزمت وحش الحمل الزائد وأنرت المعرض والمدينة!
             </h2>
             <p className="text-zinc-300 text-xs sm:text-sm max-w-md mb-5 leading-relaxed">
-              أنت بطل حقيقي للإنارة! لقد تغلبت على جميع التحديات والمؤقتات وأعدت النور لكافة المعالم.
+              أنت بطل أسطوري حقيقي للإنارة! لقد حبست وحش الحمل الزائد وشغلت القاطع الرئيسي للمعرض بنجاح تام.
             </p>
 
             {/* VIP Promo Coupon Card */}
@@ -1679,7 +1891,7 @@ export const GameEngine: React.FC = () => {
 
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
-                href={`https://wa.me/218916580068?text=${encodeURIComponent('مرحباً شركة الإنارة الحديثة، فزت بجميع مراحل لعبة بطل الإنارة وحصلت على كود الخصم: ENARAH-HERO')}`}
+                href={`https://wa.me/218916580068?text=${encodeURIComponent('مرحباً شركة الإنارة الحديثة، هزمت وحش الحمل الزائد وفزت بلعبة بطل الإنارة وحصلت على كود الخصم: ENARAH-HERO')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all active:scale-95 flex items-center gap-2"
