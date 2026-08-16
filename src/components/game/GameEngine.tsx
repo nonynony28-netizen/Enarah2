@@ -1974,20 +1974,20 @@ export const GameEngine: React.FC = () => {
       ref={containerRef}
       className={`w-full max-w-5xl mx-auto flex flex-col items-center select-none transition-all duration-300 ${
         isFullscreen
-          ? 'fixed inset-0 z-[99999] bg-[#07080b] w-screen h-screen flex flex-col justify-between p-2 sm:p-4 overflow-hidden select-none touch-none'
-          : 'relative'
+          ? 'fixed inset-0 z-[99999] bg-[#07080b] w-screen h-[100dvh] flex flex-col justify-between p-1.5 sm:p-3 overflow-hidden select-none touch-none'
+          : 'relative min-h-[calc(100dvh-7rem)] flex flex-col justify-between'
       }`}
     >
       
-      {/* Dynamic Banner Alert */}
+      {/* Dynamic Floating Banner Alert (Toast Overlay) */}
       {bannerAlert && (
         <div 
-          className={`w-full mb-3 py-2.5 px-4 border rounded-xl text-center text-xs font-bold shadow-lg transition-all ${
+          className={`absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md py-1.5 px-3 border rounded-xl text-center text-xs font-bold shadow-2xl backdrop-blur-md transition-all animate-bounce ${
             bannerAlert.type === 'error'
-              ? 'bg-red-950/90 border-red-500/50 text-red-200 animate-shake'
+              ? 'bg-red-950/95 border-red-500/70 text-red-200 shadow-red-950/50'
               : bannerAlert.type === 'success'
-              ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200'
-              : 'bg-blue-600/90 border-blue-400/30 text-white'
+              ? 'bg-emerald-950/95 border-emerald-500/70 text-emerald-200 shadow-emerald-950/50'
+              : 'bg-blue-600/95 border-blue-400/50 text-white shadow-blue-950/50'
           }`}
         >
           {bannerAlert.msg}
@@ -1995,19 +1995,17 @@ export const GameEngine: React.FC = () => {
       )}
 
       {/* Game Top HUD Bar - Ultra-Clean Unified Toolbar */}
-      <div className={`w-full bg-[#111215]/95 border border-zinc-800/80 rounded-2xl px-2.5 py-1.5 flex items-center justify-between gap-1.5 shadow-md backdrop-blur-md ${
-        isFullscreen ? 'mb-1.5' : 'mb-3'
-      }`}>
+      <div className="w-full bg-[#111215]/95 border border-zinc-800/80 rounded-2xl px-2 py-1.5 mb-1.5 shrink-0 flex items-center justify-between gap-1 shadow-md backdrop-blur-md">
         
         {/* Left: Stage info & Timer */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex items-center gap-1 bg-zinc-900/90 px-2 py-1 rounded-xl border border-zinc-800 text-xs font-bold text-blue-400">
-            <Compass className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1 bg-zinc-900/90 px-2 py-1 rounded-lg border border-zinc-800 text-[11px] sm:text-xs font-bold text-blue-400">
+            <Compass className="w-3 h-3" />
             <span>مـ{currentLevelIdx + 1}</span>
           </div>
 
           <div 
-            className={`flex items-center gap-1 px-2 py-1 rounded-xl border font-mono font-bold text-xs ${
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg border font-mono font-bold text-[11px] sm:text-xs ${
               timeLeft <= 10
                 ? 'bg-red-500/20 border-red-500/50 text-red-400 animate-pulse'
                 : timeLeft <= 20
@@ -2015,26 +2013,26 @@ export const GameEngine: React.FC = () => {
                 : 'bg-zinc-900/90 border-zinc-800 text-emerald-400'
             }`}
           >
-            <Timer className="w-3.5 h-3.5" />
+            <Timer className="w-3 h-3" />
             <span>{timeLeft}s</span>
           </div>
         </div>
 
         {/* Center: Lamps & Materials count */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex items-center gap-1 bg-zinc-900/90 px-2 py-1 rounded-xl border border-zinc-800 text-xs text-zinc-300" title="المصابيح المنارة">
-            <Lightbulb className="w-3.5 h-3.5 text-blue-400 fill-current" />
+        <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1 bg-zinc-900/90 px-1.5 sm:px-2 py-1 rounded-lg border border-zinc-800 text-[11px] sm:text-xs text-zinc-300" title="المصابيح المنارة">
+            <Lightbulb className="w-3 h-3 text-blue-400 fill-current" />
             <span className="font-bold">{lampsLitCount}/{totalLampsCount}</span>
           </div>
 
-          <div className="flex items-center gap-1 bg-zinc-900/90 px-2 py-1 rounded-xl border border-zinc-800 text-xs text-zinc-300" title="المواد المجمعة">
-            <Zap className="w-3.5 h-3.5 text-amber-400 fill-current" />
+          <div className="flex items-center gap-1 bg-zinc-900/90 px-1.5 sm:px-2 py-1 rounded-lg border border-zinc-800 text-[11px] sm:text-xs text-zinc-300" title="المواد المجمعة">
+            <Zap className="w-3 h-3 text-amber-400 fill-current" />
             <span className="font-bold">{collectedSparksCount}/{totalSparksCount}</span>
           </div>
 
           {/* Master Switch Status Badge */}
           <div 
-            className={`flex items-center gap-1 px-2 py-1 rounded-xl text-[11px] font-bold border transition-all ${
+            className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold border transition-all ${
               isStage100PercentComplete
                 ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 animate-pulse'
                 : 'bg-zinc-900/90 border-zinc-800 text-zinc-400'
@@ -2047,66 +2045,62 @@ export const GameEngine: React.FC = () => {
         </div>
 
         {/* Right: Quick Action buttons (Leaderboard, Mute, Restart, Fullscreen, Exit) */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => setShowLeaderboard(true)}
-            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-amber-500/30 text-amber-300 transition-all cursor-pointer active:scale-95"
+            className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-amber-500/30 text-amber-300 transition-all cursor-pointer active:scale-95"
             title="لوحة الشرف"
           >
-            <Trophy className="w-4 h-4 text-amber-400" />
+            <Trophy className="w-3.5 h-3.5 text-amber-400" />
           </button>
 
           <button
             onClick={toggleMute}
-            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95"
+            className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95"
             title={isMuted ? 'تشغيل الصوت' : 'كتم الصوت'}
           >
-            {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4" />}
+            {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
           
           <button
             onClick={() => startGame(currentLevelIdx)}
-            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95"
+            className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95"
             title="إعادة المرحلة"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
           {isFullscreen ? (
             <button
               onClick={() => setIsFullscreen(false)}
-              className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 shadow-lg"
+              className="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 active:scale-95 shadow-md"
               title="خروج من وضع الشاشة الكاملة"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
               <span>خروج</span>
             </button>
           ) : (
             <button
               onClick={toggleFullscreen}
-              className="px-2.5 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 hover:text-white text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1"
+              className="px-2 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 hover:text-white text-[11px] font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1"
               title="تكبير الشاشة للعب المريح"
             >
-              <Maximize2 className="w-3.5 h-3.5 text-blue-400" />
-              <span>ملء الشاشة</span>
+              <Maximize2 className="w-3 h-3 text-blue-400" />
+              <span className="hidden sm:inline">ملء الشاشة</span>
             </button>
           )}
         </div>
 
       </div>
 
-      {/* Main Canvas Viewport */}
-      <div className={`relative w-full bg-black rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl flex items-center justify-center transition-all ${
-        isFullscreen 
-          ? 'flex-1 max-h-[64vh] sm:max-h-[72vh] aspect-[4/3] sm:aspect-[16/10]' 
-          : 'aspect-[4/3] sm:aspect-[16/10] max-h-[620px]'
-      }`}>
+      {/* Main Canvas Viewport - Auto-flex to fit screen perfectly */}
+      <div className="relative w-full flex-1 min-h-0 bg-black rounded-2xl overflow-hidden border border-zinc-800/80 shadow-2xl flex items-center justify-center">
         
         <canvas
           ref={canvasRef}
           width={LEVELS[currentLevelIdx].width}
           height={LEVELS[currentLevelIdx].height}
-          className="w-full h-full object-contain"
+          className="w-full h-full max-h-full object-contain"
         />
 
         {/* ==========================================
@@ -2410,13 +2404,11 @@ export const GameEngine: React.FC = () => {
       {/* ==========================================
           VIRTUAL ANALOG JOYSTICK (360° CONTROLLER)
       ========================================== */}
-      <div className={`w-full flex flex-col items-center justify-center select-none touch-none ${
-        isFullscreen ? 'mt-1 mb-1 shrink-0' : 'mt-4'
-      }`}>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] text-zinc-400 font-bold flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
-            <span>عصا التحكم التناظرية 360° (اسحب لتوجيه اللمبة بسلاسة)</span>
+      <div className="w-full shrink-0 mt-1 mb-1 sm:mb-2 flex flex-col items-center justify-center select-none touch-none">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-[10px] sm:text-xs text-zinc-400 font-bold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping" />
+            <span>عصا التحكم التناظرية 360° (اسحب للتوجيه بسلاسة)</span>
           </span>
         </div>
         
@@ -2447,9 +2439,9 @@ export const GameEngine: React.FC = () => {
             handleJoystickEnd()
           }}
           onTouchCancel={handleJoystickEnd}
-          className={`relative w-32 h-32 sm:w-36 sm:h-36 rounded-full border-2 transition-colors cursor-grab active:cursor-grabbing flex items-center justify-center shadow-2xl backdrop-blur-md ${
+          className={`relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full border-2 transition-colors cursor-grab active:cursor-grabbing flex items-center justify-center shadow-2xl backdrop-blur-md ${
             joystickData.active
-              ? 'bg-blue-950/40 border-blue-500/70 shadow-[0_0_25px_rgba(59,130,246,0.35)]'
+              ? 'bg-blue-950/40 border-blue-500/70 shadow-[0_0_20px_rgba(59,130,246,0.35)]'
               : 'bg-zinc-950/80 border-zinc-800 shadow-lg'
           }`}
           style={{ touchAction: 'none' }}
