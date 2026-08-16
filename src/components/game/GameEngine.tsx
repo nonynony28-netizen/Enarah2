@@ -96,13 +96,7 @@ export interface LeaderboardEntry {
   date: string
 }
 
-const DEFAULT_LEADERBOARD: LeaderboardEntry[] = [
-  { id: '1', name: 'م. سفيان العريبي', city: 'بنغازي - الليثي', score: 4850, timeTakenSec: 82, date: 'اليوم' },
-  { id: '2', name: 'أحمد الفيتوري', city: 'بنغازي - الحميضة', score: 4620, timeTakenSec: 94, date: 'اليوم' },
-  { id: '3', name: 'طارق الورفلي', city: 'بنغازي - فينيسيا', score: 4380, timeTakenSec: 108, date: 'أمس' },
-  { id: '4', name: 'محمد بوعجيله', city: 'طبرق', score: 4120, timeTakenSec: 115, date: 'أمس' },
-  { id: '5', name: 'علي المجبري', city: 'المرج', score: 3950, timeTakenSec: 126, date: 'منذ يومين' },
-]
+const DEFAULT_LEADERBOARD: LeaderboardEntry[] = []
 
 const LEVELS: LevelData[] = [
   // =========================================================================
@@ -427,7 +421,7 @@ export const GameEngine: React.FC = () => {
   const [bossHp, setBossHp] = useState(100)
   const [bannerAlert, setBannerAlert] = useState<{ msg: string; type: 'info' | 'error' | 'success' } | null>(null)
 
-  // Leaderboard state
+  // Leaderboard state (Starts 100% empty for real winners only)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [playerNameInput, setPlayerNameInput] = useState('')
   const [playerCityInput, setPlayerCityInput] = useState('بنغازي')
@@ -435,9 +429,18 @@ export const GameEngine: React.FC = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(() => {
     try {
       const saved = localStorage.getItem('enarah_hero_leaderboard')
-      return saved ? JSON.parse(saved) : DEFAULT_LEADERBOARD
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        const isOldMock = parsed.some((p: any) => p.name === 'م. سفيان العريبي' || p.name === 'أحمد الفيتوري')
+        if (isOldMock) {
+          localStorage.removeItem('enarah_hero_leaderboard')
+          return []
+        }
+        return parsed
+      }
+      return []
     } catch {
-      return DEFAULT_LEADERBOARD
+      return []
     }
   })
 
@@ -2157,54 +2160,66 @@ export const GameEngine: React.FC = () => {
 
             {/* Competitors List */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-              {leaderboard.map((item, idx) => (
-                <div
-                  key={item.id}
-                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
-                    idx === 0
-                      ? 'bg-gradient-to-l from-amber-950/40 to-zinc-900 border-amber-500/50'
-                      : idx === 1
-                      ? 'bg-gradient-to-l from-slate-900 to-zinc-900 border-slate-500/40'
-                      : idx === 2
-                      ? 'bg-gradient-to-l from-amber-950/20 to-zinc-900 border-amber-700/30'
-                      : 'bg-zinc-900/60 border-zinc-800/80'
-                  }`}
-                >
-                  {/* Score & Time */}
-                  <div className="flex items-center gap-3">
-                    <div className="text-left">
-                      <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
-                      <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
-                    </div>
+              {leaderboard.length === 0 ? (
+                <div className="py-10 px-4 text-center flex flex-col items-center justify-center">
+                  <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-3 shadow-md animate-pulse">
+                    <Trophy className="w-8 h-8" />
                   </div>
-
-                  {/* Competitor Name & City */}
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <div className="text-xs font-bold text-white flex items-center gap-1 justify-end">
-                        <span>{item.name}</span>
-                        {idx === 0 && <span className="text-amber-400">👑</span>}
-                      </div>
-                      <div className="text-[10px] text-zinc-400">{item.city}</div>
-                    </div>
-
-                    {/* Rank Badge */}
-                    <div
-                      className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs ${
-                        idx === 0
-                          ? 'bg-amber-500 text-black shadow-md'
-                          : idx === 1
-                          ? 'bg-slate-300 text-black'
-                          : idx === 2
-                          ? 'bg-amber-700 text-white'
-                          : 'bg-zinc-800 text-zinc-400'
-                      }`}
-                    >
-                      {idx + 1}
-                    </div>
-                  </div>
+                  <h4 className="text-sm sm:text-base font-bold text-white mb-1">لوحة الشرف بانتظار أول بطل! 👑</h4>
+                  <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
+                    العب الآن وانهِ جميع المراحل واهزم وحش الحمل الزائد لتسجل اسمك في المركز الأول وتتصدر لوحة الأبطال!
+                  </p>
                 </div>
-              ))}
+              ) : (
+                leaderboard.map((item, idx) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
+                      idx === 0
+                        ? 'bg-gradient-to-l from-amber-950/40 to-zinc-900 border-amber-500/50'
+                        : idx === 1
+                        ? 'bg-gradient-to-l from-slate-900 to-zinc-900 border-slate-500/40'
+                        : idx === 2
+                        ? 'bg-gradient-to-l from-amber-950/20 to-zinc-900 border-amber-700/30'
+                        : 'bg-zinc-900/60 border-zinc-800/80'
+                    }`}
+                  >
+                    {/* Score & Time */}
+                    <div className="flex items-center gap-3">
+                      <div className="text-left">
+                        <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
+                        <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
+                      </div>
+                    </div>
+
+                    {/* Competitor Name & City */}
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="text-xs font-bold text-white flex items-center gap-1 justify-end">
+                          <span>{item.name}</span>
+                          {idx === 0 && <span className="text-amber-400">👑</span>}
+                        </div>
+                        <div className="text-[10px] text-zinc-400">{item.city}</div>
+                      </div>
+
+                      {/* Rank Badge */}
+                      <div
+                        className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs ${
+                          idx === 0
+                            ? 'bg-amber-500 text-black shadow-md'
+                            : idx === 1
+                            ? 'bg-slate-300 text-black'
+                            : idx === 2
+                            ? 'bg-amber-700 text-white'
+                            : 'bg-zinc-800 text-zinc-400'
+                        }`}
+                      >
+                        {idx + 1}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             {/* Footer Close */}
