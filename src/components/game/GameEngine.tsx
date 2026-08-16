@@ -537,6 +537,10 @@ export const GameEngine: React.FC = () => {
     setCollectedSparksCount(0)
     setTotalSparksCount(cloned.sparks.length)
     setLightPower(cloned.initialLight)
+    setTimeLeft(cloned.timeLimit)
+    timeLeftRef.current = cloned.timeLimit
+    heroRef.current.invincibleTimer = 1.0
+    isResettingRef.current = false
     particlesRef.current = []
     keysRef.current = {}
     joystickRef.current = {
@@ -838,6 +842,8 @@ export const GameEngine: React.FC = () => {
     let lastTime = performance.now()
 
     const gameLoop = (time: number) => {
+      animationFrameId = requestAnimationFrame(gameLoop)
+
       const dt = Math.min((time - lastTime) / 1000, 0.1)
       lastTime = time
 
@@ -854,7 +860,6 @@ export const GameEngine: React.FC = () => {
 
         if (timeLeftRef.current <= 0) {
           handleHeroInjured('timeout')
-          return
         }
 
         if (hero.invincibleTimer > 0) {
@@ -1961,8 +1966,6 @@ export const GameEngine: React.FC = () => {
         }
         ctx.restore()
       }
-
-      animationFrameId = requestAnimationFrame(gameLoop)
     }
 
     animationFrameId = requestAnimationFrame(gameLoop)
