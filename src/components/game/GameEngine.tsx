@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { sound } from './audio'
-import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart, Medal, Star, Send, X, User } from 'lucide-react'
+import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart, Medal, Star, Send, X, User, Maximize2, Minimize2 } from 'lucide-react'
 
 export interface Hazard {
   id: number
@@ -403,6 +403,7 @@ interface TrailNode {
 }
 
 export const GameEngine: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   
   // Game state
@@ -414,6 +415,7 @@ export const GameEngine: React.FC = () => {
   const [totalPlayTimeSec, setTotalPlayTimeSec] = useState(0)
   const [lightPower, setLightPower] = useState(140)
   const [isMuted, setIsMuted] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const [lampsLitCount, setLampsLitCount] = useState(0)
   const [totalLampsCount, setTotalLampsCount] = useState(0)
   const [collectedSparksCount, setCollectedSparksCount] = useState(0)
@@ -545,8 +547,72 @@ export const GameEngine: React.FC = () => {
     }
   }, [])
 
-  // Start game
+  // Fullscreen & Immersive Mode Management
+  const toggleFullscreen = () => {
+    if (!isFullscreen) {
+      setIsFullscreen(true)
+      if (containerRef.current && (containerRef.current as any).requestFullscreen) {
+        (containerRef.current as any).requestFullscreen().catch(() => {})
+      } else if (containerRef.current && (containerRef.current as any).webkitRequestFullscreen) {
+        (containerRef.current as any).webkitRequestFullscreen()
+      }
+    } else {
+      setIsFullscreen(false)
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {})
+      } else if ((document as any).webkitFullscreenElement && (document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen()
+      }
+    }
+  }
+
+  // Synchronize browser Fullscreen changes (e.g., when pressing Esc)
+  useEffect(() => {
+    const handleFsChange = () => {
+      const isCurrentlyFs = !!(document.fullscreenElement || (document as any).webkitFullscreenElement)
+      setIsFullscreen(isCurrentlyFs)
+    }
+    document.addEventListener('fullscreenchange', handleFsChange)
+    document.addEventListener('webkitfullscreenchange', handleFsChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFsChange)
+      document.removeEventListener('webkitfullscreenchange', handleFsChange)
+    }
+  }, [])
+
+  // Lock body scroll & gestures during gameplay or fullscreen to prevent glitching & bounce
+  useEffect(() => {
+    if (gameState === 'playing' || isFullscreen) {
+      const origOverflow = document.body.style.overflow
+      const origOverscroll = document.body.style.overscrollBehavior
+      const origTouchAction = document.body.style.touchAction
+
+      document.body.style.overflow = 'hidden'
+      document.body.style.overscrollBehavior = 'none'
+      document.body.style.touchAction = 'none'
+
+      return () => {
+        document.body.style.overflow = origOverflow
+        document.body.style.overscrollBehavior = origOverscroll
+        document.body.style.touchAction = origTouchAction
+      }
+    }
+  }, [gameState, isFullscreen])
+
+  // Start game (with auto-expand and smooth focus)
   const startGame = (levelIdx = 0) => {
+    // Auto-enter expanded/immersive mode for maximum comfort and focus
+    if (!isFullscreen) {
+      setIsFullscreen(true)
+      if (containerRef.current && (containerRef.current as any).requestFullscreen) {
+        (containerRef.current as any).requestFullscreen().catch(() => {})
+      }
+    }
+
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
     setCurrentLevelIdx(levelIdx)
     loadLevel(levelIdx)
     if (levelIdx === 0) {
@@ -1893,7 +1959,14 @@ export const GameEngine: React.FC = () => {
   }, [gameState, lightPower, combo, currentLevelIdx, isStage100PercentComplete])
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col items-center select-none">
+    <div 
+      ref={containerRef}
+      className={`w-full max-w-5xl mx-auto flex flex-col items-center select-none transition-all duration-300 ${
+        isFullscreen
+          ? 'fixed inset-0 z-50 bg-[#07080b] w-screen h-screen flex flex-col justify-between p-2 sm:p-4 overflow-hidden'
+          : 'relative'
+      }`}
+    >
       
       {/* Dynamic Banner Alert */}
       {bannerAlert && (
@@ -1911,7 +1984,9 @@ export const GameEngine: React.FC = () => {
       )}
 
       {/* Game Top HUD Bar */}
-      <div className="w-full bg-[#111215] border border-zinc-800 rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-md">
+      <div className={`w-full bg-[#111215] border border-zinc-800 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-md ${
+        isFullscreen ? 'mb-2' : 'mb-4'
+      }`}>
         
         {/* Level Name & Leaderboard Button */}
         <div className="flex items-center gap-2">
@@ -1986,11 +2061,24 @@ export const GameEngine: React.FC = () => {
           </div>
         </div>
 
-        {/* Controls: Mute & Restart */}
+        {/* Controls: Fullscreen, Mute & Restart */}
         <div className="flex items-center gap-2">
           <button
+            onClick={toggleFullscreen}
+            className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 ${
+              isFullscreen
+                ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_12px_rgba(59,130,246,0.5)]'
+                : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
+            }`}
+            title={isFullscreen ? 'تصغير الشاشة' : 'تكبير الشاشة للعب المريح والتركيز'}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            <span className="hidden sm:inline text-xs font-bold">{isFullscreen ? 'تصغير' : 'ملء الشاشة'}</span>
+          </button>
+
+          <button
             onClick={toggleMute}
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer active:scale-95"
             title={isMuted ? 'تشغيل الصوت' : 'كتم الصوت'}
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -1998,7 +2086,7 @@ export const GameEngine: React.FC = () => {
           
           <button
             onClick={() => startGame(currentLevelIdx)}
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer active:scale-95"
             title="إعادة المرحلة"
           >
             <RotateCcw className="w-4 h-4" />
@@ -2008,7 +2096,11 @@ export const GameEngine: React.FC = () => {
       </div>
 
       {/* Main Canvas Viewport */}
-      <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] max-h-[620px] bg-black rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl flex items-center justify-center">
+      <div className={`relative w-full bg-black rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl flex items-center justify-center transition-all ${
+        isFullscreen 
+          ? 'flex-1 max-h-[58vh] sm:max-h-[68vh] aspect-[4/3] sm:aspect-[16/10]' 
+          : 'aspect-[4/3] sm:aspect-[16/10] max-h-[620px]'
+      }`}>
         
         <canvas
           ref={canvasRef}
@@ -2307,8 +2399,10 @@ export const GameEngine: React.FC = () => {
       {/* ==========================================
           VIRTUAL ANALOG JOYSTICK (360° CONTROLLER)
       ========================================== */}
-      <div className="w-full mt-4 flex flex-col items-center justify-center select-none touch-none">
-        <div className="flex items-center gap-2 mb-2">
+      <div className={`w-full flex flex-col items-center justify-center select-none touch-none ${
+        isFullscreen ? 'mt-1 mb-1 shrink-0' : 'mt-4'
+      }`}>
+        <div className="flex items-center gap-2 mb-1">
           <span className="text-[11px] text-zinc-400 font-bold flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
             <span>عصا التحكم التناظرية 360° (اسحب لتوجيه اللمبة بسلاسة)</span>
@@ -2342,7 +2436,7 @@ export const GameEngine: React.FC = () => {
             handleJoystickEnd()
           }}
           onTouchCancel={handleJoystickEnd}
-          className={`relative w-36 h-36 sm:w-40 sm:h-40 rounded-full border-2 transition-colors cursor-grab active:cursor-grabbing flex items-center justify-center shadow-2xl backdrop-blur-md ${
+          className={`relative w-32 h-32 sm:w-36 sm:h-36 rounded-full border-2 transition-colors cursor-grab active:cursor-grabbing flex items-center justify-center shadow-2xl backdrop-blur-md ${
             joystickData.active
               ? 'bg-blue-950/40 border-blue-500/70 shadow-[0_0_25px_rgba(59,130,246,0.35)]'
               : 'bg-zinc-950/80 border-zinc-800 shadow-lg'
