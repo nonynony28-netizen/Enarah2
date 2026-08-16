@@ -580,35 +580,24 @@ export const GameEngine: React.FC = () => {
     }
   }, [])
 
-  // Lock body scroll & gestures during gameplay or fullscreen to prevent glitching & bounce
+  // Lock body scroll only while in Fullscreen mode
   useEffect(() => {
-    if (gameState === 'playing' || isFullscreen) {
+    if (isFullscreen) {
       const origOverflow = document.body.style.overflow
       const origOverscroll = document.body.style.overscrollBehavior
-      const origTouchAction = document.body.style.touchAction
 
       document.body.style.overflow = 'hidden'
       document.body.style.overscrollBehavior = 'none'
-      document.body.style.touchAction = 'none'
 
       return () => {
         document.body.style.overflow = origOverflow
         document.body.style.overscrollBehavior = origOverscroll
-        document.body.style.touchAction = origTouchAction
       }
     }
-  }, [gameState, isFullscreen])
+  }, [isFullscreen])
 
-  // Start game (with auto-expand and smooth focus)
+  // Start game
   const startGame = (levelIdx = 0) => {
-    // Auto-enter expanded/immersive mode for maximum comfort and focus
-    if (!isFullscreen) {
-      setIsFullscreen(true)
-      if (containerRef.current && (containerRef.current as any).requestFullscreen) {
-        (containerRef.current as any).requestFullscreen().catch(() => {})
-      }
-    }
-
     if (containerRef.current) {
       containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
@@ -1983,114 +1972,106 @@ export const GameEngine: React.FC = () => {
         </div>
       )}
 
-      {/* Game Top HUD Bar */}
-      <div className={`w-full bg-[#111215] border border-zinc-800 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-md ${
-        isFullscreen ? 'mb-2' : 'mb-4'
+      {/* Game Top HUD Bar - Ultra-Clean Unified Toolbar */}
+      <div className={`w-full bg-[#111215]/95 border border-zinc-800/80 rounded-2xl px-2.5 py-1.5 flex items-center justify-between gap-1.5 shadow-md backdrop-blur-md ${
+        isFullscreen ? 'mb-1.5' : 'mb-3'
       }`}>
         
-        {/* Level Name & Leaderboard Button */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
-            <Compass className="w-4 h-4 text-blue-400" />
-            <span className="text-xs text-zinc-200 font-bold">
-              {LEVELS[currentLevelIdx].nameAr.split(':')[0]}
-            </span>
+        {/* Left: Stage info & Timer */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 bg-zinc-900/90 px-2 py-1 rounded-xl border border-zinc-800 text-xs font-bold text-blue-400">
+            <Compass className="w-3.5 h-3.5" />
+            <span>مـ{currentLevelIdx + 1}</span>
           </div>
 
-          <button
-            onClick={() => setShowLeaderboard(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
-            title="لوحة الشرف والمتصدرين"
-          >
-            <Trophy className="w-4 h-4 text-amber-400" />
-            <span>لوحة الشرف</span>
-          </button>
-        </div>
-
-        {/* 100% Checklist, Boss Bar & Countdown Timer */}
-        <div className="flex items-center gap-2.5">
-          
-          {/* Dynamic Countdown Timer */}
           <div 
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-xs transition-all ${
+            className={`flex items-center gap-1 px-2 py-1 rounded-xl border font-mono font-bold text-xs ${
               timeLeft <= 10
                 ? 'bg-red-500/20 border-red-500/50 text-red-400 animate-pulse'
                 : timeLeft <= 20
                 ? 'bg-amber-500/15 border-amber-500/30 text-amber-300'
-                : 'bg-zinc-900 border-zinc-800 text-emerald-400'
+                : 'bg-zinc-900/90 border-zinc-800 text-emerald-400'
             }`}
           >
-            <Timer className="w-4 h-4" />
-            <span>{timeLeft} ثانية</span>
+            <Timer className="w-3.5 h-3.5" />
+            <span>{timeLeft}s</span>
+          </div>
+        </div>
+
+        {/* Center: Lamps & Materials count */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 bg-zinc-900/90 px-2 py-1 rounded-xl border border-zinc-800 text-xs text-zinc-300" title="المصابيح المنارة">
+            <Lightbulb className="w-3.5 h-3.5 text-blue-400 fill-current" />
+            <span className="font-bold">{lampsLitCount}/{totalLampsCount}</span>
           </div>
 
-          {/* Level 4 Boss HP Bar */}
-          {LEVELS[currentLevelIdx].boss && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-300 text-xs font-bold animate-pulse">
-              <Skull className="w-4 h-4 text-red-400" />
-              <span>الزعيم: {bossHp}%</span>
-            </div>
-          )}
-
-          <div className="flex items-center gap-1.5 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
-            <Lightbulb className="w-4 h-4 text-blue-400" />
-            <span className="text-[11px] text-zinc-400">المصابيح:</span>
-            <span className="text-white font-bold text-xs">
-              {lampsLitCount}/{totalLampsCount}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
-            <Zap className="w-4 h-4 text-amber-400" />
-            <span className="text-[11px] text-zinc-400">المواد:</span>
-            <span className="text-white font-bold text-xs">
-              {collectedSparksCount}/{totalSparksCount}
-            </span>
+          <div className="flex items-center gap-1 bg-zinc-900/90 px-2 py-1 rounded-xl border border-zinc-800 text-xs text-zinc-300" title="المواد المجمعة">
+            <Zap className="w-3.5 h-3.5 text-amber-400 fill-current" />
+            <span className="font-bold">{collectedSparksCount}/{totalSparksCount}</span>
           </div>
 
           {/* Master Switch Status Badge */}
           <div 
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all ${
+            className={`flex items-center gap-1 px-2 py-1 rounded-xl text-[11px] font-bold border transition-all ${
               isStage100PercentComplete
                 ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 animate-pulse'
-                : 'bg-red-500/10 border-red-500/20 text-red-400'
+                : 'bg-zinc-900/90 border-zinc-800 text-zinc-400'
             }`}
+            title="حالة القاطع الرئيسي"
           >
-            {isStage100PercentComplete ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-            <span>{isStage100PercentComplete ? 'جاهز!' : `متبقي: ${totalRemaining}`}</span>
+            {isStage100PercentComplete ? <Unlock className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-zinc-500" />}
+            <span className="hidden sm:inline">{isStage100PercentComplete ? 'جاهز' : `${totalRemaining}`}</span>
           </div>
         </div>
 
-        {/* Controls: Fullscreen, Mute & Restart */}
-        <div className="flex items-center gap-2">
+        {/* Right: Quick Action buttons (Leaderboard, Mute, Restart, Fullscreen, Exit) */}
+        <div className="flex items-center gap-1 shrink-0">
           <button
-            onClick={toggleFullscreen}
-            className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 ${
-              isFullscreen
-                ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_12px_rgba(59,130,246,0.5)]'
-                : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
-            }`}
-            title={isFullscreen ? 'تصغير الشاشة' : 'تكبير الشاشة للعب المريح والتركيز'}
+            onClick={() => setShowLeaderboard(true)}
+            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-amber-500/30 text-amber-300 transition-all cursor-pointer active:scale-95"
+            title="لوحة الشرف"
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            <span className="hidden sm:inline text-xs font-bold">{isFullscreen ? 'تصغير' : 'ملء الشاشة'}</span>
+            <Trophy className="w-4 h-4 text-amber-400" />
           </button>
 
           <button
             onClick={toggleMute}
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer active:scale-95"
+            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95"
             title={isMuted ? 'تشغيل الصوت' : 'كتم الصوت'}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4" />}
           </button>
           
           <button
             onClick={() => startGame(currentLevelIdx)}
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer active:scale-95"
+            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95"
             title="إعادة المرحلة"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
+
+          <button
+            onClick={toggleFullscreen}
+            className={`p-1.5 rounded-xl border transition-all cursor-pointer active:scale-95 ${
+              isFullscreen
+                ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]'
+                : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-400 hover:text-white'
+            }`}
+            title={isFullscreen ? 'تصغير الشاشة' : 'تكبير الشاشة'}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+
+          {isFullscreen && (
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="px-2 py-1 rounded-xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+              title="خروج من وضع الشاشة الكاملة"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>خروج</span>
+            </button>
+          )}
         </div>
 
       </div>

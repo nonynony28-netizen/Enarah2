@@ -105,6 +105,8 @@ function App() {
     }
   }, []);
 
+  const isGamePage = location.pathname === '/game';
+
   return (
     <>
       <OfflineNotice />
@@ -135,8 +137,12 @@ function App() {
         </Routes>
       </Suspense>
 
-      <WhatsAppButton />
-      <AIChatWidget />
+      {!isGamePage && (
+        <>
+          <WhatsAppButton />
+          <AIChatWidget />
+        </>
+      )}
     </>
   )
 }
