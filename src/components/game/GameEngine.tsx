@@ -650,6 +650,78 @@ export const GameEngine: React.FC = () => {
     }
   }
 
+  // Virtual Analog Joystick State
+  const [joystickData, setJoystickData] = useState({
+    active: false,
+    knobX: 0,
+    knobY: 0,
+    angleDeg: 0,
+    intensity: 0,
+  })
+
+  const joystickRef = useRef({
+    active: false,
+    touchId: null as number | null,
+    baseX: 0,
+    baseY: 0,
+    vectorX: 0,
+    vectorY: 0,
+    intensity: 0,
+  })
+
+  const handleJoystickStart = (clientX: number, clientY: number, rect: DOMRect, touchId: number | null = null) => {
+    joystickRef.current.active = true
+    joystickRef.current.touchId = touchId
+    joystickRef.current.baseX = rect.left + rect.width / 2
+    joystickRef.current.baseY = rect.top + rect.height / 2
+    handleJoystickMove(clientX, clientY)
+  }
+
+  const handleJoystickMove = (clientX: number, clientY: number) => {
+    if (!joystickRef.current.active) return
+    const dx = clientX - joystickRef.current.baseX
+    const dy = clientY - joystickRef.current.baseY
+    const dist = Math.hypot(dx, dy)
+    const maxRadius = 45
+
+    const intensity = Math.min(dist / maxRadius, 1.0)
+    const normX = dist > 0 ? dx / dist : 0
+    const normY = dist > 0 ? dy / dist : 0
+
+    const clampedDist = Math.min(dist, maxRadius)
+    const knobX = normX * clampedDist
+    const knobY = normY * clampedDist
+
+    joystickRef.current.vectorX = normX * intensity
+    joystickRef.current.vectorY = normY * intensity
+    joystickRef.current.intensity = intensity
+
+    const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI
+
+    setJoystickData({
+      active: true,
+      knobX,
+      knobY,
+      angleDeg,
+      intensity,
+    })
+  }
+
+  const handleJoystickEnd = () => {
+    joystickRef.current.active = false
+    joystickRef.current.touchId = null
+    joystickRef.current.vectorX = 0
+    joystickRef.current.vectorY = 0
+    joystickRef.current.intensity = 0
+    setJoystickData({
+      active: false,
+      knobX: 0,
+      knobY: 0,
+      angleDeg: 0,
+      intensity: 0,
+    })
+  }
+
   // Keyboard controls listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -669,15 +741,6 @@ export const GameEngine: React.FC = () => {
       window.removeEventListener('keyup', handleKeyUp)
     }
   }, [])
-
-  // Touch D-Pad directional handlers
-  const handleTouchDir = (dx: number, dy: number) => {
-    touchInputRef.current = { x: dx, y: dy }
-  }
-
-  const handleTouchEnd = () => {
-    touchInputRef.current = { x: 0, y: 0 }
-  }
 
   // Calculate remaining uncollected items & unlit lamps
   const remainingLamps = levelRef.current.lamps.filter((l) => !l.isLit).length
@@ -721,7 +784,7 @@ export const GameEngine: React.FC = () => {
           hero.invincibleTimer -= dt
         }
 
-        // 1. Process Input
+        // 1. Process Input (Keyboard + 360-Degree Analog Virtual Joystick)
         let moveX = 0
         let moveY = 0
 
@@ -730,17 +793,22 @@ export const GameEngine: React.FC = () => {
         if (keysRef.current['ArrowUp'] || keysRef.current['KeyW']) moveY -= 1
         if (keysRef.current['ArrowDown'] || keysRef.current['KeyS']) moveY += 1
 
-        if (touchInputRef.current.x !== 0 || touchInputRef.current.y !== 0) {
-          moveX += touchInputRef.current.x
-          moveY += touchInputRef.current.y
+        // Analog 360° Joystick Velocity
+        if (joystickRef.current.active) {
+          moveX += joystickRef.current.vectorX
+          moveY += joystickRef.current.vectorY
         }
 
-        const length = Math.hypot(moveX, moveY)
-        if (length > 0) {
-          moveX = (moveX / length) * hero.speed
-          moveY = (moveY / length) * hero.speed
+        const inputMagnitude = Math.hypot(moveX, moveY)
+        if (inputMagnitude > 0.05) {
+          const speedMultiplier = joystickRef.current.active 
+            ? Math.min(inputMagnitude, 1.0) 
+            : 1.0
+
+          moveX = (moveX / inputMagnitude) * hero.speed * speedMultiplier
+          moveY = (moveY / inputMagnitude) * hero.speed * speedMultiplier
           hero.isMoving = true
-          hero.walkCycle += dt * 14
+          hero.walkCycle += dt * 14 * speedMultiplier
 
           if (Math.abs(moveX) > Math.abs(moveY)) {
             hero.facing = moveX > 0 ? 'right' : 'left'
@@ -2236,55 +2304,98 @@ export const GameEngine: React.FC = () => {
         </div>
       )}
 
-      {/* Mobile Touch Controls (D-Pad Controller) */}
-      <div className="w-full mt-5 flex sm:hidden flex-col items-center justify-center">
-        <p className="text-[11px] text-zinc-500 mb-2">لوحة التحكم باللمس للهواتف</p>
+      {/* ==========================================
+          VIRTUAL ANALOG JOYSTICK (360° CONTROLLER)
+      ========================================== */}
+      <div className="w-full mt-4 flex flex-col items-center justify-center select-none touch-none">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-[11px] text-zinc-400 font-bold flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+            <span>عصا التحكم التناظرية 360° (اسحب لتوجيه اللمبة بسلاسة)</span>
+          </span>
+        </div>
         
-        <div className="relative w-44 h-44 bg-zinc-950/90 border border-zinc-800 rounded-full p-2 flex items-center justify-center shadow-lg">
-          <button
-            onTouchStart={() => handleTouchDir(0, -1)}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={() => handleTouchDir(0, -1)}
-            onMouseUp={handleTouchEnd}
-            className="absolute top-2 w-12 h-12 bg-zinc-900 active:bg-blue-600 border border-zinc-800 text-white rounded-xl flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
-          >
-            ▲
-          </button>
+        {/* Analog Base Ring */}
+        <div
+          onMouseDown={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect()
+            handleJoystickStart(e.clientX, e.clientY, rect)
+          }}
+          onMouseMove={(e) => {
+            if (joystickData.active) handleJoystickMove(e.clientX, e.clientY)
+          }}
+          onMouseUp={handleJoystickEnd}
+          onMouseLeave={handleJoystickEnd}
+          onTouchStart={(e) => {
+            e.preventDefault()
+            const touch = e.touches[0]
+            const rect = e.currentTarget.getBoundingClientRect()
+            handleJoystickStart(touch.clientX, touch.clientY, rect, touch.identifier)
+          }}
+          onTouchMove={(e) => {
+            e.preventDefault()
+            const touch = Array.from(e.touches).find(t => t.identifier === joystickRef.current.touchId) || e.touches[0]
+            if (touch) handleJoystickMove(touch.clientX, touch.clientY)
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault()
+            handleJoystickEnd()
+          }}
+          onTouchCancel={handleJoystickEnd}
+          className={`relative w-36 h-36 sm:w-40 sm:h-40 rounded-full border-2 transition-colors cursor-grab active:cursor-grabbing flex items-center justify-center shadow-2xl backdrop-blur-md ${
+            joystickData.active
+              ? 'bg-blue-950/40 border-blue-500/70 shadow-[0_0_25px_rgba(59,130,246,0.35)]'
+              : 'bg-zinc-950/80 border-zinc-800 shadow-lg'
+          }`}
+          style={{ touchAction: 'none' }}
+        >
+          {/* Concentric Decorative Rings */}
+          <div className="absolute inset-4 rounded-full border border-blue-500/15 pointer-events-none" />
+          <div className="absolute inset-8 rounded-full border border-blue-400/10 pointer-events-none" />
 
-          <button
-            onTouchStart={() => handleTouchDir(0, 1)}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={() => handleTouchDir(0, 1)}
-            onMouseUp={handleTouchEnd}
-            className="absolute bottom-2 w-12 h-12 bg-zinc-900 active:bg-blue-600 border border-zinc-800 text-white rounded-xl flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
-          >
-            ▼
-          </button>
+          {/* Compass Direction Ticks */}
+          <div className="absolute top-1.5 text-[9px] font-bold text-zinc-500 select-none">▲</div>
+          <div className="absolute bottom-1.5 text-[9px] font-bold text-zinc-500 select-none">▼</div>
+          <div className="absolute left-2 text-[9px] font-bold text-zinc-500 select-none">◀</div>
+          <div className="absolute right-2 text-[9px] font-bold text-zinc-500 select-none">▶</div>
 
-          <button
-            onTouchStart={() => handleTouchDir(-1, 0)}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={() => handleTouchDir(-1, 0)}
-            onMouseUp={handleTouchEnd}
-            className="absolute left-2 w-12 h-12 bg-zinc-900 active:bg-blue-600 border border-zinc-800 text-white rounded-xl flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
-          >
-            ◀
-          </button>
+          {/* Active Directional Glow Beam */}
+          {joystickData.active && joystickData.intensity > 0.1 && (
+            <div
+              className="absolute w-12 h-1 bg-gradient-to-r from-blue-500 to-transparent rounded-full origin-left pointer-events-none"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `rotate(${joystickData.angleDeg}deg)`,
+                opacity: joystickData.intensity,
+              }}
+            />
+          )}
 
-          <button
-            onTouchStart={() => handleTouchDir(1, 0)}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={() => handleTouchDir(1, 0)}
-            onMouseUp={handleTouchEnd}
-            className="absolute right-2 w-12 h-12 bg-zinc-900 active:bg-blue-600 border border-zinc-800 text-white rounded-xl flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
+          {/* Floating Analog Stick Knob */}
+          <div
+            className={`w-14 h-14 rounded-full flex items-center justify-center text-white border-2 shadow-2xl transition-transform duration-75 pointer-events-none ${
+              joystickData.active
+                ? 'bg-gradient-to-b from-blue-500 to-blue-700 border-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.8)] scale-105'
+                : 'bg-gradient-to-b from-zinc-800 to-zinc-900 border-zinc-700 shadow-md'
+            }`}
+            style={{
+              transform: `translate(${joystickData.knobX}px, ${joystickData.knobY}px)`,
+            }}
           >
-            ▶
-          </button>
-
-          <div className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center text-blue-400 border border-zinc-800">
-            <Lightbulb className="w-5 h-5" />
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+              joystickData.active ? 'text-amber-300' : 'text-blue-400'
+            }`}>
+              <Lightbulb className="w-5 h-5 fill-current transition-colors" />
+            </div>
           </div>
         </div>
+
+        <span className="text-[10px] text-zinc-500 mt-1.5">
+          {joystickData.active
+            ? `⚡ حركة نشطة: ${(joystickData.intensity * 100).toFixed(0)}%`
+            : '💡 يمكنك أيضاً استخدام مفاتيح الأسهم أو WASD'}
+        </span>
       </div>
 
     </div>
