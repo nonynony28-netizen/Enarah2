@@ -1979,16 +1979,17 @@ export const GameEngine: React.FC = () => {
       }`}
     >
       
-      {/* Dynamic Floating Banner Alert (Toast Overlay) */}
+      {/* Dynamic Floating Banner Alert (Toast Overlay - Perfectly Centered in RTL and LTR) */}
       {bannerAlert && (
         <div 
-          className={`absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md py-1.5 px-3 border rounded-xl text-center text-xs font-bold shadow-2xl backdrop-blur-md transition-all animate-bounce ${
+          className={`absolute top-12 sm:top-14 inset-x-0 mx-auto z-50 w-[90%] max-w-sm py-2 px-4 border rounded-2xl text-center text-xs sm:text-sm font-bold shadow-2xl backdrop-blur-md transition-all animate-bounce ${
             bannerAlert.type === 'error'
               ? 'bg-red-950/95 border-red-500/70 text-red-200 shadow-red-950/50'
               : bannerAlert.type === 'success'
               ? 'bg-emerald-950/95 border-emerald-500/70 text-emerald-200 shadow-emerald-950/50'
               : 'bg-blue-600/95 border-blue-400/50 text-white shadow-blue-950/50'
           }`}
+          style={{ left: 0, right: 0, margin: '0 auto' }}
         >
           {bannerAlert.msg}
         </div>
