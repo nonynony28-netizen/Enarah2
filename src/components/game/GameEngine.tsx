@@ -537,9 +537,24 @@ export const GameEngine: React.FC = () => {
     setCollectedSparksCount(0)
     setTotalSparksCount(cloned.sparks.length)
     setLightPower(cloned.initialLight)
-    setTimeLeft(cloned.timeLimit)
-    timeLeftRef.current = cloned.timeLimit
     particlesRef.current = []
+    keysRef.current = {}
+    joystickRef.current = {
+      active: false,
+      touchId: null,
+      baseX: 0,
+      baseY: 0,
+      vectorX: 0,
+      vectorY: 0,
+      intensity: 0,
+    }
+    setJoystickData({
+      active: false,
+      knobX: 0,
+      knobY: 0,
+      angleDeg: 0,
+      intensity: 0,
+    })
 
     if (cloned.boss) {
       setBossHp(cloned.boss.hp)
@@ -640,8 +655,14 @@ export const GameEngine: React.FC = () => {
     setTimeout(() => setBannerAlert(null), 3800)
   }
 
+  const isResettingRef = useRef(false)
+
   // Reset stage upon injury or timeout
   const handleHeroInjured = (reason = 'hit') => {
+    if (isResettingRef.current) return
+    isResettingRef.current = true
+    heroRef.current.invincibleTimer = 999
+
     sound.playShortCircuit()
     spawnParticles(heroRef.current.x, heroRef.current.y, '#ef4444', 40, 3.5)
     
@@ -655,6 +676,7 @@ export const GameEngine: React.FC = () => {
     
     setTimeout(() => {
       loadLevel(currentLevelIdx)
+      isResettingRef.current = false
     }, 450)
   }
 

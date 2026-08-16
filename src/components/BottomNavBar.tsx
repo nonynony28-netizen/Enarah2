@@ -7,6 +7,8 @@ export default function BottomNavBar() {
   const location = useLocation()
   const { isAr } = useLanguage()
 
+  if (location.pathname.startsWith('/game')) return null
+
   const navItems = [
     { path: '/', label: isAr ? 'الرئيسية' : 'Home', icon: Home },
     { path: '/products', label: isAr ? 'المنتجات' : 'Products', icon: Lightbulb },

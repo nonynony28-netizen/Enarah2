@@ -121,6 +121,8 @@ export default function Navbar() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [location.pathname])
 
+  if (location.pathname.startsWith('/game')) return null
+
   return (
     <>
       <motion.nav

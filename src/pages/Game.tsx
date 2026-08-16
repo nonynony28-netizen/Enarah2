@@ -8,18 +8,35 @@ export default function Game() {
   const { isAr } = useLanguage()
 
   return (
-    <div className="min-h-screen bg-transparent text-white pt-24 md:pt-28 pb-16 relative overflow-hidden">
+    <div className="min-h-screen bg-transparent text-white pt-6 sm:pt-8 pb-16 relative overflow-hidden">
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Back to Home button */}
-        <div className="mb-6 flex justify-start">
+        {/* Top Header with Brand Logo & Back to Home */}
+        <div className="mb-6 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform">
+              <Lightbulb className="w-5 h-5" />
+            </div>
+            <span className="font-extrabold text-lg sm:text-xl text-white tracking-tight">
+              {isAr ? (
+                <>
+                  الإنارة <span className="text-blue-400">الحديثة</span>
+                </>
+              ) : (
+                <>
+                  ENARAH <span className="text-blue-400">MODERN</span>
+                </>
+              )}
+            </span>
+          </Link>
+
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all text-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all text-xs sm:text-sm active:scale-95 shadow-sm"
           >
             <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
+            <span>{isAr ? 'العودة للموقع الرئيسي' : 'Back to Website'}</span>
           </Link>
         </div>
 
