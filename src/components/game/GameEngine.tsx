@@ -1952,7 +1952,7 @@ export const GameEngine: React.FC = () => {
       ref={containerRef}
       className={`w-full max-w-5xl mx-auto flex flex-col items-center select-none transition-all duration-300 ${
         isFullscreen
-          ? 'fixed inset-0 z-50 bg-[#07080b] w-screen h-screen flex flex-col justify-between p-2 sm:p-4 overflow-hidden'
+          ? 'fixed inset-0 z-[99999] bg-[#07080b] w-screen h-screen flex flex-col justify-between p-2 sm:p-4 overflow-hidden select-none touch-none'
           : 'relative'
       }`}
     >
@@ -2025,7 +2025,7 @@ export const GameEngine: React.FC = () => {
         </div>
 
         {/* Right: Quick Action buttons (Leaderboard, Mute, Restart, Fullscreen, Exit) */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => setShowLeaderboard(true)}
             className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-amber-500/30 text-amber-300 transition-all cursor-pointer active:scale-95"
@@ -2050,26 +2050,23 @@ export const GameEngine: React.FC = () => {
             <RotateCcw className="w-4 h-4" />
           </button>
 
-          <button
-            onClick={toggleFullscreen}
-            className={`p-1.5 rounded-xl border transition-all cursor-pointer active:scale-95 ${
-              isFullscreen
-                ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]'
-                : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-400 hover:text-white'
-            }`}
-            title={isFullscreen ? 'تصغير الشاشة' : 'تكبير الشاشة'}
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
-
-          {isFullscreen && (
+          {isFullscreen ? (
             <button
               onClick={() => setIsFullscreen(false)}
-              className="px-2 py-1 rounded-xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+              className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 shadow-lg"
               title="خروج من وضع الشاشة الكاملة"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
               <span>خروج</span>
+            </button>
+          ) : (
+            <button
+              onClick={toggleFullscreen}
+              className="px-2.5 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 hover:text-white text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1"
+              title="تكبير الشاشة للعب المريح"
+            >
+              <Maximize2 className="w-3.5 h-3.5 text-blue-400" />
+              <span>ملء الشاشة</span>
             </button>
           )}
         </div>
@@ -2079,7 +2076,7 @@ export const GameEngine: React.FC = () => {
       {/* Main Canvas Viewport */}
       <div className={`relative w-full bg-black rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl flex items-center justify-center transition-all ${
         isFullscreen 
-          ? 'flex-1 max-h-[58vh] sm:max-h-[68vh] aspect-[4/3] sm:aspect-[16/10]' 
+          ? 'flex-1 max-h-[64vh] sm:max-h-[72vh] aspect-[4/3] sm:aspect-[16/10]' 
           : 'aspect-[4/3] sm:aspect-[16/10] max-h-[620px]'
       }`}>
         
@@ -2102,25 +2099,36 @@ export const GameEngine: React.FC = () => {
             <h2 className="text-2xl sm:text-4xl font-black text-white mb-2">
               رحلة النور | بطل <span className="text-blue-400">الإنارة الحديثة</span>
             </h2>
-            <p className="text-zinc-400 text-xs sm:text-sm max-w-md leading-relaxed mb-4 font-normal">
+            <p className="text-zinc-400 text-xs sm:text-sm max-w-md leading-relaxed mb-5 font-normal">
               تحدي الأبطال الحقيقي! انطلق بالأثر الضوئي المتوهج، نافس على لوحة الشرف، واحبس وحش الحمل الزائد في المعرض الرئيسي!
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
+              <button
+                onClick={() => {
+                  setIsFullscreen(true);
+                  startGame(0);
+                }}
+                className="px-6 py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-xl font-bold text-sm flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-lg"
+              >
+                <Maximize2 className="w-4 h-4" />
+                <span>العب بملء الشاشة ⛶ (أفضل تجربة)</span>
+              </button>
+
               <button
                 onClick={() => startGame(0)}
-                className="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-base flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-lg"
+                className="px-5 py-3.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white rounded-xl font-bold text-sm flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95"
               >
-                <Play className="w-5 h-5 fill-current" />
-                <span>ابدأ التحدي (حي الليثي)</span>
+                <Play className="w-4 h-4 fill-current text-blue-400" />
+                <span>لعب عادي</span>
               </button>
 
               <button
                 onClick={() => setShowLeaderboard(true)}
-                className="px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 border border-amber-500/40 text-amber-300 rounded-xl font-bold text-sm flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+                className="px-5 py-3.5 bg-zinc-900 hover:bg-zinc-800 border border-amber-500/40 text-amber-300 rounded-xl font-bold text-sm flex items-center gap-2 cursor-pointer transition-all active:scale-95"
               >
                 <Trophy className="w-4 h-4 text-amber-400" />
-                <span>لوحة الشرف والمتصدرين</span>
+                <span>لوحة الشرف</span>
               </button>
             </div>
           </div>

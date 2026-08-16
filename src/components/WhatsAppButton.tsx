@@ -1,6 +1,10 @@
 import { MessageCircle } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 
 export default function WhatsAppButton() {
+  const location = useLocation()
+  if (location.pathname.startsWith('/game')) return null
+
   return (
     <a
       href="https://wa.me/218916580068"

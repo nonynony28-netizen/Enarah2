@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Lightbulb, X, Send, Bot, Loader2 } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 
 type Message = {
@@ -12,6 +13,8 @@ type Message = {
 
 export default function AIChatWidget() {
   const { t, isAr } = useLanguage()
+  const location = useLocation()
+  if (location.pathname.startsWith('/game')) return null
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
