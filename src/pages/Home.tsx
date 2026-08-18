@@ -94,6 +94,135 @@ const getPaintColors = (isAr: boolean) => [
   }},
 ]
 
+const getHomeBrands = (isAr: boolean) => [
+  {
+    id: 'legrand',
+    name: 'Legrand',
+    origin: isAr ? 'فرنسا 🇫🇷' : 'France 🇫🇷',
+    description: isAr ? 'أنظمة تحكم ومفاتيح فاخرة' : 'Premium wiring & smart controls',
+    logoUrl: '/images/brand-legrand.png?v=2'
+  },
+  {
+    id: 'philips',
+    name: 'Philips',
+    origin: isAr ? 'هولندا 🇳🇱' : 'Netherlands 🇳🇱',
+    description: isAr ? 'حلول إضاءة LED ومصابيح موفرة' : 'LED lighting & smart bulbs',
+    logoUrl: '/images/brand-philips.png?v=2'
+  },
+  {
+    id: 'gewiss',
+    name: 'Gewiss',
+    origin: isAr ? 'إيطاليا 🇮🇹' : 'Italy 🇮🇹',
+    description: isAr ? 'أنظمة تشغيل آلي وتوزيع طاقة' : 'Building automation & power',
+    logoUrl: '/images/brand-gewiss.png?v=2'
+  },
+  {
+    id: 'chint',
+    name: 'CHINT',
+    origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
+    description: isAr ? 'قواطع آمنة ومعدات جهد منخفض' : 'Low-voltage gear & breakers',
+    logoUrl: '/images/brand-chint.png?v=2'
+  },
+  {
+    id: 'wellmax',
+    name: 'WELLMAX',
+    origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
+    description: isAr ? 'عملاق تكنولوجيا مصابيح Samsung LED' : 'Samsung LED chip technology',
+    logoUrl: '/images/brand-wellmax.png?v=2'
+  },
+  {
+    id: 'alfanar',
+    name: 'Alfanar',
+    origin: isAr ? 'السعودية 🇸🇦' : 'Saudi Arabia 🇸🇦',
+    description: isAr ? 'كابلات نحاسية ولوحات توزيع آمنة' : 'Cables & distribution boards',
+    logoUrl: '/images/brand-alfanar.png?v=2'
+  },
+  {
+    id: 'fumagalli',
+    name: 'Fumagalli',
+    origin: isAr ? 'إيطاليا 🇮🇹' : 'Italy 🇮🇹',
+    description: isAr ? 'إنارة حدائق خارجية مقاومة للصدأ' : 'Rustproof outdoor lighting',
+    logoUrl: '/images/brand-fumagalli.png?v=2'
+  },
+  {
+    id: 'commax',
+    name: 'Commax',
+    origin: isAr ? 'كوريا الجنوبية 🇰🇷' : 'South Korea 🇰🇷',
+    description: isAr ? 'أنظمة انتركم واتصال داخلي ذكي' : 'Smart video intercoms',
+    logoUrl: '/images/brand-commax.png?v=2'
+  },
+  {
+    id: 'cata',
+    name: 'CATA',
+    origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+    description: isAr ? 'إضاءة زخرفية وسبوت لايت عصري' : 'Decorative & spot lighting',
+    logoUrl: '/images/brand-cata.png?v=2'
+  },
+  {
+    id: 'borsan',
+    name: 'Borsan',
+    origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+    description: isAr ? 'كابلات نحاسية وتجهيزات تركيب' : 'Copper cables & equipment',
+    logoUrl: '/images/brand-borsan.png?v=2'
+  },
+  {
+    id: 'makel',
+    name: 'Makel',
+    origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+    description: isAr ? 'مفاتيح ومقابس وقواطع كهربائية' : 'Switches, sockets & breakers',
+    logoUrl: '/images/brand-makel.png?v=2'
+  },
+  {
+    id: 'isildar',
+    name: 'Isildar',
+    origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+    description: isAr ? 'أنظمة تأسيس كهربائي وإضاءة' : 'Installation gear & lighting',
+    logoUrl: '/images/brand-isildar.png?v=2'
+  },
+  {
+    id: 'icc',
+    name: 'ICC',
+    origin: isAr ? 'إيطاليا 🇮🇹' : 'Italy 🇮🇹',
+    description: isAr ? 'أنظمة إنارة وإكسسوارات توصيل' : 'Lighting fixtures & wiring',
+    logoUrl: '/images/brand-icc.png?v=2'
+  },
+  {
+    id: 'ecoliok',
+    name: 'ECOLIOK',
+    origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+    description: isAr ? 'حلول إضاءة LED اقتصادية ومريحة' : 'Eco-friendly LED solutions',
+    logoUrl: '/images/brand-ecoliok.png?v=2'
+  },
+  {
+    id: 'carkit',
+    name: 'Carkit',
+    origin: isAr ? 'تركيا 🇹🇷' : 'Turkey 🇹🇷',
+    description: isAr ? 'حوامل كابلات ومجاري أسلاك' : 'Cable trays & metal trunks',
+    logoUrl: '/images/brand-carkit.png?v=2'
+  },
+  {
+    id: 'geros',
+    name: 'Geros',
+    origin: isAr ? 'إيطاليا 🇮🇹' : 'Italy 🇮🇹',
+    description: isAr ? 'علب توزيع وخزائن مفاتيح ضد الماء' : 'Waterproof junction boxes',
+    logoUrl: '/images/brand-geros.png?v=2'
+  },
+  {
+    id: 'edison',
+    name: 'Edison',
+    origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
+    description: isAr ? 'أفياش وتوصيلات كهربائية آمنة' : 'Safe outlets & extensions',
+    logoUrl: '/images/brand-edison.png?v=2'
+  },
+  {
+    id: 'sharm',
+    name: 'Sharm',
+    origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳',
+    description: isAr ? 'نجف حديث وإنارة ديكورية معاصرة' : 'Modern chandeliers & decor',
+    logoUrl: '/images/brand-sharm.png?v=2'
+  }
+]
+
 const getLocalizedSize = (size: string, isAr: boolean) => {
   const numeric = size.replace(' ملي', '').replace(' مم', '').replace(' ملي', '').replace(' مم', '').trim()
   return isAr ? `${numeric} مم` : `${numeric} mm`
@@ -170,6 +299,7 @@ function HeroTextOverlay({ scrollYProgress, t, isAr }: { scrollYProgress: any; t
 export default function Home() {
   const { t, isAr } = useLanguage()
   const paintColors = getPaintColors(isAr)
+  const homeBrands = getHomeBrands(isAr)
   const filamentColor = "#fbbf24"
   const filamentGlow = "drop-shadow(0 0 8px rgba(245,158,11,0.85))"
   const spotlightOpacity = 0.45
@@ -706,6 +836,89 @@ export default function Home() {
                 </div>
               </div>
 
+            </div>
+
+          </div>
+        </section>
+
+        {/* =========================================================
+            3. قسم شركاؤنا من العلامات العالمية (الوكالات والماركات المعتمدة)
+            ========================================================= */}
+        <section id="brands-partners" className="py-20 md:py-28 relative overflow-hidden border-t border-zinc-800/80 bg-transparent">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            
+            {/* عنوان القسم */}
+            <div className="text-center mb-14 md:mb-18">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-white">
+                {isAr ? (
+                  <>شركاؤنا من <span className="text-blue-400">العلامات العالمية</span></>
+                ) : (
+                  <>Our Partners of <span className="text-blue-400">Global Brands</span></>
+                )}
+              </h2>
+
+              <p className="text-zinc-400 max-w-3xl mx-auto leading-relaxed text-sm md:text-base mb-6 font-normal">
+                {isAr 
+                  ? 'نتعاون مع نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية'
+                  : 'We collaborate with a group of the most prominent international brands and companies specialized in lighting and electrical equipment'
+                }
+              </p>
+
+              <div className="flex items-center justify-center gap-1.5 mt-5">
+                <div className="w-16 h-[1px] bg-zinc-800" />
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <div className="w-16 h-[1px] bg-zinc-800" />
+              </div>
+            </div>
+
+            {/* شبكة كروت الوكالات والعلامات العالمية */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 sm:gap-4 lg:gap-5">
+              {homeBrands.map((brand) => (
+                <Link
+                  key={brand.id}
+                  to="/brands"
+                  className="group relative bg-[#111215] border border-white/[0.08] hover:border-blue-500/40 rounded-2xl p-3.5 sm:p-4 flex flex-col items-center justify-between text-center transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-[0_8px_25px_rgba(59,130,246,0.15)] overflow-hidden cursor-pointer h-full"
+                >
+                  {/* Brand Logo Container */}
+                  <div className="w-full h-16 sm:h-20 bg-zinc-950/80 rounded-xl border border-zinc-800/80 flex items-center justify-center p-2.5 mb-3 group-hover:border-blue-500/30 transition-colors relative overflow-hidden">
+                    <img
+                      src={brand.logoUrl}
+                      alt={brand.name}
+                      loading="lazy"
+                      className="max-h-full max-w-full object-contain filter brightness-100 group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                        const fallback = e.currentTarget.parentElement?.querySelector('.brand-fallback')
+                        if (fallback) fallback.classList.remove('hidden')
+                      }}
+                    />
+                    <div className="brand-fallback hidden absolute inset-0 flex items-center justify-center text-white font-bold text-sm tracking-wider select-none">
+                      {brand.name}
+                    </div>
+                  </div>
+
+                  {/* Brand Name & Origin */}
+                  <div className="w-full">
+                    <h3 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors mb-1 truncate">
+                      {brand.name}
+                    </h3>
+                    <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-medium">
+                      {brand.origin}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* زر استعراض كافة تفاصيل الوكالات والمنتجات */}
+            <div className="mt-10 md:mt-12 text-center">
+              <Link
+                to="/brands"
+                className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-blue-600/10 hover:bg-blue-600 border border-blue-500/30 hover:border-blue-500 text-blue-400 hover:text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-sm active:scale-95 cursor-pointer"
+              >
+                <span>{isAr ? 'استعرض تفاصيل كافة الوكالات والشركات (18 علامة عالمية)' : 'Explore All 18 Global Agencies'}</span>
+                <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
+              </Link>
             </div>
 
           </div>
