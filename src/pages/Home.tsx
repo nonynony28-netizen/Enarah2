@@ -574,51 +574,6 @@ export default function Home() {
 
   return (
     <>
-      {/* شاشة التحميل المتوهجة الفاخرة */}
-      <AnimatePresence>
-        {pageLoading && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a192f]"
-          >
-            <div className="relative flex flex-col items-center">
-              {/* حلقات متوهجة تدور */}
-              <div className="relative w-24 h-24 mb-6">
-                <div className="absolute inset-0 rounded-full border-4 border-blue-500/20"></div>
-                <div className="absolute inset-0 rounded-full border-4 border-t-blue-400 animate-spin"></div>
-                <div className="absolute inset-2 rounded-full border-4 border-blue-300/10"></div>
-                <div className="absolute inset-2 rounded-full border-4 border-b-blue-300 animate-spin [animation-direction:reverse] [animation-duration:1.5s]"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Lightbulb className="w-9 h-9 text-blue-300 animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
-                </div>
-              </div>
-
-              {/* الاسم المتوهج */}
-              <motion.h2 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.15, duration: 0.4, ease: 'easeOut' }}
-                className="text-3xl font-black text-white mb-2 tracking-wider" 
-                style={glowingTitleStyle}
-              >
-                {isAr ? (
-                  <>الإنارة <span className="text-blue-300">الحديثة</span></>
-                ) : (
-                  <>ENARAH <span className="text-blue-300">MODERN</span></>
-                )}
-              </motion.h2>
-              <div className="flex items-center gap-1.5 mt-2">
-                <span className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce"></span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="pt-0 relative cursor-default bg-transparent text-white">
         
         {/* =========================================================

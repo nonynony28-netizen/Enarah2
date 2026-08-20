@@ -45,26 +45,8 @@ function App() {
     sessionStorage.setItem('enarah_session_active', 'true');
   }, []);
 
-  const [loading, setLoading] = useState(() => {
-    if (typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent || '')) {
-      return false;
-    }
-    return true;
-  })
-
-  // 1. شاشة البداية السينمائية المتوهجة السلسة للعملاء والتحميل المسبق المباشر
+  // التحميل المسبق لصفحة المنتجات وباقي الصفحات لفتحها فوراً بـ 0 ثانية بدلاً من التأخير
   useEffect(() => {
-    const isBot = typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent || '');
-    if (isBot) {
-      setLoading(false);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 2200)
-
-    // التحميل المسبق لصفحة المنتجات وباقي الصفحات لفتحها فوراً بـ 0 ثانية بدلاً من التأخير
     const prefetchTimer = setTimeout(() => {
       import('./pages/Products')
       import('./pages/Projects')
@@ -72,7 +54,6 @@ function App() {
     }, 500)
 
     return () => {
-      clearTimeout(timer)
       clearTimeout(prefetchTimer)
     }
   }, [])
@@ -110,9 +91,6 @@ function App() {
   return (
     <>
       <OfflineNotice />
-      <AnimatePresence>
-        {loading && <SplashScreen key="splash" />}
-      </AnimatePresence>
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
