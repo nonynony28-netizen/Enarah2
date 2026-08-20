@@ -633,35 +633,26 @@ export default function Home() {
 
         {/* 1. الواجهة الترحيبية السينمائية التلقائية (Automatic 3D Scene Animation) */}
         <section id="hero" className="relative min-h-[55vh] sm:min-h-[65vh] md:h-screen w-full overflow-hidden touch-pan-y select-none pointer-events-none">
-          <HeroAutoCanvas totalFrames={192} folderPath="/hero-sequence" startDelay={0}>
-            {({ currentFrame, isFinished }) => {
-              // تظهر كافة الكلمات والمعلومات فقط بعد اكتمال تشغيل اللقطة بالكامل كـ فيديو واحد كامل
-              const showText = isFinished || currentFrame >= 185;
-
-              return (
-                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center pt-6 sm:pt-10 md:pt-14 z-10 px-4">
-                  <AnimatePresence>
-                    {showText && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 25, filter: "blur(12px)", scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
-                        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                        className="max-w-4xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
-                      >
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
-                          <span className="text-white drop-shadow-md">{t('hero.title.part1')}</span>{' '}
-                          <span className="text-blue-400 drop-shadow-sm">{t('hero.title.part2')}</span>
-                        </h1>
-                        
-                        <p className="text-xs sm:text-base md:text-xl text-zinc-300 mb-0 max-w-2xl mx-auto leading-relaxed font-normal drop-shadow-sm">
-                          {t('hero.subtitle')}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            }}
+          <HeroAutoCanvas videoSrc={heroVideoUrl || '/bg-video.mp4'} posterSrc="/poster.jpg">
+            {() => (
+              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center pt-6 sm:pt-10 md:pt-14 z-10 px-4">
+                <motion.div 
+                  initial={{ opacity: 0, y: 18, filter: "blur(6px)", scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="max-w-4xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
+                >
+                  <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
+                    <span className="text-white drop-shadow-md">{t('hero.title.part1')}</span>{' '}
+                    <span className="text-blue-400 drop-shadow-sm">{t('hero.title.part2')}</span>
+                  </h1>
+                  
+                  <p className="text-xs sm:text-base md:text-xl text-zinc-300 mb-0 max-w-2xl mx-auto leading-relaxed font-normal drop-shadow-sm">
+                    {t('hero.subtitle')}
+                  </p>
+                </motion.div>
+              </div>
+            )}
           </HeroAutoCanvas>
         </section>
 
