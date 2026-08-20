@@ -31,18 +31,30 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "true");
 
-    const playVideo = () => {
+    const startFromBeginning = () => {
       if (!video) return;
+      video.currentTime = 0;
       const promise = video.play();
       if (promise !== undefined) {
-        promise.catch(() => {
-          // Will auto kick on touch or scroll
-        });
+        promise.catch(() => {});
       }
     };
 
-    // البدء الفوري المباشر من الثانية 0.00 بدون أي انتظار
-    playVideo();
+    // الاستماع لحدث انتهاء شاشة البداية (Splash Screen) لبدء خروج اللمبة من 0:00 مباشرة
+    const handleSplashFinished = () => {
+      startFromBeginning();
+    };
+
+    window.addEventListener("enarah_splash_finished", handleSplashFinished);
+
+    // إذا كانت شاشة البداية معروضة حالياً، قف عند الإطار 0:00 حتى تنتهي
+    const isSplashActive = typeof document !== "undefined" && !!document.getElementById("splash-screen");
+    if (!isSplashActive) {
+      startFromBeginning();
+    } else {
+      video.pause();
+      video.currentTime = 0;
+    }
 
     const handleUserInteraction = () => {
       if (video && video.paused) {
@@ -54,15 +66,14 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     window.addEventListener("scroll", handleUserInteraction, { passive: true });
     window.addEventListener("pointerdown", handleUserInteraction, { passive: true });
 
-    // استشعار العودة لأعلى الصفحة لإعادة تشغيل اللقطة من البداية (خروج اللمبة)
+    // استشعار العودة لأعلى الصفحة لإعادة تشغيل اللقطة من البداية (خروج اللمبة من 0:00)
     const heroEl = document.getElementById("hero");
     let observer: IntersectionObserver | null = null;
     if (heroEl) {
       observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && video) {
-            video.currentTime = 0;
-            playVideo();
+            startFromBeginning();
           }
         });
       }, { threshold: 0.25 });
@@ -70,6 +81,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     }
 
     return () => {
+      window.removeEventListener("enarah_splash_finished", handleSplashFinished);
       window.removeEventListener("touchstart", handleUserInteraction);
       window.removeEventListener("scroll", handleUserInteraction);
       window.removeEventListener("pointerdown", handleUserInteraction);

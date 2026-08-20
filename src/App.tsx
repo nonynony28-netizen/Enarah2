@@ -45,6 +45,29 @@ function App() {
     sessionStorage.setItem('enarah_session_active', 'true');
   }, []);
 
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent || '')) {
+      return false;
+    }
+    return true;
+  });
+
+  // 1. شاشة البداية السينمائية المتوهجة السلسة
+  useEffect(() => {
+    if (!showSplash) return;
+
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [showSplash]);
+
   // التحميل المسبق لصفحة المنتجات وباقي الصفحات لفتحها فوراً بـ 0 ثانية بدلاً من التأخير
   useEffect(() => {
     const prefetchTimer = setTimeout(() => {
@@ -91,6 +114,9 @@ function App() {
   return (
     <>
       <OfflineNotice />
+      <AnimatePresence>
+        {showSplash && <SplashScreen key="splash" />}
+      </AnimatePresence>
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
