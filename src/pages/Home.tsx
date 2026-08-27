@@ -1465,75 +1465,116 @@ export default function Home() {
         {/* =========================================================
             قسم مسرح الأسلاك الـ 3D التفاعلي: يقع مباشرة فوق قسم "ابدأ مشروعك معنا اليوم"
             ========================================================= */}
-        <section id="wires-import-showcase" className="py-8 md:py-14 relative overflow-hidden bg-transparent border-t border-zinc-800/80">
+        {/* =========================================================
+            قسم مسرح الأسلاك الـ 3D التفاعلي: تصميم متطور مقسوم (Split-View)
+            ========================================================= */}
+        <section id="wires-import-showcase" className="py-12 md:py-20 relative overflow-hidden bg-transparent border-t border-zinc-800/80">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {/* 🎬 مسرح موشن الأسلاك */}
-            <div className="relative w-full aspect-[9/16] md:aspect-[16/9] min-h-[70vh] sm:min-h-[78vh] md:max-h-[80vh] mx-auto rounded-3xl overflow-hidden bg-zinc-950 border border-white/[0.08] shadow-md group">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
-              {/* 1. موشن الأسلاك الأصلي الـ 240 إطار */}
-              <WiresAutoCanvas totalFrames={240} fps={30} fitMode="cover" className="w-full h-full" />
-              
-              {/* 2. تظليل سُفلي وعلوي خفيف للتمييز البصري */}
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-transparent to-zinc-950/50 z-10 pointer-events-none" />
+              {/* 🎬 1. العمود البصري: مسرح موشن الأسلاك ثلاثي الأبعاد بالكامل بدون أي حجب نصوص */}
+              <motion.div 
+                initial={{ opacity: 0, x: isAr ? 30 : -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                viewport={{ once: true }}
+                className="lg:col-span-6 w-full"
+              >
+                <div className="relative w-full aspect-square sm:aspect-[4/3] lg:aspect-square rounded-3xl overflow-hidden bg-zinc-950 border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.15)] group">
+                  {/* كانفاس موشن الأسلاك الأصلي الـ 240 إطار */}
+                  <WiresAutoCanvas totalFrames={240} fps={30} fitMode="cover" className="w-full h-full" />
+                  
+                  {/* تظليل ناعم عند الأطراف لتناسق الإطار */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-transparent to-zinc-950/30 pointer-events-none z-10" />
 
-              {/* 3. النصوص والشارات الطافية */}
-              <div className="absolute inset-0 z-20 p-5 sm:p-8 md:p-12 flex flex-col justify-between items-center text-center">
-                
-                {/* شارة علوية طافية */}
-                <motion.div 
-                  initial={{ opacity: 0, y: -20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  viewport={{ once: true }}
-                  className="w-full flex items-center justify-between gap-2"
-                >
-                  <span className="px-3.5 py-1.5 rounded-full bg-zinc-900/90 text-white text-[11px] sm:text-xs font-semibold border border-zinc-700 backdrop-blur-md">
-                    🇮🇹 🇹🇷 {isAr ? 'استيراد إيطاليا وتركيا المباشر' : 'Direct Italy & Turkey Import'}
-                  </span>
-
-                  <span className="px-3.5 py-1.5 rounded-full bg-zinc-900/90 text-zinc-300 text-[10px] sm:text-xs font-semibold border border-zinc-700 backdrop-blur-md hidden xs:inline-flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-blue-500" />
-                    <span>{isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Copper & Aluminum'}</span>
-                  </span>
-                </motion.div>
-
-                {/* المحتوى والمواصفات المصغرة */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.6 }}
-                  viewport={{ once: true }}
-                  className="mt-auto mb-2 w-full max-w-xl"
-                >
-                  <h3 className="text-xl sm:text-3xl md:text-4xl font-black text-white mb-2 leading-tight">
-                    {isAr ? (
-                      <>أسلاك وكوابل إيطالية وتركية <span className="text-blue-400">من المصنع مباشرة</span></>
-                    ) : (
-                      <>Italian & Turkish Wires <span className="text-blue-400">Direct from Source</span></>
-                    )}
-                  </h3>
-
-                  {/* شريحة الميزات المصغرة */}
-                  <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-[10px] sm:text-xs font-semibold text-zinc-300">
-                    <span className="px-3 py-1 rounded-lg bg-zinc-900/90 border border-zinc-800 backdrop-blur-md">🇮🇹 {isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
-                    <span className="px-3 py-1 rounded-lg bg-zinc-900/90 border border-zinc-800 backdrop-blur-md">⚡ {isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}</span>
-                    <span className="px-3 py-1 rounded-lg bg-zinc-900/90 border border-zinc-800 backdrop-blur-md">🛡️ {isAr ? 'عزل معتمد' : 'Certified PVC'}</span>
+                  {/* شارة طافية بالأعلى في زاوية الكابل */}
+                  <div className="absolute top-4 right-4 z-20">
+                    <span className="px-3.5 py-1.5 rounded-full bg-zinc-950/85 text-white text-[11px] sm:text-xs font-semibold border border-blue-500/40 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+                      <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                      <span>{isAr ? '🇮🇹 🇹🇷 استيراد مباشر' : 'Direct Import'}</span>
+                    </span>
                   </div>
 
-                  {/* زر التسوق بالمتجر الإلكتروني */}
-                  <div className="mt-5">
-                    <Link 
-                      to="/products"
-                      className="inline-flex items-center justify-center gap-2.5 px-6 py-3 sm:px-8 sm:py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm md:text-base transition-all duration-200 border border-blue-400/20 active:scale-95"
-                    >
-                      <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>{isAr ? 'تسوق أسلاك النحاس والألومنيوم بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
-                    </Link>
+                  {/* شارة طافية بالأسفل */}
+                  <div className="absolute bottom-4 left-4 z-20">
+                    <span className="px-3.5 py-1.5 rounded-full bg-zinc-950/85 text-zinc-300 text-[11px] sm:text-xs font-semibold border border-zinc-800 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+                      <span>⚡ {isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Metal'}</span>
+                    </span>
                   </div>
-                </motion.div>
+                </div>
+              </motion.div>
 
-              </div>
+              {/* 📝 2. العمود المعلوماتي: تفاصيل الجودة والمواصفات والأزرار */}
+              <motion.div 
+                initial={{ opacity: 0, x: isAr ? -30 : 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                viewport={{ once: true }}
+                className="lg:col-span-6 flex flex-col justify-center text-right"
+              >
+                {/* شارة التعريف العلوية */}
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-400 text-xs font-semibold w-fit mb-4">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{isAr ? 'معايير الجودة والتأسيس الكهربائي' : 'Electrical Standards & Cables'}</span>
+                </div>
+
+                {/* العنوان الرئيسي */}
+                <h3 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight">
+                  {isAr ? (
+                    <>أسلاك وكوابل إيطالية وتركية <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500">من المصنع مباشرة</span></>
+                  ) : (
+                    <>Italian & Turkish Wires <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500">Direct from Source</span></>
+                  )}
+                </h3>
+
+                <p className="text-zinc-400 text-xs sm:text-sm md:text-base leading-relaxed mb-6 font-normal">
+                  {isAr
+                    ? 'نوفر أفضل وأجود أنواع الأسلاك والكوابل الإيطالية والتركية المعتمدة لجميع مشاريع التأسيس السكني والتجاري بنحاس نقي 100% وعزل حراري فائق الأمان.'
+                    : 'We supply certified Italian and Turkish wires and cables engineered with 100% pure electrolytic copper and flame-retardant PVC insulation.'}
+                </p>
+
+                {/* كروت المواصفات الفاخرة */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+                  <div className="p-3.5 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-sm flex flex-col gap-1">
+                    <span className="text-lg">🇮🇹 🇹🇷</span>
+                    <span className="text-xs font-bold text-white">{isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
+                    <span className="text-[10px] text-zinc-400">{isAr ? 'من كبرى المصانع' : 'From Top Factories'}</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-sm flex flex-col gap-1">
+                    <span className="text-lg">⚡</span>
+                    <span className="text-xs font-bold text-white">{isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}</span>
+                    <span className="text-[10px] text-zinc-400">{isAr ? 'نقاء وتوصيل 100%' : '100% Conductivity'}</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-sm flex flex-col gap-1">
+                    <span className="text-lg">🛡️</span>
+                    <span className="text-xs font-bold text-white">{isAr ? 'عزل معتمد' : 'Certified PVC'}</span>
+                    <span className="text-[10px] text-zinc-400">{isAr ? 'مقاوم للحرارة' : 'Flame Retardant'}</span>
+                  </div>
+                </div>
+
+                {/* أزرار الإجراءات التفاعلية */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <Link 
+                    to="/products"
+                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm transition-all duration-200 border border-blue-400/20 shadow-lg shadow-blue-600/25 active:scale-95 text-center"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
+                  </Link>
+
+                  <Link 
+                    to="/wire-prices"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-semibold text-xs sm:text-sm transition-all duration-200 border border-zinc-800 hover:border-zinc-700 active:scale-95 text-center"
+                  >
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    <span>{isAr ? 'جدول أسعار الأسلاك المحدث' : 'Live Price Table'}</span>
+                  </Link>
+                </div>
+
+              </motion.div>
 
             </div>
 
