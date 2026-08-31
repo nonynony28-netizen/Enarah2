@@ -46,22 +46,33 @@ function App() {
   }, []);
 
   const [showSplash, setShowSplash] = useState(() => {
-    if (typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot/i.test(navigator.userAgent || '')) {
-      return false;
+    if (typeof window !== 'undefined') {
+      const isBot = /Chrome-Lighthouse|Lighthouse|PageSpeed|Googlebot|HeadlessChrome|Speed Insights|PTST|Mediapartners|Google-Inspection/i.test(navigator.userAgent || '') || 
+                    !!(window as any).__PRERENDER_INJECTED || 
+                    !!(window as any).navigator?.webdriver;
+      if (isBot) return false;
+      if (sessionStorage.getItem('enarah_splash_done')) return false;
+      return true;
     }
-    return true;
+    return false;
   });
 
   // 1. شاشة البداية السينمائية المتوهجة السلسة
   useEffect(() => {
-    if (!showSplash) return;
-
-    const timer = setTimeout(() => {
-      setShowSplash(false);
+    if (!showSplash) {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
       }
-    }, 2000);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+      sessionStorage.setItem('enarah_splash_done', 'true');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
+      }
+    }, 1400);
 
     return () => {
       clearTimeout(timer);

@@ -12,9 +12,8 @@
     <meta name="google-site-verification" content="google2e5fc99dfc453bab" />
     <link rel="canonical" href="https://enarahmodern.com/" />
 
-    <!-- Preload Hero Background Video & Poster for Instant Zero-Delay 60FPS Playback -->
+    <!-- Preload Critical Hero Poster (Lightweight Image) for 0ms First Paint -->
     <link rel="preload" as="image" href="/poster.jpg" fetchpriority="high" />
-    <link rel="preload" as="video" href="/bg-video.mp4" type="video/mp4" />
 
     <!-- Open Graph / WhatsApp / Facebook / Messenger / Telegram -->
     <meta property="og:type" content="website" />
@@ -102,18 +101,14 @@
     }
     </script>
 
-    <!-- تحميل مسبق عالي الأسبقية للبوستر والفيديو لافتتاح الموقع فوراً بدون شاشة سوداء -->
-    <link rel="preload" as="image" href="/poster.jpg" />
-    <link rel="preload" as="video" href="/bg-video.mp4" type="video/mp4" />
-
-    <link rel="dns-prefetch" href="https://pub-4cff48cfd0904acfa2890603fb3c0c40.r2.dev" />
-    <link rel="preconnect" href="https://pub-4cff48cfd0904acfa2890603fb3c0c40.r2.dev" crossorigin />
-    <link rel="dns-prefetch" href="https://images.unsplash.com" />
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <!-- تحسين سرعة تحميل الخطوط بدون حجب الرسم الأولي (Non-Blocking Fonts) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Readex+Pro:wght@400;600;700&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Readex+Pro:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Readex+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
+    </noscript>
   </head>
 
   <body>
