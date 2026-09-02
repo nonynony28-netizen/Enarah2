@@ -76,12 +76,21 @@ const getLocalizedProject = (project: { name: string; category: string; descript
 
 export default function Projects() {
   const { t, isAr } = useLanguage()
+  // دالة استبعاد الكروت غير المرغوب فيها (الأسلاك والكوابل، مواد التأسيس، مفاتيح وبرايز)
+  const isExcludedProject = (item: any) => {
+    const name = String(item.name || '').toLowerCase().trim()
+    const category = String(item.category || '').toLowerCase().trim()
+    const desc = String(item.description || '').toLowerCase().trim()
+
+    return name.includes('أسلاك') || name.includes('اسلاك') || name.includes('كوابل') ||
+           name.includes('تأسيس') || name.includes('تاسيس') || name.includes('مفاتيح') || name.includes('برايز') ||
+           category.includes('أسلاك') || category.includes('اسلاك') || category.includes('تأسيس') || category.includes('تاسيس') || category.includes('مفاتيح') || category.includes('برايز') ||
+           desc.includes('الاسلاك الايطاليه') || desc.includes('مواد التاسيس') || desc.includes('تشكيله كبيره من المفاتيح')
+  }
+
   const [projects, setProjects] = useState<ProjectItem[]>(() => {
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('enarah_cached_projects')
-      if (cached) {
-        try { return JSON.parse(cached) } catch {}
-      }
+      localStorage.removeItem('enarah_cached_projects')
     }
     return []
   })
@@ -106,6 +115,11 @@ export default function Projects() {
                } catch {
                  return false
                }
+            })
+            .filter((item: any) => {
+               let mediaData: any = {}
+               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
+               return !isExcludedProject({ name: item.name, category: mediaData.category, description: mediaData.description })
             })
             .map((item: any, index: number) => {
               let mediaData: any = {}
