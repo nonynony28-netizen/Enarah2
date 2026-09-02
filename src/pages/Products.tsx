@@ -185,27 +185,36 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const [products, setProducts] = useState<ProductItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('enarah_cached_products')
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached)
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map((p: any) => ({
-              ...p,
-              name: String(p.name || '').replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد'),
-              description: String(p.description || '').replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد').replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
-            }))
-          }
-        } catch {}
-      }
+  // دالة تحقق صارمة لضمان حصرية الأسلاك والكوابل فقط واستبعاد أي منتج آخر
+  const isWireProduct = (item: ProductItem) => {
+    const name = String(item.name || '').toLowerCase().trim()
+    const cat = String(item.category || '').toLowerCase().trim()
+    
+    // استبعاد صريح لأي سبوت لايت، ثريات، مفاتيح، برايز، انترفون، سكك ليد
+    if (
+      name.includes('سبوت') || name.includes('spot') || 
+      name.includes('ثريا') || name.includes('chandelier') ||
+      name.includes('مفتاح') || name.includes('switch') || 
+      name.includes('بريز') || name.includes('socket') ||
+      name.includes('سكة') || name.includes('انترفون') || 
+      name.includes('intercom') || name.includes('مواسير')
+    ) {
+      return false
     }
-    return defaultFallbackProducts
-  })
 
-  // 1. جلب المنتجات من السيرفر المباشر وتنسيقها
+    return cat.includes('سلك') || cat.includes('أسلاك') || cat.includes('كابل') || cat.includes('wire') ||
+           name.includes('سلك') || name.includes('أسلاك') || name.includes('كابل') || name.includes('wire')
+  }
+
+  const [products, setProducts] = useState<ProductItem[]>(defaultFallbackProducts)
+
+  // 1. جلب منتجات الأسلاك فقط من السيرفر المباشر وتنسيقها
   useEffect(() => {
+    // تنظيف الكاش القديم لضمان عدم ظهور أي ثريات أو سبوتات قديمة
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('enarah_cached_products')
+    }
+
     const fetchProducts = async () => {
       try {
         const res = await fetch('https://enarah2.vercel.app/api/get-users')
@@ -241,7 +250,7 @@ export default function Products() {
                 descText = isAr ? (descObj.ar || descObj.en || descText) : (descObj.en || descObj.ar || descText)
               } catch {}
 
-              let nameText = item.name || 'منتج إنارة'
+              let nameText = item.name || 'سلك كهربائي إيطالي معتمد'
               try {
                 const nameObj = JSON.parse(nameText)
                 nameText = isAr ? (nameObj.ar || nameObj.en || nameText) : (nameObj.en || nameObj.ar || nameText)
@@ -262,21 +271,21 @@ export default function Products() {
                 id: item._id || String(index),
                 name: nameText,
                 description: descText,
-                image: mediaData.imageUrl || '/images/default-product.jpg',
+                image: mediaData.imageUrl || 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
                 video: mediaData.videoUrl || '',
                 price: mediaData.price,
                 discountPrice: mediaData.discountPrice,
                 stockStatus: mediaData.stockStatus || 'available',
                 stockQty: mediaData.stockQty,
-                category: (mediaData.category || item.category || '').trim()
+                category: 'الأسلاك والكوابل الإيطالية والتركية'
               }
             })
+            .filter(isWireProduct)
 
-          const loadedProducts = formattedProducts.reverse()
-          if (loadedProducts.length > 0) {
-            // دمج منتجات السيرفر مع المنتجات الافتراضية لضمان تنوع المتجر
-            setProducts([...loadedProducts, ...defaultFallbackProducts])
-            localStorage.setItem('enarah_cached_products', JSON.stringify(loadedProducts))
+          if (formattedProducts.length > 0) {
+            setProducts([...formattedProducts, ...defaultFallbackProducts.filter(fb => !formattedProducts.some(p => p.id === fb.id))])
+          } else {
+            setProducts(defaultFallbackProducts)
           }
         }
       } catch (error) {
@@ -309,32 +318,23 @@ export default function Products() {
     }, 1200)
   }
 
-  // 3. فلترة منتجات البحث الفوري
+  // 3. فلترة منتجات البحث الفوري (أسلاك فقط)
   const searchedProducts = useMemo(() => {
     if (!searchQuery.trim()) return []
     const q = searchQuery.toLowerCase().trim()
-    return products.filter(p => 
+    return products.filter(isWireProduct).filter(p => 
       p.name.toLowerCase().includes(q) || 
-      p.description.toLowerCase().includes(q) || 
-      (p.category && p.category.toLowerCase().includes(q))
+      p.description.toLowerCase().includes(q)
     )
   }, [products, searchQuery])
 
   // 4. تجميع المنتجات (الأسلاك والكوابل فقط)
   const categoryGroups = useMemo(() => {
     return CATEGORIES_LIST.map(cat => {
-      const categoryProducts = products.filter(p => {
-        if (!p.category) return false
-        const catClean = p.category.trim().toLowerCase()
-        return catClean.includes('سلك') || catClean.includes('أسلاك') || catClean.includes('كابل') || catClean.includes('wire') || catClean === cat.nameAr.toLowerCase()
-      })
-
-      // إذا لم يتوفر منتج مرفوع، نضع المنتجات الافتراضية
-      const items = categoryProducts.length > 0 ? categoryProducts : defaultFallbackProducts
-
+      const items = products.filter(isWireProduct)
       return {
         ...cat,
-        items
+        items: items.length > 0 ? items : defaultFallbackProducts
       }
     })
   }, [products, isAr])
