@@ -1,54 +1,42 @@
-import mongoose from 'mongoose'
+import { MongoClient } from 'mongodb'
 import { applySecurityHeaders, checkRateLimit, sanitizeString } from '../lib/security.js'
 
-const MONGO_URI = process.env.MONGODB_URI
+let cachedClient = null
+let cachedDb = null
 
-if (!MONGO_URI) {
-  throw new Error("MONGODB_URI environment variable is missing")
+async function connectToDatabase() {
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb }
+  }
+
+  const uri = process.env.MONGODB_URI
+  if (!uri) {
+    throw new Error('MONGODB_URI environment variable is missing')
+  }
+
+  const client = new MongoClient(uri)
+  await client.connect()
+  const db = client.db('my_app_database')
+
+  cachedClient = client
+  cachedDb = db
+  return { client, db }
 }
 
-if (!mongoose.connections[0].readyState) {
-  mongoose.connect(MONGO_URI)
-}
-
-const UserSchema =
-  new mongoose.Schema(
-    {
-      name: String,
-      email: String,
-      phone: String,
-      type: {
-        type: String,
-        default: 'contact',
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-    {
-      collection: 'users',
-    }
-  )
-
-const User =
-  mongoose.models.User ||
-  mongoose.model(
-    'User',
-    UserSchema
-  )
-
-export default async function handler(
-  req,
-  res
-) {
+export default async function handler(req, res) {
   applySecurityHeaders(res)
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
+  }
 
   if (req.method !== 'POST') {
     return res.status(405).json({
       success: false,
-      message:
-        'Method Not Allowed',
+      message: 'Method Not Allowed',
     })
   }
 
@@ -70,43 +58,39 @@ export default async function handler(
     const phone = sanitizeString(rawPhone)
     const message = sanitizeString(rawMessage)
 
-    if (
-      !name ||
-      !phone ||
-      !message
-    ) {
+    if (!name || !phone || !message) {
       return res.status(400).json({
         success: false,
-        message:
-          'جميع الحقول مطلوبة',
+        message: 'جميع الحقول مطلوبة',
       })
     }
 
-    // نفس قاعدة البيانات الحالية
-    const newContact =
-      await User.create({
-        name,
-        email: message, // نخزن الرسالة داخل email
-        phone,
-        type: 'contact',
-      })
+    const { db } = await connectToDatabase()
+
+    const newContactDoc = {
+      name,
+      email: message, // نخزن الرسالة داخل email
+      phone,
+      type: 'contact',
+      createdAt: new Date()
+    }
+
+    const result = await db.collection('users').insertOne(newContactDoc)
 
     return res.status(200).json({
       success: true,
-      message:
-        'تم حفظ الرسالة',
-      data: newContact,
+      message: 'تم حفظ الرسالة بنجاح',
+      data: {
+        _id: result.insertedId,
+        ...newContactDoc
+      },
     })
   } catch (error) {
-    console.error(
-      'Contact Save Error:',
-      error
-    )
-
+    console.error('Contact Submit Error:', error)
     return res.status(500).json({
       success: false,
-      message:
-        'خطأ في السيرفر',
+      message: 'حدث خطأ في السيرفر أثناء إرسال الرسالة',
+      error: error.message
     })
   }
 }
