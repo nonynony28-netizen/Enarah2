@@ -100,7 +100,7 @@ export default function AIChatWidget() {
       
       let replyContent = ''
       if (response.ok && data.success) {
-        replyContent = data.response
+        replyContent = data.answer || data.response || (isAr ? 'أهلاً بك! كيف يمكنني مساعدتك؟' : 'Hello! How can I help you?')
       } else {
         replyContent = data.error || (isAr ? 'عذراً، حدث خطأ أثناء الاتصال بالمساعد الذكي. يرجى المحاولة لاحقاً.' : 'Sorry, an error occurred while connecting to the assistant. Please try again later.')
       }
