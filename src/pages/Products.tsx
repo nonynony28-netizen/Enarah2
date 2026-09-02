@@ -325,6 +325,12 @@ export default function Products() {
                 .replace(/كابل\s*\/\s*سلك/gi, 'سلك')
                 .replace(/كوابل/gi, 'أسلاك')
 
+              const itemCategory = mediaData.category === 'التخفيضات والعروض الخاصة' || 
+                (mediaData.category && mediaData.category.includes('تخفيض')) ||
+                (mediaData.discountPrice && mediaData.price && mediaData.discountPrice < mediaData.price && (nameText.includes('باقة') || nameText.includes('عرض') || nameText.includes('تخفيض') || nameText.includes('خصم')))
+                ? 'التخفيضات والعروض الخاصة'
+                : 'الأسلاك والكوابل الإيطالية والتركية'
+
               return {
                 id: item._id || String(index),
                 name: nameText,
@@ -335,7 +341,7 @@ export default function Products() {
                 discountPrice: mediaData.discountPrice,
                 stockStatus: mediaData.stockStatus || 'available',
                 stockQty: mediaData.stockQty,
-                category: 'الأسلاك والكوابل الإيطالية والتركية'
+                category: itemCategory
               }
             })
             .filter(isAllowedStoreProduct)

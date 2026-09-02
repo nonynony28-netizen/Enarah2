@@ -61,6 +61,7 @@
     <button class="update-prices-btn" onclick="openWireModal()">تحديث أسعار الأسلاك ⚡</button>
     <a href="/media-uploader.html" class="add-btn">إضافة منتج/مشروع +</a>
     <button class="filter-all" onclick="filterType('all')">الكل</button>
+    <button class="filter-discount" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; box-shadow: 0 4px 12px rgba(239,68,68,0.3);" onclick="filterType('discount')">التخفيضات والعروض 🔥</button>
     <button class="filter-product" onclick="filterType('product')">المنتجات 🔵</button>
     <button class="filter-project" onclick="filterType('project')">المشاريع 🟡</button>
     <button class="filter-contact" onclick="filterType('contact')">الرسائل/الطلبات 🔴</button>
@@ -294,6 +295,7 @@
 
           if (currentFilter === "all") return true;
           if (currentFilter === "contact") return item.type === "contact";
+          if (currentFilter === "discount") return item.type !== "contact" && (media.category === "التخفيضات والعروض الخاصة" || (media.category && media.category.includes("تخفيض")) || (media.discountPrice && media.price && parseFloat(media.discountPrice) < parseFloat(media.price)));
           if (currentFilter === "project") return item.type !== "contact" && media.type === "project";
           if (currentFilter === "product") return item.type !== "contact" && media.type !== "project";
           return true;
@@ -324,6 +326,11 @@
               </div>`;
           }
           else {
+            const isDiscount = media.category === "التخفيضات والعروض الخاصة" || (media.category && media.category.includes("تخفيض")) || (media.discountPrice && media.price && parseFloat(media.discountPrice) < parseFloat(media.price));
+            const badgeHtml = isDiscount
+              ? `<span class="badge" style="background: rgba(245, 158, 11, 0.25); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4);">عرض وتخفيض 🔥</span>`
+              : `<span class="badge product-badge">منتج 🔵</span>`;
+
             // تنسيق وعرض الأسعار والتخفيضات في لوحة التحكم
             let priceHtml = "";
             if (media.price) {
@@ -343,12 +350,12 @@
               ? `<span style="background: rgba(244, 63, 94, 0.15); color: #fca5a5; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(244, 63, 94, 0.3); display: inline-block;">نفذت الكمية ❌</span>`
               : `<span style="background: rgba(16, 185, 129, 0.15); color: #a7f3d0; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block;">متوفر في المخزن ✅ ${media.stockQty !== undefined ? `(${media.stockQty} قطعة)` : ''}</span>`;
 
-            card.innerHTML = `<span class="badge product-badge">منتج 🔵</span>
+            card.innerHTML = `${badgeHtml}
               ${media.imageUrl ? `<img src="${media.imageUrl}" alt="product image" />` : ""}
               <h3>${item.name || "منتج بدون اسم"}</h3>
               <p>${media.description || ""}</p>
               ${priceHtml}
-              <div style="margin-top: 10px; margin-bottom: 15px;">${stockHtml}</div>
+              <div style="margin-top: 8px; margin-bottom: 12px;">${stockHtml}</div>
               <div style="display: flex; gap: 10px; margin-top: 14px;">
                 <button class="edit-btn" style="margin-top: 0; flex: 1;" onclick="openEditModal('${item._id}')">تعديل ✏️</button>
                 <button class="delete-btn" style="margin-top: 0; flex: 1;" onclick="deleteItem('${item._id}')">حذف 🗑️</button>
