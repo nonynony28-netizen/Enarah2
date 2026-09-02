@@ -22,76 +22,21 @@ type ProductItem = {
   category?: string
 }
 
-// 📦 أقسام المتجر الرئيسية (Categories List)
+// 📦 أقسام المتجر الرئيسية (الأسلاك والكوابل فقط)
 const CATEGORIES_LIST = [
   {
     id: 'cat-wires',
-    nameAr: 'الأسلاك والكوابل',
-    nameEn: 'Wires & Cables',
-    descriptionAr: 'الأسلاك الإيطالية الأصلية والموصلات المعتمدة لضمان أقصى درجات الأمان والسلامة.',
-    descriptionEn: 'Certified Italian copper wires and cables directly from original source.',
+    nameAr: 'الأسلاك والكوابل الإيطالية والتركية',
+    nameEn: 'Italian & Turkish Wires & Cables',
+    descriptionAr: 'الأسلاك الإيطالية والأوروبية الأصلية المعتمدة 100% بنحاس إلكتروليتي نقي لجميع مشاريع التأسيس.',
+    descriptionEn: 'Certified 100% pure electrolytic copper Italian and Turkish wires and cables.',
     icon: Zap,
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp'
-  },
-  {
-    id: 'cat-spots',
-    nameAr: 'سبوت لايت',
-    nameEn: 'Spotlights',
-    descriptionAr: 'سبوتات مضادة للتوهج Anti-Glare وتصاميم غاطسة ومتحركة لجميع المساحات.',
-    descriptionEn: 'Anti-glare and architectural spotlights designed for all interior spaces.',
-    icon: Sparkles,
-    image: 'https://i.postimg.cc/9XDrxxfX/IMG-3399.webp'
-  },
-  {
-    id: 'cat-switches',
-    nameAr: 'مفاتيح وبرايز',
-    nameEn: 'Switches & Sockets',
-    descriptionAr: 'تشكيلة عصرية من المفاتيح والمآخذ الذكية والديكورية بأعلى معايير الجودة.',
-    descriptionEn: 'Modern smart switches and decorative sockets fitting every interior style.',
-    icon: Layers,
-    image: 'https://i.postimg.cc/rFdZwLwK/IMG-3396.webp'
-  },
-  {
-    id: 'cat-chandeliers',
-    nameAr: 'ثريات',
-    nameEn: 'Chandeliers',
-    descriptionAr: 'ثريات كريستالية وديكورية عصرية تعطي لمسة فخامة استثنائية لم منزلك.',
-    descriptionEn: 'Luxury crystal and modern chandeliers to elevate your living spaces.',
-    icon: Star,
-    image: 'https://i.postimg.cc/QxrShKw7/IMG-3394.webp'
-  },
-  {
-    id: 'cat-led',
-    nameAr: 'سكة الليد',
-    nameEn: 'LED Track Lights',
-    descriptionAr: 'أنظمة سكك الليد المغناطيسية والغاطسة والسطحية لمرونة إضاءة لا مثيل لها.',
-    descriptionEn: 'Magnetic and recessed LED track lighting systems for high flexibility.',
-    icon: Sparkles,
-    image: 'https://i.postimg.cc/4xjYRVFC/IMG-3391.webp'
-  },
-  {
-    id: 'cat-intercom',
-    nameAr: 'انترفون',
-    nameEn: 'Intercom Systems',
-    descriptionAr: 'أنظمة انترفون سلكية وللاسلكية ذكية بوضوح عالي للحماية والأمان.',
-    descriptionEn: 'Smart video intercom systems with high clarity for home security.',
-    icon: Package,
-    image: 'https://i.postimg.cc/pLN7ftsB/IMG-3725.webp'
-  },
-  {
-    id: 'cat-foundation',
-    nameAr: 'مواد تأسيس الكهربائي',
-    nameEn: 'Electrical Materials',
-    descriptionAr: 'جميع مستلزمات ومواد التأسيس الكهربائي الأولية والتكميلية بالجودة العالية.',
-    descriptionEn: 'Complete range of electrical installation materials and accessories.',
-    icon: Layers,
-    image: 'https://i.postimg.cc/zDy4VhdZ/IMG-3395.webp'
   }
 ]
 
-// 🛒 المنتجات الافتراضية الموزعة حسب الأقسام
+// 🛒 المنتجات المعتمدة (الأسلاك والكوابل بجميع القياسات)
 const defaultFallbackProducts: ProductItem[] = [
-  // الأسلاك والكوابل الإيطالية المعتمدة (جميع القياسات)
   {
     id: 'wire-size-15',
     name: 'سلك كهربائي إيطالي معتمد 1.5 مم (لفة 100 متر)',
@@ -101,7 +46,7 @@ const defaultFallbackProducts: ProductItem[] = [
     discountPrice: 230,
     stockStatus: 'available',
     stockQty: 150,
-    category: 'الأسلاك والكوابل'
+    category: 'الأسلاك والكوابل الإيطالية والتركية'
   },
   {
     id: 'wire-size-25',
@@ -112,7 +57,7 @@ const defaultFallbackProducts: ProductItem[] = [
     discountPrice: 350,
     stockStatus: 'available',
     stockQty: 200,
-    category: 'الأسلاك والكوابل'
+    category: 'الأسلاك والكوابل الإيطالية والتركية'
   },
   {
     id: 'wire-size-40',
@@ -123,7 +68,7 @@ const defaultFallbackProducts: ProductItem[] = [
     discountPrice: 550,
     stockStatus: 'available',
     stockQty: 100,
-    category: 'الأسلاك والكوابل'
+    category: 'الأسلاك والكوابل الإيطالية والتركية'
   },
   {
     id: 'wire-size-60',
@@ -134,7 +79,7 @@ const defaultFallbackProducts: ProductItem[] = [
     discountPrice: 810,
     stockStatus: 'available',
     stockQty: 80,
-    category: 'الأسلاك والكوابل'
+    category: 'الأسلاك والكوابل الإيطالية والتركية'
   },
   {
     id: 'wire-size-100',
@@ -145,7 +90,7 @@ const defaultFallbackProducts: ProductItem[] = [
     discountPrice: 1290,
     stockStatus: 'available',
     stockQty: 40,
-    category: 'الأسلاك والكوابل'
+    category: 'الأسلاك والكوابل الإيطالية والتركية'
   },
   {
     id: 'wire-size-160',
@@ -156,7 +101,7 @@ const defaultFallbackProducts: ProductItem[] = [
     discountPrice: 1900,
     stockStatus: 'available',
     stockQty: 25,
-    category: 'الأسلاك والكوابل'
+    category: 'الأسلاك والكوابل الإيطالية والتركية'
   },
   {
     id: 'wire-size-250',
@@ -167,101 +112,66 @@ const defaultFallbackProducts: ProductItem[] = [
     discountPrice: 2850,
     stockStatus: 'available',
     stockQty: 20,
-    category: 'الأسلاك والكوابل'
-  },
-  // سبوت لايت
+    category: 'الأسلاك والكوابل الإيطالية والتركية'
+  }
+]
+
+// 🔮 قائمة الأقسام القادمة قريباً (Coming Soon Categories)
+const COMING_SOON_CATEGORIES = [
   {
-    id: 'spot-antiglare-7w',
-    name: 'سبوت لايت 7 واط ضد التوهج Anti-Glare',
-    description: 'سبوت لايت معتمد بزاوية إضاءة مريحة للعين وإطار غاطس فاخر لمختلف الغرف.',
-    image: 'https://i.postimg.cc/9XDrxxfX/IMG-3399.webp',
-    price: 35,
-    discountPrice: 28,
-    stockStatus: 'available',
-    stockQty: 85,
-    category: 'سبوت لايت'
-  },
-  {
-    id: 'spot-cob-12w',
-    name: 'سبوت لايت COB 12 واط متحرك',
-    description: 'إضاءة توجيهية ممتازة بدقة عالية وتصميم ألومنيوم مقاوم للحرارة.',
-    image: 'https://i.postimg.cc/9XDrxxfX/IMG-3399.webp',
-    price: 55,
-    discountPrice: 45,
-    stockStatus: 'available',
-    stockQty: 40,
-    category: 'سبوت لايت'
-  },
-  // مفاتيح وبرايز
-  {
-    id: 'switch-touch-gold',
-    name: 'مفتاح كهربائي ذكي مودرن',
-    description: 'مفاتيح ومآخذ كهربائية عصرية وتصاميم فخمة مقاومة للخدش والحرارة.',
-    image: 'https://i.postimg.cc/rFdZwLwK/IMG-3396.webp',
-    price: 65,
-    discountPrice: 55,
-    stockStatus: 'available',
-    stockQty: 60,
-    category: 'مفاتيح وبرايز'
-  },
-  {
-    id: 'socket-[#0f213a]',
-    name: 'مأخذ شحن سريع USB + Type-C',
-    description: 'بريز كهربائي مزود بمنفذين شحن سريع وتصميم عصري عالي الجودة.',
-    image: 'https://i.postimg.cc/rFdZwLwK/IMG-3396.webp',
-    price: 48,
-    discountPrice: 40,
-    stockStatus: 'available',
-    stockQty: 75,
-    category: 'مفاتيح وبرايز'
-  },
-  // ثريات
-  {
-    id: 'chandelier-crystal-gold',
-    name: 'ثريا كريستال مودرن فاخرة',
-    description: 'تصميم راقي بإضاءة خافتة وكريستال نقي لإعطاء فخامة للمجالس والصالونات.',
+    id: 'soon-chandeliers',
+    nameAr: 'الثريات المودرن والإنارة الفاخرة',
+    nameEn: 'Modern & Crystal Chandeliers',
+    descriptionAr: 'تشكيلة حصرية من أرقى الثريات الكريستالية والمودرن للمجالس والصالونات.',
+    descriptionEn: 'Luxury crystal and modern chandeliers to elevate your living spaces.',
     image: 'https://i.postimg.cc/QxrShKw7/IMG-3394.webp',
-    price: 450,
-    discountPrice: 390,
-    stockStatus: 'available',
-    stockQty: 15,
-    category: 'ثريات'
+    badgeAr: 'قريباً',
+    badgeEn: 'Coming Soon',
+    tag: 'ثريات فاخرة'
   },
-  // سكة الليد
   {
-    id: 'led-track-magnetic',
-    name: 'سكة ليد مغناطيسية غاطسة 2 متر',
-    description: 'نظام إضاءة خطي مغناطيسي مرن يتيح تركيب وتغيير السبوتات بسهولة.',
-    image: 'https://i.postimg.cc/4xjYRVFC/IMG-3391.webp',
-    price: 120,
-    discountPrice: 105,
-    stockStatus: 'available',
-    stockQty: 30,
-    category: 'سكة الليد'
+    id: 'soon-spots',
+    nameAr: 'سبوت لايت وسكك الليد المغناطيسية',
+    nameEn: 'Spotlights & Magnetic Track Lights',
+    descriptionAr: 'سبوتات مضادة للتوهج Anti-Glare وأنظمة إنارة خطية مغناطيسية متطورة.',
+    descriptionEn: 'Anti-glare spotlights and modern magnetic track lighting systems.',
+    image: 'https://i.postimg.cc/9XDrxxfX/IMG-3399.webp',
+    badgeAr: 'قريباً',
+    badgeEn: 'Coming Soon',
+    tag: 'إنارة معمارية'
   },
-  // انترفون
   {
-    id: 'intercom-video-wifi',
-    name: 'انترفون مرئي ذكي بشاشة 7 بوصة',
-    description: 'كاميرا خارجية بدقة HD مع خاصية الاتصال التلقائي بالهاتف عبر الواي فاي.',
+    id: 'soon-switches',
+    nameAr: 'المفاتيح والبريزات الذكية',
+    nameEn: 'Smart Switches & Sockets',
+    descriptionAr: 'مفاتيح لمس ذكية وتصاميم عصرية ومآخذ شحن سريع بأعلى معايير الأمان.',
+    descriptionEn: 'Modern touch smart switches and high-speed fast charging sockets.',
+    image: 'https://i.postimg.cc/rFdZwLwK/IMG-3396.webp',
+    badgeAr: 'قريباً',
+    badgeEn: 'Coming Soon',
+    tag: 'مفاتيح ذكية'
+  },
+  {
+    id: 'soon-intercom',
+    nameAr: 'أنظمة الإنترفون المرئي والأمان',
+    nameEn: 'Smart Video Intercom Systems',
+    descriptionAr: 'أحدث أجهزة الإنترفون الذكية بشاشات HD وخاصية الاتصال بالهاتف.',
+    descriptionEn: 'Smart HD video intercom systems with mobile connectivity for home security.',
     image: 'https://i.postimg.cc/pLN7ftsB/IMG-3725.webp',
-    price: 320,
-    discountPrice: 280,
-    stockStatus: 'available',
-    stockQty: 20,
-    category: 'انترفون'
+    badgeAr: 'قريباً',
+    badgeEn: 'Coming Soon',
+    tag: 'أمان وحماية'
   },
-  // مواد تأسيس الكهربائي
   {
-    id: 'foundation-box-pvc',
-    name: 'علب توزيع ومواسير تأسيس بي في سي',
-    description: 'علب ومواسير كهربائية معتمدة شديدة التحمل ومقاومة للضغط والحرارة.',
+    id: 'soon-foundation',
+    nameAr: 'مواد التأسيس والعلب والمواسير',
+    nameEn: 'Electrical Installation Materials',
+    descriptionAr: 'مواسير وعلب وقواطع حماية معتمدة شديدة التحمل للمباني والمشاريع.',
+    descriptionEn: 'Heavy-duty certified pipes, junction boxes, and installation essentials.',
     image: 'https://i.postimg.cc/zDy4VhdZ/IMG-3395.webp',
-    price: 15,
-    discountPrice: 12,
-    stockStatus: 'available',
-    stockQty: 200,
-    category: 'مواد تأسيس الكهربائي'
+    badgeAr: 'قريباً',
+    badgeEn: 'Coming Soon',
+    tag: 'تأسيس معتمد'
   }
 ]
 
@@ -410,18 +320,17 @@ export default function Products() {
     )
   }, [products, searchQuery])
 
-  // 4. تجميع المنتجات حسب كل قسم على حدة (Stacked Category Groups)
+  // 4. تجميع المنتجات (الأسلاك والكوابل فقط)
   const categoryGroups = useMemo(() => {
     return CATEGORIES_LIST.map(cat => {
-      const categoryName = isAr ? cat.nameAr : cat.nameEn
       const categoryProducts = products.filter(p => {
         if (!p.category) return false
         const catClean = p.category.trim().toLowerCase()
-        return catClean === cat.nameAr.toLowerCase() || catClean === cat.nameEn.toLowerCase()
+        return catClean.includes('سلك') || catClean.includes('أسلاك') || catClean.includes('كابل') || catClean.includes('wire') || catClean === cat.nameAr.toLowerCase()
       })
 
-      // إذا لم يتوفر منتج مرفوع مخصص للقسم، نضع المنتجات الافتراضية
-      const items = categoryProducts.length > 0 ? categoryProducts : defaultFallbackProducts.filter(p => p.category === cat.nameAr)
+      // إذا لم يتوفر منتج مرفوع، نضع المنتجات الافتراضية
+      const items = categoryProducts.length > 0 ? categoryProducts : defaultFallbackProducts
 
       return {
         ...cat,
@@ -456,13 +365,13 @@ export default function Products() {
           </h1>
           <p className="text-zinc-400 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
             {isAr 
-              ? 'تصفح أقسام متجرنا المنسقة والمنتجات المعتمدة بجودة عالية وأفضل الأسعار'
-              : 'Browse our organized store categories and certified high-quality lighting products'
+              ? 'تصفح قائمة الأسلاك والكوابل المعتمدة بأعلى معايير الجودة وأفضل الأسعار'
+              : 'Browse certified Italian and Turkish wires & cables with the best market prices'
             }
           </p>
         </motion.div>
 
-        {/* 🔍 1. خانة البحث الفوري الاحترافية (Instant Store Search Bar) */}
+        {/* 🔍 1. خانة البحث الفوري الاحترافية عن مقاسات الأسلاك */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="relative max-w-2xl mx-auto mb-10">
           <div className="relative flex items-center">
             <Search className={`absolute ${isAr ? 'right-4' : 'left-4'} w-5 h-5 text-zinc-400 pointer-events-none`} />
@@ -470,7 +379,7 @@ export default function Products() {
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isAr ? "ابحث عن سلك، سبوت لايت، ثريا، مفتاح ذكي..." : "Search wires, spotlights, chandeliers, switches..."}
+              placeholder={isAr ? "ابحث عن مقاس السلك (مثال: 1.5 مم، 2.5 مم، 4.0 مم، 6.0 مم...)" : "Search wire size (e.g. 1.5mm, 2.5mm, 4.0mm, 6.0mm...)"}
               className={`w-full ${isAr ? 'pr-12 pl-12' : 'pl-12 pr-12'} py-3.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-white/20 transition-all text-sm`}
             />
             {searchQuery && (
@@ -487,57 +396,11 @@ export default function Products() {
             <div className="mt-3 flex items-center justify-between px-2 text-xs text-zinc-400 font-semibold">
               <span>{isAr ? `نتائج البحث عن: "${searchQuery}"` : `Search results for: "${searchQuery}"`}</span>
               <span className="px-3 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300">
-                {isAr ? `${searchedProducts.length} منتج متطابق` : `${searchedProducts.length} products found`}
+                {isAr ? `${searchedProducts.length} مقاس متطابق` : `${searchedProducts.length} matches found`}
               </span>
             </div>
           )}
         </motion.div>
-
-        {/* 🗂️ 2. شريط التنقل السريع بين الأقسام (Sticky Category Navigation Pills) */}
-        {searchQuery.trim() === '' && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-14 overflow-x-auto pb-3 no-scrollbar scroll-smooth">
-            <div className="flex items-center gap-2.5 min-w-max px-1">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 border cursor-pointer ${
-                  selectedCategory === 'all'
-                    ? 'bg-zinc-800 text-white border-zinc-600 ring-1 ring-white/20'
-                    : 'bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-white'
-                }`}
-              >
-                <Layers className="w-4 h-4" />
-                <span>{isAr ? 'جميع الأقسام' : 'All Categories'}</span>
-              </button>
-
-              {CATEGORIES_LIST.map((cat) => {
-                const catName = isAr ? cat.nameAr : cat.nameEn
-                const isSelected = selectedCategory === catName
-                const IconComponent = cat.icon
-
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      setSelectedCategory(catName)
-                      const element = document.getElementById(cat.id)
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                      }
-                    }}
-                    className={`px-4 py-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 border cursor-pointer ${
-                      isSelected
-                        ? 'bg-zinc-800 text-white border-zinc-600 ring-1 ring-white/20'
-                        : 'bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-white'
-                    }`}
-                  >
-                    <IconComponent className="w-4 h-4 text-blue-400" />
-                    <span>{catName}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </motion.div>
-        )}
 
         {/* 🔎 حالة نتائج البحث المباشرة (Search Mode View) */}
         {searchQuery.trim() !== '' ? (
@@ -559,62 +422,58 @@ export default function Products() {
               <div className="text-center py-20 bg-[#111215] rounded-2xl border border-zinc-800">
                 <Package className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-white mb-2">
-                  {isAr ? 'لم نجد نتائج مطابقة لفي البحث' : 'No matching products found'}
+                  {isAr ? 'لم نجد مقاسات مطابقة للبحث' : 'No matching wire sizes found'}
                 </h3>
                 <p className="text-zinc-400 text-xs mb-6">
-                  {isAr ? 'جرب البحث باسم آخر مثل "سلك"، "سبوت"، "ثريا"' : 'Try searching for wires, spotlights, or chandeliers'}
+                  {isAr ? 'جرب البحث برقم المقاس مثل "1.5" أو "2.5" أو "4.0"' : 'Try searching for 1.5, 2.5, or 4.0'}
                 </p>
                 <button 
-                  onClick={() => setSearchQuery('')}
+                  onClick={() => setSearchQuery('')} 
                   className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-all"
                 >
-                  {isAr ? 'إلغاء البحث ورؤية كافة الأقسام' : 'Clear search'}
+                  {isAr ? 'عرض جميع مقاسات الأسلاك' : 'Show all wire sizes'}
                 </button>
               </div>
             )}
           </div>
         ) : (
-          /* 🛍️ 3. الأقسام المتراتبة تحت بعضها (Stacked Categories Store View) */
+          /* 🛍️ قسم الأسلاك المعتمدة الرئيسي + قسم قريباً بالأسفل */
           <div className="space-y-16">
             {categoryGroups.map((catGroup) => {
               const catName = isAr ? catGroup.nameAr : catGroup.nameEn
               const catDesc = isAr ? catGroup.descriptionAr : catGroup.descriptionEn
               const IconComponent = catGroup.icon
 
-              if (selectedCategory !== 'all' && selectedCategory !== catName) {
-                return null
-              }
-
               return (
                 <section key={catGroup.id} id={catGroup.id} className="scroll-mt-32">
                   
-                  {/* رأس القسم (Category Section Banner Header) */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-zinc-800">
+                  {/* رأس قسم الأسلاك */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-zinc-800">
                     <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-blue-400">
+                      <div className="w-10 h-10 rounded-xl bg-blue-950/50 border border-blue-800/60 flex items-center justify-center text-blue-400">
                         <IconComponent className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2.5">
                           <h2 className="text-xl sm:text-2xl font-bold text-white">{catName}</h2>
-                          <span className="px-2.5 py-0.5 bg-zinc-800 text-zinc-300 text-xs font-semibold rounded-md">
-                            {isAr ? `${catGroup.items.length} منتج` : `${catGroup.items.length} items`}
+                          <span className="px-3 py-0.5 bg-blue-500/10 border border-blue-400/20 text-blue-400 text-xs font-bold rounded-full">
+                            {isAr ? `${catGroup.items.length} مقاسات متوفرة` : `${catGroup.items.length} sizes in stock`}
                           </span>
                         </div>
-                        <p className="text-zinc-400 text-xs mt-0.5 font-normal">{catDesc}</p>
+                        <p className="text-zinc-400 text-xs mt-1 font-normal">{catDesc}</p>
                       </div>
                     </div>
 
-                    <button 
-                      onClick={() => setSelectedCategory(catName)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors self-start md:self-auto cursor-pointer"
+                    <Link 
+                      to="/wire-prices"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-semibold transition-all self-start md:self-auto"
                     >
-                      <span>{isAr ? 'عرض منتجات هذا القسم فقط' : 'Filter by this category'}</span>
-                      <ChevronLeft className={`w-3.5 h-3.5 ${isAr ? '' : 'rotate-180'}`} />
-                    </button>
+                      <Zap className="w-3.5 h-3.5 text-blue-400" />
+                      <span>{isAr ? 'عرض جدول أسعار الأسلاك المحدث ←' : 'Live Wire Prices Table ←'}</span>
+                    </Link>
                   </div>
 
-                  {/* المنتجات التابعة لهذا القسم تحت بعضها (Products Grid per Category) */}
+                  {/* شبكة مقاسات الأسلاك والكوابل */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {catGroup.items.map((product) => (
                       <ProductCard 
@@ -630,6 +489,115 @@ export default function Products() {
                 </section>
               )
             })}
+
+            {/* 🔮 قسم قريباً... (Coming Soon Section) */}
+            <section id="coming-soon-section" className="pt-12 border-t border-zinc-800/80">
+              {/* رأس قسم قريباً */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-zinc-800">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-950/40 border border-blue-800/50 flex items-center justify-center text-blue-400">
+                    <Sparkles className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="text-xl sm:text-2xl font-bold text-white">
+                        {isAr ? 'قريباً في متجرنا...' : 'Coming Soon...'}
+                      </h2>
+                      <span className="px-3 py-0.5 bg-blue-500/10 border border-blue-400/20 text-blue-400 text-xs font-bold rounded-full">
+                        {isAr ? 'تشكيلات جديدة' : 'New Collections'}
+                      </span>
+                    </div>
+                    <p className="text-zinc-400 text-xs mt-1 font-normal">
+                      {isAr 
+                        ? 'نعمل حالياً على تجهيز وإضافة تشكيلات حصرية من أرقى منتجات الإنارة والتأسيس الذكي:'
+                        : 'We are curating and adding premium exclusive collections for lighting and smart installation:'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* شبكة بطاقات الأقسام القادمة قريباً */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10">
+                {COMING_SOON_CATEGORIES.map((soonCat) => (
+                  <motion.div
+                    key={soonCat.id}
+                    whileHover={{ y: -5 }}
+                    className="group relative bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 shadow-sm flex flex-col justify-between"
+                  >
+                    <div className="relative aspect-[4/3] bg-zinc-900 overflow-hidden">
+                      <img 
+                        src={soonCat.image} 
+                        alt={isAr ? soonCat.nameAr : soonCat.nameEn}
+                        className="w-full h-full object-cover opacity-60 group-hover:opacity-85 group-hover:scale-105 transition-all duration-500 filter blur-[0.4px] group-hover:blur-0"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+                      
+                      {/* شارة قريباً المتوهجة */}
+                      <div className="absolute top-3 right-3 z-10">
+                        <span className="px-2.5 py-1 rounded-full bg-blue-950/90 border border-blue-500/40 text-blue-300 text-[10px] font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping" />
+                          <span>{isAr ? soonCat.badgeAr : soonCat.badgeEn}</span>
+                        </span>
+                      </div>
+
+                      <div className="absolute bottom-3 right-3 z-10">
+                        <span className="px-2 py-0.5 rounded-md bg-zinc-900/80 border border-zinc-700 text-zinc-300 text-[10px] font-semibold backdrop-blur-sm">
+                          {soonCat.tag}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-4 flex flex-col justify-between flex-grow">
+                      <div>
+                        <h3 className="text-sm font-bold text-white mb-1.5 group-hover:text-blue-400 transition-colors">
+                          {isAr ? soonCat.nameAr : soonCat.nameEn}
+                        </h3>
+                        <p className="text-[11px] text-zinc-400 leading-relaxed font-normal line-clamp-2">
+                          {isAr ? soonCat.descriptionAr : soonCat.descriptionEn}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+                        <span className="text-[10px] text-zinc-500 font-medium">
+                          {isAr ? 'قيد التجهيز والإدراج' : 'Under preparation'}
+                        </span>
+                        <span className="text-[11px] text-blue-400 font-bold flex items-center gap-1">
+                          <span>{isAr ? 'ترقبوا' : 'Stay tuned'}</span>
+                          <span>✨</span>
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* بنر الاستفسارات والطلبات الخاصة عبر الواتساب */}
+              <div className="relative rounded-2xl bg-gradient-to-r from-blue-950/30 via-zinc-900 to-blue-950/20 border border-blue-500/20 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden">
+                <div className="text-right">
+                  <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-400 text-xs font-bold inline-block mb-2">
+                    {isAr ? '💬 طلبيات واستشارات خاصة' : 'Custom Inquiries'}
+                  </span>
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-1">
+                    {isAr ? 'هل تبحث عن منتج محدد أو إنارة خاصة لمشروعك الآن؟' : 'Looking for a specific item or project lighting?'}
+                  </h3>
+                  <p className="text-zinc-400 text-xs sm:text-sm font-normal">
+                    {isAr 
+                      ? 'فريقنا الهندسي في معرض بنغازي جاهز لتوفير كافة طلبات التأسيس والإنارة الخاصة مباشرة.'
+                      : 'Our engineering team in Benghazi is ready to supply custom electrical and lighting orders.'}
+                  </p>
+                </div>
+
+                <a 
+                  href="https://wa.me/218915079140?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%B7%D9%84%D8%A8%D9%8A%D8%A9%20%D8%AE%D8%A7%D8%B5%D8%A9%20%D9%85%D9%86%20%D9%85%D8%AA%D8%AC%D8%B1%20%D8%A7%D9%84%D8%A5%D9%86%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%D8%A9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm whitespace-nowrap shadow-lg shadow-emerald-600/25 transition-all active:scale-95 cursor-pointer"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>{isAr ? 'تواصل معنا فوراً عبر الواتساب' : 'Contact via WhatsApp'}</span>
+                </a>
+              </div>
+            </section>
           </div>
         )}
 
