@@ -422,37 +422,44 @@ export default function HomeCleanWhitePreview() {
       <section id="about" className="py-20 md:py-28 relative overflow-hidden border-t border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          {/* عنوان قسم لماذا نحن */}
-          <div className="text-center mb-14 md:mb-20">
+          {/* عنوان قسم لماذا نحن بتنظيم معماري أنيق */}
+          <div className="text-center mb-14 md:mb-18">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-4 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>{isAr ? 'معايير الجودة والقوة التشغيلية' : 'Quality & Operational Strength'}</span>
+            </div>
+
             <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-slate-900">
               {isAr ? 'لماذا' : 'Why'}{' '}
               <span className="text-blue-600">
                 {isAr ? 'نحن؟' : 'Choose Us?'}
               </span>
             </h2>
-            <p className="text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal">
+
+            <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal leading-relaxed">
               {isAr 
-                ? 'تجربة متكاملة تجمع بين الجودة المعتمدة، الأسعار المنافسة، والدعم الفني السريع' 
-                : 'An integrated experience combining certified quality, competitive pricing, and fast technical support'}
+                ? 'تجربة متكاملة تجمع بين الجودة المعتمدة، كميات كبيرة وتوريد للشركات والمقاولين والمحلات، والدعم الفني السريع' 
+                : 'An integrated experience combining certified quality, bulk supply for companies, contractors and retail shops, and fast technical support'}
             </p>
-            <div className="flex items-center justify-center gap-1.5 mt-5">
-              <div className="w-16 h-[2px] bg-slate-200" />
+
+            <div className="flex items-center justify-center gap-2 mt-5">
+              <div className="w-14 h-[2px] bg-slate-200" />
               <div className="w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-blue-100" />
-              <div className="w-16 h-[2px] bg-slate-200" />
+              <div className="w-14 h-[2px] bg-slate-200" />
             </div>
           </div>
 
-          {/* شبكة البطاقات الثلاث الموحدة - تصميم أبيض فخم مع لمسات زرقاء ساطعة */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
+          {/* شبكة البطاقات الثلاث الموحدة بتنظيم هندسي متناسق */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10 items-stretch">
             
             {/* البطاقة الأولى: وكلاء حصريون لشركات عالمية */}
-            <div className="relative p-8 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300">
+            <div className="relative p-7 sm:p-8 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full">
               <div>
                 <div className="flex items-center justify-between gap-2 mb-6">
                   <span className="px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wider">
-                    {isAr ? 'وكالة رسمية' : 'Official Agency'}
+                    {isAr ? 'وكالة رسمية معتمدة' : 'Official Exclusive Agency'}
                   </span>
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
                     <Globe className="w-5 h-5" />
                   </div>
                 </div>
@@ -461,23 +468,23 @@ export default function HomeCleanWhitePreview() {
                   {isAr ? 'وكلاء حصريون لشركات عالمية' : 'Exclusive Agents for Global Brands'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[42px]">
                   {isAr 
-                    ? 'منتجات من شركات عالمية مختلفة نحن وكلائها الحصريون لضمان أعلى معايير الجودة والأصالة.' 
-                    : 'Products from leading global brands for which we serve as exclusive agents.'}
+                    ? 'منتجات أصلية ومباشرة من كبرى المصانع العالمية نحن وكلاؤها الحصريون لضمان أعلى معايير الجودة والأصالة.' 
+                    : 'Certified original products directly from leading global brands for which we serve as exclusive agents.'}
                 </p>
 
                 <div className="space-y-3 mb-6">
                   {(isAr ? [
-                    'منتجات أصلية من شركات عالمية نحن وكلائها الحصريون.',
+                    'منتجات أصلية 100% نحن وكلاؤها الحصريون في ليبيا.',
                     'استيراد وتوريد مباشر من المصانع العالمية المعتمدة.',
                     'تنوع واسع في العلامات التجارية يلبي كافة المشاريع.',
-                    'شفافية كاملة ومواصفات موثوقة ودقيقة لكافة بيانات المنتجات.'
+                    'شفافية كاملة ومواصفات فنية موثوقة ومطابقة للمعايير.'
                   ] : [
-                    'Original products from global brands with exclusive agency.',
+                    '100% authentic products with exclusive agency in Libya.',
                     'Direct import from certified international factories.',
-                    'Wide diversity of world-class brands for all projects.',
-                    'Complete transparency and accurate technical specifications for all product data.'
+                    'Wide brand diversity meeting all project requirements.',
+                    'Complete transparency and certified European standards.'
                   ]).map((feat, idx) => (
                     <div key={idx} className="flex items-start gap-3">
                       <CheckCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
@@ -487,45 +494,45 @@ export default function HomeCleanWhitePreview() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
-                <span>{isAr ? 'وكالة رسمية وحصرية' : 'Official Exclusive Agency'}</span>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
+                <span>{isAr ? 'أصالة واعتماد المنتجات' : 'Product Authenticity'}</span>
                 <span className="text-blue-600 font-black text-base">100%</span>
               </div>
             </div>
 
-            {/* البطاقة الثانية: حلول متكاملة */}
-            <div className="relative p-8 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300">
+            {/* البطاقة الثانية: كميات كبيرة وتوريد للشركات والمقاولين والمحلات */}
+            <div className="relative p-7 sm:p-8 rounded-2xl bg-white border border-blue-300 hover:border-blue-600 shadow-sm hover:shadow-xl hover:shadow-blue-500/15 flex flex-col justify-between group transition-all duration-300 h-full ring-1 ring-blue-100">
               <div>
                 <div className="flex items-center justify-between gap-2 mb-6">
-                  <span className="px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wider">
-                    {isAr ? 'حلول متكاملة' : 'Integrated Solutions'}
+                  <span className="px-3.5 py-1 rounded-full bg-blue-600 text-white text-xs font-bold tracking-wider shadow-sm">
+                    {isAr ? 'توريد تجاري ومشاريع' : 'Commercial & Project Supply'}
                   </span>
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                 </div>
 
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'حلول تأسيس وإنارة شاملة' : 'Integrated Electrical & Lighting'}
+                  {isAr ? 'كميات كبيرة وتوريد للشركات والمقاولين والمحلات' : 'Bulk Supply for Companies, Contractors & Retail'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[42px]">
                   {isAr 
-                    ? 'نوفر لك كل ما تحتاجه لتأسيس منزلك أو مشروعك من كابلات، أسلاك إيطالية، ومفاتيح ذكية في مكان واحد.' 
-                    : 'We provide everything you need to set up your home or project, from cables and Italian wires to smart switches.'}
+                    ? 'جاهزية تامة لتجهيز المشاريع الكبرى وتوفير كميات ضخمة ومستمرة لكافة الشركات الهندسية والمقاولين ومحلات المواد الكهربائية.' 
+                    : 'Full readiness to supply major projects and continuous bulk volumes directly to companies, contractors, and retail shops.'}
                 </p>
 
                 <div className="space-y-3 mb-6">
                   {(isAr ? [
-                    'توفير كافة مستلزمات التأسيس والإنارة بدون عناء.',
-                    'كابلات وأسلاك إيطالية بأحدث التقنيات.',
-                    'تجهيز كامل للمشاريع بأسعار منافسة.',
-                    'حلول ديكورية تناسب جميع التصاميم.'
+                    'توفير كميات كبيرة وتوريد فوري للشركات والمقاولين والمحلات.',
+                    'كابلات وأسلاك إيطالية وتركية بأعلى تقنيات الأمان والعزل.',
+                    'تجهيز كامل للمشاريع السكنية والتجارية والمخططات الهندسية.',
+                    'حلول تأسيس وإنارة ديكورية ومعمارية متكاملة تحت سقف واحد.'
                   ] : [
-                    'All electrical and lighting needs in one stop.',
-                    'Italian wires and smart switches with modern tech.',
-                    'Complete project provisioning at competitive prices.',
-                    'Integrated decorative lighting solutions.'
+                    'Bulk volume supply for companies, contractors and retail.',
+                    'Certified Italian and Turkish wires with high thermal safety.',
+                    'Full project provisioning for residential & commercial sites.',
+                    'Comprehensive decorative & architectural lighting under one roof.'
                   ]).map((feat, idx) => (
                     <div key={idx} className="flex items-start gap-3">
                       <CheckCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
@@ -535,20 +542,20 @@ export default function HomeCleanWhitePreview() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
-                <span>{isAr ? 'تغطية شاملة للمشاريع' : 'Full Project Provisioning'}</span>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
+                <span>{isAr ? 'جاهزية التوريد والكميات' : 'Bulk Supply Readiness'}</span>
                 <span className="text-blue-600 font-black text-base">100%</span>
               </div>
             </div>
 
-            {/* البطاقة الثالثة: دعم فني واسع */}
-            <div className="relative p-8 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300">
+            {/* البطاقة الثالثة: دعم فني واستشارات مجاناً */}
+            <div className="relative p-7 sm:p-8 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full">
               <div>
                 <div className="flex items-center justify-between gap-2 mb-6">
                   <span className="px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wider">
-                    {isAr ? 'استشارات ودعم' : 'Technical Support'}
+                    {isAr ? 'استشارات ودعم فني' : 'Technical Support'}
                   </span>
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
                     <Phone className="w-5 h-5" />
                   </div>
                 </div>
@@ -557,7 +564,7 @@ export default function HomeCleanWhitePreview() {
                   {isAr ? 'دعم فني واستشارات مجاناً' : 'Fast Sales Support & Consultations'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[42px]">
                   {isAr 
                     ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات وحساب أحمال الكهرباء بدقة.' 
                     : 'Our team is available to help you select products, request custom volumes, and calculate electrical loads accurately.'}
@@ -565,14 +572,14 @@ export default function HomeCleanWhitePreview() {
 
                 <div className="space-y-3 mb-6">
                   {(isAr ? [
-                    'فريق مهندسين وفنيين لإجابة كافة استفساراتك.',
-                    'حساب الأحمال والكميات المطلوبة بدقة بدون هدر.',
-                    'متابعة مستمرة حتى وصول طلبك بأمان.',
-                    'توصيل سريع ومضمون لكافة المشاريع.'
+                    'فريق مهندسين وفنيين لإجابة كافة استفساراتك الهندسية.',
+                    'حساب الأحمال والكميات المطلوبة بدقة لمنع أي هدر مالي.',
+                    'متابعة مستمرة وتنسيق مباشر حتى وصول طلبك بأمان.',
+                    'توصيل سريع ومضمون لكافة المدن ومواقع العمل.'
                   ] : [
-                    'Dedicated specialists to answer all your queries.',
-                    'Accurate calculation of loads and quantities.',
-                    'Continuous order tracking and coordination.',
+                    'Dedicated specialists to answer all your technical queries.',
+                    'Accurate calculation of loads and quantities preventing waste.',
+                    'Continuous order tracking and coordination until delivery.',
                     'Fast and guaranteed delivery to all project sites.'
                   ]).map((feat, idx) => (
                     <div key={idx} className="flex items-start gap-3">
@@ -583,7 +590,7 @@ export default function HomeCleanWhitePreview() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
                 <span>{isAr ? 'استجابة واستشارات فورية' : '24/7 Support & Response'}</span>
                 <span className="text-blue-600 font-black text-base">24/7</span>
               </div>
