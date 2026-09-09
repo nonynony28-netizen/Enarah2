@@ -273,10 +273,10 @@ html {
   filter: none !important;
 }
 
-/* استثناء خاص وحاسم لشاشة البداية لتكون في الظلام الدامس مع إضاءة اللمبة والشعار */
+/* استثناء خاص وحاسم لشاشة البداية لتكون في الظلام الدامس 100% بدون أي لون أزرق في الخلفية */
 #splash-screen,
 .splash-screen-container {
-  background-color: #060811 !important;
+  background-color: #000000 !important;
 }
 
 #splash-screen h1,
