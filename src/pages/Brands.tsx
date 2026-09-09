@@ -197,17 +197,17 @@ export default function Brands() {
   ]
 
   return (
-    <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-white">
+    <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
       
       {/* شبكة هندسية خفيفة جداً في الخلفية للفخامة */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f610_1px,transparent_1px),linear-gradient(to_bottom,#3b82f610_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className="mb-6 flex justify-start">
-            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all">
+            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm">
               <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
               {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
@@ -217,15 +217,15 @@ export default function Brands() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? (
-                <>شركاؤنا من <span className="text-blue-400">العلامات العالمية</span></>
+                <>شركاؤنا من <span className="text-blue-600">العلامات العالمية</span></>
               ) : (
-                <>Our Partners of <span className="text-blue-400">Global Brands</span></>
+                <>Our Partners of <span className="text-blue-600">Global Brands</span></>
               )}
             </h1>
 
-            <p className="text-zinc-400 max-w-3xl mx-auto leading-relaxed text-base md:text-lg mb-6 font-normal">
+            <p className="text-slate-600 max-w-3xl mx-auto leading-relaxed text-base md:text-lg mb-6 font-normal">
               {isAr 
                 ? 'نتعاون مع نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية'
                 : 'We collaborate with a group of the most prominent international brands and companies specialized in lighting and electrical equipment'
@@ -233,9 +233,9 @@ export default function Brands() {
             </p>
 
             <div className="flex items-center justify-center gap-1.5 mt-5">
-              <div className="w-16 h-[1px] bg-zinc-800" />
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              <div className="w-16 h-[1px] bg-zinc-800" />
+              <div className="w-16 h-[2px] bg-slate-300" />
+              <div className="w-2 h-2 rounded-full bg-blue-600 ring-4 ring-blue-100" />
+              <div className="w-16 h-[2px] bg-slate-300" />
             </div>
           </div>
         </FadeIn>
@@ -244,15 +244,15 @@ export default function Brands() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {brands.map((brand, i) => (
             <FadeIn key={brand.id} delay={0.2 + (i * 0.03)}>
-              <div className="group relative bg-[#111215] border border-white/[0.08] hover:border-white/[0.18] rounded-2xl overflow-hidden transition-all duration-200 shadow-sm flex flex-col h-full">
+              <div className="group relative bg-white border border-slate-200 hover:border-blue-500 rounded-2xl overflow-hidden transition-all duration-200 shadow-sm hover:shadow-xl flex flex-col h-full">
                 
                 {/* Brand Logo Container */}
-                <div className="bg-zinc-950/80 p-6 flex items-center justify-center min-h-[140px] relative border-b border-zinc-800/80">
+                <div className="bg-slate-50/80 p-6 flex items-center justify-center min-h-[140px] relative border-b border-slate-100 group-hover:bg-blue-50/20 transition-colors">
                   <div className="w-full max-w-[160px] h-[60px] overflow-hidden flex items-center justify-center relative">
                     <img
                       src={brand.logoUrl}
                       alt={brand.name}
-                      className="w-full h-full object-contain filter brightness-100 group-hover:scale-105 transition-all duration-300 z-10"
+                      className="w-full h-full object-contain filter brightness-95 group-hover:scale-105 transition-all duration-300 z-10"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                         const fallback = e.currentTarget.parentElement?.querySelector('.brand-fallback');
@@ -260,23 +260,23 @@ export default function Brands() {
                       }}
                     />
                     {/* Fallback Text Logo */}
-                    <div className="brand-fallback hidden absolute inset-0 flex items-center justify-center text-white font-bold text-xl tracking-wider select-none z-10">
+                    <div className="brand-fallback hidden absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xl tracking-wider select-none z-10">
                       {brand.name}
                     </div>
                   </div>
                 </div>
 
                 {/* Brand Details Container */}
-                <div className="p-6 flex flex-col flex-grow bg-transparent">
+                <div className="p-6 flex flex-col flex-grow bg-white">
                   <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors duration-200">
+                    <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200">
                       {brand.name}
                     </h2>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-medium">
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold">
                       {brand.origin}
                     </span>
                   </div>
-                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed font-normal flex-grow">
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal flex-grow">
                     {brand.description}
                   </p>
                 </div>

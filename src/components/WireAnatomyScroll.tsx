@@ -27,10 +27,10 @@ export default function WireAnatomyScroll() {
   return (
     <div ref={containerRef} className="relative w-full min-h-[130vh] lg:min-h-[160vh] py-10 my-10">
       <div className="text-center mb-10 max-w-2xl mx-auto px-4">
-        <h3 className="text-2xl md:text-3xl font-black text-white mb-3">
+        <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-3">
           {isAr ? 'التشريح التفاعلي للأسلاك الإيطالية' : 'Interactive Anatomy of Italian Wires'}
         </h3>
-        <p className="text-xs md:text-sm text-slate-400">
+        <p className="text-xs md:text-sm text-slate-500">
           {isAr 
             ? 'حرك الصفحة للأسفل وشاهد تفكيك وتركيب طبقات السلك المعتمد مباشرة خطوة بخطوة'
             : 'Scroll down to see the step-by-step interactive assembly of our certified wires'}
@@ -41,7 +41,7 @@ export default function WireAnatomyScroll() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
         
         {/* Left Sticky Panel: Visual Wire Render */}
-        <div className="lg:col-span-6 sticky top-28 h-[45vh] lg:h-[55vh] flex items-center justify-center p-6 rounded-2xl bg-[#111215] border border-white/[0.08] shadow-sm overflow-hidden z-20">
+        <div className="lg:col-span-6 sticky top-28 h-[45vh] lg:h-[55vh] flex items-center justify-center p-6 rounded-2xl bg-white border border-slate-200 shadow-md overflow-hidden z-20">
           {/* SVG Anatomy Visual */}
           <div className="w-full max-w-[480px] relative">
             <svg viewBox="0 0 500 200" className="w-full h-auto overflow-visible">
@@ -64,11 +64,11 @@ export default function WireAnatomyScroll() {
                   <stop offset="100%" stopColor="#1d4ed8" />
                 </linearGradient>
 
-                {/* Outer Sheath Gradient (Dark Grey / Black) */}
+                {/* Outer Sheath Gradient (Slate / Charcoal) */}
                 <linearGradient id="sheathGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#475569" />
-                  <stop offset="50%" stopColor="#334155" />
-                  <stop offset="100%" stopColor="#1e293b" />
+                  <stop offset="0%" stopColor="#64748b" />
+                  <stop offset="50%" stopColor="#475569" />
+                  <stop offset="100%" stopColor="#334155" />
                 </linearGradient>
 
                 {/* Inner Shadows for realism */}
@@ -76,7 +76,7 @@ export default function WireAnatomyScroll() {
                   <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
                   <stop offset="40%" stopColor="#ffffff" stopOpacity="0" />
                   <stop offset="60%" stopColor="#000000" stopOpacity="0" />
-                  <stop offset="100%" stopColor="#000000" stopOpacity="0.5" />
+                  <stop offset="100%" stopColor="#000000" stopOpacity="0.35" />
                 </linearGradient>
               </defs>
 
@@ -139,28 +139,28 @@ export default function WireAnatomyScroll() {
               <motion.g style={{ opacity: copperLabelOpacity }}>
                 <line x1="75" y1="80" x2="75" y2="35" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="2 2" />
                 <circle cx="75" cy="80" r="3" fill="#f59e0b" />
-                <rect x="25" y="15" width="100" height="22" rx="6" fill="#18181b" stroke="#f59e0b" strokeWidth="1" />
-                <text x="75" y="30" fill="#fef3c7" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">
+                <rect x="25" y="15" width="100" height="22" rx="6" fill="#ffffff" stroke="#f59e0b" strokeWidth="1.5" />
+                <text x="75" y="30" fill="#b45309" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">
                   {isAr ? 'نحاس نقي 99.9%' : 'Pure Copper 99.9%'}
                 </text>
               </motion.g>
 
               {/* PVC Label */}
               <motion.g style={{ opacity: insulationLabelOpacity }}>
-                <line x1="225" y1="130" x2="225" y2="170" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="2 2" />
-                <circle cx="225" cy="130" r="3" fill="#3b82f6" />
-                <rect x="175" y="170" width="100" height="22" rx="6" fill="#18181b" stroke="#3b82f6" strokeWidth="1" />
-                <text x="225" y="185" fill="#bfdbfe" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">
+                <line x1="225" y1="130" x2="225" y2="170" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="2 2" />
+                <circle cx="225" cy="130" r="3" fill="#2563eb" />
+                <rect x="175" y="170" width="100" height="22" rx="6" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+                <text x="225" y="185" fill="#1d4ed8" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">
                   {isAr ? 'عازل PVC ملون' : 'Colored PVC'}
                 </text>
               </motion.g>
 
               {/* Sheath Label */}
               <motion.g style={{ opacity: sheathLabelOpacity }}>
-                <line x1="390" y1="60" x2="390" y2="20" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="2 2" />
-                <circle cx="390" cy="60" r="3" fill="#94a3b8" />
-                <rect x="340" y="5" width="100" height="22" rx="6" fill="#18181b" stroke="#94a3b8" strokeWidth="1" />
-                <text x="390" y="20" fill="#f1f5f9" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">
+                <line x1="390" y1="60" x2="390" y2="20" stroke="#475569" strokeWidth="1.5" strokeDasharray="2 2" />
+                <circle cx="390" cy="60" r="3" fill="#475569" />
+                <rect x="340" y="5" width="100" height="22" rx="6" fill="#ffffff" stroke="#475569" strokeWidth="1.5" />
+                <text x="390" y="20" fill="#334155" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">
                   {isAr ? 'غلاف خارجي متين' : 'Outer Sheath'}
                 </text>
               </motion.g>
@@ -182,16 +182,16 @@ export default function WireAnatomyScroll() {
         <div className="lg:col-span-6 space-y-16 lg:space-y-24 pb-28 py-8">
           
           {/* Card 1 */}
-          <div className="min-h-[30vh] lg:min-h-[38vh] flex flex-col justify-center p-6 md:p-8 rounded-2xl bg-[#111215] border border-white/[0.08] space-y-3 text-right">
+          <div className="min-h-[30vh] lg:min-h-[38vh] flex flex-col justify-center p-6 md:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-right">
             <div className="flex items-center gap-3 justify-end">
-              <h4 className="text-lg md:text-xl font-bold text-white">
+              <h4 className="text-lg md:text-xl font-bold text-slate-900">
                 {isAr ? '1. القلب الموصل: النحاس النقي' : '1. Conductor: Pure Copper'}
               </h4>
-              <div className="p-2 rounded-xl bg-zinc-900 text-amber-400 border border-zinc-800">
+              <div className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
                 <Zap className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-sm text-zinc-400 leading-relaxed font-normal">
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               {isAr 
                 ? 'يتكون قلب السلك من نحاس خام فائق النقاء بنسبة 99.9%. هذا النقاء يضمن أعلى ناقلية كهربائية ممكنة مع تقليل المقاومة للحد الأدنى، مما يمنع ارتفاع حرارة الكابل ويحمي منزلك من مخاطر التماس الحراري.'
                 : 'The conductor core consists of 99.9% pure copper. This guarantees high electrical conductivity, minimizing resistance to prevent heat buildup and electrical fire hazards.'}
@@ -199,16 +199,16 @@ export default function WireAnatomyScroll() {
           </div>
 
           {/* Card 2 */}
-          <div className="min-h-[30vh] lg:min-h-[38vh] flex flex-col justify-center p-6 md:p-8 rounded-2xl bg-[#111215] border border-white/[0.08] space-y-3 text-right">
+          <div className="min-h-[30vh] lg:min-h-[38vh] flex flex-col justify-center p-6 md:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-right">
             <div className="flex items-center gap-3 justify-end">
-              <h4 className="text-lg md:text-xl font-bold text-white">
+              <h4 className="text-lg md:text-xl font-bold text-slate-900">
                 {isAr ? '2. العازل الداخلي: PVC ملون' : '2. Insulation: PVC Compound'}
               </h4>
-              <div className="p-2 rounded-xl bg-zinc-900 text-blue-400 border border-zinc-800">
+              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
                 <Shield className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-sm text-zinc-400 leading-relaxed font-normal">
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               {isAr 
                 ? 'طبقة حماية عازلة مصنوعة من مادة الـ PVC عالية الجودة والمرونة. يتم تلوينها بالأزرق أو البني أو الأصفر والأخضر لتمييز الفازات والخط الأرضي، وهي مصممة لعزل التيار بالكامل وتحمل الفولتية العالية دون تلف.'
                 : 'A highly flexible primary PVC insulation layer. It is color-coded (blue, brown, or yellow-green) to distinguish live, neutral, and earth lines, engineered to isolate high voltages safely.'}
@@ -216,16 +216,16 @@ export default function WireAnatomyScroll() {
           </div>
 
           {/* Card 3 */}
-          <div className="min-h-[30vh] lg:min-h-[38vh] flex flex-col justify-center p-6 md:p-8 rounded-2xl bg-[#111215] border border-white/[0.08] space-y-3 text-right">
+          <div className="min-h-[30vh] lg:min-h-[38vh] flex flex-col justify-center p-6 md:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-right">
             <div className="flex items-center gap-3 justify-end">
-              <h4 className="text-lg md:text-xl font-bold text-white">
+              <h4 className="text-lg md:text-xl font-bold text-slate-900">
                 {isAr ? '3. الغلاف الخارجي: حماية إضافية ومقاومة حريق' : '3. Protective Sheath: Flame-Retardant Jacket'}
               </h4>
-              <div className="p-2 rounded-xl bg-zinc-900 text-zinc-400 border border-zinc-800">
+              <div className="p-2 rounded-xl bg-slate-100 text-slate-700 border border-slate-200">
                 <AlertCircle className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-sm text-zinc-400 leading-relaxed font-normal">
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               {isAr 
                 ? 'الغلاف الخارجي المتين الذي يحمي الأسلاك الداخلية من الرطوبة، الاحتكاك، والتآكل أثناء السحب داخل الأنابيب الجدارية. يحتوي الغلاف على مركبات خاصة تثبط انتشار اللهب ومقاومة للاشتعال لأعلى درجات الأمان.'
                 : 'A durable outer jacket protecting inner wires from moisture, friction, and abrasion. Formulated with flame-retardant compounds for maximum safety.'}

@@ -146,19 +146,18 @@ export default function AIChatWidget() {
               exit={{ opacity: 0, x: isAr ? 10 : -10, scale: 0.9 }}
               transition={{ delay: 0.5, duration: 0.4 }}
               onClick={() => setIsOpen(true)}
-              className="relative px-4 py-2.5 rounded-2xl bg-[#0d2342]/95 border border-blue-500/30 text-blue-100 text-xs font-bold whitespace-nowrap shadow-[0_0_20px_rgba(59,130,246,0.2)] flex items-center gap-2 select-none cursor-pointer hover:bg-[#122e54] hover:border-blue-500/50 transition-all duration-300"
-              style={{ textShadow: '0 0 10px rgba(59, 130, 246, 0.4)' }}
+              className="relative px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-800 text-xs font-bold whitespace-nowrap shadow-xl flex items-center gap-2 select-none cursor-pointer hover:bg-slate-50 hover:border-blue-500/50 transition-all duration-300"
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
               </span>
               <span>{isAr ? 'اسأل مساعدك الذكي 💡' : 'Ask your AI assistant 💡'}</span>
               {/* ذيل الفقاعة الصغير */}
               <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent ${
                 isAr 
-                  ? 'right-auto -left-[6px] border-r-[6px] border-r-[#0d2342]'
-                  : 'left-auto -right-[6px] border-l-[6px] border-l-[#0d2342]'
+                  ? 'right-auto -left-[6px] border-r-[6px] border-r-white'
+                  : 'left-auto -right-[6px] border-l-[6px] border-l-white'
               }`} />
             </motion.div>
           )}
@@ -166,7 +165,7 @@ export default function AIChatWidget() {
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 hover:from-blue-500 hover:to-blue-300 flex items-center justify-center text-white shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:shadow-[0_0_35px_rgba(59,130,246,0.85)] hover:scale-110 active:scale-95 transition-all duration-300 group"
+          className="relative w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:scale-105 active:scale-95 transition-all duration-300 group"
           aria-label="مساعد الذكاء الاصطناعي"
         >
           <AnimatePresence mode="wait">
@@ -190,7 +189,7 @@ export default function AIChatWidget() {
                 className="relative flex items-center justify-center"
               >
                 <Lightbulb className="w-7 h-7 text-white animate-pulse" />
-                <span className="absolute -top-1 -left-1 w-3 h-3 bg-green-400 border-2 border-blue-500 rounded-full"></span>
+                <span className="absolute -top-1 -left-1 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full"></span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -205,39 +204,34 @@ export default function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className={`fixed bottom-[90px] z-50 w-auto md:w-[400px] h-[#460px] md:h-[600px] bg-[#0a192f]/95 backdrop-blur-xl border border-blue-500/25 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
+            className={`fixed bottom-[90px] z-50 w-auto md:w-[400px] h-[#460px] md:h-[600px] bg-white/98 backdrop-blur-xl border border-slate-200 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
               isAr ? 'left-4 right-4 md:left-auto md:right-[96px] text-right' : 'left-4 right-4 md:right-auto md:left-[96px] text-left'
             }`}
           >
-            {/* الخلفيات الجمالية لتصميم نيون راقي */}
-            <div className="absolute inset-0 bg-animated-grid opacity-10 pointer-events-none z-0" />
-            <div className="absolute -top-20 -right-20 w-44 h-44 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none z-0" />
-            <div className="absolute -bottom-20 -left-20 w-44 h-44 bg-blue-300/5 rounded-full blur-[80px] pointer-events-none z-0" />
-
             {/* رأس شات نافذة المساعد الذكي */}
-            <div className={`relative z-10 p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02] ${
+            <div className={`relative z-10 p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/80 ${
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
               <div className={`flex items-center gap-3 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
-                <div className="relative w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                <div className="relative w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                   <Bot className="w-5.5 h-5.5" />
-                  <span className="absolute -bottom-0.5 -left-0.5 w-3 h-3 bg-green-500 border-2 border-[#0a192f] rounded-full"></span>
+                  <span className="absolute -bottom-0.5 -left-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
                 </div>
                 <div className={isAr ? 'text-right' : 'text-left'}>
-                  <h3 className="text-sm font-bold text-white leading-none mb-1">{isAr ? 'مساعد الإنارة الحديثة' : 'Modern Enarah Assistant'}</h3>
-                  <span className="text-[10px] text-green-400 font-semibold block">{isAr ? 'متصل الآن - ذكاء اصطناعي' : 'Online now - AI Bot'}</span>
+                  <h3 className="text-sm font-bold text-slate-900 leading-none mb-1">{isAr ? 'مساعد الإنارة الحديثة' : 'Modern Enarah Assistant'}</h3>
+                  <span className="text-[10px] text-emerald-600 font-semibold block">{isAr ? 'متصل الآن - ذكاء اصطناعي' : 'Online now - AI Bot'}</span>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-full bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+                className="p-1.5 rounded-full bg-slate-200/60 text-slate-600 hover:text-slate-900 hover:bg-slate-200 active:scale-95 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* قائمة الرسائل المتبادلة */}
-            <div className="relative z-10 flex-grow overflow-y-auto p-5 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
+            <div className="relative z-10 flex-grow overflow-y-auto p-5 space-y-4 scrollbar-thin scrollbar-thumb-slate-200 bg-white">
               {messages.map((msg) => {
                 const isUser = msg.role === 'user'
                 return (
@@ -252,12 +246,12 @@ export default function AIChatWidget() {
                     <div
                       className={`max-w-[85%] rounded-[1.25rem] px-4 py-3 text-sm leading-relaxed ${
                         isUser
-                          ? `bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] ${isAr ? 'rounded-br-none' : 'rounded-bl-none'}`
-                          : `bg-[#122540] text-slate-100 border border-white/5 ${isAr ? 'rounded-bl-none' : 'rounded-br-none'}`
+                          ? `bg-blue-600 text-white shadow-sm ${isAr ? 'rounded-br-none' : 'rounded-bl-none'}`
+                          : `bg-slate-100 text-slate-800 border border-slate-200 ${isAr ? 'rounded-bl-none' : 'rounded-br-none'}`
                       }`}
                     >
                       {msg.content}
-                      <span className="block text-[9px] text-slate-400/70 mt-1.5 text-left">
+                      <span className={`block text-[9px] mt-1.5 text-left ${isUser ? 'text-blue-100' : 'text-slate-400'}`}>
                         {msg.timestamp.toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -268,11 +262,11 @@ export default function AIChatWidget() {
               {/* مؤشر التفكير والكتابة */}
               {isLoading && (
                 <div className={`flex ${isAr ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`bg-[#122540] text-slate-100 border border-white/5 px-4 py-3.5 flex items-center gap-1.5 ${
+                  <div className={`bg-slate-100 text-slate-700 border border-slate-200 px-4 py-3.5 flex items-center gap-1.5 ${
                     isAr ? 'rounded-[1.25rem] rounded-bl-none' : 'rounded-[1.25rem] rounded-br-none'
                   }`}>
-                    <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
-                    <span className="text-xs text-slate-400 font-medium">{isAr ? 'يتم الآن التفكير...' : 'Thinking...'}</span>
+                    <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+                    <span className="text-xs text-slate-500 font-medium">{isAr ? 'يتم الآن التفكير...' : 'Thinking...'}</span>
                   </div>
                 </div>
               )}
@@ -280,13 +274,13 @@ export default function AIChatWidget() {
               {/* الأسئلة السريعة المقترحة */}
               {messages.length <= 1 && !isLoading && (
                 <div className="pt-4 space-y-2">
-                  <span className="text-xs text-slate-400 font-semibold block mb-2">{isAr ? 'أسئلة شائعة قد تهمك:' : 'Suggested questions:'}</span>
+                  <span className="text-xs text-slate-500 font-semibold block mb-2">{isAr ? 'أسئلة شائعة قد تهمك:' : 'Suggested questions:'}</span>
                   <div className="flex flex-col gap-2">
                     {QUICK_QUESTIONS.map((q, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleSendMessage(q)}
-                        className={`text-xs text-blue-300/90 hover:text-white bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/15 hover:border-blue-500/30 rounded-xl px-3.5 py-2.5 transition-all duration-300 ${
+                        className={`text-xs text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl px-3.5 py-2.5 transition-all duration-200 font-medium ${
                           isAr ? 'text-right' : 'text-left'
                         }`}
                       >
@@ -303,9 +297,9 @@ export default function AIChatWidget() {
             {/* حقل الإدخال والإرسال */}
             <form
               onSubmit={handleFormSubmit}
-              className="relative z-10 p-4 border-t border-white/5 bg-white/[0.01]"
+              className="relative z-10 p-4 border-t border-slate-200 bg-slate-50/50"
             >
-              <div className={`relative flex items-center bg-[#0a192f] border border-white/10 rounded-xl overflow-hidden focus-within:border-blue-500/50 transition-all ${
+              <div className={`relative flex items-center bg-white border border-slate-300 rounded-xl overflow-hidden focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition-all shadow-sm ${
                 isAr ? 'flex-row' : 'flex-row-reverse'
               }`}>
                 <input
@@ -313,7 +307,7 @@ export default function AIChatWidget() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={isAr ? 'اسألني عن الإنارة، الأسلاك، التشطيب...' : 'Ask me about lighting, wires, finishing...'}
-                  className={`w-full bg-transparent text-white text-sm px-4 py-3.5 outline-none ${
+                  className={`w-full bg-transparent text-slate-900 text-sm px-4 py-3.5 outline-none placeholder:text-slate-400 ${
                     isAr ? 'text-right pr-4' : 'text-left pl-4'
                   }`}
                   disabled={isLoading}
@@ -321,7 +315,7 @@ export default function AIChatWidget() {
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
-                  className="p-3 text-blue-400 hover:text-blue-300 disabled:text-slate-600 transition-colors"
+                  className="p-3 text-blue-600 hover:text-blue-700 disabled:text-slate-300 transition-colors"
                   aria-label="إرسال الرسالة"
                 >
                   <Send className={`w-5 h-5 ${isAr ? 'transform rotate-180' : ''}`} />

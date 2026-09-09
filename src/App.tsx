@@ -29,9 +29,9 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 
 // مؤشر تحميل مخصص خفيف وسريع للصفحات الثانوية
 const PageLoader = () => (
-  <div className="min-h-[60vh] w-full flex items-center justify-center bg-[#0a192f]">
-    <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-slate-900/80 border border-sky-500/20 text-sky-400 text-sm">
-      <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
+  <div className="min-h-[60vh] w-full flex items-center justify-center bg-transparent">
+    <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-white border border-slate-200 text-blue-600 shadow-md text-sm font-semibold">
+      <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping" />
       <span>جاري الفتح السريع...</span>
     </div>
   </div>

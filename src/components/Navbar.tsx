@@ -131,8 +131,8 @@ export default function Navbar() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'bg-zinc-950/85 backdrop-blur-xl shadow-lg border-b border-white/[0.08] py-2.5'
-            : 'bg-transparent py-4'
+            ? 'bg-white/95 backdrop-blur-xl shadow-md border-b border-slate-200 py-2.5'
+            : 'bg-white/85 backdrop-blur-md border-b border-slate-200/60 py-3.5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -145,18 +145,18 @@ export default function Navbar() {
                   whileHover={{ rotate: 15, scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <Lightbulb className="w-7 h-7 text-blue-400 drop-shadow-sm" />
+                  <Lightbulb className="w-7 h-7 text-blue-600 drop-shadow-sm" />
                 </motion.div>
                 <span className="font-extrabold text-xl md:text-2xl tracking-tight">
                   {isAr ? (
                     <>
-                      <span className="text-white">الإنارة</span>{' '}
-                      <span className="text-blue-400">الحديثة</span>
+                      <span className="text-slate-900">الإنارة</span>{' '}
+                      <span className="text-blue-600">الحديثة</span>
                     </>
                   ) : (
                     <>
-                      <span className="text-white">ENARAH</span>{' '}
-                      <span className="text-blue-400">MODERN</span>
+                      <span className="text-slate-900">ENARAH</span>{' '}
+                      <span className="text-blue-600">MODERN</span>
                     </>
                   )}
                 </span>
@@ -166,7 +166,7 @@ export default function Navbar() {
               <div className="md:hidden flex items-center">
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="relative h-10 w-10 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:border-zinc-700"
+                  className="relative h-10 w-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:border-slate-300"
                   title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -176,7 +176,7 @@ export default function Navbar() {
                       animate={{ scale: [0, 1.4, 1] }}
                       transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                       key={cartCount}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-zinc-900 text-[10px] font-bold text-white flex items-center justify-center"
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-white text-[10px] font-bold text-white flex items-center justify-center"
                     >
                       {cartCount}
                     </motion.span>
@@ -191,7 +191,7 @@ export default function Navbar() {
               <Link
                 to="/"
                 className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 ${
-                  location.pathname === '/' ? 'text-white bg-zinc-800/80 border border-zinc-700/60 shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
+                  location.pathname === '/' ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-xs' : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
                 }`}
               >
                 {t('nav.home')}
@@ -204,14 +204,14 @@ export default function Navbar() {
                 onMouseLeave={() => setIsDropdownOpen(false)}
               >
                 <button
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 outline-none ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 outline-none cursor-pointer ${
                     servicesDropdownItems.some(item => location.pathname === item.path)
-                      ? 'text-white bg-zinc-800/80 border border-zinc-700/60 shadow-sm'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
+                      ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-xs'
+                      : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
                   }`}
                 >
                   {servicesDropdownLabel}
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
                 </button>
 
                 <AnimatePresence>
@@ -221,7 +221,7 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.98 }}
                       transition={{ duration: 0.18, ease: 'easeOut' }}
-                      className={`absolute top-full mt-2 w-[480px] bg-zinc-950/95 border border-zinc-800/90 rounded-2xl p-4 shadow-2xl z-50 grid grid-cols-2 gap-2 backdrop-blur-2xl ${
+                      className={`absolute top-full mt-2 w-[480px] bg-white border border-slate-200 rounded-2xl p-4 shadow-2xl z-50 grid grid-cols-2 gap-2 backdrop-blur-2xl ${
                         isAr ? 'right-0' : 'left-0'
                       }`}
                     >
@@ -231,16 +231,16 @@ export default function Navbar() {
                           <Link
                             key={item.path}
                             to={item.path}
-                            className={`flex items-start gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 ${
-                              isSubActive ? 'bg-zinc-900 border-zinc-800' : ''
+                            className={`flex items-start gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-slate-50 border border-transparent hover:border-slate-200 ${
+                              isSubActive ? 'bg-blue-50/70 border-blue-200' : ''
                             }`}
                           >
-                            <div className={`p-2 rounded-lg ${isSubActive ? 'bg-blue-600/20 text-blue-400' : 'bg-zinc-900 text-zinc-400'}`}>
+                            <div className={`p-2 rounded-lg ${isSubActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
                               <item.icon className="w-4 h-4" />
                             </div>
                             <div className={`flex-grow ${isAr ? 'text-right' : 'text-left'}`}>
-                              <h4 className="text-sm font-semibold text-white mb-0.5">{item.label}</h4>
-                              <p className="text-xs text-zinc-400 leading-relaxed font-normal">{item.desc}</p>
+                              <h4 className="text-sm font-semibold text-slate-900 mb-0.5">{item.label}</h4>
+                              <p className="text-xs text-slate-500 leading-relaxed font-normal">{item.desc}</p>
                             </div>
                           </Link>
                         )
@@ -258,7 +258,7 @@ export default function Navbar() {
                     key={link.path}
                     to={link.path}
                     className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 ${
-                      isActive ? 'text-white bg-zinc-800/80 border border-zinc-700/60 shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
+                      isActive ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-xs' : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
                     }`}
                   >
                     {link.label}
@@ -271,19 +271,19 @@ export default function Navbar() {
                 to="/game"
                 className={`relative px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 shadow-sm ${
                   location.pathname === '/game'
-                    ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.5)]'
-                    : 'bg-blue-600/15 hover:bg-blue-600/25 text-blue-300 border border-blue-500/30'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
+                    : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
                 }`}
               >
-                <Gamepad2 className="w-4 h-4 text-blue-400" />
+                <Gamepad2 className="w-4 h-4 text-blue-600" />
                 <span>{isAr ? '🎮 رحلة النور' : '🎮 Light Quest'}</span>
               </Link>
 
               {/* Shopping Cart Button (Desktop) */}
-              <div className="ml-1.5 pl-1.5 border-l border-zinc-800 flex items-center justify-center">
+              <div className="ml-1.5 pl-1.5 border-l border-slate-200 flex items-center justify-center">
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="relative p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 hover:border-zinc-700 transition-all duration-200 active:scale-95 cursor-pointer"
+                  className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all duration-200 active:scale-95 cursor-pointer"
                   title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -293,7 +293,7 @@ export default function Navbar() {
                       animate={{ scale: [0, 1.4, 1] }}
                       transition={{ type: 'spring', stiffness: 450, damping: 12 }}
                       key={cartCount}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-zinc-900 text-[10px] font-bold text-white flex items-center justify-center"
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-white text-[10px] font-bold text-white flex items-center justify-center"
                     >
                       {cartCount}
                     </motion.span>
@@ -302,13 +302,13 @@ export default function Navbar() {
               </div>
 
               {/* Language Switcher */}
-              <div className="ml-1.5 pl-1.5 border-l border-zinc-800 flex items-center justify-center">
+              <div className="ml-1.5 pl-1.5 border-l border-slate-200 flex items-center justify-center">
                 <button
                   onClick={toggleLanguage}
-                  className="px-3 py-1.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
                   title={isAr ? 'Switch to English' : 'التغيير للعربية'}
                 >
-                  <Globe className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                  <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                   <span className="whitespace-nowrap">{isAr ? 'EN' : 'العربية'}</span>
                 </button>
               </div>
@@ -319,16 +319,16 @@ export default function Navbar() {
             <div className="flex md:hidden items-center gap-2">
               <button
                 onClick={toggleLanguage}
-                className="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
                 title={isAr ? 'Switch to English' : 'التغيير للعربية'}
               >
-                <Globe className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                 <span className="whitespace-nowrap">{isAr ? 'EN' : 'AR'}</span>
               </button>
 
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-zinc-800 active:scale-95 transition-all"
+                className="p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 active:scale-95 transition-all"
               >
                 {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -348,33 +348,33 @@ export default function Navbar() {
             className="fixed inset-0 z-40 md:hidden"
           >
             {/* الخلفية المظلمة الشفافة السريعة */}
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
             
             <motion.div
               initial={{ x: isAr ? '100%' : '-100%' }} 
               animate={{ x: 0 }} 
               exit={{ x: isAr ? '100%' : '-100%' }}
               transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
-              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-zinc-950 shadow-2xl overflow-y-auto flex flex-col justify-between ${
-                isAr ? 'right-0 border-l border-zinc-800' : 'left-0 border-r border-zinc-800'
+              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-white shadow-2xl overflow-y-auto flex flex-col justify-between ${
+                isAr ? 'right-0 border-l border-slate-200' : 'left-0 border-r border-slate-200'
               }`}
             >
               <div className="relative z-10">
                 {/* رأس المنيو الجانبي */}
-                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-zinc-800">
+                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-200 bg-slate-50">
                   <div className="flex items-center gap-2">
-                    <Lightbulb className="w-6 h-6 text-blue-400" />
-                    <span className="font-extrabold text-lg text-white">
+                    <Lightbulb className="w-6 h-6 text-blue-600" />
+                    <span className="font-extrabold text-lg text-slate-900">
                       {isAr ? (
-                        <>الإنارة <span className="text-blue-400">الحديثة</span></>
+                        <>الإنارة <span className="text-blue-600">الحديثة</span></>
                       ) : (
-                        <>ENARAH <span className="text-blue-400">MODERN</span></>
+                        <>ENARAH <span className="text-blue-600">MODERN</span></>
                       )}
                     </span>
                   </div>
                   <button 
                     onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-white active:scale-95 transition-all"
+                    className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 active:scale-95 transition-all cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -389,11 +389,11 @@ export default function Navbar() {
                       onClick={() => setIsOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold transition-all ${
                         location.pathname === '/' 
-                          ? 'text-white bg-zinc-900 border border-zinc-800' 
-                          : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
+                          ? 'text-blue-700 bg-blue-50 border border-blue-200' 
+                          : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
                       }`}
                     >
-                      <Home className="w-5 h-5 text-blue-400" />
+                      <Home className="w-5 h-5 text-blue-600" />
                       <span>{t('nav.home')}</span>
                     </Link>
                   </motion.div>
@@ -406,32 +406,32 @@ export default function Navbar() {
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold transition-all ${
                         location.pathname === '/game' 
                           ? 'text-white bg-blue-600 shadow-md' 
-                          : 'text-blue-300 bg-blue-600/15 border border-blue-500/30 hover:bg-blue-600/25'
+                          : 'text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100'
                       }`}
                     >
-                      <Gamepad2 className="w-5 h-5 text-blue-400" />
+                      <Gamepad2 className="w-5 h-5 text-blue-600" />
                       <span>{isAr ? '🎮 رحلة النور (لعبة واكسب خصم)' : '🎮 Light Quest Game'}</span>
                     </Link>
                   </motion.div>
 
                   {/* قائمة الأكورديون للجوال (الأقسام والأسعار) */}
                   <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-                    <div className="border border-zinc-800/80 rounded-xl bg-zinc-900/40 p-2 transition-all">
+                    <div className="border border-slate-200 rounded-xl bg-slate-50 p-2 transition-all">
                       <button
                         onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                        className="w-full flex items-center justify-between px-3 py-2 text-base font-semibold text-zinc-300 outline-none hover:text-white"
+                        className="w-full flex items-center justify-between px-3 py-2 text-base font-semibold text-slate-800 outline-none hover:text-blue-600 cursor-pointer"
                       >
                         <div className="flex items-center gap-3">
-                          <Award className="w-5 h-5 text-blue-400" />
+                          <Award className="w-5 h-5 text-blue-600" />
                           <span>{servicesDropdownLabel}</span>
                         </div>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMobileDropdownOpen ? 'rotate-180 text-blue-400' : ''}`} />
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMobileDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
                       </button>
 
                       <div 
                         className={`overflow-hidden transition-all duration-200 ease-in-out flex flex-col gap-1 px-1 ${
                           isMobileDropdownOpen 
-                            ? 'max-h-[300px] opacity-100 border-t border-zinc-800 pt-2 mt-1' 
+                            ? 'max-h-[300px] opacity-100 border-t border-slate-200 pt-2 mt-1' 
                             : 'max-h-0 opacity-0 pointer-events-none border-transparent pt-0 mt-0'
                         }`}
                       >
@@ -443,10 +443,10 @@ export default function Navbar() {
                               to={item.path}
                               onClick={() => setIsOpen(false)}
                               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                isSubActive ? 'text-white bg-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                                isSubActive ? 'text-blue-700 bg-blue-50 font-bold' : 'text-slate-600 hover:text-blue-600 hover:bg-slate-100'
                               }`}
                             >
-                              <item.icon className="w-4 h-4 text-blue-400" />
+                              <item.icon className="w-4 h-4 text-blue-600" />
                               <span>{item.label}</span>
                             </Link>
                           )
@@ -469,11 +469,11 @@ export default function Navbar() {
                           onClick={() => setIsOpen(false)}
                           className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold transition-all ${
                             isActive
-                              ? 'text-white bg-zinc-900 border border-zinc-800'
-                              : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
+                              ? 'text-blue-700 bg-blue-50 border border-blue-200 font-bold'
+                              : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
                           }`}
                         >
-                          <link.icon className="w-5 h-5 text-blue-400" />
+                          <link.icon className="w-5 h-5 text-blue-600" />
                           <span>{link.label}</span>
                         </Link>
                       </motion.div>
@@ -483,19 +483,19 @@ export default function Navbar() {
               </div>
 
               {/* ذيل القائمة الجانبية (بيانات التواصل والروابط الاجتماعية) */}
-              <div className="relative z-10 p-6 border-t border-zinc-800 bg-zinc-950 flex flex-col gap-4">
+              <div className="relative z-10 p-6 border-t border-slate-200 bg-slate-50 flex flex-col gap-4">
                 <div className={isAr ? 'text-right' : 'text-left'}>
-                  <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-500 block mb-1">
+                  <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-500 block mb-1">
                     {isAr ? 'مركز الاتصال' : 'Call Center'}
                   </span>
                   <a 
                     href="tel:0916580068" 
-                    className={`text-sm font-bold text-white flex items-center gap-2 hover:text-blue-400 transition-colors ${
+                    className={`text-sm font-bold text-slate-900 flex items-center gap-2 hover:text-blue-600 transition-colors ${
                       isAr ? 'justify-end' : 'justify-start'
                     }`}
                   >
                     <span>0916580068</span>
-                    <Phone className="w-4 h-4 text-blue-400" />
+                    <Phone className="w-4 h-4 text-blue-600" />
                   </a>
                 </div>
               </div>

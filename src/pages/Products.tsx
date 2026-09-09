@@ -422,15 +422,15 @@ export default function Products() {
   }, [categoryGroups, selectedCategory, isAr])
 
   return (
-    <div className="pt-24 md:pt-32 pb-36 bg-transparent min-h-screen relative overflow-hidden text-white">
+    <div className="pt-24 md:pt-32 pb-36 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
       {/* شبكة هندسية خلفية دافئة */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f610_1px,transparent_1px),linear-gradient(to_bottom,#3b82f610_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* زر العودة */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-6 flex justify-start">
-          <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all">
+          <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm">
             <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
             {isAr ? 'العودة للرئيسية' : 'Back to Home'}
           </Link>
@@ -438,14 +438,14 @@ export default function Products() {
 
         {/* عنوان المعرض الرئيسي */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-10 md:mb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-white">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
             {isAr ? (
-              <>متجر <span className="text-blue-400">الإنارة والكهرباء</span></>
+              <>متجر <span className="text-blue-600">الإنارة والكهرباء</span></>
             ) : (
-              <>Lighting & Electrical <span className="text-blue-400">Store</span></>
+              <>Lighting & Electrical <span className="text-blue-600">Store</span></>
             )}
           </h1>
-          <p className="text-zinc-400 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
+          <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
             {isAr 
               ? 'تصفح قائمة الأسلاك والكوابل المعتمدة وقسم التخفيضات الحصرية بأعلى معايير الجودة وأفضل الأسعار'
               : 'Browse certified Italian wires, cables, and exclusive discount packages with the best market prices'
@@ -456,18 +456,18 @@ export default function Products() {
         {/* 🔍 1. خانة البحث الفوري الاحترافية */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="relative max-w-2xl mx-auto mb-8">
           <div className="relative flex items-center">
-            <Search className={`absolute ${isAr ? 'right-4' : 'left-4'} w-5 h-5 text-zinc-400 pointer-events-none`} />
+            <Search className={`absolute ${isAr ? 'right-4' : 'left-4'} w-5 h-5 text-slate-400 pointer-events-none`} />
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isAr ? "ابحث عن مقاس السلك أو العرض (مثال: 1.5 مم، 2.5 مم، باقة تأسيس...)" : "Search wire size or bundle (e.g. 1.5mm, 2.5mm, bundle...)"}
-              className={`w-full ${isAr ? 'pr-12 pl-12' : 'pl-12 pr-12'} py-3.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-white/20 transition-all text-sm`}
+              className={`w-full ${isAr ? 'pr-12 pl-12' : 'pl-12 pr-12'} py-3.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all text-sm shadow-sm`}
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')} 
-                className={`absolute ${isAr ? 'left-4' : 'right-4'} p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white transition-all`}
+                className={`absolute ${isAr ? 'left-4' : 'right-4'} p-1 rounded-lg bg-slate-100 text-slate-500 hover:text-slate-800 transition-all`}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -475,9 +475,9 @@ export default function Products() {
           </div>
 
           {searchQuery.trim() !== '' && (
-            <div className="mt-3 flex items-center justify-between px-2 text-xs text-zinc-400 font-semibold">
+            <div className="mt-3 flex items-center justify-between px-2 text-xs text-slate-500 font-semibold">
               <span>{isAr ? `نتائج البحث عن: "${searchQuery}"` : `Search results for: "${searchQuery}"`}</span>
-              <span className="px-3 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300">
+              <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700">
                 {isAr ? `${searchedProducts.length} عنصر متطابق` : `${searchedProducts.length} matches found`}
               </span>
             </div>
@@ -487,16 +487,16 @@ export default function Products() {
         {/* 🗂️ 2. شريط التنقل السريع بين الأقسام الفعالة */}
         {searchQuery.trim() === '' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12 flex justify-center">
-            <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 shadow-xl overflow-x-auto max-w-full">
+            <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-white border border-slate-200 shadow-md overflow-x-auto max-w-full">
               <button
                 onClick={() => setSelectedCategory('all')}
                 className={`px-4 py-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                   selectedCategory === 'all'
-                    ? 'bg-zinc-800 text-white border border-zinc-700 shadow-md ring-1 ring-white/10'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
                 }`}
               >
-                <Layers className="w-4 h-4 text-zinc-400" />
+                <Layers className="w-4 h-4 text-slate-400" />
                 <span>{isAr ? 'جميع الأقسام' : 'All Categories'}</span>
               </button>
 
@@ -513,15 +513,15 @@ export default function Products() {
                     className={`px-4 py-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                       isSelected
                         ? (isDiscountCat 
-                            ? 'bg-gradient-to-r from-amber-600/30 to-red-600/30 text-amber-300 border border-amber-500/50 shadow-md ring-1 ring-amber-400/20' 
-                            : 'bg-blue-600/30 text-blue-300 border border-blue-500/50 shadow-md ring-1 ring-blue-400/20')
-                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                            ? 'bg-amber-500 text-white shadow-sm' 
+                            : 'bg-blue-600 text-white shadow-sm')
+                        : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
                     }`}
                   >
-                    <IconComponent className={`w-4 h-4 ${isDiscountCat ? 'text-amber-400' : 'text-blue-400'}`} />
+                    <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : (isDiscountCat ? 'text-amber-500' : 'text-blue-600')}`} />
                     <span>{catName}</span>
                     {isDiscountCat && (
-                      <span className="px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-400 text-[10px] font-bold border border-red-500/30 animate-pulse">
+                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-red-50 text-red-600 border border-red-200 animate-pulse'}`}>
                         {isAr ? 'خصومات' : 'Offers'}
                       </span>
                     )}
@@ -549,17 +549,17 @@ export default function Products() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 bg-[#111215] rounded-2xl border border-zinc-800">
-                <Package className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-white mb-2">
+              <div className="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <Package className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
                   {isAr ? 'لم نجد نتائج مطابقة للبحث' : 'No matching results found'}
                 </h3>
-                <p className="text-zinc-400 text-xs mb-6">
+                <p className="text-slate-500 text-xs mb-6">
                   {isAr ? 'جرب البحث باسم المقاس أو كلمة "باقة" أو "سلك"' : 'Try searching by wire size or "bundle"'}
                 </p>
                 <button 
                   onClick={() => setSearchQuery('')} 
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-all"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-all"
                 >
                   {isAr ? 'عرض جميع المنتجات' : 'Show all products'}
                 </button>
@@ -580,28 +580,28 @@ export default function Products() {
                   
                   {/* رأس قسم المتجر */}
                   <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b ${
-                    isDiscountCat ? 'border-amber-500/20' : 'border-zinc-800'
+                    isDiscountCat ? 'border-amber-200' : 'border-slate-200'
                   }`}>
                     <div className="flex items-center gap-3.5">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         isDiscountCat 
-                          ? 'bg-amber-950/50 border border-amber-800/60 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]' 
-                          : 'bg-blue-950/50 border border-blue-800/60 text-blue-400'
+                          ? 'bg-amber-50 border border-amber-200 text-amber-600' 
+                          : 'bg-blue-50 border border-blue-200 text-blue-600'
                       }`}>
                         <IconComponent className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2.5">
-                          <h2 className="text-xl sm:text-2xl font-bold text-white">{catName}</h2>
+                          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{catName}</h2>
                           <span className={`px-3 py-0.5 text-xs font-bold rounded-full border ${
                             isDiscountCat
-                              ? 'bg-amber-500/10 border-amber-400/30 text-amber-300'
-                              : 'bg-blue-500/10 border-blue-400/20 text-blue-400'
+                              ? 'bg-amber-50 border-amber-200 text-amber-700'
+                              : 'bg-blue-50 border-blue-200 text-blue-700'
                           }`}>
                             {isAr ? `${catGroup.items.length} عروض متوفرة` : `${catGroup.items.length} offers available`}
                           </span>
                         </div>
-                        <p className="text-zinc-400 text-xs mt-1 font-normal">{catDesc}</p>
+                        <p className="text-slate-500 text-xs mt-1 font-normal">{catDesc}</p>
                       </div>
                     </div>
 
@@ -618,9 +618,9 @@ export default function Products() {
                     ) : (
                       <Link 
                         to="/wire-prices"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-semibold transition-all self-start md:self-auto"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-blue-600 text-xs font-semibold transition-all self-start md:self-auto shadow-sm"
                       >
-                        <Zap className="w-3.5 h-3.5 text-blue-400" />
+                        <Zap className="w-3.5 h-3.5 text-blue-600" />
                         <span>{isAr ? 'عرض جدول أسعار الأسلاك المحدث ←' : 'Live Wire Prices Table ←'}</span>
                       </Link>
                     )}
@@ -644,23 +644,23 @@ export default function Products() {
             })}
 
             {/* 🔮 قسم قريباً... (Coming Soon Section) */}
-            <section id="coming-soon-section" className="pt-12 border-t border-zinc-800/80">
+            <section id="coming-soon-section" className="pt-12 border-t border-slate-200">
               {/* رأس قسم قريباً */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-zinc-800">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-blue-950/40 border border-blue-800/50 flex items-center justify-center text-blue-400">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                     <Sparkles className="w-5 h-5 animate-pulse" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2.5">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white">
+                      <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                         {isAr ? 'قريباً في متجرنا...' : 'Coming Soon...'}
                       </h2>
-                      <span className="px-3 py-0.5 bg-blue-500/10 border border-blue-400/20 text-blue-400 text-xs font-bold rounded-full">
+                      <span className="px-3 py-0.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-full">
                         {isAr ? 'تشكيلات جديدة' : 'New Collections'}
                       </span>
                     </div>
-                    <p className="text-zinc-400 text-xs mt-1 font-normal">
+                    <p className="text-slate-500 text-xs mt-1 font-normal">
                       {isAr 
                         ? 'نعمل حالياً على تجهيز وإضافة تشكيلات حصرية من أرقى منتجات الإنارة والتأسيس الذكي:'
                         : 'We are curating and adding premium exclusive collections for lighting and smart installation:'}
@@ -675,26 +675,26 @@ export default function Products() {
                   <motion.div
                     key={soonCat.id}
                     whileHover={{ y: -5 }}
-                    className="group relative bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 shadow-sm flex flex-col justify-between"
+                    className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-xl transition-all duration-300 shadow-sm flex flex-col justify-between"
                   >
-                    <div className="relative aspect-[4/3] bg-zinc-900 overflow-hidden">
+                    <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
                       <img 
                         src={soonCat.image} 
                         alt={isAr ? soonCat.nameAr : soonCat.nameEn}
-                        className="w-full h-full object-cover opacity-60 group-hover:opacity-85 group-hover:scale-105 transition-all duration-500 filter blur-[0.4px] group-hover:blur-0"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
                       
-                      {/* شارة قريباً المتوهجة */}
+                      {/* شارة قريباً */}
                       <div className="absolute top-3 right-3 z-10">
-                        <span className="px-2.5 py-1 rounded-full bg-blue-950/90 border border-blue-500/40 text-blue-300 text-[10px] font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping" />
+                        <span className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-[10px] font-bold shadow-md flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                           <span>{isAr ? soonCat.badgeAr : soonCat.badgeEn}</span>
                         </span>
                       </div>
 
                       <div className="absolute bottom-3 right-3 z-10">
-                        <span className="px-2 py-0.5 rounded-md bg-zinc-900/80 border border-zinc-700 text-zinc-300 text-[10px] font-semibold backdrop-blur-sm">
+                        <span className="px-2 py-0.5 rounded-md bg-white/90 text-slate-800 text-[10px] font-semibold backdrop-blur-sm shadow-sm">
                           {soonCat.tag}
                         </span>
                       </div>
@@ -702,19 +702,19 @@ export default function Products() {
 
                     <div className="p-4 flex flex-col justify-between flex-grow">
                       <div>
-                        <h3 className="text-sm font-bold text-white mb-1.5 group-hover:text-blue-400 transition-colors">
+                        <h3 className="text-sm font-bold text-slate-900 mb-1.5 group-hover:text-blue-600 transition-colors">
                           {isAr ? soonCat.nameAr : soonCat.nameEn}
                         </h3>
-                        <p className="text-[11px] text-zinc-400 leading-relaxed font-normal line-clamp-2">
+                        <p className="text-[11px] text-slate-500 leading-relaxed font-normal line-clamp-2">
                           {isAr ? soonCat.descriptionAr : soonCat.descriptionEn}
                         </p>
                       </div>
 
-                      <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
-                        <span className="text-[10px] text-zinc-500 font-medium">
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[10px] text-slate-400 font-medium">
                           {isAr ? 'قيد التجهيز والإدراج' : 'Under preparation'}
                         </span>
-                        <span className="text-[11px] text-blue-400 font-bold flex items-center gap-1">
+                        <span className="text-[11px] text-blue-600 font-bold flex items-center gap-1">
                           <span>{isAr ? 'ترقبوا' : 'Stay tuned'}</span>
                           <span>✨</span>
                         </span>
@@ -725,15 +725,15 @@ export default function Products() {
               </div>
 
               {/* بنر الاستفسارات والطلبات الخاصة عبر الواتساب */}
-              <div className="relative rounded-2xl bg-gradient-to-r from-blue-950/30 via-zinc-900 to-blue-950/20 border border-blue-500/20 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden">
+              <div className="relative rounded-2xl bg-gradient-to-r from-blue-50 via-white to-blue-50 border border-blue-200 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden shadow-sm">
                 <div className="text-right">
-                  <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-400 text-xs font-bold inline-block mb-2">
+                  <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold inline-block mb-2">
                     {isAr ? '💬 طلبيات واستشارات خاصة' : 'Custom Inquiries'}
                   </span>
-                  <h3 className="text-lg md:text-xl font-bold text-white mb-1">
+                  <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-1">
                     {isAr ? 'هل تبحث عن منتج محدد أو إنارة خاصة لمشروعك الآن؟' : 'Looking for a specific item or project lighting?'}
                   </h3>
-                  <p className="text-zinc-400 text-xs sm:text-sm font-normal">
+                  <p className="text-slate-600 text-xs sm:text-sm font-normal">
                     {isAr 
                       ? 'فريقنا الهندسي في معرض بنغازي جاهز لتوفير كافة طلبات التأسيس والإنارة الخاصة مباشرة.'
                       : 'Our engineering team in Benghazi is ready to supply custom electrical and lighting orders.'}
@@ -744,7 +744,7 @@ export default function Products() {
                   href="https://wa.me/218915079140?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%B7%D9%84%D8%A8%D9%8A%D8%A9%20%D8%AE%D8%A7%D8%B5%D8%A9%20%D9%85%D9%86%20%D9%85%D8%AA%D8%AC%D8%B1%20%D8%A7%D9%84%D8%A5%D9%86%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%D8%A9"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm whitespace-nowrap shadow-lg shadow-emerald-600/25 transition-all active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm whitespace-nowrap shadow-lg shadow-emerald-600/25 transition-all active:scale-95 cursor-pointer"
                 >
                   <Zap className="w-4 h-4" />
                   <span>{isAr ? 'تواصل معنا فوراً عبر الواتساب' : 'Contact via WhatsApp'}</span>
@@ -764,24 +764,24 @@ export default function Products() {
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
             onClick={() => setSelectedProduct(null)}
-            className="fixed inset-0 z-[2500] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-[2500] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4"
           >
             <motion.div 
               initial={{ scale: 0.95, y: 15 }} 
               animate={{ scale: 1, y: 0 }} 
               exit={{ scale: 0.95, y: 15 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#111215] border border-zinc-800 rounded-2xl max-w-2xl w-full p-6 md:p-8 relative shadow-2xl overflow-hidden dir-rtl"
+              className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-6 md:p-8 relative shadow-2xl overflow-hidden dir-rtl"
             >
               <button 
                 onClick={() => setSelectedProduct(null)}
-                className="absolute top-4 left-4 p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-white transition-all z-20"
+                className="absolute top-4 left-4 p-2 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-800 transition-all z-20"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800">
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
                   <img 
                     src={selectedProduct.image} 
                     alt={selectedProduct.name} 
@@ -792,17 +792,17 @@ export default function Products() {
 
                 <div className="flex flex-col justify-between h-full">
                   <div>
-                    <span className="px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 text-xs font-semibold inline-block mb-3">
+                    <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold inline-block mb-3">
                       {selectedProduct.category || (isAr ? 'منتج معتمد' : 'Certified Product')}
                     </span>
-                    <h3 className="text-xl font-bold text-white mb-2">{selectedProduct.name}</h3>
-                    <p className="text-zinc-400 text-sm leading-relaxed mb-6 font-normal">{selectedProduct.description}</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">{selectedProduct.name}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-6 font-normal">{selectedProduct.description}</p>
                   </div>
 
-                  <div className="border-t border-zinc-800 pt-4 mt-4 flex items-center justify-between">
+                  <div className="border-t border-slate-200 pt-4 mt-4 flex items-center justify-between">
                     <div>
-                      <span className="text-zinc-500 text-xs block">{isAr ? 'السعر الرسمي' : 'Official Price'}</span>
-                      <span className="text-2xl font-bold text-white">
+                      <span className="text-slate-400 text-xs block">{isAr ? 'السعر الرسمي' : 'Official Price'}</span>
+                      <span className="text-2xl font-bold text-slate-900">
                         {selectedProduct.price ? `${selectedProduct.price} د.ل` : (isAr ? 'اتصل للسعر' : 'Call for Price')}
                       </span>
                     </div>
@@ -812,7 +812,7 @@ export default function Products() {
                         handleAddToCart(e, selectedProduct)
                         setSelectedProduct(null)
                       }}
-                      className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer shadow-md shadow-blue-500/20"
                     >
                       <ShoppingCart className="w-4 h-4" />
                       <span>{isAr ? 'إضافة إلى السلة' : 'Add to Cart'}</span>
@@ -848,10 +848,10 @@ function ProductCard({
     <motion.div 
       onClick={onOpenModal}
       whileHover={{ y: -4 }}
-      className="group relative bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden hover:border-white/[0.18] transition-all duration-200 shadow-sm flex flex-col h-full cursor-pointer"
+      className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-xl transition-all duration-200 shadow-sm flex flex-col h-full cursor-pointer"
     >
       {/* صورة المنتج مع زوم انسيابي */}
-      <div className="relative aspect-[4/3] bg-zinc-900 overflow-hidden flex items-center justify-center border-b border-zinc-800">
+      <div className="relative aspect-[4/3] bg-slate-50 overflow-hidden flex items-center justify-center border-b border-slate-100">
         <img 
           src={product.image} 
           alt={product.name} 
@@ -871,11 +871,11 @@ function ProductCard({
 
         {/* شارة التوفر */}
         {product.stockStatus === 'out_of_stock' ? (
-          <div className="absolute top-3 right-3 z-20 bg-rose-950/90 border border-rose-800 px-2.5 py-0.5 rounded-full text-[10px] text-rose-300 font-semibold">
+          <div className="absolute top-3 right-3 z-20 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full text-[10px] text-rose-600 font-semibold">
             {isAr ? 'نفذت الكمية ❌' : 'Out of Stock'}
           </div>
         ) : (
-          <div className="absolute top-3 right-3 z-20 bg-emerald-950/90 border border-emerald-800 px-2.5 py-0.5 rounded-full text-[10px] text-emerald-300 font-semibold">
+          <div className="absolute top-3 right-3 z-20 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] text-emerald-700 font-semibold">
             {isAr ? 'متوفر بالمخزن' : 'In Stock'}
           </div>
         )}
@@ -884,23 +884,23 @@ function ProductCard({
       {/* تفاصيل المنتج وازرار الشراء */}
       <div className="p-5 flex flex-col flex-grow justify-between">
         <div>
-          <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors duration-200 mb-2 line-clamp-1">
+          <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200 mb-2 line-clamp-1">
             {product.name}
           </h3>
-          <p className="text-zinc-400 text-xs leading-relaxed line-clamp-2 mb-4 font-normal">
+          <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-4 font-normal">
             {product.description}
           </p>
         </div>
 
-        <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between mt-auto">
+        <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
           <div>
-            <span className="text-[10px] text-zinc-500 block">{isAr ? 'السعر' : 'Price'}</span>
+            <span className="text-[10px] text-slate-400 block">{isAr ? 'السعر' : 'Price'}</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold text-white">
+              <span className="text-base font-bold text-slate-900">
                 {hasDiscount ? `${product.discountPrice} د.ل` : (product.price ? `${product.price} د.ل` : (isAr ? 'حسب القياس' : 'On Request'))}
               </span>
               {hasDiscount && (
-                <span className="text-xs text-zinc-500 line-through">
+                <span className="text-xs text-slate-400 line-through">
                   {product.price} د.ل
                 </span>
               )}
@@ -913,7 +913,7 @@ function ProductCard({
             className={`px-3.5 py-2 rounded-xl font-semibold text-xs transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${
               isAdding
                 ? 'bg-emerald-600 text-white'
-                : 'bg-blue-600 hover:bg-blue-500 text-white active:scale-95'
+                : 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95 shadow-sm shadow-blue-500/20'
             }`}
           >
             {isAdding ? (

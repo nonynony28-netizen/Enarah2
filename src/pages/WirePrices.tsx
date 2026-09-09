@@ -173,7 +173,6 @@ export default function WirePrices() {
     if (historyData.length <= 1) return 250
     return (index / (historyData.length - 1)) * 400 + 50
   }
-
   const getY = (price: number) => {
     return 170 - ((price - minPrice) / priceRange) * 130
   }
@@ -185,17 +184,17 @@ export default function WirePrices() {
     : ''
 
   return (
-    <div className="pt-24 md:pt-32 pb-36 bg-transparent min-h-screen relative overflow-hidden text-white">
+    <div className="pt-24 md:pt-32 pb-36 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
       
       {/* شبكة هندسية خفيفة جداً في الخلفية */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f610_1px,transparent_1px),linear-gradient(to_bottom,#3b82f610_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className="mb-6 flex justify-start">
-            <Link to="/" className={`inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all ${
+            <Link to="/" className={`inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm ${
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
               <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
@@ -207,28 +206,28 @@ export default function WirePrices() {
         {/* رأس الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-14">
-            <div className="inline-flex items-center justify-center p-3.5 bg-zinc-900 border border-zinc-800 rounded-2xl mb-6 shadow-sm">
-              <Zap className="w-7 h-7 text-amber-400" />
+            <div className="inline-flex items-center justify-center p-3.5 bg-blue-50 border border-blue-200 rounded-2xl mb-6 shadow-sm">
+              <Zap className="w-7 h-7 text-blue-600" />
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? 'أسعار الأسلاك' : 'Wire Prices'}{' '}
-              <span className="text-blue-400">
+              <span className="text-blue-600">
                 {isAr ? 'الإيطالية' : 'Italian'}
               </span>
             </h1>
             
-            <p className="text-zinc-400 max-w-2xl mx-auto text-base md:text-lg mb-8 font-normal">
+            <p className="text-slate-600 max-w-2xl mx-auto text-base md:text-lg mb-8 font-normal">
               {isAr 
                 ? 'نقدم لكم التحديث اليومي لأسعار الأسلاك الكهربائية الإيطالية المعتمدة، لضمان أعلى معايير الجودة لمشاريعكم.'
                 : 'Providing you with the daily certified Italian electrical wire price updates, ensuring the highest standards of safety and quality for your projects.'
               }
             </p>
 
-            <div className={`inline-flex items-center gap-2.5 px-5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 font-semibold text-sm shadow-sm ${
+            <div className={`inline-flex items-center gap-2.5 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-semibold text-sm shadow-sm ${
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
-              <Calendar className="w-4 h-4 text-blue-400" />
+              <Calendar className="w-4 h-4 text-blue-600" />
               <span>{isAr ? 'تحديث اليوم:' : 'Today\'s Update:'} {currentDate}</span>
             </div>
           </div>
@@ -241,56 +240,56 @@ export default function WirePrices() {
 
         {/* جدول الأسعار */}
         <FadeIn delay={0.2}>
-          <div className="bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             
-            <div className={`bg-zinc-900/60 p-5 md:p-6 border-b border-zinc-800 flex items-center justify-between ${
+            <div className={`bg-slate-50 p-5 md:p-6 border-b border-slate-200 flex items-center justify-between ${
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
-              <h3 className={`text-lg md:text-xl font-bold text-white flex items-center gap-2 ${
+              <h3 className={`text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2 ${
                 isAr ? 'flex-row' : 'flex-row-reverse'
               }`}>
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <ShieldCheck className="w-5 h-5 text-emerald-600" />
                 <span>{isAr ? 'قائمة الأسعار المعتمدة' : 'Certified Price List'}</span>
               </h3>
-              <span className="text-xs font-semibold bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
+              <span className="text-xs font-semibold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">
                 {isAr ? 'محدث الآن' : 'Updated Now'}
               </span>
             </div>
 
-            <div className="divide-y divide-zinc-800/80">
+            <div className="divide-y divide-slate-100">
               {wirePrices.map((wire, idx) => (
-                <div key={wire.id} className={`p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-zinc-900/40 transition-colors duration-200 ${
+                <div key={wire.id} className={`p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/80 transition-colors duration-200 ${
                   isAr ? 'text-right' : 'text-left'
                 }`}>
                   
                   <div className={`flex items-center gap-4 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
-                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 font-bold text-sm">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 font-bold text-sm">
                       {idx + 1}
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold text-white mb-0.5">{getLocalizedSize(wire.id, isAr)}</h4>
-                      <p className="text-xs text-zinc-400">{getLocalizedType(isAr)}</p>
+                      <h4 className="text-lg font-bold text-slate-900 mb-0.5">{getLocalizedSize(wire.id, isAr)}</h4>
+                      <p className="text-xs text-slate-500">{getLocalizedType(isAr)}</p>
                     </div>
                   </div>
 
-                  <div className={`flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-zinc-800/80 pt-4 md:pt-0 ${
+                  <div className={`flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0 ${
                     isAr ? 'flex-row' : 'flex-row-reverse'
                   }`}>
                     <div className={isAr ? 'text-right' : 'text-left'}>
-                      <span className="text-xs text-zinc-400 block mb-0.5">{isAr ? 'السعر التقريبي' : 'Approx. Price'}</span>
-                      <div className={`text-xl font-bold text-white flex items-baseline gap-1 ${
+                      <span className="text-xs text-slate-400 block mb-0.5">{isAr ? 'السعر التقريبي' : 'Approx. Price'}</span>
+                      <div className={`text-xl font-bold text-slate-900 flex items-baseline gap-1 ${
                         isAr ? 'flex-row' : 'flex-row-reverse'
                       }`}>
                         <span>{wire.price}</span>
-                        <span className="text-xs font-normal text-zinc-400">{isAr ? 'د.ل' : 'LYD'}</span>
+                        <span className="text-xs font-normal text-slate-500">{isAr ? 'د.ل' : 'LYD'}</span>
                       </div>
                     </div>
 
                     <div className={`flex items-center gap-3 ${isAr ? 'flex-row' : 'flex-row-reverse'}`}>
                       <div className={`flex items-center justify-center w-9 h-9 rounded-xl border ${
-                        wire.trend === 'up' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
-                        wire.trend === 'down' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' :
-                        'bg-zinc-800 border-zinc-700 text-zinc-400'
+                        wire.trend === 'up' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' :
+                        wire.trend === 'down' ? 'bg-rose-50 border-rose-200 text-rose-600' :
+                        'bg-slate-100 border-slate-200 text-slate-500'
                       }`}>
                         {wire.trend === 'up' && <TrendingUp className="w-4 h-4" />}
                         {wire.trend === 'down' && <TrendingDown className="w-4 h-4" />}
@@ -302,8 +301,8 @@ export default function WirePrices() {
                         disabled={addingId === `wire-${wire.id}`}
                         className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border ${
                           addingId === `wire-${wire.id}`
-                            ? 'bg-emerald-600 border-emerald-500 text-white'
-                            : 'bg-blue-600 border-blue-500 text-white hover:bg-blue-500 active:scale-95'
+                            ? 'bg-emerald-600 border-emerald-600 text-white'
+                            : 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-sm shadow-blue-500/20'
                         }`}
                       >
                         <AnimatePresence mode="wait">
@@ -335,7 +334,7 @@ export default function WirePrices() {
               ))}
             </div>
             
-            <div className="bg-zinc-950/80 p-4 text-center text-xs text-zinc-500 border-t border-zinc-800">
+            <div className="bg-slate-50 p-4 text-center text-xs text-slate-500 border-t border-slate-200">
               {isAr 
                 ? '* الأسعار تقريبية وقابلة للتغيير الطفيف حسب تقلبات السوق وكمية الطلب.'
                 : '* Prices are approximate and subject to slight changes based on market fluctuations and order volume.'
@@ -347,18 +346,18 @@ export default function WirePrices() {
 
         {/* قسم مخطط البورصة التفاعلي لأسعار الأسلاك */}
         <FadeIn delay={0.3}>
-          <div className="mt-12 bg-[#111215] border border-white/[0.08] rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden">
+          <div className="mt-12 bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden">
             <div className={`flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 relative z-10 ${
               isAr ? 'text-right' : 'text-left'
             }`}>
               <div>
-                <h3 className={`text-xl font-bold text-white flex items-center gap-2 font-sans ${
+                <h3 className={`text-xl font-bold text-slate-900 flex items-center gap-2 font-sans ${
                   isAr ? 'flex-row' : 'flex-row-reverse'
                 }`}>
-                  <TrendingUp className="w-5 h-5 text-blue-400" />
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
                   <span>{isAr ? 'مؤشر حركة الأسعار التفاعلي (البورصة اليومية)' : 'Interactive Price Index (Daily Market)'}</span>
                 </h3>
-                <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed font-normal">
+                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed font-normal">
                   {isAr 
                     ? 'تتبع حركة تغير أسعار الأسلاك الكهربائية صعوداً وهبوطاً. اختر مقاس السلك بالأسفل لعرض المخطط البياني الخاص به:'
                     : 'Track the price movements of electrical wires up and down. Choose the wire size below to display its price history chart:'
@@ -374,8 +373,8 @@ export default function WirePrices() {
                     onClick={() => setSelectedChartWireId(wire.id)}
                     className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 border cursor-pointer ${
                       selectedChartWireId === wire.id
-                        ? 'bg-zinc-800 border-zinc-600 text-white ring-1 ring-white/30'
-                        : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                        : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                     }`}
                   >
                     {getLocalizedSize(wire.id, isAr)}
@@ -385,26 +384,26 @@ export default function WirePrices() {
             </div>
 
             {/* مخطط بياني خطي SVG */}
-            <div className="bg-zinc-950/80 rounded-xl p-4 md:p-6 border border-zinc-800 relative z-10">
+            <div className="bg-slate-50 rounded-xl p-4 md:p-6 border border-slate-200 relative z-10">
               <div className="w-full overflow-x-auto">
                 <div className="min-w-[480px]">
                   <svg viewBox="0 0 500 220" className="w-full h-auto overflow-visible">
                     <defs>
                       <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.2" />
+                        <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
 
                     {/* خطوط الخلفية الأفقية */}
-                    <line x1="50" y1="40" x2="450" y2="40" stroke="rgba(255,255,255,0.06)" strokeDasharray="3,3" />
-                    <line x1="50" y1="105" x2="450" y2="105" stroke="rgba(255,255,255,0.06)" strokeDasharray="3,3" />
-                    <line x1="50" y1="170" x2="450" y2="170" stroke="rgba(255,255,255,0.06)" strokeDasharray="3,3" />
+                    <line x1="50" y1="40" x2="450" y2="40" stroke="rgba(0,0,0,0.06)" strokeDasharray="3,3" />
+                    <line x1="50" y1="105" x2="450" y2="105" stroke="rgba(0,0,0,0.06)" strokeDasharray="3,3" />
+                    <line x1="50" y1="170" x2="450" y2="170" stroke="rgba(0,0,0,0.06)" strokeDasharray="3,3" />
 
                     {/* علامات وقيم المحور الرأسي */}
-                    <text x="40" y="44" fill="#71717a" fontSize="8" fontWeight="bold" textAnchor="end">{maxPrice.toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
-                    <text x="40" y="109" fill="#71717a" fontSize="8" fontWeight="bold" textAnchor="end">{((maxPrice + minPrice) / 2).toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
-                    <text x="40" y="174" fill="#71717a" fontSize="8" fontWeight="bold" textAnchor="end">{minPrice.toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
+                    <text x="40" y="44" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{maxPrice.toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
+                    <text x="40" y="109" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{((maxPrice + minPrice) / 2).toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
+                    <text x="40" y="174" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="end">{minPrice.toFixed(2)} {isAr ? 'د.ل' : 'LYD'}</text>
 
                     {/* المساحة الملونة المعبأة */}
                     {areaD && <path d={areaD} fill="url(#chartGradient)" className="transition-all duration-500" />}
@@ -414,7 +413,7 @@ export default function WirePrices() {
                       <path
                         d={pathD}
                         fill="none"
-                        stroke="#3b82f6"
+                        stroke="#2563eb"
                         strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -431,14 +430,14 @@ export default function WirePrices() {
                           r="4"
                           fill="#ffffff"
                           stroke="#2563eb"
-                          strokeWidth="2"
+                          strokeWidth="2.5"
                           className="transition-all duration-200 group-hover:scale-125"
                         />
                         {/* السعر أعلى النقطة */}
                         <text
                           x={getX(idx)}
                           y={getY(d.price) - 10}
-                          fill="#93c5fd"
+                          fill="#2563eb"
                           fontSize="8"
                           fontWeight="bold"
                           textAnchor="middle"
@@ -449,7 +448,7 @@ export default function WirePrices() {
                         <text
                           x={getX(idx)}
                           y="195"
-                          fill="#71717a"
+                          fill="#64748b"
                           fontSize="8.5"
                           fontWeight="medium"
                           textAnchor="middle"
@@ -464,8 +463,6 @@ export default function WirePrices() {
             </div>
           </div>
         </FadeIn>
-
-
 
       </div>
     </div>

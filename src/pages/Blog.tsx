@@ -117,17 +117,17 @@ export default function Blog() {
   }, [selectedPost])
 
   return (
-    <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-white">
+    <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
       
       {/* شبكة هندسية خفيفة جداً في الخلفية للفخامة */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f610_1px,transparent_1px),linear-gradient(to_bottom,#3b82f610_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className="mb-6 flex justify-start">
-            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-zinc-300 hover:text-white font-semibold transition-all">
+            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm">
               <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
               {isAr ? 'العودة للرئيسية' : 'Back to Home'}
             </Link>
@@ -137,23 +137,23 @@ export default function Blog() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? (
-                <>مدونة <span className="text-blue-400">الإنارة</span></>
+                <>مدونة <span className="text-blue-600">الإنارة</span></>
               ) : (
-                <>ENARAH <span className="text-blue-400">Blog</span></>
+                <>ENARAH <span className="text-blue-600">Blog</span></>
               )}
             </h1>
-            <p className="text-zinc-400 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
+            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
               {isAr 
                 ? 'نصائح هندسية، أفكار تصميمية، وأحدث صيحات عالم الإضاءة لنجعل مساحتك أكثر إشراقاً'
                 : 'Engineering tips, design ideas, and the latest trends in the lighting world to make your space brighter'
               }
             </p>
             <div className="flex items-center justify-center gap-1.5 mt-5">
-              <div className="w-16 h-[1px] bg-zinc-800" />
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              <div className="w-16 h-[1px] bg-zinc-800" />
+              <div className="w-16 h-[1px] bg-slate-200" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+              <div className="w-16 h-[1px] bg-slate-200" />
             </div>
           </div>
         </FadeIn>
@@ -165,26 +165,26 @@ export default function Blog() {
               <div 
                 onClick={() => setSelectedPost(post)}
                 style={{ willChange: "transform, opacity" }} 
-                className="group cursor-pointer relative bg-[#111215] border border-white/[0.08] rounded-2xl overflow-hidden hover:border-white/[0.18] transition-all duration-200 shadow-sm flex flex-col h-full"
+                className="group cursor-pointer relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-xl transition-all duration-200 shadow-sm flex flex-col h-full"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-zinc-900 border-b border-zinc-800">
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 border-b border-slate-100">
                   <img src={post.coverImage} alt={post.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111215] via-[#111215]/30 to-transparent opacity-80" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-80" />
                   
-                  <div className="absolute top-3.5 right-3.5 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 text-zinc-300 text-xs font-semibold px-3 py-1 rounded-md">
+                  <div className="absolute top-3.5 right-3.5 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-md shadow-sm">
                     {post.badge}
                   </div>
                 </div>
                 
                 <div className="p-6 flex-grow flex flex-col relative z-20">
-                  <div className="flex items-center gap-3 text-xs font-semibold text-zinc-400 mb-3">
+                  <div className="flex items-center gap-3 text-xs font-semibold text-slate-500 mb-3">
                     <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {post.date}</span>
                     <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {post.readTime}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">{post.title}</h3>
-                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed font-normal flex-grow line-clamp-3 mb-5">{post.summary}</p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">{post.title}</h3>
+                  <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-normal flex-grow line-clamp-3 mb-5">{post.summary}</p>
                   
-                  <span className="mt-auto inline-flex items-center gap-1.5 text-xs text-blue-400 font-semibold group-hover:text-blue-300 transition-colors">
+                  <span className="mt-auto inline-flex items-center gap-1.5 text-xs text-blue-600 font-bold group-hover:text-blue-700 transition-colors">
                     {isAr ? 'اقرأ المقال كاملاً' : 'Read full article'}
                     <ArrowLeft className={`w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform ${isAr ? '' : 'rotate-180 group-hover:translate-x-1'}`} />
                   </span>
@@ -204,7 +204,7 @@ export default function Blog() {
               className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
             >
               {/* الخلفية المعتمة */}
-              <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedPost(null)} />
+              <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setSelectedPost(null)} />
               
               {/* نافذة المقال */}
               <motion.div
@@ -212,12 +212,12 @@ export default function Blog() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.96 }}
                 transition={{ duration: 0.25, ease: "easeOut" }} 
-                className="relative w-full max-w-4xl max-h-[90vh] bg-[#111215] border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+                className="relative w-full max-w-4xl max-h-[90vh] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
               >
                 {/* زر الإغلاق */}
                 <button
                   onClick={() => setSelectedPost(null)}
-                  className="absolute top-4 left-4 z-50 p-2 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 rounded-xl transition-all duration-200 shadow-md"
+                  className="absolute top-4 left-4 z-50 p-2 bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl transition-all duration-200 shadow-md"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -225,51 +225,51 @@ export default function Blog() {
                 {/* صورة المقال الرئيسية */}
                 <div className="relative w-full h-56 md:h-80 flex-shrink-0">
                   <img src={selectedPost.coverImage} alt={selectedPost.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111215] via-[#111215]/40 to-transparent opacity-95" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-95" />
                 </div>
 
                 {/* محتوى المقال (قابل للتمرير) */}
-                <div className="flex-grow overflow-y-auto p-6 md:p-10 custom-scrollbar bg-[#111215]">
+                <div className="flex-grow overflow-y-auto p-6 md:p-10 custom-scrollbar bg-white">
                   <div className="max-w-3xl mx-auto">
-                    <div className="flex items-center justify-center gap-4 text-xs font-semibold text-zinc-400 mb-6">
-                      <span className="flex items-center gap-1.5 bg-zinc-900 px-3.5 py-1.5 rounded-lg border border-zinc-800"><Calendar className="w-4 h-4 text-blue-400" /> {selectedPost.date}</span>
-                      <span className="flex items-center gap-1.5 bg-zinc-900 px-3.5 py-1.5 rounded-lg border border-zinc-800"><Clock className="w-4 h-4 text-blue-400" /> {selectedPost.readTime}</span>
+                    <div className="flex items-center justify-center gap-4 text-xs font-semibold text-slate-500 mb-6">
+                      <span className="flex items-center gap-1.5 bg-slate-100 px-3.5 py-1.5 rounded-lg border border-slate-200"><Calendar className="w-4 h-4 text-blue-600" /> {selectedPost.date}</span>
+                      <span className="flex items-center gap-1.5 bg-slate-100 px-3.5 py-1.5 rounded-lg border border-slate-200"><Clock className="w-4 h-4 text-blue-600" /> {selectedPost.readTime}</span>
                     </div>
                     
-                    <h2 className="text-2xl md:text-4xl font-bold text-white text-center mb-8 leading-tight">
+                    <h2 className="text-2xl md:text-4xl font-bold text-slate-900 text-center mb-8 leading-tight">
                       {selectedPost.title}
                     </h2>
 
-                    <p className="text-base text-zinc-300 leading-relaxed text-center mb-10 font-normal bg-zinc-950/80 p-6 rounded-2xl border border-zinc-800">
-                      <span className="text-blue-400 text-3xl leading-none">"</span>
+                    <p className="text-base text-slate-700 leading-relaxed text-center mb-10 font-normal bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
+                      <span className="text-blue-600 text-3xl leading-none">"</span>
                       {selectedPost.summary}
-                      <span className="text-blue-400 text-3xl leading-none">"</span>
+                      <span className="text-blue-600 text-3xl leading-none">"</span>
                     </p>
 
-                    <div className="w-16 h-1 bg-blue-500 mx-auto mb-10 rounded-full" />
+                    <div className="w-16 h-1 bg-blue-600 mx-auto mb-10 rounded-full" />
 
                     {/* الأقسام الداخلية والصور */}
                     {selectedPost.sections.map((sec, idx) => (
                       <div key={idx} className="mb-10">
-                        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2.5">
-                          <span className="w-1.5 h-5 bg-blue-500 rounded-full inline-block"></span>
+                        <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2.5">
+                          <span className="w-1.5 h-5 bg-blue-600 rounded-full inline-block"></span>
                           {sec.heading}
                         </h3>
-                        <p className="text-zinc-300 text-sm sm:text-base leading-relaxed mb-6 font-normal">{sec.text}</p>
+                        <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 font-normal">{sec.text}</p>
                         
                         {sec.image && (
-                          <div className="rounded-xl overflow-hidden border border-zinc-800 shadow-md">
+                          <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                             <img src={sec.image} alt={sec.heading} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                           </div>
                         )}
                       </div>
                     ))}
                     
-                    <div className="text-center pt-6 border-t border-zinc-800 mt-10">
-                      <p className="text-zinc-400 text-xs font-semibold mb-4">
+                    <div className="text-center pt-6 border-t border-slate-200 mt-10">
+                      <p className="text-slate-500 text-xs font-semibold mb-4">
                         {isAr ? 'هل أعجبك المقال؟ شاركه الآن' : 'Did you like the article? Share it now'}
                       </p>
-                      <button onClick={() => setSelectedPost(null)} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors cursor-pointer active:scale-95 text-xs sm:text-sm">
+                      <button onClick={() => setSelectedPost(null)} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors cursor-pointer active:scale-95 text-xs sm:text-sm shadow-md shadow-blue-500/20">
                         {isAr ? 'العودة للمدونة' : 'Back to Blog'}
                       </button>
                     </div>

@@ -171,18 +171,18 @@ export default function Layout() {
   }
 
   return (
-    <div className="relative min-h-screen text-white">
-      {/* الخلفية المعمارية الفاخرة المطفأة (Architectural Luxury Dark Background) */}
-      <div className="fixed inset-0 -z-50 w-full h-full bg-[#09090b] overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#09090b] via-[#0d0d11] to-[#09090b]"></div>
-        <div className="absolute inset-0 bg-animated-grid opacity-[0.03]"></div>
+    <div className="relative min-h-screen text-slate-900 bg-[#f8fafc]">
+      {/* الخلفية المعمارية البيضاء النظيفة الفاخرة (Clean White Architectural Background) */}
+      <div className="fixed inset-0 -z-50 w-full h-full bg-[#f8fafc] overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#ffffff] via-[#f8fafc] to-[#f1f5f9]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:32px_32px]"></div>
       </div>
 
       {/* 2. حبل السحب العائم التفاعلي لتعديل وتعتيم الضوء وسحب المفتاح (يُخفى في صفحة اللعبة لعدم التشويش) */}
       {!isGamePage && (
         <div className="fixed top-0 left-16 md:left-[70px] z-[2000] flex flex-col items-center pointer-events-none select-none">
           <motion.div 
-            className="w-[1px] md:w-[2px] bg-gradient-to-b from-[#333] via-[#666] to-amber-500/70"
+            className="w-[1px] md:w-[2px] bg-gradient-to-b from-slate-400 via-slate-600 to-amber-500/70"
             style={{ height: cordHeight }}
           />
           <motion.div 
@@ -195,17 +195,13 @@ export default function Layout() {
             className="w-12 h-12 flex items-center justify-center cursor-grab active:cursor-grabbing pointer-events-auto -mt-5"
             title={isAr ? 'اسحب لتغيير وضع الإضاءة' : 'Pull to change lighting mode'}
           >
-            <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 border-[1.5px] border-white shadow-[0_2px_8px_rgba(0,0,0,0.5),0_0_8px_rgba(245,158,11,0.5)] flex items-center justify-center transition-shadow duration-300">
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 border-[1.5px] border-white shadow-[0_2px_8px_rgba(0,0,0,0.15),0_0_8px_rgba(245,158,11,0.5)] flex items-center justify-center transition-shadow duration-300">
               <div className="w-[4px] h-[4px] bg-white rounded-full opacity-90" />
             </div>
           </motion.div>
 
           {/* مؤشر الإرشاد العائم */}
-          <div className={`absolute top-full mt-3 text-[9px] md:text-[10px] font-semibold tracking-tight px-3 py-1 rounded-full border transition-all duration-300 whitespace-nowrap shadow-sm pointer-events-none ${
-            theme === 'light'
-              ? 'bg-white/95 text-zinc-800 border-zinc-200/80 shadow-sm'
-              : 'bg-zinc-900/90 text-zinc-300 border-zinc-800 shadow-sm'
-          }`}>
+          <div className="absolute top-full mt-3 text-[9px] md:text-[10px] font-semibold tracking-tight px-3 py-1 rounded-full border transition-all duration-300 whitespace-nowrap shadow-sm pointer-events-none bg-white/95 text-slate-800 border-slate-200 shadow-sm">
             {isDragging 
               ? (isAr ? 'اترك الحبل الآن...' : 'Release now...') 
               : (isAr ? 'اسحب الإنارة لتغيير وضع الإضاءة 💡' : 'Pull light to change mode 💡')}
