@@ -62,7 +62,7 @@ function App() {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
       }
-    }, 2000);
+    }, 2300);
 
     return () => {
       clearTimeout(timer);
