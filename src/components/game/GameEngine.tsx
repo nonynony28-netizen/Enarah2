@@ -559,6 +559,15 @@ export const GameEngine: React.FC = () => {
       angleDeg: 0,
       intensity: 0,
     })
+    dpadRef.current = { up: false, down: false, left: false, right: false }
+    setDpadActive({ up: false, down: false, left: false, right: false })
+    turboRef.current = { active: false, timeLeft: 0, cooldown: 0 }
+    setIsTurboActive(false)
+    setTurboCooldownRatio(0)
+    stunRef.current = { active: false, timeLeft: 0, cooldown: 0 }
+    setIsStunActive(false)
+    setFlashCooldownRatio(0)
+    canvasTouchRef.current = { active: false, targetX: 0, targetY: 0 }
 
     if (cloned.boss) {
       setBossHp(cloned.boss.hp)
@@ -750,6 +759,91 @@ export const GameEngine: React.FC = () => {
     intensity: 0,
   })
 
+  // Control Mode: 'dpad' or 'joystick'
+  const [controlMode, setControlMode] = useState<'dpad' | 'joystick'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('enarah_game_control_mode') as 'dpad' | 'joystick') || 'dpad'
+    }
+    return 'dpad'
+  })
+
+  // D-Pad state
+  const dpadRef = useRef({ up: false, down: false, left: false, right: false })
+  const [dpadActive, setDpadActive] = useState({ up: false, down: false, left: false, right: false })
+
+  const handleDpadPress = (dir: 'up' | 'down' | 'left' | 'right', isPressed: boolean) => {
+    dpadRef.current[dir] = isPressed
+    setDpadActive(prev => ({ ...prev, [dir]: isPressed }))
+    if (isPressed) {
+      try { navigator.vibrate?.(12) } catch {}
+    }
+  }
+
+  // Turbo Sprint state
+  const turboRef = useRef({ active: false, timeLeft: 0, cooldown: 0 })
+  const [isTurboActive, setIsTurboActive] = useState(false)
+  const [turboCooldownRatio, setTurboCooldownRatio] = useState(0)
+
+  const triggerTurbo = useCallback(() => {
+    if (turboRef.current.cooldown > 0 || turboRef.current.active) return
+    turboRef.current.active = true
+    turboRef.current.timeLeft = 2.2
+    turboRef.current.cooldown = 4.0
+    setIsTurboActive(true)
+    setTurboCooldownRatio(1.0)
+    sound.playTurbo()
+    try { navigator.vibrate?.([20, 30]) } catch {}
+    showAlert('⚡ تيربو السرعة القصوى نشط! (انطلاق كهربائي سريع)', 'success')
+  }, [])
+
+  // Flash Stun state
+  const stunRef = useRef({ active: false, timeLeft: 0, cooldown: 0 })
+  const [isStunActive, setIsStunActive] = useState(false)
+  const [flashCooldownRatio, setFlashCooldownRatio] = useState(0)
+
+  const triggerFlashStun = useCallback(() => {
+    if (stunRef.current.cooldown > 0 || stunRef.current.active) return
+    stunRef.current.active = true
+    stunRef.current.timeLeft = 3.0
+    stunRef.current.cooldown = 7.5
+    setIsStunActive(true)
+    setFlashCooldownRatio(1.0)
+    sound.playFlashStun()
+    try { navigator.vibrate?.([30, 50, 30]) } catch {}
+    showAlert('💡 وميض النور الخارق! تم تجميد كافة العوائق مؤقتاً!', 'success')
+  }, [])
+
+  // Direct Canvas Touch Navigation
+  const canvasTouchRef = useRef<{ active: boolean; targetX: number; targetY: number }>({ active: false, targetX: 0, targetY: 0 })
+
+  const handleCanvasPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const canvasX = (e.clientX - rect.left) * scaleX
+    const canvasY = (e.clientY - rect.top) * scaleY
+    canvasTouchRef.current = { active: true, targetX: canvasX, targetY: canvasY }
+  }
+
+  const handleCanvasPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!canvasTouchRef.current.active) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const canvasX = (e.clientX - rect.left) * scaleX
+    const canvasY = (e.clientY - rect.top) * scaleY
+    canvasTouchRef.current.targetX = canvasX
+    canvasTouchRef.current.targetY = canvasY
+  }
+
+  const handleCanvasPointerUp = () => {
+    canvasTouchRef.current.active = false
+  }
+
   const handleJoystickStart = (clientX: number, clientY: number, rect: DOMRect, touchId: number | null = null) => {
     joystickRef.current.active = true
     joystickRef.current.touchId = touchId
@@ -803,11 +897,17 @@ export const GameEngine: React.FC = () => {
     })
   }
 
-  // Keyboard controls listener
+  // Keyboard controls listener (Arrows, WASD, Space for Turbo, E/F for Flash)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       keysRef.current[e.code] = true
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+      if (e.code === 'Space') {
+        e.preventDefault()
+        triggerTurbo()
+      } else if (e.code === 'KeyF' || e.code === 'KeyE') {
+        e.preventDefault()
+        triggerFlashStun()
+      } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
         e.preventDefault()
       }
     }
@@ -821,7 +921,7 @@ export const GameEngine: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [])
+  }, [triggerTurbo, triggerFlashStun])
 
   // Calculate remaining uncollected items & unlit lamps
   const remainingLamps = levelRef.current.lamps.filter((l) => !l.isLit).length
@@ -866,7 +966,7 @@ export const GameEngine: React.FC = () => {
           hero.invincibleTimer -= dt
         }
 
-        // 1. Process Input (Keyboard + 360-Degree Analog Virtual Joystick)
+        // 1. Process Input (Keyboard + D-Pad + 360° Joystick + Direct Canvas Touch)
         let moveX = 0
         let moveY = 0
 
@@ -875,20 +975,69 @@ export const GameEngine: React.FC = () => {
         if (keysRef.current['ArrowUp'] || keysRef.current['KeyW']) moveY -= 1
         if (keysRef.current['ArrowDown'] || keysRef.current['KeyS']) moveY += 1
 
+        // D-Pad input (Mobile)
+        if (dpadRef.current.right) moveX += 1
+        if (dpadRef.current.left) moveX -= 1
+        if (dpadRef.current.up) moveY -= 1
+        if (dpadRef.current.down) moveY += 1
+
+        // Direct Canvas Touch Navigation
+        if (canvasTouchRef.current.active) {
+          const dx = canvasTouchRef.current.targetX - hero.x
+          const dy = canvasTouchRef.current.targetY - hero.y
+          const dist = Math.hypot(dx, dy)
+          if (dist > 18) {
+            moveX += dx / dist
+            moveY += dy / dist
+          }
+        }
+
         // Analog 360° Joystick Velocity
         if (joystickRef.current.active) {
           moveX += joystickRef.current.vectorX
           moveY += joystickRef.current.vectorY
         }
 
+        // Update Turbo state & particles
+        if (turboRef.current.active) {
+          turboRef.current.timeLeft -= dt
+          if (turboRef.current.timeLeft <= 0) {
+            turboRef.current.active = false
+            setIsTurboActive(false)
+          }
+          if (Math.random() < 0.6) {
+            spawnParticles(hero.x, hero.y, '#38bdf8', 2, 2)
+          }
+        } else if (turboRef.current.cooldown > 0) {
+          turboRef.current.cooldown -= dt
+          setTurboCooldownRatio(Math.max(0, turboRef.current.cooldown / 4.0))
+        }
+
+        // Update Flash Stun state
+        if (stunRef.current.active) {
+          stunRef.current.timeLeft -= dt
+          if (stunRef.current.timeLeft <= 0) {
+            stunRef.current.active = false
+            setIsStunActive(false)
+          }
+        } else if (stunRef.current.cooldown > 0) {
+          stunRef.current.cooldown -= dt
+          setFlashCooldownRatio(Math.max(0, stunRef.current.cooldown / 7.5))
+        }
+
         const inputMagnitude = Math.hypot(moveX, moveY)
         if (inputMagnitude > 0.05) {
+          let currentSpeed = hero.speed
+          if (turboRef.current.active) {
+            currentSpeed *= 1.65
+          }
+
           const speedMultiplier = joystickRef.current.active 
             ? Math.min(inputMagnitude, 1.0) 
             : 1.0
 
-          moveX = (moveX / inputMagnitude) * hero.speed * speedMultiplier
-          moveY = (moveY / inputMagnitude) * hero.speed * speedMultiplier
+          moveX = (moveX / inputMagnitude) * currentSpeed * speedMultiplier
+          moveY = (moveY / inputMagnitude) * currentSpeed * speedMultiplier
           hero.isMoving = true
           hero.walkCycle += dt * 14 * speedMultiplier
 
@@ -957,14 +1106,16 @@ export const GameEngine: React.FC = () => {
 
         // 3. Update Hazards
         for (const h of level.hazards) {
-          h.x += h.vx
-          h.y += h.vy
+          if (!stunRef.current.active) {
+            h.x += h.vx
+            h.y += h.vy
 
-          if (h.minX !== undefined && (h.x <= h.minX || h.x >= h.maxX!)) h.vx *= -1
-          if (h.minY !== undefined && (h.y <= h.minY || h.y >= h.maxY!)) h.vy *= -1
+            if (h.minX !== undefined && (h.x <= h.minX || h.x >= h.maxX!)) h.vx *= -1
+            if (h.minY !== undefined && (h.y <= h.minY || h.y >= h.maxY!)) h.vy *= -1
+          }
 
           const hDist = Math.hypot(hero.x - h.x, hero.y - h.y)
-          if (hDist < hero.radius + h.radius && hero.invincibleTimer <= 0) {
+          if (hDist < hero.radius + h.radius && hero.invincibleTimer <= 0 && !stunRef.current.active) {
             handleHeroInjured('hit')
             break
           }
@@ -973,14 +1124,16 @@ export const GameEngine: React.FC = () => {
         // 4. Update Final Boss
         if (level.boss && !level.boss.isDefeated) {
           const boss = level.boss
-          boss.x += boss.vx
-          boss.y += boss.vy
+          if (!stunRef.current.active) {
+            boss.x += boss.vx
+            boss.y += boss.vy
 
-          if (boss.x <= 350 || boss.x >= 700) boss.vx *= -1
-          if (boss.y <= 240 || boss.y >= 450) boss.vy *= -1
+            if (boss.x <= 350 || boss.x >= 700) boss.vx *= -1
+            if (boss.y <= 240 || boss.y >= 450) boss.vy *= -1
+          }
 
           const bDist = Math.hypot(hero.x - boss.x, hero.y - boss.y)
-          if (bDist < hero.radius + boss.radius && hero.invincibleTimer <= 0) {
+          if (bDist < hero.radius + boss.radius && hero.invincibleTimer <= 0 && !stunRef.current.active) {
             handleHeroInjured('boss')
             return
           }
@@ -1483,6 +1636,23 @@ export const GameEngine: React.FC = () => {
             ctx.fill()
           }
 
+          // Visual freeze aura if Stun is active
+          if (stunRef.current.active) {
+            ctx.beginPath()
+            ctx.arc(0, 0, bossRad + 14, 0, Math.PI * 2)
+            ctx.strokeStyle = '#38bdf8'
+            ctx.lineWidth = 3
+            ctx.setLineDash([5, 5])
+            ctx.shadowColor = '#38bdf8'
+            ctx.shadowBlur = 16
+            ctx.stroke()
+            ctx.setLineDash([])
+            ctx.fillStyle = '#67e8f9'
+            ctx.font = 'bold 12px sans-serif'
+            ctx.textAlign = 'center'
+            ctx.fillText('⚡ مجمّد بالنور!', 0, -bossRad - 12)
+          }
+
           ctx.fillStyle = '#fef08a'
           ctx.beginPath()
           ctx.arc(-12, -8, 6, 0, Math.PI * 2)
@@ -1564,6 +1734,24 @@ export const GameEngine: React.FC = () => {
           ctx.fill()
           ctx.stroke()
         }
+
+        // Freeze aura on hazards when Stun is active
+        if (stunRef.current.active) {
+          ctx.beginPath()
+          ctx.arc(0, 0, h.radius + 6, 0, Math.PI * 2)
+          ctx.strokeStyle = '#38bdf8'
+          ctx.lineWidth = 2
+          ctx.setLineDash([4, 4])
+          ctx.shadowColor = '#38bdf8'
+          ctx.shadowBlur = 10
+          ctx.stroke()
+          ctx.setLineDash([])
+          ctx.fillStyle = '#67e8f9'
+          ctx.font = 'bold 10px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.fillText('⚡مجمّد', 0, -h.radius - 5)
+        }
+
         ctx.restore()
       }
 
@@ -1758,6 +1946,22 @@ export const GameEngine: React.FC = () => {
       const lookOffsetX = hero.facing === 'left' ? -2.5 : hero.facing === 'right' ? 2.5 : 0
       const lookOffsetY = hero.facing === 'up' ? -2 : hero.facing === 'down' ? 1.5 : 0
 
+      // Turbo speed electric pulse aura around hero
+      if (turboRef.current.active) {
+        ctx.save()
+        const pulse = Math.sin(time * 0.02) * 3
+        ctx.beginPath()
+        ctx.arc(0, -10 + bobbing, 22 + pulse, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.25)'
+        ctx.strokeStyle = '#38bdf8'
+        ctx.lineWidth = 2
+        ctx.shadowColor = '#38bdf8'
+        ctx.shadowBlur = 15
+        ctx.fill()
+        ctx.stroke()
+        ctx.restore()
+      }
+
       if (level.theme === 'street') {
         ctx.beginPath()
         ctx.arc(0, -14 + bobbing, 15, 0, Math.PI * 2)
@@ -1938,14 +2142,19 @@ export const GameEngine: React.FC = () => {
 
           darkCtx.globalCompositeOperation = 'destination-out'
 
-          // 1. Hero's Light Circle
-          const heroLightGrad = darkCtx.createRadialGradient(hero.x, hero.y, 10, hero.x, hero.y, lightPower)
+          // 1. Hero's Light Circle (expands to 950px during Super Flash Stun, 1.35x during Turbo)
+          const effectiveLightRadius = stunRef.current.active
+            ? 950
+            : turboRef.current.active
+            ? lightPower * 1.35
+            : lightPower
+          const heroLightGrad = darkCtx.createRadialGradient(hero.x, hero.y, 10, hero.x, hero.y, effectiveLightRadius)
           heroLightGrad.addColorStop(0, 'rgba(0, 0, 0, 1)')
           heroLightGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.9)')
           heroLightGrad.addColorStop(1, 'rgba(0, 0, 0, 0)')
           darkCtx.fillStyle = heroLightGrad
           darkCtx.beginPath()
-          darkCtx.arc(hero.x, hero.y, lightPower, 0, Math.PI * 2)
+          darkCtx.arc(hero.x, hero.y, effectiveLightRadius, 0, Math.PI * 2)
           darkCtx.fill()
 
           // 2. Permanent light circles around Lit Lamps
@@ -2098,13 +2307,20 @@ export const GameEngine: React.FC = () => {
       </div>
 
       {/* Main Canvas Viewport - Auto-flex to fit screen perfectly */}
-      <div className="relative w-full flex-1 min-h-0 bg-black rounded-2xl overflow-hidden border border-zinc-800/80 shadow-2xl flex items-center justify-center">
+      <div className={`relative w-full flex-1 min-h-0 bg-black rounded-2xl overflow-hidden border border-zinc-800/80 shadow-2xl flex items-center justify-center ${
+        isFullscreen ? 'max-h-none' : 'max-h-[46vh] sm:max-h-[58vh]'
+      }`}>
         
         <canvas
           ref={canvasRef}
           width={LEVELS[currentLevelIdx].width}
           height={LEVELS[currentLevelIdx].height}
-          className="w-full h-full max-h-full object-contain"
+          className="w-full h-full max-h-full object-contain cursor-crosshair touch-none select-none"
+          style={{ touchAction: 'none' }}
+          onPointerDown={handleCanvasPointerDown}
+          onPointerMove={handleCanvasPointerMove}
+          onPointerUp={handleCanvasPointerUp}
+          onPointerCancel={handleCanvasPointerUp}
         />
 
         {/* ==========================================
@@ -2405,98 +2621,297 @@ export const GameEngine: React.FC = () => {
         </div>
       )}
 
-      {/* ==========================================
-          VIRTUAL ANALOG JOYSTICK (360° CONTROLLER)
-      ========================================== */}
-      <div className="w-full shrink-0 mt-1 mb-1 sm:mb-2 flex flex-col items-center justify-center select-none touch-none">
-        <div className="flex items-center gap-1.5 mb-1">
-          <span className="text-[10px] sm:text-xs text-zinc-400 font-bold flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping" />
-            <span>عصا التحكم التناظرية 360° (اسحب للتوجيه بسلاسة)</span>
-          </span>
-        </div>
+      {/* =========================================================
+          ERGONOMIC MOBILE GAMEPAD & ABILITY DECK (تحكم الهواتف المطور)
+      ========================================================= */}
+      <div className="w-full shrink-0 mt-1 mb-1 sm:mb-2 flex flex-col items-center justify-center select-none touch-none px-2">
         
-        {/* Analog Base Ring */}
-        <div
-          onMouseDown={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect()
-            handleJoystickStart(e.clientX, e.clientY, rect)
-          }}
-          onMouseMove={(e) => {
-            if (joystickData.active) handleJoystickMove(e.clientX, e.clientY)
-          }}
-          onMouseUp={handleJoystickEnd}
-          onMouseLeave={handleJoystickEnd}
-          onTouchStart={(e) => {
-            e.preventDefault()
-            const touch = e.touches[0]
-            const rect = e.currentTarget.getBoundingClientRect()
-            handleJoystickStart(touch.clientX, touch.clientY, rect, touch.identifier)
-          }}
-          onTouchMove={(e) => {
-            e.preventDefault()
-            const touch = Array.from(e.touches).find(t => t.identifier === joystickRef.current.touchId) || e.touches[0]
-            if (touch) handleJoystickMove(touch.clientX, touch.clientY)
-          }}
-          onTouchEnd={(e) => {
-            e.preventDefault()
-            handleJoystickEnd()
-          }}
-          onTouchCancel={handleJoystickEnd}
-          className={`relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full border-2 transition-colors cursor-grab active:cursor-grabbing flex items-center justify-center shadow-2xl backdrop-blur-md ${
-            joystickData.active
-              ? 'bg-blue-950/40 border-blue-500/70 shadow-[0_0_20px_rgba(59,130,246,0.35)]'
-              : 'bg-zinc-950/80 border-zinc-800 shadow-lg'
-          }`}
-          style={{ touchAction: 'none' }}
-        >
-          {/* Concentric Decorative Rings */}
-          <div className="absolute inset-4 rounded-full border border-blue-500/15 pointer-events-none" />
-          <div className="absolute inset-8 rounded-full border border-blue-400/10 pointer-events-none" />
-
-          {/* Compass Direction Ticks */}
-          <div className="absolute top-1.5 text-[9px] font-bold text-zinc-500 select-none">▲</div>
-          <div className="absolute bottom-1.5 text-[9px] font-bold text-zinc-500 select-none">▼</div>
-          <div className="absolute left-2 text-[9px] font-bold text-zinc-500 select-none">◀</div>
-          <div className="absolute right-2 text-[9px] font-bold text-zinc-500 select-none">▶</div>
-
-          {/* Active Directional Glow Beam */}
-          {joystickData.active && joystickData.intensity > 0.1 && (
-            <div
-              className="absolute w-12 h-1 bg-gradient-to-r from-blue-500 to-transparent rounded-full origin-left pointer-events-none"
-              style={{
-                left: '50%',
-                top: '50%',
-                transform: `rotate(${joystickData.angleDeg}deg)`,
-                opacity: joystickData.intensity,
+        {/* Top bar: Mode Switcher & Mobile Hints */}
+        <div className="w-full max-w-xl flex items-center justify-between gap-2 px-2 py-1 mb-1.5 bg-zinc-900/60 border border-zinc-800/80 rounded-xl backdrop-blur-sm">
+          {/* Controller Mode Tabs */}
+          <div className="flex items-center gap-1 bg-black/50 p-0.5 rounded-lg border border-zinc-800">
+            <button
+              type="button"
+              onClick={() => {
+                setControlMode('dpad')
+                localStorage.setItem('enarah_game_control_mode', 'dpad')
+                try { navigator.vibrate?.(10) } catch {}
               }}
-            />
-          )}
+              className={`px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                controlMode === 'dpad'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <span>🎛️</span>
+              <span>أزرار التوجيه (D-Pad)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setControlMode('joystick')
+                localStorage.setItem('enarah_game_control_mode', 'joystick')
+                try { navigator.vibrate?.(10) } catch {}
+              }}
+              className={`px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                controlMode === 'joystick'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <span>🕹️</span>
+              <span>عصا 360°</span>
+            </button>
+          </div>
 
-          {/* Floating Analog Stick Knob */}
-          <div
-            className={`w-14 h-14 rounded-full flex items-center justify-center text-white border-2 shadow-2xl transition-transform duration-75 pointer-events-none ${
-              joystickData.active
-                ? 'bg-gradient-to-b from-blue-500 to-blue-700 border-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.8)] scale-105'
-                : 'bg-gradient-to-b from-zinc-800 to-zinc-900 border-zinc-700 shadow-md'
-            }`}
-            style={{
-              transform: `translate(${joystickData.knobX}px, ${joystickData.knobY}px)`,
-            }}
-          >
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-              joystickData.active ? 'text-amber-300' : 'text-blue-400'
-            }`}>
-              <Lightbulb className="w-5 h-5 fill-current transition-colors" />
-            </div>
+          {/* Quick status or hint */}
+          <div className="text-[10px] sm:text-xs text-zinc-400 font-medium hidden xs:flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span>يمكنك أيضاً لمس الشاشة مباشرةً للمشي!</span>
           </div>
         </div>
 
-        <span className="text-[10px] text-zinc-500 mt-1.5">
-          {joystickData.active
-            ? `⚡ حركة نشطة: ${(joystickData.intensity * 100).toFixed(0)}%`
-            : '💡 يمكنك أيضاً استخدام مفاتيح الأسهم أو WASD'}
-        </span>
+        {/* Handheld Deck: Directional Controls (Left) + Actions Cluster (Right) */}
+        <div className="w-full max-w-xl flex items-center justify-between sm:justify-around gap-2 p-2 sm:p-3 bg-zinc-950/80 border border-zinc-800/80 rounded-2xl shadow-xl backdrop-blur-md">
+          
+          {/* LEFT: DIRECTION CONTROLS (D-PAD OR JOYSTICK) */}
+          <div className="flex items-center justify-center">
+            {controlMode === 'dpad' ? (
+              /* Precision 4-Way D-Pad */
+              <div 
+                className="relative w-32 h-32 sm:w-36 sm:h-36 bg-zinc-900/90 rounded-2xl border-2 border-zinc-800 shadow-inner flex items-center justify-center p-1"
+                style={{ touchAction: 'none' }}
+              >
+                {/* Center Core */}
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center pointer-events-none z-10 shadow-sm">
+                  <div className="w-3 h-3 rounded-full bg-blue-500/40 animate-pulse" />
+                </div>
+
+                {/* UP BUTTON */}
+                <button
+                  type="button"
+                  onPointerDown={(e) => { e.preventDefault(); handleDpadPress('up', true) }}
+                  onPointerUp={(e) => { e.preventDefault(); handleDpadPress('up', false) }}
+                  onPointerLeave={() => handleDpadPress('up', false)}
+                  onPointerCancel={() => handleDpadPress('up', false)}
+                  className={`absolute top-1.5 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-black text-sm transition-all cursor-pointer select-none active:scale-90 ${
+                    dpadActive.up
+                      ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.8)] border-blue-400 scale-95'
+                      : 'bg-zinc-800/90 text-zinc-300 hover:bg-zinc-700/90 border border-zinc-700/60 shadow-md'
+                  }`}
+                  aria-label="تحرك للأعلى"
+                >
+                  ▲
+                </button>
+
+                {/* DOWN BUTTON */}
+                <button
+                  type="button"
+                  onPointerDown={(e) => { e.preventDefault(); handleDpadPress('down', true) }}
+                  onPointerUp={(e) => { e.preventDefault(); handleDpadPress('down', false) }}
+                  onPointerLeave={() => handleDpadPress('down', false)}
+                  onPointerCancel={() => handleDpadPress('down', false)}
+                  className={`absolute bottom-1.5 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-black text-sm transition-all cursor-pointer select-none active:scale-90 ${
+                    dpadActive.down
+                      ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.8)] border-blue-400 scale-95'
+                      : 'bg-zinc-800/90 text-zinc-300 hover:bg-zinc-700/90 border border-zinc-700/60 shadow-md'
+                  }`}
+                  aria-label="تحرك للأسفل"
+                >
+                  ▼
+                </button>
+
+                {/* LEFT BUTTON */}
+                <button
+                  type="button"
+                  onPointerDown={(e) => { e.preventDefault(); handleDpadPress('left', true) }}
+                  onPointerUp={(e) => { e.preventDefault(); handleDpadPress('left', false) }}
+                  onPointerLeave={() => handleDpadPress('left', false)}
+                  onPointerCancel={() => handleDpadPress('left', false)}
+                  className={`absolute left-1.5 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-black text-sm transition-all cursor-pointer select-none active:scale-90 ${
+                    dpadActive.left
+                      ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.8)] border-blue-400 scale-95'
+                      : 'bg-zinc-800/90 text-zinc-300 hover:bg-zinc-700/90 border border-zinc-700/60 shadow-md'
+                  }`}
+                  aria-label="تحرك لليسار"
+                >
+                  ◀
+                </button>
+
+                {/* RIGHT BUTTON */}
+                <button
+                  type="button"
+                  onPointerDown={(e) => { e.preventDefault(); handleDpadPress('right', true) }}
+                  onPointerUp={(e) => { e.preventDefault(); handleDpadPress('right', false) }}
+                  onPointerLeave={() => handleDpadPress('right', false)}
+                  onPointerCancel={() => handleDpadPress('right', false)}
+                  className={`absolute right-1.5 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-black text-sm transition-all cursor-pointer select-none active:scale-90 ${
+                    dpadActive.right
+                      ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.8)] border-blue-400 scale-95'
+                      : 'bg-zinc-800/90 text-zinc-300 hover:bg-zinc-700/90 border border-zinc-700/60 shadow-md'
+                  }`}
+                  aria-label="تحرك لليمين"
+                >
+                  ▶
+                </button>
+              </div>
+            ) : (
+              /* Analog 360° Joystick */
+              <div
+                onMouseDown={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  handleJoystickStart(e.clientX, e.clientY, rect)
+                }}
+                onMouseMove={(e) => {
+                  if (joystickData.active) handleJoystickMove(e.clientX, e.clientY)
+                }}
+                onMouseUp={handleJoystickEnd}
+                onMouseLeave={handleJoystickEnd}
+                onTouchStart={(e) => {
+                  e.preventDefault()
+                  const touch = e.touches[0]
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  handleJoystickStart(touch.clientX, touch.clientY, rect, touch.identifier)
+                }}
+                onTouchMove={(e) => {
+                  e.preventDefault()
+                  const touch = Array.from(e.touches).find(t => t.identifier === joystickRef.current.touchId) || e.touches[0]
+                  if (touch) handleJoystickMove(touch.clientX, touch.clientY)
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault()
+                  handleJoystickEnd()
+                }}
+                onTouchCancel={handleJoystickEnd}
+                className={`relative w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 transition-colors cursor-grab active:cursor-grabbing flex items-center justify-center shadow-2xl backdrop-blur-md ${
+                  joystickData.active
+                    ? 'bg-blue-950/40 border-blue-500/70 shadow-[0_0_20px_rgba(59,130,246,0.35)]'
+                    : 'bg-zinc-950/80 border-zinc-800 shadow-lg'
+                }`}
+                style={{ touchAction: 'none' }}
+              >
+                {/* Concentric Decorative Rings */}
+                <div className="absolute inset-3 rounded-full border border-blue-500/15 pointer-events-none" />
+                <div className="absolute inset-6 rounded-full border border-blue-400/10 pointer-events-none" />
+
+                {/* Compass Direction Ticks */}
+                <div className="absolute top-1 text-[8px] font-bold text-zinc-500 select-none">▲</div>
+                <div className="absolute bottom-1 text-[8px] font-bold text-zinc-500 select-none">▼</div>
+                <div className="absolute left-1.5 text-[8px] font-bold text-zinc-500 select-none">◀</div>
+                <div className="absolute right-1.5 text-[8px] font-bold text-zinc-500 select-none">▶</div>
+
+                {/* Active Directional Glow Beam */}
+                {joystickData.active && joystickData.intensity > 0.1 && (
+                  <div
+                    className="absolute w-10 h-1 bg-gradient-to-r from-blue-500 to-transparent rounded-full origin-left pointer-events-none"
+                    style={{
+                      left: '50%',
+                      top: '50%',
+                      transform: `rotate(${joystickData.angleDeg}deg)`,
+                      opacity: joystickData.intensity,
+                    }}
+                  />
+                )}
+
+                {/* Floating Analog Stick Knob */}
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center text-white border-2 shadow-2xl transition-transform duration-75 pointer-events-none ${
+                    joystickData.active
+                      ? 'bg-gradient-to-b from-blue-500 to-blue-700 border-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.8)] scale-105'
+                      : 'bg-gradient-to-b from-zinc-800 to-zinc-900 border-zinc-700 shadow-md'
+                  }`}
+                  style={{
+                    transform: `translate(${joystickData.knobX}px, ${joystickData.knobY}px)`,
+                  }}
+                >
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                    joystickData.active ? 'text-amber-300' : 'text-blue-400'
+                  }`}>
+                    <Lightbulb className="w-4 h-4 fill-current transition-colors" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT: ACTION ABILITIES CLUSTER (TURBO SPRINT + FLASH STUN) */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            
+            {/* ⚡ TURBO SPRINT BUTTON */}
+            <div className="flex flex-col items-center">
+              <button
+                type="button"
+                onClick={triggerTurbo}
+                onTouchStart={(e) => { e.preventDefault(); triggerTurbo() }}
+                disabled={turboCooldownRatio > 0 || isTurboActive}
+                className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer select-none active:scale-90 border-2 shadow-xl ${
+                  isTurboActive
+                    ? 'bg-gradient-to-tr from-cyan-500 to-blue-600 border-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.9)] animate-pulse'
+                    : turboCooldownRatio > 0
+                    ? 'bg-zinc-900 border-zinc-800 opacity-50 cursor-not-allowed text-zinc-500'
+                    : 'bg-gradient-to-tr from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+                }`}
+                aria-label="تفعيل تيربو السرعة"
+                title="تيربو السرعة الخارقة (Space)"
+              >
+                {/* Radial or overlay Cooldown indicator */}
+                {turboCooldownRatio > 0 && (
+                  <div 
+                    className="absolute inset-0 bg-black/70 rounded-2xl flex items-center justify-center font-mono text-xs font-bold text-amber-300"
+                  >
+                    {(turboCooldownRatio * 4.0).toFixed(1)}s
+                  </div>
+                )}
+                <Zap className={`w-6 h-6 ${isTurboActive ? 'text-white fill-current animate-bounce' : 'text-white'}`} />
+                <span className="text-[9px] sm:text-[10px] font-black text-white mt-0.5">تيربو</span>
+              </button>
+              <span className="text-[9px] text-zinc-500 mt-1 font-semibold">Space</span>
+            </div>
+
+            {/* 💡 SUPER FLASH STUN BUTTON */}
+            <div className="flex flex-col items-center">
+              <button
+                type="button"
+                onClick={triggerFlashStun}
+                onTouchStart={(e) => { e.preventDefault(); triggerFlashStun() }}
+                disabled={flashCooldownRatio > 0 || isStunActive}
+                className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer select-none active:scale-90 border-2 shadow-xl ${
+                  isStunActive
+                    ? 'bg-gradient-to-tr from-yellow-300 to-amber-500 border-white shadow-[0_0_25px_rgba(253,224,71,0.9)] animate-pulse'
+                    : flashCooldownRatio > 0
+                    ? 'bg-zinc-900 border-zinc-800 opacity-50 cursor-not-allowed text-zinc-500'
+                    : 'bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]'
+                }`}
+                aria-label="تفعيل وميض تجميد العوائق"
+                title="وميض تجميد العوائق (E أو F)"
+              >
+                {/* Cooldown overlay */}
+                {flashCooldownRatio > 0 && (
+                  <div 
+                    className="absolute inset-0 bg-black/70 rounded-2xl flex items-center justify-center font-mono text-xs font-bold text-blue-300"
+                  >
+                    {(flashCooldownRatio * 7.5).toFixed(1)}s
+                  </div>
+                )}
+                <Lightbulb className={`w-6 h-6 ${isStunActive ? 'text-black fill-current animate-spin' : 'text-amber-300 fill-current'}`} />
+                <span className="text-[9px] sm:text-[10px] font-black text-white mt-0.5">وميض</span>
+              </button>
+              <span className="text-[9px] text-zinc-500 mt-1 font-semibold">مفتاح E</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* Bottom subtle micro-label */}
+        <div className="text-[10px] text-zinc-500 mt-1 flex items-center gap-2">
+          <span>{controlMode === 'dpad' ? '🎛️ تحكم دقيق بالأسهم' : `🕹️ عصا متحركة ${(joystickData.intensity * 100).toFixed(0)}%`}</span>
+          <span>•</span>
+          <span>⚡ تيربو للسرعة</span>
+          <span>•</span>
+          <span>💡 وميض لتجميد الأشرار</span>
+        </div>
+
       </div>
 
     </div>

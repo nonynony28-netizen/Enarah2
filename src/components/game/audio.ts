@@ -337,6 +337,54 @@ class SoundEngine {
     osc.start(now)
     osc.stop(now + 0.35)
   }
+
+  // صوت النبضة السريعة والتيربو (Turbo Boost)
+  public playTurbo() {
+    if (this.isMuted) return
+    this.initCtx()
+    if (!this.ctx) return
+
+    const now = this.ctx.currentTime
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(300, now)
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.25)
+
+    gain.gain.setValueAtTime(0.2, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25)
+
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.25)
+  }
+
+  // صوت وميض النور الخارق (Flash Stun)
+  public playFlashStun() {
+    if (this.isMuted) return
+    this.initCtx()
+    if (!this.ctx) return
+
+    const now = this.ctx.currentTime
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+
+    osc.type = 'triangle'
+    osc.frequency.setValueAtTime(880, now)
+    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.3)
+
+    gain.gain.setValueAtTime(0.35, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4)
+
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.4)
+  }
 }
 
 export const sound = new SoundEngine()

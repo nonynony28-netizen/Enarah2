@@ -64,7 +64,7 @@ export default function Game() {
         </div>
 
         {/* Instructions & Game Rules Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-200">
           
           <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3.5 text-right">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0 mt-0.5">
@@ -99,17 +99,33 @@ export default function Game() {
           </div>
 
           <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3.5 text-right">
+            <div className="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 shrink-0 mt-0.5">
+              <Gamepad2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm text-slate-900 mb-1">
+                {isAr ? '3. تحكم فائق وقدرات خاصة' : '3. Pro Controls & Abilities'}
+              </h4>
+              <p className="text-slate-600 text-xs leading-relaxed font-normal">
+                {isAr
+                  ? 'بدّل بين أزرار D-Pad الدقيقة أو عصا 360° أو اللمس المباشر، وفعل تيربو السرعة (⚡) ووميض التجميد (💡).'
+                  : 'Switch between tactile D-Pad, 360° joystick, or touch steering. Trigger Turbo (⚡) & Flash Stun (💡).'}
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3.5 text-right">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5">
               <Trophy className="w-5 h-5" />
             </div>
             <div>
               <h4 className="font-bold text-sm text-slate-900 mb-1">
-                {isAr ? '3. شغّل القاطع واكسب الخصم' : '3. Power On & Win'}
+                {isAr ? '4. شغّل القاطع واكسب الخصم' : '4. Power On & Win'}
               </h4>
               <p className="text-slate-600 text-xs leading-relaxed font-normal">
                 {isAr
-                  ? 'ارفع مقبض القاطع الرئيسي لتنير العالم واكسب كود الخصم الحصري لمشترياتك.'
-                  : 'Pull the master breaker to illuminate the city and claim your special voucher code.'}
+                  ? 'ارفع مقبض القاطع الرئيسي لتنير العالم، واحبس وحش الحمل الزائد واكسب كود الخصم الحصري.'
+                  : 'Pull the master breaker to illuminate the city, defeat the overload boss, and claim your reward.'}
               </p>
             </div>
           </div>
