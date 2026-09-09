@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { sound } from './audio'
 import { Sparkles, Zap, Lightbulb, Volume2, VolumeX, RotateCcw, Trophy, CheckCircle, ArrowRight, Play, Award, Flame, Lock, Unlock, Compass, AlertTriangle, Clock, Timer, ShieldAlert, Skull, Heart, Medal, Star, Send, X, User, Maximize2, Minimize2 } from 'lucide-react'
 
@@ -94,6 +94,50 @@ export interface LeaderboardEntry {
   score: number
   timeTakenSec: number
   date: string
+  weekKey?: string
+}
+
+export interface WeeklyChallengeInfo {
+  weekId: string
+  weekTitle: string
+  daysLeft: number
+  hoursLeft: number
+  startDateStr: string
+  endDateStr: string
+}
+
+// Computes the current weekly challenge tournament window (Saturday to Friday cycle)
+export const getWeeklyChallengeInfo = (date = new Date()): WeeklyChallengeInfo => {
+  const day = date.getDay()
+  const diffToSaturday = (day + 1) % 7
+  const saturday = new Date(date)
+  saturday.setDate(date.getDate() - diffToSaturday)
+  saturday.setHours(0, 0, 0, 0)
+
+  const nextFriday = new Date(saturday)
+  nextFriday.setDate(saturday.getDate() + 6)
+  nextFriday.setHours(23, 59, 59, 999)
+
+  const msLeft = Math.max(0, nextFriday.getTime() - date.getTime())
+  const daysLeft = Math.floor(msLeft / (1000 * 60 * 60 * 24))
+  const hoursLeft = Math.floor((msLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+
+  const weekNum = Math.ceil((((saturday.getTime() - new Date(saturday.getFullYear(), 0, 1).getTime()) / 86400000) + 1) / 7)
+  const weekId = `${saturday.getFullYear()}-W${weekNum}`
+
+  const monthsArabic = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+  const startDay = saturday.getDate()
+  const endDay = nextFriday.getDate()
+  const monthName = monthsArabic[nextFriday.getMonth()]
+
+  return {
+    weekId,
+    weekTitle: `تحدي هذا الأسبوع (${startDay} - ${endDay} ${monthName})`,
+    daysLeft,
+    hoursLeft,
+    startDateStr: `${startDay} ${monthsArabic[saturday.getMonth()]}`,
+    endDateStr: `${endDay} ${monthName}`,
+  }
 }
 
 const DEFAULT_LEADERBOARD: LeaderboardEntry[] = []
@@ -423,28 +467,72 @@ export const GameEngine: React.FC = () => {
   const [bossHp, setBossHp] = useState(100)
   const [bannerAlert, setBannerAlert] = useState<{ msg: string; type: 'info' | 'error' | 'success' } | null>(null)
 
-  // Leaderboard state (Starts 100% empty for real winners only)
+  // Leaderboard & Weekly Tournament State (يتجدد كل أسبوع)
+  const weeklyInfo = useMemo(() => getWeeklyChallengeInfo(), [])
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [leaderboardTab, setLeaderboardTab] = useState<'current' | 'previous'>('current')
   const [playerNameInput, setPlayerNameInput] = useState('')
   const [playerCityInput, setPlayerCityInput] = useState('بنغازي')
   const [hasSubmittedScore, setHasSubmittedScore] = useState(false)
+
+  // Current Week's Leaderboard (Resets automatically every week for a new challenge)
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(() => {
     try {
-      const saved = localStorage.getItem('enarah_hero_leaderboard')
-      if (saved) {
-        const parsed = JSON.parse(saved)
+      const info = getWeeklyChallengeInfo()
+      const currentSaved = localStorage.getItem(`enarah_weekly_leaderboard_${info.weekId}`)
+      if (currentSaved) {
+        return JSON.parse(currentSaved)
+      }
+      // Migrate from legacy if exists and clean
+      const legacy = localStorage.getItem('enarah_hero_leaderboard')
+      if (legacy) {
+        const parsed = JSON.parse(legacy)
         const isOldMock = parsed.some((p: any) => p.name === 'م. سفيان العريبي' || p.name === 'أحمد الفيتوري')
-        if (isOldMock) {
-          localStorage.removeItem('enarah_hero_leaderboard')
-          return []
+        if (!isOldMock && parsed.length > 0) {
+          localStorage.setItem(`enarah_weekly_leaderboard_${info.weekId}`, JSON.stringify(parsed))
+          return parsed
         }
-        return parsed
       }
       return []
     } catch {
       return []
     }
   })
+
+  // Previous Week's Leaderboard (Preserves past champions)
+  const [previousWeekBoard, setPreviousWeekBoard] = useState<LeaderboardEntry[]>(() => {
+    try {
+      const prev = localStorage.getItem('enarah_last_week_champions')
+      return prev ? JSON.parse(prev) : []
+    } catch {
+      return []
+    }
+  })
+
+  // Sync with Online Weekly Leaderboard API in background
+  useEffect(() => {
+    fetch(`/api/leaderboard?week=${weeklyInfo.weekId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.entries) && data.entries.length > 0) {
+          setLeaderboard(prev => {
+            const map = new Map<string, LeaderboardEntry>()
+            prev.forEach(item => map.set(`${item.name}_${item.score}`, item))
+            data.entries.forEach((remote: LeaderboardEntry) => {
+              map.set(`${remote.name}_${remote.score}`, remote)
+            })
+            const merged = Array.from(map.values())
+              .sort((a, b) => b.score - a.score || a.timeTakenSec - b.timeTakenSec)
+              .slice(0, 10)
+            try {
+              localStorage.setItem(`enarah_weekly_leaderboard_${weeklyInfo.weekId}`, JSON.stringify(merged))
+            } catch {}
+            return merged
+          })
+        }
+      })
+      .catch(() => {})
+  }, [weeklyInfo.weekId])
 
   // Game Reward Configuration (synced with admin-dashboard.html & MongoDB API)
   const [rewardConfig, setRewardConfig] = useState({
@@ -693,7 +781,7 @@ export const GameEngine: React.FC = () => {
     }, 450)
   }
 
-  // Submit player score to Leaderboard
+  // Submit player score to Weekly Leaderboard
   const handleSubmitLeaderboard = (e: React.FormEvent) => {
     e.preventDefault()
     if (!playerNameInput.trim()) return
@@ -704,7 +792,8 @@ export const GameEngine: React.FC = () => {
       city: playerCityInput.trim() || 'بنغازي',
       score: score,
       timeTakenSec: Math.max(totalPlayTimeSec, 45),
-      date: 'الآن',
+      date: 'هذا الأسبوع',
+      weekKey: weeklyInfo.weekId,
     }
 
     const updated = [newEntry, ...leaderboard]
@@ -714,11 +803,27 @@ export const GameEngine: React.FC = () => {
     setLeaderboard(updated)
     setHasSubmittedScore(true)
     try {
+      localStorage.setItem(`enarah_weekly_leaderboard_${weeklyInfo.weekId}`, JSON.stringify(updated))
       localStorage.setItem('enarah_hero_leaderboard', JSON.stringify(updated))
     } catch {}
 
+    // Submit to online API in background
+    try {
+      fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newEntry.name,
+          city: newEntry.city,
+          score: newEntry.score,
+          timeTakenSec: newEntry.timeTakenSec,
+          weekId: weeklyInfo.weekId,
+        }),
+      }).catch(() => {})
+    } catch {}
+
     sound.playBonusTime()
-    showAlert('🏆 رائع! تم تسجيل اسمك في لوحة شرف أبطال الإنارة الحديثة!', 'success')
+    showAlert('🏆 رائع! تم تسجيل اسمك في لوحة شرف أبطال هذا الأسبوع!', 'success')
   }
 
   // Spawn visual particles
@@ -2423,9 +2528,16 @@ export const GameEngine: React.FC = () => {
             {/* Submit to Leaderboard Form */}
             {!hasSubmittedScore ? (
               <form onSubmit={handleSubmitLeaderboard} className="bg-zinc-900/90 border border-amber-500/40 rounded-2xl p-4 mb-4 max-w-sm w-full text-right shadow-xl">
-                <div className="flex items-center gap-2 text-amber-400 font-bold text-xs mb-3">
-                  <Medal className="w-4 h-4" />
-                  <span>سجّل اسمك الآن في لوحة شرف أبطال الإنارة:</span>
+                <div className="flex items-center justify-between text-amber-400 font-bold text-xs mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                    <span>سجّل اسمك في تحدي هذا الأسبوع:</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-amber-300/80 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-1 mb-2.5">
+                  <span>{weeklyInfo.weekTitle}</span>
+                  <span className="text-[10px] text-emerald-400">ينتهي بعد {weeklyInfo.daysLeft} أيام</span>
                 </div>
 
                 <div className="space-y-2 mb-3">
@@ -2451,13 +2563,13 @@ export const GameEngine: React.FC = () => {
                   className="w-full py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>حفظ في لوحة الشرف الرسمية 🏆</span>
+                  <span>حفظ في لوحة شرف أبطال هذا الأسبوع 🏆</span>
                 </button>
               </form>
             ) : (
               <div className="bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-3.5 mb-4 text-emerald-300 text-xs font-bold flex items-center justify-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span>تم تسجيل نتيجتك بنجاح في لوحة الشرف!</span>
+                <span>تم تسجيل نتيجتك بنجاح في لوحة شرف أبطال هذا الأسبوع!</span>
               </div>
             )}
 
@@ -2523,14 +2635,14 @@ export const GameEngine: React.FC = () => {
       </div>
 
       {/* ==========================================
-          MODAL: LEADERBOARD / HALL OF FAME (لوحة الشرف)
+          MODAL: LEADERBOARD / HALL OF FAME (لوحة الشرف الأسبوعية)
       ========================================== */}
       {showLeaderboard && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#121316] border border-amber-500/40 rounded-3xl w-full max-w-lg p-5 shadow-2xl relative text-right flex flex-col max-h-[85vh]">
+          <div className="bg-[#121316] border border-amber-500/40 rounded-3xl w-full max-w-lg p-5 shadow-2xl relative text-right flex flex-col max-h-[88vh]">
             
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-3">
               <button
                 onClick={() => setShowLeaderboard(false)}
                 className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer"
@@ -2543,67 +2655,157 @@ export const GameEngine: React.FC = () => {
               </div>
             </div>
 
-            {/* Competitors List */}
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-              {leaderboard.length === 0 ? (
-                <div className="py-10 px-4 text-center flex flex-col items-center justify-center">
-                  <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-3 shadow-md animate-pulse">
-                    <Trophy className="w-8 h-8" />
-                  </div>
-                  <h4 className="text-sm sm:text-base font-bold text-white mb-1">لوحة الشرف بانتظار أول بطل! 👑</h4>
-                  <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
-                    العب الآن وانهِ جميع المراحل واهزم وحش الحمل الزائد لتسجل اسمك في المركز الأول وتتصدر لوحة الأبطال!
-                  </p>
+            {/* Weekly Tournament Banner & Countdown */}
+            <div className="bg-gradient-to-r from-amber-950/40 via-zinc-900 to-blue-950/40 border border-amber-500/30 rounded-2xl p-3 mb-3 text-right shadow-md">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>{weeklyInfo.weekTitle}</span>
                 </div>
-              ) : (
-                leaderboard.map((item, idx) => (
-                  <div
-                    key={item.id}
-                    className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
-                      idx === 0
-                        ? 'bg-gradient-to-l from-amber-950/40 to-zinc-900 border-amber-500/50'
-                        : idx === 1
-                        ? 'bg-gradient-to-l from-slate-900 to-zinc-900 border-slate-500/40'
-                        : idx === 2
-                        ? 'bg-gradient-to-l from-amber-950/20 to-zinc-900 border-amber-700/30'
-                        : 'bg-zinc-900/60 border-zinc-800/80'
-                    }`}
-                  >
-                    {/* Score & Time */}
-                    <div className="flex items-center gap-3">
-                      <div className="text-left">
-                        <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
-                        <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
-                      </div>
-                    </div>
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-black/50 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                  <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>ينتهي خلال {weeklyInfo.daysLeft} يوم و {weeklyInfo.hoursLeft} ساعة</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                ⚡ <strong className="text-zinc-300">تحدي أسبوعي متجدد:</strong> يتجدد التحدي وتتصدر أسماء جديدة كل أسبوع لإتاحة فرصة الفوز لجميع الأبطال!
+              </p>
+            </div>
 
-                    {/* Competitor Name & City */}
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-white flex items-center gap-1 justify-end">
-                          <span>{item.name}</span>
-                          {idx === 0 && <span className="text-amber-400">👑</span>}
-                        </div>
-                        <div className="text-[10px] text-zinc-400">{item.city}</div>
-                      </div>
+            {/* Navigation Tabs (This Week vs Previous Week) */}
+            <div className="flex items-center gap-2 mb-3">
+              <button
+                type="button"
+                onClick={() => setLeaderboardTab('current')}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  leaderboardTab === 'current'
+                    ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20'
+                    : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                }`}
+              >
+                <Trophy className="w-3.5 h-3.5" />
+                <span>أبطال هذا الأسبوع</span>
+                <span className="text-[10px] opacity-80">({leaderboard.length})</span>
+              </button>
 
-                      {/* Rank Badge */}
-                      <div
-                        className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs ${
-                          idx === 0
-                            ? 'bg-amber-500 text-black shadow-md'
-                            : idx === 1
-                            ? 'bg-slate-300 text-black'
-                            : idx === 2
-                            ? 'bg-amber-700 text-white'
-                            : 'bg-zinc-800 text-zinc-400'
-                        }`}
-                      >
-                        {idx + 1}
-                      </div>
+              <button
+                type="button"
+                onClick={() => setLeaderboardTab('previous')}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  leaderboardTab === 'previous'
+                    ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20'
+                    : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                }`}
+              >
+                <Medal className="w-3.5 h-3.5" />
+                <span>أبطال الأسبوع الماضي</span>
+                <span className="text-[10px] opacity-80">({previousWeekBoard.length})</span>
+              </button>
+            </div>
+
+            {/* Competitors List */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar min-h-[160px]">
+              {leaderboardTab === 'current' ? (
+                leaderboard.length === 0 ? (
+                  <div className="py-8 px-4 text-center flex flex-col items-center justify-center">
+                    <div className="w-14 h-14 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-2.5 shadow-md animate-pulse">
+                      <Trophy className="w-7 h-7" />
                     </div>
+                    <h4 className="text-sm sm:text-base font-bold text-white mb-1">تحدي هذا الأسبوع بانتظار أول بطل! 👑</h4>
+                    <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
+                      العب الآن واهزم وحش الحمل الزائد لتسجل اسمك في المركز الأول وتتصدر لوحة شرف هذا الأسبوع!
+                    </p>
                   </div>
-                ))
+                ) : (
+                  leaderboard.map((item, idx) => (
+                    <div
+                      key={item.id}
+                      className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
+                        idx === 0
+                          ? 'bg-gradient-to-l from-amber-950/40 to-zinc-900 border-amber-500/50 shadow-md shadow-amber-500/5'
+                          : idx === 1
+                          ? 'bg-gradient-to-l from-slate-900 to-zinc-900 border-slate-500/40'
+                          : idx === 2
+                          ? 'bg-gradient-to-l from-amber-950/20 to-zinc-900 border-amber-700/30'
+                          : 'bg-zinc-900/60 border-zinc-800/80'
+                      }`}
+                    >
+                      {/* Score & Time */}
+                      <div className="flex items-center gap-3">
+                        <div className="text-left">
+                          <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
+                          <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
+                        </div>
+                      </div>
+
+                      {/* Competitor Name & City */}
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="text-xs font-bold text-white flex items-center gap-1 justify-end">
+                            <span>{item.name}</span>
+                            {idx === 0 && <span className="text-amber-400">👑</span>}
+                          </div>
+                          <div className="text-[10px] text-zinc-400">{item.city}</div>
+                        </div>
+
+                        {/* Rank Badge */}
+                        <div
+                          className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs ${
+                            idx === 0
+                              ? 'bg-amber-500 text-black shadow-md shadow-amber-500/30'
+                              : idx === 1
+                              ? 'bg-slate-300 text-black'
+                              : idx === 2
+                              ? 'bg-amber-700 text-white'
+                              : 'bg-zinc-800 text-zinc-400'
+                          }`}
+                        >
+                          {idx + 1}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )
+              ) : (
+                previousWeekBoard.length === 0 ? (
+                  <div className="py-8 px-4 text-center flex flex-col items-center justify-center">
+                    <div className="w-14 h-14 rounded-3xl bg-zinc-800/80 border border-zinc-700 flex items-center justify-center text-zinc-400 mb-2.5">
+                      <Medal className="w-7 h-7" />
+                    </div>
+                    <h4 className="text-sm sm:text-base font-bold text-white mb-1">أبطال الأسبوع الماضي</h4>
+                    <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
+                      يتم حفظ وتوثيق متصدري كل أسبوع هنا تلقائياً عند انتهاء فترة التحدي الحالية وبداية أسبوع جديد.
+                    </p>
+                  </div>
+                ) : (
+                  previousWeekBoard.map((item, idx) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-3 rounded-2xl border bg-zinc-900/60 border-zinc-800/80"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="text-left">
+                          <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
+                          <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="text-xs font-bold text-white flex items-center gap-1 justify-end">
+                            <span>{item.name}</span>
+                            {idx === 0 && <span className="text-amber-400">🏅</span>}
+                          </div>
+                          <div className="text-[10px] text-zinc-400">{item.city}</div>
+                        </div>
+
+                        <div className="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs bg-zinc-800 text-zinc-300">
+                          {idx + 1}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )
               )}
             </div>
 
