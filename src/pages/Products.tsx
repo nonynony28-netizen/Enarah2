@@ -38,69 +38,22 @@ const CATEGORIES_LIST = [
     id: 'cat-discounts',
     nameAr: 'التخفيضات والعروض الخاصة',
     nameEn: 'Special Discounts & Offers',
-    descriptionAr: 'باقات تأسيس شاملة وعروض توفير حصرية على الأسلاك الإيطالية المعتمدة بأفضل الأسعار في ليبيا.',
-    descriptionEn: 'Exclusive discounted bundles and limited-time deals on certified Italian wires and installation materials.',
+    descriptionAr: 'قسم العروض والتخفيضات الخاصة - يتم إدراج وتحديد الأصناف المشمولة بالخصم لاحقاً.',
+    descriptionEn: 'Promotional section - discount items are configured and managed directly.',
     icon: Flame,
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp'
   }
 ]
 
-// 🛒 المنتجات المعتمدة (الأسلاك والكوابل + باقات التخفيضات)
+// 🛒 المنتجات المعتمدة (الأسلاك والكوابل الإيطالية المعتمدة)
 const defaultFallbackProducts: ProductItem[] = [
-  // 🏷️ 1. باقات وعروض قسم التخفيضات
-  {
-    id: 'discount-full-apt-bundle',
-    name: 'باقة التأسيس الشاملة (3 لفات سلك 1.5 مم + 2 لفة 2.5 مم إيطالي معتمد)',
-    description: 'عرض خاص متكامل لتأسيس الشقق والمنازل، نحاس إيطالي أصلي 100% معتمد مع ضمان الجودة وأعلى درجات الأمان.',
-    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
-    price: 1485,
-    discountPrice: 1350,
-    stockStatus: 'available',
-    stockQty: 30,
-    category: 'التخفيضات والعروض الخاصة'
-  },
-  {
-    id: 'discount-duo-pack',
-    name: 'عرض ثنائي التأسيس (لفة 1.5 مم + لفة 2.5 مم إيطالي أصلي)',
-    description: 'باقة التوفير الأساسية للأحمال والإنارة المنزلية من أفضل المصانع الإيطالية المعتمدة مع توفير فوري.',
-    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
-    price: 620,
-    discountPrice: 570,
-    stockStatus: 'available',
-    stockQty: 50,
-    category: 'التخفيضات والعروض الخاصة'
-  },
-  {
-    id: 'discount-heavy-duty-bundle',
-    name: 'باقة الأحمال والمكيفات (لفة 4.0 مم + لفة 6.0 مم إيطالي معتمد)',
-    description: 'تحمل عالي وضغط كهربائي متوازن مخصص لتشغيل المكيفات الكبيرة والأفران والسخانات بأعلى أمان.',
-    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
-    price: 1430,
-    discountPrice: 1340,
-    stockStatus: 'available',
-    stockQty: 25,
-    category: 'التخفيضات والعروض الخاصة'
-  },
-  {
-    id: 'discount-contractor-pack-25',
-    name: 'عرض المقاولين (10 لفات سلك 2.5 مم إيطالي معتمد)',
-    description: 'عرض خاص للكميات والمشاريع الكبيرة، سلك نحاس إلكتروليتي نقي مطابق للمواصفات القياسية الأوروبية.',
-    image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
-    price: 3750,
-    discountPrice: 3450,
-    stockStatus: 'available',
-    stockQty: 15,
-    category: 'التخفيضات والعروض الخاصة'
-  },
-
-  // 🔌 2. مقاسات الأسلاك والكوابل الإيطالية
+  // 🔌 مقاسات الأسلاك والكوابل الإيطالية
   {
     id: 'wire-size-15',
     name: 'سلك كهربائي إيطالي معتمد 1.5 مم (لفة 100 متر)',
     description: 'نحاس صافي 100% عالي النقاء مستورد مباشرة من إيطاليا، مناسب للإنارة والإضاءة العامة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 245,
-    discountPrice: 230,
     stockStatus: 'available',
     stockQty: 150,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
@@ -111,7 +64,6 @@ const defaultFallbackProducts: ProductItem[] = [
     description: 'نحاس صافي 100% عازل للحرارة والكهرباء، مخصص للتأسيس المنزلي والأحمال المتوسطة والبرايز.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 375,
-    discountPrice: 350,
     stockStatus: 'available',
     stockQty: 200,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
@@ -122,7 +74,6 @@ const defaultFallbackProducts: ProductItem[] = [
     description: 'نحاس إلكتروليتي إيطالي صافي 100%، مخصص للمكيفات والأجهزة الكبيرة والأحمال الثقيلة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 585,
-    discountPrice: 550,
     stockStatus: 'available',
     stockQty: 100,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
@@ -133,7 +84,6 @@ const defaultFallbackProducts: ProductItem[] = [
     description: 'سلك نحاسي إيطالي فائق القوة للخطوط المغذية الرئيسية والفرعية والأحمال العالية.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 845,
-    discountPrice: 810,
     stockStatus: 'available',
     stockQty: 80,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
@@ -144,7 +94,6 @@ const defaultFallbackProducts: ProductItem[] = [
     description: 'موصلات نحاسية إيطالية صافية 100% معتمدة للوحات التوزيع والعدادات الرئيسية.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 1350,
-    discountPrice: 1290,
     stockStatus: 'available',
     stockQty: 40,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
@@ -155,7 +104,6 @@ const defaultFallbackProducts: ProductItem[] = [
     description: 'أسلاك إيطالية ثقيلة فائقة النقاء عازلة للضغط العالي مخصصة للتأسيس الصناعي والمباني الضخمة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 1980,
-    discountPrice: 1900,
     stockStatus: 'available',
     stockQty: 25,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
@@ -166,7 +114,6 @@ const defaultFallbackProducts: ProductItem[] = [
     description: 'أسلاك نحاسية إيطالية فائقة النقاء للأحمال والمصانع والعدادات الرئيسية الضخمة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 2950,
-    discountPrice: 2850,
     stockStatus: 'available',
     stockQty: 20,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
@@ -338,10 +285,10 @@ export default function Products() {
                 image: mediaData.imageUrl || 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
                 video: mediaData.videoUrl || '',
                 price: mediaData.price,
-                discountPrice: mediaData.discountPrice,
+                discountPrice: undefined, // إزالة التخفيضات من الأصناف حالياً ليتحكم بها المستخدم
                 stockStatus: mediaData.stockStatus || 'available',
                 stockQty: mediaData.stockQty,
-                category: itemCategory
+                category: 'الأسلاك والكوابل الإيطالية والتركية'
               }
             })
             .filter(isAllowedStoreProduct)
@@ -372,8 +319,7 @@ export default function Products() {
       name: product.name,
       description: product.description,
       image: product.image,
-      price: product.discountPrice && product.price && product.discountPrice < product.price ? product.discountPrice : (product.price || 0),
-      discountPrice: product.discountPrice,
+      price: product.price || 0,
       stockStatus: product.stockStatus,
       stockQty: product.stockQty
     })
@@ -392,19 +338,17 @@ export default function Products() {
     )
   }, [products, searchQuery])
 
-  // 4. تجميع المنتجات حسب الأقسام
+  // 4. تجميع المنتجات حسب الأقسام (خانة التخفيضات فارغة حالياً)
   const categoryGroups = useMemo(() => {
     return CATEGORIES_LIST.map(cat => {
       let items: ProductItem[] = []
       if (cat.id === 'cat-discounts') {
-        items = products.filter(p => p.category === 'التخفيضات والعروض الخاصة' || (p.discountPrice && p.price && p.discountPrice < p.price && (p.name.includes('باقة') || p.name.includes('عرض'))))
-        if (items.length === 0) {
-          items = defaultFallbackProducts.filter(p => p.category === 'التخفيضات والعروض الخاصة')
-        }
+        // خانة التخفيضات فارغة حالياً ليتحكم بها العميل ويضيف الأصناف لاحقاً
+        items = []
       } else {
         items = products.filter(p => p.category !== 'التخفيضات والعروض الخاصة')
         if (items.length === 0) {
-          items = defaultFallbackProducts.filter(p => p.category === 'الأسلاك والكوابل الإيطالية والتركية')
+          items = defaultFallbackProducts
         }
       }
 
@@ -447,8 +391,8 @@ export default function Products() {
           </h1>
           <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
             {isAr 
-              ? 'تصفح قائمة الأسلاك والكوابل المعتمدة وقسم التخفيضات الحصرية بأعلى معايير الجودة وأفضل الأسعار'
-              : 'Browse certified Italian wires, cables, and exclusive discount packages with the best market prices'
+              ? 'تصفح قائمة الأسلاك والكوابل الإيطالية والتركية المعتمدة بأعلى معايير الجودة وأفضل الأسعار'
+              : 'Browse certified Italian and Turkish wires and cables with the highest quality standards and best prices'
             }
           </p>
         </motion.div>
@@ -461,7 +405,7 @@ export default function Products() {
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isAr ? "ابحث عن مقاس السلك أو العرض (مثال: 1.5 مم، 2.5 مم، باقة تأسيس...)" : "Search wire size or bundle (e.g. 1.5mm, 2.5mm, bundle...)"}
+              placeholder={isAr ? "ابحث عن مقاس السلك (مثال: 1.5 مم، 2.5 مم، 4 مم...)" : "Search wire size (e.g. 1.5mm, 2.5mm, 4mm...)"}
               className={`w-full ${isAr ? 'pr-12 pl-12' : 'pl-12 pr-12'} py-3.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all text-sm shadow-sm`}
             />
             {searchQuery && (
@@ -505,6 +449,7 @@ export default function Products() {
                 const isSelected = selectedCategory === catName || selectedCategory === cat.id
                 const IconComponent = cat.icon
                 const isDiscountCat = cat.id === 'cat-discounts'
+                const catItemsCount = categoryGroups.find(c => c.id === cat.id)?.items.length || 0
 
                 return (
                   <button
@@ -521,8 +466,8 @@ export default function Products() {
                     <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : (isDiscountCat ? 'text-amber-500' : 'text-blue-600')}`} />
                     <span>{catName}</span>
                     {isDiscountCat && (
-                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-red-50 text-red-600 border border-red-200 animate-pulse'}`}>
-                        {isAr ? 'خصومات' : 'Offers'}
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
+                        {catItemsCount}
                       </span>
                     )}
                   </button>
@@ -598,7 +543,7 @@ export default function Products() {
                               ? 'bg-amber-50 border-amber-200 text-amber-700'
                               : 'bg-blue-50 border-blue-200 text-blue-700'
                           }`}>
-                            {isAr ? `${catGroup.items.length} عروض متوفرة` : `${catGroup.items.length} offers available`}
+                            {isAr ? `${catGroup.items.length} صنف` : `${catGroup.items.length} items`}
                           </span>
                         </div>
                         <p className="text-slate-500 text-xs mt-1 font-normal">{catDesc}</p>
@@ -607,13 +552,13 @@ export default function Products() {
 
                     {isDiscountCat ? (
                       <a 
-                        href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%B9%D8%B1%D9%88%D8%B6%20%D8%A7%D9%84%D8%AA%D8%AE%D9%81%D9%8A%D8%B6%D8%A7%D8%AA%20%D9%88%D8%A8%D8%A7%D9%82%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AA%D8%A3%D8%B3%D9%8A%D8%B3"
+                        href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D9%88%D8%A7%D9%84%D8%B9%D8%B1%D9%88%D8%B6"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold shadow-md transition-all self-start md:self-auto cursor-pointer"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all self-start md:self-auto cursor-pointer border border-slate-200"
                       >
-                        <Flame className="w-3.5 h-3.5 text-yellow-200" />
-                        <span>{isAr ? 'طلب باقة مخصصة عبر واتساب ←' : 'Custom Bundle on WhatsApp ←'}</span>
+                        <Flame className="w-3.5 h-3.5 text-amber-600" />
+                        <span>{isAr ? 'الاستفسار عن الأسعار عبر واتساب ←' : 'Inquire on WhatsApp ←'}</span>
                       </a>
                     ) : (
                       <Link 
@@ -626,19 +571,36 @@ export default function Products() {
                     )}
                   </div>
 
-                  {/* شبكة البطاقات */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {catGroup.items.map((product) => (
-                      <ProductCard 
-                        key={product.id} 
-                        product={product} 
-                        isAr={isAr} 
-                        onAddToCart={handleAddToCart}
-                        isAdding={addingId === product.id}
-                        onOpenModal={() => setSelectedProduct(product)}
-                      />
-                    ))}
-                  </div>
+                  {/* شبكة البطاقات أو حالة الخانة الفارغة */}
+                  {catGroup.items.length === 0 ? (
+                    <div className="bg-slate-50 border border-dashed border-slate-300 rounded-2xl p-12 text-center my-4">
+                      <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mx-auto mb-3">
+                        <Flame className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-base font-bold text-slate-800 mb-1">
+                        {isAr ? 'لا توجد أصناف في قسم التخفيضات حالياً' : 'No items in the discounts section currently'}
+                      </h3>
+                      <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                        {isAr 
+                          ? 'تم إخلاء خانة التخفيضات مؤقتاً لتتمكن من مراجعة الأصناف وتحديد وتعيين التخفيضات المرغوبة وإدراجها لاحقاً.'
+                          : 'The discounts section is currently empty for reviewing and configuring discount items.'
+                        }
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {catGroup.items.map((product) => (
+                        <ProductCard 
+                          key={product.id} 
+                          product={product} 
+                          isAr={isAr} 
+                          onAddToCart={handleAddToCart}
+                          isAdding={addingId === product.id}
+                          onOpenModal={() => setSelectedProduct(product)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </section>
               )
             })}
@@ -842,8 +804,6 @@ function ProductCard({
   isAdding: boolean
   onOpenModal: () => void
 }) {
-  const hasDiscount = product.discountPrice && product.price && product.discountPrice < product.price
-
   return (
     <motion.div 
       onClick={onOpenModal}
@@ -860,14 +820,6 @@ function ProductCard({
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0" 
           onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} 
         />
-
-        {/* شارة التخفيض المميزة */}
-        {hasDiscount && (
-          <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-amber-600 to-red-600 px-2.5 py-0.5 rounded-full text-[10px] text-white font-bold shadow-md flex items-center gap-1">
-            <Flame className="w-3 h-3 text-yellow-200 animate-pulse" />
-            <span>{isAr ? `وفر ${(product.price! - product.discountPrice!).toFixed(0)} د.ل` : `Save ${(product.price! - product.discountPrice!).toFixed(0)} LYD`}</span>
-          </div>
-        )}
 
         {/* شارة التوفر */}
         {product.stockStatus === 'out_of_stock' ? (
@@ -897,13 +849,8 @@ function ProductCard({
             <span className="text-[10px] text-slate-400 block">{isAr ? 'السعر' : 'Price'}</span>
             <div className="flex items-baseline gap-2">
               <span className="text-base font-bold text-slate-900">
-                {hasDiscount ? `${product.discountPrice} د.ل` : (product.price ? `${product.price} د.ل` : (isAr ? 'حسب القياس' : 'On Request'))}
+                {product.price ? `${product.price} د.ل` : (isAr ? 'حسب القياس' : 'On Request')}
               </span>
-              {hasDiscount && (
-                <span className="text-xs text-slate-400 line-through">
-                  {product.price} د.ل
-                </span>
-              )}
             </div>
           </div>
 
