@@ -21,6 +21,7 @@ const Blog = lazy(() => import('./pages/Blog'))
 const WirePrices = lazy(() => import('./pages/WirePrices'))
 const Contractors = lazy(() => import('./pages/Contractors'))
 const Game = lazy(() => import('./pages/Game'))
+const HomeCleanWhitePreview = lazy(() => import('./pages/HomeCleanWhitePreview'))
 
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   return <div className="w-full">{children}</div>
@@ -138,10 +139,13 @@ function App() {
             <Route path="/branches" element={<PageTransition><Branches /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           </Route>
+
+          {/* 👈 مسار المعاينة المعمارية البيضاء النظيفة بالكامل (Clean White Architecture) */}
+          <Route path="/preview" element={<PageTransition><HomeCleanWhitePreview /></PageTransition>} />
         </Routes>
       </Suspense>
 
-      {!isGamePage && (
+      {!isGamePage && location.pathname !== '/preview' && (
         <>
           <WhatsAppButton />
           <AIChatWidget />
