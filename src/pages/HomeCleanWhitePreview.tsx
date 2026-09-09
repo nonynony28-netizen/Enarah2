@@ -1338,21 +1338,13 @@ export default function HomeCleanWhitePreview() {
               </div>
 
               {/* أزرار الإجراءات التفاعلية */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3">
                 <Link 
                   to="/products"
-                  className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-blue-600/30 active:scale-95 text-center"
+                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-blue-600/30 hover:scale-[1.02] active:scale-95 text-center"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
-                </Link>
-
-                <Link 
-                  to="/wire-prices"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm transition-all duration-200 border border-slate-300 active:scale-95 text-center shadow-sm"
-                >
-                  <TrendingUp className="w-4 h-4 text-emerald-600" />
-                  <span>{isAr ? 'جدول أسعار الأسلاك المحدث' : 'Live Price Table'}</span>
                 </Link>
               </div>
 
