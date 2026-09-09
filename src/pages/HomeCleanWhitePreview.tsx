@@ -380,11 +380,6 @@ export default function HomeCleanWhitePreview() {
                 transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 className="max-w-4xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
               >
-                {/* شارة توجيهية زرقاء بارزة */}
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/90 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-600/40 backdrop-blur-md mb-4 border border-blue-400/40">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isAr ? 'الإنارة الحديثة • بنغازي وليبيا' : 'Modern Lighting • Benghazi & Libya'}</span>
-                </div>
 
                 <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
                   <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.8)]">{t('hero.title.part1')}</span>{' '}
