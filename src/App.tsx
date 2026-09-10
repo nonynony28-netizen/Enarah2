@@ -52,6 +52,7 @@ function App() {
   useEffect(() => {
     if (!showSplash) {
       if (typeof window !== 'undefined') {
+        document.body.style.backgroundColor = '#f8fafc';
         window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
       }
       return;
@@ -60,6 +61,7 @@ function App() {
     const timer = setTimeout(() => {
       setShowSplash(false);
       if (typeof window !== 'undefined') {
+        document.body.style.backgroundColor = '#f8fafc';
         window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
       }
     }, 2650);

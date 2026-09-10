@@ -692,7 +692,7 @@ export default function Home() {
                 defaultMuted
                 playsInline
                 webkit-playsinline="true"
-                preload="auto"
+                preload="metadata"
                 poster="/poster.jpg"
                 onLoadedMetadata={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}
                 onCanPlay={(e) => { e.currentTarget.muted = true; e.currentTarget.play().catch(() => {}); }}

@@ -103,7 +103,7 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
         defaultMuted
         playsInline
         webkit-playsinline="true"
-        preload="auto"
+        preload="metadata"
         className="absolute inset-0 w-full h-full object-cover z-0 brightness-100 will-change-transform transform-gpu"
         style={{ transform: "translateZ(0)" }}
         onEnded={() => {
