@@ -9,7 +9,8 @@ import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
-  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone, Gamepad2
+  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone, Gamepad2,
+  Layers, ImagePlus
 } from 'lucide-react'
 
 type ProjectItem = { id: string; name: string; description: string; image: string; coverImage: string; video?: string; category: string }
@@ -589,6 +590,207 @@ export default function Home() {
                 <span>{isAr ? 'خدمة واستشارات' : 'Consultation & Support'}</span>
                 <span className="text-blue-600 font-black text-sm">{isAr ? 'مجاناً 100%' : '100% Free'}</span>
               </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 2.5 قسم شركة الإنارة - لتجارة وتصنيع مواد التأسيس الكهربائي والاضاءات (منذ 1988) */}
+      <section id="company-enarah" className="py-16 md:py-24 relative overflow-hidden bg-white border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* الحاوية المعمارية الفاخرة للشركة */}
+          <div className="bg-gradient-to-b from-slate-50/90 via-white to-slate-50/50 border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm relative overflow-hidden">
+            
+            {/* لمسات إضاءة خفيفة في الخلفية */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-emerald-500/5 via-orange-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+            {/* الجزء الرئيسي: الشعار الرسمي + بطاقة التعريف التاريخية */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-12 relative z-10">
+              
+              {/* عمود الشعار الدائري للشركة */}
+              <div className="lg:col-span-4 flex flex-col items-center text-center">
+                <div className="relative group">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-white border-2 border-slate-200 shadow-md p-3 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105">
+                    <img 
+                      src="/images/company-enarah-logo.jpg" 
+                      alt="شعار شركة الإنارة - ENARAH" 
+                      className="w-full h-full object-contain rounded-full"
+                    />
+                  </div>
+                  {/* شارة سنة التأسيس */}
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
+                    {isAr ? 'تأسست عام 1988' : 'EST. 1988'}
+                  </div>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <span className="inline-block text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full mb-1.5">
+                    {isAr ? 'ريادة وموثوقية في السوق الليبي' : 'Pioneering in Libya'}
+                  </span>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {isAr ? 'أكثر من ثلاثة عقود من الخبرة والتطوير' : 'Over 3 Decades of Excellence'}
+                  </p>
+                </div>
+              </div>
+
+              {/* عمود البيانات والنصوص الرسمية */}
+              <div className="lg:col-span-8 space-y-5 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-bold">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{isAr ? 'الريادة والتصنيع المحلي' : 'Pioneering & Manufacturing'}</span>
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-snug">
+                  {isAr ? 'شركة الإنارة' : 'ENARAH Company'}
+                  <span className="block text-base sm:text-lg md:text-xl font-bold text-blue-600 mt-1.5">
+                    {isAr ? 'لتجارة وتصنيع مواد التأسيس الكهربائي والاضاءات المختلفة' : 'For Electrical Installation Materials & Lighting Trading & Manufacturing'}
+                  </span>
+                </h2>
+
+                <div className="space-y-4 text-slate-700 leading-relaxed text-sm sm:text-base font-normal">
+                  <p className="p-4 sm:p-5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-xs">
+                    {isAr 
+                      ? 'شركة الإنارة لتجارة وتصنيع  مواد التأسيس الكهربائي والاضاءات المختلفة، إحدى الشركات الرائدة في السوق الليبي منذ تأسيسها عام 1988.'
+                      : 'Enarah Company for trading and manufacturing electrical foundation materials and various lightings, one of the leading companies in the Libyan market since its establishment in 1988.'}
+                  </p>
+                  <p className="p-4 sm:p-5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-xs">
+                    {isAr 
+                      ? 'نمتلك خبرة طويلة في مجال استيراد وتصنيع وتوزيع المنتجات الكهربائية، ونحرص دائمًا على توفير أحدث المنتجات ذات الجودة العالية التي تلبي احتياجات السوق الليبي. على مدار أكثر من ثلاثة عقود، بنينا شبكة واسعة من الفروع ونقاط التوزيع في مختلف المدن الليبية، مما مكّننا من خدمة عملائنا بسرعة وكفاءة وموثوقية عالية. كما نفخر بكوننا موزعين ووكلاء لعدد من العلامات التجارية العالمية المعروفة في مجال الإنارة والتجهيزات الكهربائية.'
+                      : 'We have extensive experience in importing, manufacturing, and distributing electrical products, always ensuring modern high-quality products meeting Libyan market demands. Across over three decades, we established a widespread network of branches and distribution centers in various Libyan cities, serving our clients with speed, efficiency, and reliability. We are also proud distributors and agents for world-renowned international brands in lighting and electrical equipment.'}
+                  </p>
+                </div>
+
+                {/* كروت الأرقام والمزايا الرئيسية */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-base sm:text-lg font-black text-slate-900">+36</span>
+                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'عاماً من الخبرة' : 'Years Experience'}</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-base sm:text-lg font-black text-emerald-600">1988</span>
+                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'سنة التأسيس' : 'Established'}</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-base sm:text-lg font-black text-blue-600">{isAr ? 'فروع ليبيا' : 'Libya Branches'}</span>
+                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'تغطية شاملة' : 'Nationwide'}</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-base sm:text-lg font-black text-orange-500">100%</span>
+                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'وكلاء وموزعون' : 'Certified Agency'}</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* قسم معرض منتجات الشركة المخصص لإضافة صور المنتجات */}
+            <div className="pt-8 border-t border-slate-200 relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-blue-600" />
+                    <span>{isAr ? 'منتجات وتجهيزات شركة الإنارة' : 'ENARAH Products & Offerings'}</span>
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                    {isAr ? 'تشكيلات ومواد تأسيس وإضاءات كهربائية متوافقة مع أرقى المعايير والمواصفات' : 'Electrical foundation materials and lighting assemblies complying with highest standards'}
+                  </p>
+                </div>
+                <div className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg w-fit">
+                  {isAr ? 'مجال مخصص لإضافة وتحديث صور المنتجات 📷' : 'Dedicated Area for Product Photos 📷'}
+                </div>
+              </div>
+
+              {/* شبكة كروت المنتجات الجاهزة للعرض والإضافة */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                {/* كارت 1: كابلات وأسلاك التأسيس */}
+                <div className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-md transition-all flex flex-col">
+                  <div className="h-44 bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                    <img 
+                      src="/images/cat-cables.jpg" 
+                      alt="كابلات وأسلاك شركة الإنارة" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-2.5 right-2.5 bg-slate-900/85 text-white text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-xs">
+                      {isAr ? 'مواد تأسيس' : 'Foundation'}
+                    </div>
+                  </div>
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-blue-600 transition-colors">
+                      {isAr ? 'كابلات وأسلاك التأسيس الكهربائي' : 'Electrical Foundation Cables & Wires'}
+                    </h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {isAr ? 'أسلاك نحاسية معتمدة ومقاومة للحرارة تلبي متطلبات المشاريع السكنية والتجارية.' : 'Certified heat-resistant copper wires for residential and commercial projects.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* كارت 2: الإضاءات والسبوت لايت */}
+                <div className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-md transition-all flex flex-col">
+                  <div className="h-44 bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                    <img 
+                      src="/images/cat-spotlight.jpg" 
+                      alt="حلول الإضاءة المختلفة" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-2.5 right-2.5 bg-slate-900/85 text-white text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-xs">
+                      {isAr ? 'إنارة معمارية' : 'Lighting'}
+                    </div>
+                  </div>
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-blue-600 transition-colors">
+                      {isAr ? 'الإضاءات والسبوت لايت المتطورة' : 'Advanced Lighting & Spotlights'}
+                    </h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {isAr ? 'تشكيلات إضاءة داخلية وديكورية وخارجية موفرة للطاقة بتصاميم حديثة ومريحة.' : 'Energy-efficient modern indoor and outdoor decorative lighting fixtures.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* كارت 3: المفاتيح والبريزات ومستلزمات التركيب */}
+                <div className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-md transition-all flex flex-col">
+                  <div className="h-44 bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                    <img 
+                      src="/images/cat-ledprofile.jpg" 
+                      alt="مستلزمات التجهيزات الكهربائية" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-2.5 right-2.5 bg-slate-900/85 text-white text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-xs">
+                      {isAr ? 'تجهيزات ومفاتيح' : 'Switches'}
+                    </div>
+                  </div>
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-blue-600 transition-colors">
+                      {isAr ? 'المفاتيح والبريزات ومستلزمات التركيب' : 'Switches, Sockets & Fittings'}
+                    </h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {isAr ? 'مستلزمات توصيل وقواطع آمنة ومفاتيح كهربائية بأعلى معايير الحماية والأمان.' : 'Safe circuit accessories, breakers, and high-protection electrical fittings.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* كارت 4: خانة مخصصة ومهيأة لإضافة صور جديدة لمنتجات شركة الإنارة */}
+                <div className="border-2 border-dashed border-blue-200 hover:border-blue-400 rounded-2xl p-6 bg-blue-50/20 hover:bg-blue-50/40 transition-all flex flex-col items-center justify-center text-center group min-h-[260px]">
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-blue-200 flex items-center justify-center text-blue-600 shadow-xs mb-3 group-hover:scale-110 transition-transform">
+                    <ImagePlus className="w-7 h-7" />
+                  </div>
+                  <span className="text-xs font-bold text-blue-700 mb-1">
+                    {isAr ? 'مساحة مخصصة للصور الجديدة' : 'Slot for Additional Photos'}
+                  </span>
+                  <p className="text-[11px] text-slate-500 max-w-[200px] leading-relaxed">
+                    {isAr ? 'جاهزة لإدراج صور إضافية لمنتجات وتصنيع شركة الإنارة فور تزويدنا بها.' : 'Ready to showcase new Enarah product photos as soon as uploaded.'}
+                  </p>
+                  <div className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                    <span>{isAr ? 'جاهز للإضافة والتوسعة' : 'Ready for upload'}</span>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
 
           </div>
