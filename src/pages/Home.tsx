@@ -421,7 +421,7 @@ export default function Home() {
           <div className="text-center mb-14 md:mb-18">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-4 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>{isAr ? 'معايير الجودة والقوة التشغيلية' : 'Quality & Operational Strength'}</span>
+              <span>{isAr ? 'الثقة والجودة في مكان واحد' : 'Trust & Quality in One Place'}</span>
             </div>
 
             <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-slate-900">
