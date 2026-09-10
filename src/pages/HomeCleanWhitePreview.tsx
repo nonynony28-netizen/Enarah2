@@ -447,147 +447,147 @@ export default function HomeCleanWhitePreview() {
           {/* شبكة البطاقات الثلاث الموحدة بتنظيم هندسي متناسق */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10 items-stretch">
             
-            {/* البطاقة الأولى: وكلاء حصريون لشركات عالمية */}
-            <div className="relative p-7 sm:p-8 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full">
+            {/* البطاقة الأولى: وكالات عالمية حصرية */}
+            <div className="relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full hover:-translate-y-1">
               <div>
-                <div className="flex items-center justify-between gap-2 mb-6">
-                  <span className="px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wider">
-                    {isAr ? 'وكالة رسمية معتمدة' : 'Official Exclusive Agency'}
+                <div className="flex items-center justify-between gap-2 mb-5">
+                  <span className="px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-bold">
+                    {isAr ? 'وكالة رسمية معتمدة' : 'Official Agency'}
                   </span>
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/60 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
                     <Globe className="w-5 h-5" />
                   </div>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'وكلاء حصريون لشركات عالمية' : 'Exclusive Agents for Global Brands'}
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors">
+                  {isAr ? 'وكالات عالمية حصرية' : 'Exclusive Global Agencies'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[42px]">
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-5 font-normal">
                   {isAr 
-                    ? 'منتجات أصلية ومباشرة من كبرى المصانع العالمية نحن وكلاؤها الحصريون لضمان أعلى معايير الجودة والأصالة.' 
-                    : 'Certified original products directly from leading global brands for which we serve as exclusive agents.'}
+                    ? 'استيراد وتوريد مباشر من كبرى المصانع العالمية مع ضمان أصالة 100%.' 
+                    : 'Direct import from leading international manufacturers with 100% guaranteed authenticity.'}
                 </p>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-2.5 mb-6">
                   {(isAr ? [
-                    'منتجات أصلية 100% نحن وكلاؤها الحصريون في ليبيا.',
-                    'استيراد وتوريد مباشر من المصانع العالمية المعتمدة.',
-                    'تنوع واسع في العلامات التجارية يلبي كافة المشاريع.',
-                    'شفافية كاملة ومواصفات فنية موثوقة ومطابقة للمعايير.'
+                    'منتجات أصلية 100% معتمدة رسمياً في ليبيا',
+                    'استيراد مباشر من المصانع الأوروبية المعتمدة',
+                    'تنوع شامل يلبي أرقى المعايير والمشاريع'
                   ] : [
-                    '100% authentic products with exclusive agency in Libya.',
-                    'Direct import from certified international factories.',
-                    'Wide brand diversity meeting all project requirements.',
-                    'Complete transparency and certified European standards.'
+                    '100% certified authentic products in Libya',
+                    'Direct import from certified European factories',
+                    'Comprehensive range meeting the highest standards'
                   ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <div key={idx} className="flex items-center gap-2.5">
+                      <div className="w-5 h-5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-blue-600 stroke-[3]" />
+                      </div>
                       <span className="text-xs sm:text-sm text-slate-700 font-medium leading-snug">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'أصالة واعتماد المنتجات' : 'Product Authenticity'}</span>
-                <span className="text-blue-600 font-black text-base">100%</span>
+              <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
+                <span>{isAr ? 'الأصالة والاعتماد' : 'Authenticity & Certification'}</span>
+                <span className="text-blue-600 font-black text-sm">{isAr ? '100% مضمون' : '100% Guaranteed'}</span>
               </div>
             </div>
 
-            {/* البطاقة الثانية: كميات كبيرة وتوريد للشركات والمقاولين والمحلات */}
-            <div className="relative p-7 sm:p-8 rounded-2xl bg-white border border-blue-300 hover:border-blue-600 shadow-sm hover:shadow-xl hover:shadow-blue-500/15 flex flex-col justify-between group transition-all duration-300 h-full ring-1 ring-blue-100">
+            {/* البطاقة الثانية: توريد كبرى المشاريع والجملة (البطاقة البارزة) */}
+            <div className="relative p-6 sm:p-7 rounded-2xl bg-white border-2 border-blue-600 shadow-md hover:shadow-2xl hover:shadow-blue-500/15 flex flex-col justify-between group transition-all duration-300 h-full hover:-translate-y-1.5 ring-4 ring-blue-50">
               <div>
-                <div className="flex items-center justify-between gap-2 mb-6">
-                  <span className="px-3.5 py-1 rounded-full bg-blue-600 text-white text-xs font-bold tracking-wider shadow-sm">
-                    {isAr ? 'توريد تجاري ومشاريع' : 'Commercial & Project Supply'}
+                <div className="flex items-center justify-between gap-2 mb-5">
+                  <span className="px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold tracking-wide shadow-sm">
+                    {isAr ? 'توريد تجاري ومشاريع' : 'Commercial Supply'}
                   </span>
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'كميات كبيرة وتوريد للشركات والمقاولين والمحلات' : 'Bulk Supply for Companies, Contractors & Retail'}
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors">
+                  {isAr ? 'توريد كبرى المشاريع والجملة' : 'Bulk & Project Supply'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[42px]">
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-5 font-normal">
                   {isAr 
-                    ? 'جاهزية تامة لتجهيز المشاريع الكبرى وتوفير كميات ضخمة ومستمرة لكافة الشركات الهندسية والمقاولين ومحلات المواد الكهربائية.' 
-                    : 'Full readiness to supply major projects and continuous bulk volumes directly to companies, contractors, and retail shops.'}
+                    ? 'تجهيز فوري وشامل لطلبيات المقاولين والشركات ومحلات الكهرباء.' 
+                    : 'Immediate comprehensive fulfillment for contractors, companies, and retail shops.'}
                 </p>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-2.5 mb-6">
                   {(isAr ? [
-                    'توفير كميات كبيرة وتوريد فوري للشركات والمقاولين والمحلات.',
-                    'كابلات وأسلاك إيطالية وتركية بأعلى تقنيات الأمان والعزل.',
-                    'تجهيز كامل للمشاريع السكنية والتجارية والمخططات الهندسية.',
-                    'حلول تأسيس وإنارة ديكورية ومعمارية متكاملة تحت سقف واحد.'
+                    'أسعار جملة تنافسية لكبار المقاولين والمحلات',
+                    'أسلاك وكابلات إيطالية بأعلى مواصفات الأمان',
+                    'تجهيز كامل للمخططات السكنية والتجارية'
                   ] : [
-                    'Bulk volume supply for companies, contractors and retail.',
-                    'Certified Italian and Turkish wires with high thermal safety.',
-                    'Full project provisioning for residential & commercial sites.',
-                    'Comprehensive decorative & architectural lighting under one roof.'
+                    'Competitive wholesale pricing for contractors & shops',
+                    'Certified Italian wires with top thermal safety',
+                    'Full provisioning for residential & commercial sites'
                   ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                      <span className="text-xs sm:text-sm text-slate-700 font-medium leading-snug">{feat}</span>
+                    <div key={idx} className="flex items-center gap-2.5">
+                      <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                        <Check className="w-3 h-3 text-white stroke-[3]" />
+                      </div>
+                      <span className="text-xs sm:text-sm text-slate-800 font-bold leading-snug">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'جاهزية التوريد والكميات' : 'Bulk Supply Readiness'}</span>
-                <span className="text-blue-600 font-black text-base">100%</span>
+              <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
+                <span>{isAr ? 'جاهزية المستودعات' : 'Warehouse Readiness'}</span>
+                <span className="text-blue-600 font-black text-sm">{isAr ? 'كميات متوفرة دائماً' : 'Always in Stock'}</span>
               </div>
             </div>
 
-            {/* البطاقة الثالثة: دعم فني واستشارات مجاناً */}
-            <div className="relative p-7 sm:p-8 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full">
+            {/* البطاقة الثالثة: استشارات ودعم هندسي مجاناً (بدون حاسبة أحمال) */}
+            <div className="relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full hover:-translate-y-1">
               <div>
-                <div className="flex items-center justify-between gap-2 mb-6">
-                  <span className="px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wider">
+                <div className="flex items-center justify-between gap-2 mb-5">
+                  <span className="px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-bold">
                     {isAr ? 'استشارات ودعم فني' : 'Technical Support'}
                   </span>
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/60 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
                     <Phone className="w-5 h-5" />
                   </div>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'دعم فني واستشارات مجاناً' : 'Fast Sales Support & Consultations'}
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors">
+                  {isAr ? 'استشارات ودعم هندسي مجاناً' : 'Free Engineering Support'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[42px]">
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-5 font-normal">
                   {isAr 
-                    ? 'فريقنا متواجد دائماً لمساعدتك في اختيار المنتجات المناسبة وتوفير الكميات وحساب أحمال الكهرباء بدقة.' 
-                    : 'Our team is available to help you select products, request custom volumes, and calculate electrical loads accurately.'}
+                    ? 'فريقنا متواجد دائماً لإرشادك لاختيار المنتجات المناسبة وتجهيز طلبيتك بأفضل جودة.' 
+                    : 'Our team is always available to guide you to the right products and prepare your order.'}
                 </p>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-2.5 mb-6">
                   {(isAr ? [
-                    'فريق مهندسين وفنيين لإجابة كافة استفساراتك الهندسية.',
-                    'حساب الأحمال والكميات المطلوبة بدقة لمنع أي هدر مالي.',
-                    'متابعة مستمرة وتنسيق مباشر حتى وصول طلبك بأمان.',
-                    'توصيل سريع ومضمون لكافة المدن ومواقع العمل.'
+                    'إرشاد فني متخصص لاختيار أفضل المنتجات والكميات',
+                    'اقتراح حلول الإنارة المعمارية والديكورية المناسبة',
+                    'متابعة وتنسيق مباشر وتوصيل سريع لموقع العمل'
                   ] : [
-                    'Dedicated specialists to answer all your technical queries.',
-                    'Accurate calculation of loads and quantities preventing waste.',
-                    'Continuous order tracking and coordination until delivery.',
-                    'Fast and guaranteed delivery to all project sites.'
+                    'Specialized technical guidance for ideal products & quantities',
+                    'Curated architectural & decorative lighting solutions',
+                    'Direct coordination and fast delivery to your job site'
                   ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <div key={idx} className="flex items-center gap-2.5">
+                      <div className="w-5 h-5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-blue-600 stroke-[3]" />
+                      </div>
                       <span className="text-xs sm:text-sm text-slate-700 font-medium leading-snug">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'استجابة واستشارات فورية' : '24/7 Support & Response'}</span>
-                <span className="text-blue-600 font-black text-base">24/7</span>
+              <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 mt-auto">
+                <span>{isAr ? 'خدمة واستشارات' : 'Consultation & Support'}</span>
+                <span className="text-blue-600 font-black text-sm">{isAr ? 'مجاناً 100%' : '100% Free'}</span>
               </div>
             </div>
 
