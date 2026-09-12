@@ -614,7 +614,7 @@ export default function Home() {
               {/* عمود الشعار الدائري للشركة */}
               <div className="lg:col-span-4 flex flex-col items-center text-center">
                 <div className="relative group">
-                  <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-white border-2 border-slate-200 shadow-md p-3 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105">
+                  <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-full bg-white border-2 border-slate-200 shadow-md p-2.5 sm:p-3 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105">
                     <img 
                       src="/images/company-enarah-logo.jpg" 
                       alt="شعار شركة الإنارة - ENARAH" 
@@ -622,36 +622,24 @@ export default function Home() {
                     />
                   </div>
                   {/* شارة سنة التأسيس */}
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-xs font-black px-4 py-1 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
                     {isAr ? 'تأسست عام 1988' : 'EST. 1988'}
                   </div>
-                </div>
-
-                <div className="mt-6 text-center">
-                  <span className="inline-block text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full mb-1.5">
-                    {isAr ? 'ريادة وموثوقية في السوق الليبي' : 'Pioneering in Libya'}
-                  </span>
-                  <p className="text-xs text-slate-500 font-medium">
-                    {isAr ? 'أكثر من ثلاثة عقود من الخبرة والتطوير' : 'Over 3 Decades of Excellence'}
-                  </p>
                 </div>
               </div>
 
               {/* عمود البيانات والنصوص الرسمية */}
-              <div className="lg:col-span-8 space-y-5 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+              <div className="lg:col-span-8 space-y-4 text-center lg:text-right" dir={isAr ? 'rtl' : 'ltr'}>
                 <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-bold">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isAr ? 'الريادة والتصنيع المحلي' : 'Pioneering & Manufacturing'}</span>
+                  <span>{isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}</span>
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-snug">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
                   {isAr ? 'شركة الإنارة' : 'ENARAH Company'}
-                  <span className="block text-base sm:text-lg md:text-xl font-bold text-blue-600 mt-1.5">
-                    {isAr ? 'لتجارة وتصنيع مواد التأسيس الكهربائي والاضاءات المختلفة' : 'For Electrical Installation Materials & Lighting Trading & Manufacturing'}
-                  </span>
                 </h2>
 
-                <div className="space-y-4 text-slate-700 leading-relaxed text-sm sm:text-base font-normal">
+                <div className="space-y-3.5 text-slate-700 leading-relaxed text-sm sm:text-base font-normal text-right">
                   <p className="p-4 sm:p-5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-xs">
                     {isAr 
                       ? 'شركة الإنارة لتجارة وتصنيع  مواد التأسيس الكهربائي والاضاءات المختلفة، إحدى الشركات الرائدة في السوق الليبي منذ تأسيسها عام 1988.'
