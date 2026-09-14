@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Sparkles, ImagePlus, CheckCircle2, SlidersHorizontal } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Sparkles, ImagePlus, SlidersHorizontal } from 'lucide-react'
 
 export interface EnarahProductItem {
   id: string
@@ -225,12 +225,8 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               </div>
 
               {/* شريط الحالة السفلي */}
-              <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span className="inline-flex items-center gap-1 font-semibold text-slate-600">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>{isAr ? 'شركة الإنارة' : 'ENARAH'}</span>
-                </span>
-                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+              <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-end text-[11px]">
+                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100/80">
                   {isAr ? product.tagAr : product.tagEn}
                 </span>
               </div>
