@@ -186,26 +186,26 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
         {ENARAH_PRODUCTS.map((product) => (
           <div
             key={product.id}
-            className={`w-[270px] sm:w-[310px] shrink-0 snap-start bg-white border rounded-2xl overflow-hidden transition-all duration-300 flex flex-col group ${
+            className={`w-[280px] sm:w-[320px] shrink-0 snap-start bg-white border rounded-2xl overflow-hidden transition-all duration-300 flex flex-col group ${
               product.isPending 
                 ? 'border-slate-200/80 hover:border-blue-300 hover:shadow-md' 
-                : 'border-slate-200 hover:border-blue-400 hover:shadow-lg shadow-xs hover:-translate-y-1'
+                : 'border-slate-200 hover:border-blue-500 hover:shadow-xl shadow-xs hover:-translate-y-1'
             }`}
           >
-            {/* حاوية الصورة الفاخرة */}
-            <div className="h-44 sm:h-48 bg-slate-50 relative overflow-hidden flex items-center justify-center p-3 border-b border-slate-100">
+            {/* حاوية الصورة الفاخرة بحجم كامل يملأ الإطار */}
+            <div className="h-52 sm:h-60 w-full bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
               <img
                 src={product.image}
                 alt={isAr ? product.titleAr : product.titleEn}
-                className={`w-full h-full object-contain transition-transform duration-500 group-hover:scale-105 ${
+                className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-108 ${
                   product.isPending ? 'opacity-85 filter contrast-90' : ''
                 }`}
                 loading="lazy"
               />
 
-              {/* شارة التصنيف العلوية */}
-              <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-xs text-slate-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs border border-slate-200/80 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+              {/* شارة التصنيف العلوية الفاخرة */}
+              <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-slate-800 text-[11px] font-bold px-3 py-1 rounded-full shadow-md border border-slate-200/80 flex items-center gap-1.5 z-10">
+                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
                 <span>{isAr ? product.categoryAr : product.categoryEn}</span>
               </div>
 
