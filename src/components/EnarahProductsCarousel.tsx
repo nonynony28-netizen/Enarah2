@@ -203,11 +203,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
                 loading="lazy"
               />
 
-              {/* شارة التصنيف العلوية الفاخرة المدمجة */}
-              <div className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-md text-slate-800 text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-slate-200/80 flex items-center gap-1.5 z-10">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                <span>{isAr ? product.categoryAr : product.categoryEn}</span>
-              </div>
+
 
               {/* وسم حالة الصورة */}
               {product.isPending && (
