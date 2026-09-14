@@ -20,8 +20,8 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     id: 'spotlights',
     titleAr: 'سبوتلايت بأشكاله المختلفة',
     titleEn: 'Diverse Architectural Spotlights',
-    categoryAr: 'إنارة معمارية LED',
-    categoryEn: 'Architectural Lighting',
+    categoryAr: 'SPOTLIGHT',
+    categoryEn: 'SPOTLIGHT',
     descAr: 'تشكيلات غاطسة وظاهرة بأحدث تقنيات LED وتصاميم هندسية عصرية تلبي متطلبات الديكور الراقي.',
     descEn: 'Recessed and surface-mounted modern LED designs for luxury interior spaces.',
     image: '/images/product-spotlights.png',
@@ -203,9 +203,9 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
                 loading="lazy"
               />
 
-              {/* شارة التصنيف العلوية الفاخرة */}
-              <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-slate-800 text-[11px] font-bold px-3 py-1 rounded-full shadow-md border border-slate-200/80 flex items-center gap-1.5 z-10">
-                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+              {/* شارة التصنيف العلوية الفاخرة المدمجة */}
+              <div className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-md text-slate-800 text-[10px] font-extrabold tracking-wider px-2.5 py-0.5 rounded-full shadow-sm border border-slate-200/80 flex items-center gap-1.5 z-10 uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                 <span>{isAr ? product.categoryAr : product.categoryEn}</span>
               </div>
 
