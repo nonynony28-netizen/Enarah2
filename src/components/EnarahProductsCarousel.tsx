@@ -22,8 +22,8 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'Diverse Architectural Spotlights',
     categoryAr: 'سبوت لايت',
     categoryEn: 'Spotlight',
-    descAr: 'تشكيلة متكاملة من سبوت لايت LED: إطارات أنيقة، لمبات مستقلة، وعدسات مانعة للتوهج مع ميزة توجيه الإضاءة.',
-    descEn: 'Comprehensive LED spotlight solutions: stylish frames, standalone bulbs, anti-glare optics, and directional lighting.',
+    descAr: 'تصنيع شركة الإنارة: سبوت لايت LED منفصل تماماً عن الإطار، مع توفير إطارات متنوعة، لمبات مستقلة، وخيارات مانعة للتوهج وموجهة للإضاءة.',
+    descEn: 'ENARAH Manufacturing: LED spotlights engineered separate from fixtures, offering standalone bulbs, modular frames, anti-glare optics, and directional options.',
     image: '/images/product-spotlights.png',
     tagAr: 'متوفر بمقاسات وأشكال متعددة',
     tagEn: 'Various shapes & sizes'
@@ -223,7 +223,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
                 <h4 className="font-bold text-slate-900 text-sm sm:text-base mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-1">
                   {isAr ? product.titleAr : product.titleEn}
                 </h4>
-                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
+                <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 min-h-[52px]">
                   {isAr ? product.descAr : product.descEn}
                 </p>
               </div>
