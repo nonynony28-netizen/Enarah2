@@ -29,6 +29,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Various shapes & sizes'
   },
   {
+    id: 'led-profile',
+    titleAr: 'عقود وسكك الليد بروفايل',
+    titleEn: 'LED Strips & Profile Tracks',
+    categoryAr: 'سكك وبروفايل',
+    categoryEn: 'LED Profiles',
+    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد عقود الليد وسكك البروفايل بأعلى معايير الدقة، بما يشمل شرائط LED بقدرات متنوعة، سكك ألمنيوم معمارية، وتوصيلات وإكسسوارات متكاملة.',
+    descEn: 'ENARAH manufactures and supplies architectural LED strips and aluminum profiles to the highest standards, including diverse wattages, channels, and complete accessories.',
+    image: '/images/product-led-profile.jpg',
+    tagAr: 'إكسسوارات وسكك متكاملة',
+    tagEn: 'Full Channels & Accessories'
+  },
+  {
     id: 'cables',
     titleAr: 'كابلات وأسلاك التأسيس الكهربائي',
     titleEn: 'Electrical Foundation Cables & Wires',
