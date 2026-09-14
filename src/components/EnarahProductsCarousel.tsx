@@ -18,12 +18,12 @@ export interface EnarahProductItem {
 export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   {
     id: 'spotlights',
-    titleAr: 'سبوتلايت بأشكاله المختلفة',
+    titleAr: 'سبوت لايت بأشكاله المختلفة',
     titleEn: 'Diverse Architectural Spotlights',
-    categoryAr: 'SPOTLIGHT',
-    categoryEn: 'SPOTLIGHT',
-    descAr: 'تشكيلات غاطسة وظاهرة بأحدث تقنيات LED وتصاميم هندسية عصرية تلبي متطلبات الديكور الراقي.',
-    descEn: 'Recessed and surface-mounted modern LED designs for luxury interior spaces.',
+    categoryAr: 'سبوت لايت',
+    categoryEn: 'Spotlight',
+    descAr: 'تشكيلة متكاملة من سبوت لايت LED: إطارات أنيقة، لمبات مستقلة، وعدسات مانعة للتوهج مع ميزة توجيه الإضاءة.',
+    descEn: 'Comprehensive LED spotlight solutions: stylish frames, standalone bulbs, anti-glare optics, and directional lighting.',
     image: '/images/product-spotlights.png',
     tagAr: 'متوفر بمقاسات وأشكال متعددة',
     tagEn: 'Various shapes & sizes'
@@ -204,7 +204,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               />
 
               {/* شارة التصنيف العلوية الفاخرة المدمجة */}
-              <div className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-md text-slate-800 text-[10px] font-extrabold tracking-wider px-2.5 py-0.5 rounded-full shadow-sm border border-slate-200/80 flex items-center gap-1.5 z-10 uppercase">
+              <div className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-md text-slate-800 text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-slate-200/80 flex items-center gap-1.5 z-10">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                 <span>{isAr ? product.categoryAr : product.categoryEn}</span>
               </div>
