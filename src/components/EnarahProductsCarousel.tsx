@@ -22,8 +22,8 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'Diverse Architectural Spotlights',
     categoryAr: 'سبوت لايت',
     categoryEn: 'Spotlight',
-    descAr: 'تصنيع شركة الإنارة: سبوت لايت LED منفصل تماماً عن الإطار، مع توفير إطارات متنوعة، لمبات مستقلة، وخيارات مانعة للتوهج وموجهة للإضاءة.',
-    descEn: 'ENARAH Manufacturing: LED spotlights engineered separate from fixtures, offering standalone bulbs, modular frames, anti-glare optics, and directional options.',
+    descAr: 'تصنيع شركة الإنارة: تشكيلات سبوت لايت متنوعة منها نوع LED والنوع المنفصل، مع خيارات مانعة للتوهج والسبوت الموجه.',
+    descEn: 'ENARAH Manufacturing: Versatile spotlight solutions including integrated LED and modular types, with anti-glare and directional options.',
     image: '/images/product-spotlights.png',
     tagAr: 'متوفر بمقاسات وأشكال متعددة',
     tagEn: 'Various shapes & sizes'
