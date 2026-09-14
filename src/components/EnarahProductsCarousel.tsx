@@ -22,8 +22,8 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'Diverse Architectural Spotlights',
     categoryAr: 'سبوت لايت',
     categoryEn: 'Spotlight',
-    descAr: 'تصنيع شركة الإنارة: تشكيلات سبوت لايت متنوعة منها نوع LED والنوع المنفصل، مع خيارات مانعة للتوهج والسبوت الموجه.',
-    descEn: 'ENARAH Manufacturing: Versatile spotlight solutions including integrated LED and modular types, with anti-glare and directional options.',
+    descAr: 'تقوم شركة الإنارة بتصنيع السبوت لايت بمختلف أنواعه وبأعلى معايير الجودة، بما يشمل أنظمة LED، إطارات التثبيت المنفصلة، والسبوتات الموجهة والمانعة للتوهج.',
+    descEn: 'ENARAH manufactures premium spotlights of all types to the highest standards, including advanced LED systems, modular frames, and directional anti-glare optics.',
     image: '/images/product-spotlights.png',
     tagAr: 'متوفر بمقاسات وأشكال متعددة',
     tagEn: 'Various shapes & sizes'
@@ -147,8 +147,8 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
           </h3>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">
             {isAr 
-              ? 'تنوع شامل في خطوط الإنتاج والتوريد: سبوتلايت، منظمات جهد، ثريات، كشافات، وتجهيزات متكاملة'
-              : 'Diverse manufacturing & supply lines: Spotlights, stabilizers, chandeliers, floodlights & wiring'}
+              ? 'خطوط تصنيع وطنية وتوريد متكامل من شركة الإنارة بأعلى معايير الجودة: سبوت لايت، كابلات، منظمات، ثريات، وكشافات'
+              : 'Official manufacturing & integrated supply by ENARAH: Spotlights, cables, stabilizers, chandeliers & floodlights'}
           </p>
         </div>
 
