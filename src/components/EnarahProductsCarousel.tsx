@@ -65,6 +65,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Thermal, Standard & Reels'
   },
   {
+    id: 'exhaust-fans',
+    titleAr: 'شفاطات التهوية بأشكالها وألوانها',
+    titleEn: 'Ventilation & Exhaust Fans',
+    categoryAr: 'تهوية وشفاطات',
+    categoryEn: 'Ventilation Fans',
+    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد شفاطات التهوية بمختلف المقاسات، بما يشمل الشفاطات الجدارية والمدفونة (الدكت)، بألوان عصرية وتشطيبات خشبية راقية مع تشغيل هادئ وعالي الكفاءة.',
+    descEn: 'ENARAH manufactures and supplies a versatile line of ventilation fans, including wall-mounted and concealed inline duct models, in modern colors and wood finishes with quiet, high-efficiency performance.',
+    image: '/images/product-exhaust-fans.jpg',
+    tagAr: 'جدارية ومدفونة وتشطيب خشبي',
+    tagEn: 'Wall, Duct & Wood Finish'
+  },
+  {
     id: 'cables',
     titleAr: 'كابلات وأسلاك التوصيل النحاسية',
     titleEn: 'Certified Copper Cables & Wires',
