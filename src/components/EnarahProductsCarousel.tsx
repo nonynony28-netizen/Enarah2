@@ -41,16 +41,29 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Full Channels & Accessories'
   },
   {
-    id: 'cables',
-    titleAr: 'كابلات وأسلاك التأسيس الكهربائي',
-    titleEn: 'Electrical Foundation Cables & Wires',
-    categoryAr: 'مواد تأسيس معتمدة',
+    id: 'electrical-foundation',
+    titleAr: 'مواد التأسيس الكهربائي',
+    titleEn: 'Electrical Foundation Materials',
+    categoryAr: 'تأسيس وتمديدات',
     categoryEn: 'Foundation Materials',
+    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد مواد التأسيس الكهربائي بأعلى معايير المتانة والأمان، بما يشمل علب الدفن، بواطات التوزيع، الخراطيم المرنة، ومستلزمات التثبيت المتكاملة.',
+    descEn: 'ENARAH manufactures and supplies electrical foundation materials to the highest safety and durability standards, including flush boxes, junction boxes, flexible conduits, and complete fittings.',
+    image: '/images/product-electrical-foundation.jpg',
+    tagAr: 'علب وبواطات وتمديدات',
+    tagEn: 'Boxes, Conduits & Fittings'
+  },
+  {
+    id: 'cables',
+    titleAr: 'كابلات وأسلاك التوصيل النحاسية',
+    titleEn: 'Certified Copper Cables & Wires',
+    categoryAr: 'كابلات معتمدة',
+    categoryEn: 'Cables & Wires',
     descAr: 'أسلاك نحاسية معتمدة ومقاومة للحرارة تلبي متطلبات المشاريع السكنية والتجارية بأعلى موثوقية.',
     descEn: 'Certified heat-resistant copper wires for residential and commercial projects.',
     image: '/images/cat-cables.jpg',
-    tagAr: 'نحاس نقي معتمد',
-    tagEn: 'Certified Pure Copper'
+    isPending: true,
+    tagAr: 'في انتظار إدراج الصورة',
+    tagEn: 'Awaiting Photo'
   },
   {
     id: 'switches',
