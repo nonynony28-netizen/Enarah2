@@ -77,6 +77,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Wall, Duct & Wood Finish'
   },
   {
+    id: 'breakers-protections',
+    titleAr: 'مفاتيح الكهرباء والحمايات والقلابات',
+    titleEn: 'Circuit Breakers, Protections & Changeovers',
+    categoryAr: 'حماية وتحكم وقواطع',
+    categoryEn: 'Breakers & Protections',
+    descAr: 'منظومة متكاملة من قواطع التيار المعتمدة، مفاتيح العزل والقلابات، حمايات التسريب الأرضي ومانعات الصواعق، وكونتاكتورات التشغيل لضمان أعلى معايير الأمان الكهربائي.',
+    descEn: 'An integrated system of certified circuit breakers, changeover isolators, residual current protections, surge arresters, and industrial contactors ensuring maximum electrical safety.',
+    image: '/images/product-breakers-protections.jpg',
+    tagAr: 'قواطع وحمايات وقلابات معتمدة',
+    tagEn: 'Certified Breakers & Protections'
+  },
+  {
     id: 'cables',
     titleAr: 'كابلات وأسلاك التوصيل النحاسية',
     titleEn: 'Certified Copper Cables & Wires',
@@ -88,18 +100,6 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     isPending: true,
     tagAr: 'في انتظار إدراج الصورة',
     tagEn: 'Awaiting Photo'
-  },
-  {
-    id: 'switches',
-    titleAr: 'المفاتيح والبريزات ومستلزمات التركيب',
-    titleEn: 'Switches, Sockets & Fittings',
-    categoryAr: 'تجهيزات ومفاتيح',
-    categoryEn: 'Switches & Sockets',
-    descAr: 'مستلزمات توصيل وقواطع آمنة ومفاتيح كهربائية عصرية تضمن سلامة المنشآت وسهولة الاستخدام.',
-    descEn: 'Safe circuit accessories, breakers, and high-protection electrical fittings.',
-    image: '/images/cat-ledprofile.jpg',
-    tagAr: 'معايير أمان وحماية',
-    tagEn: 'High Safety Standards'
   },
   {
     id: 'regulators',
