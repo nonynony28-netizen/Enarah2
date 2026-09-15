@@ -53,6 +53,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Boxes, Conduits & Fittings'
   },
   {
+    id: 'power-extensions',
+    titleAr: 'المطولات الكهربائية بأشكالها المختلفة',
+    titleEn: 'Diverse Power Strips & Cable Reels',
+    categoryAr: 'مطولات وتوصيل',
+    categoryEn: 'Extension Cords',
+    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد المطولات الكهربائية بمختلف أنواعها، بما يشمل المطولات العادية، البكرات الحرارية عالية التحمل، والنماذج المزودة بمنافذ USB وقواطع أمان متطورة.',
+    descEn: 'ENARAH manufactures and supplies a versatile line of power extensions, including standard strips, heavy-duty thermal cable reels, and models with USB ports and surge protection.',
+    image: '/images/product-power-extensions.jpg',
+    tagAr: 'حرارية وعادية وبكرات',
+    tagEn: 'Thermal, Standard & Reels'
+  },
+  {
     id: 'cables',
     titleAr: 'كابلات وأسلاك التوصيل النحاسية',
     titleEn: 'Certified Copper Cables & Wires',
