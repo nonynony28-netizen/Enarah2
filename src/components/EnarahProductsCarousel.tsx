@@ -89,6 +89,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Certified Breakers & Protections'
   },
   {
+    id: 'lighting-poles',
+    titleAr: 'أعمدة الإنارة بأشكالها وأطوالها المختلفة',
+    titleEn: 'Diverse Lighting Poles & Garden Bollards',
+    categoryAr: 'إنارة خارجية وأعمدة',
+    categoryEn: 'Poles & Bollards',
+    descAr: 'تشكيلة متكاملة من أعمدة الإنارة للشوارع والحدائق والممرات، تتوفر بأنظمة LED مدمجة وخيارات اللمبات المتغيرة، بمقاسات متعددة وتصاميم هندسية وكلاسيكية مقاومة للعوامل الجوية.',
+    descEn: 'A versatile range of street, garden, and pathway lighting poles, featuring integrated high-efficiency LED systems and replaceable lamp fixtures in modern and classic weather-resistant designs.',
+    image: '/images/product-lighting-poles.jpg',
+    tagAr: 'أنظمة LED ولمبات متغيرة',
+    tagEn: 'Integrated LED & Sockets'
+  },
+  {
     id: 'cables',
     titleAr: 'كابلات وأسلاك التوصيل النحاسية',
     titleEn: 'Certified Copper Cables & Wires',
