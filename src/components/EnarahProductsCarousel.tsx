@@ -159,8 +159,8 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
           </h3>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">
             {isAr 
-              ? 'خطوط تصنيع وطنية وتوريد متكامل من شركة الإنارة بأعلى معايير الجودة: سبوت لايت، كابلات، منظمات، ثريات، وكشافات'
-              : 'Official manufacturing & integrated supply by ENARAH: Spotlights, cables, stabilizers, chandeliers & floodlights'}
+              ? 'صناعة وطنية وتوريد متكامل بأعلى معايير الجودة والمواصفات المعتمدة.'
+              : 'National manufacturing and integrated supply complying with the highest quality standards.'}
           </p>
         </div>
 
