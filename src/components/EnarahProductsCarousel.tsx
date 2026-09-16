@@ -41,6 +41,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Full Channels & Accessories'
   },
   {
+    id: 'chandeliers',
+    titleAr: 'ثريات مودرن وكريستال وإضاءات ديكورية',
+    titleEn: 'Luxury Modern & Crystal Chandeliers',
+    categoryAr: 'ثريات فاخرة وديكورية',
+    categoryEn: 'Luxury Chandeliers',
+    descAr: 'مجموعات استثنائية من الثريات الكريستالية والمودرن المعلقة، تشمل تصاميم الحلقات الذهبية الذكية، الثريات الكريستالية متدرجة الطبقات، والتصاميم الريفية والكروية لإضفاء الفخامة على القصور والصالونات.',
+    descEn: 'An exceptional collection of luxury crystal and modern chandeliers, featuring multi-tiered gold crystal fixtures, geometric LED rings, spherical sputnik designs, and classic pendants for villas and grand halls.',
+    image: '/images/product-chandeliers.jpg',
+    tagAr: 'كريستال ومودرن وحلقات ذهبية',
+    tagEn: 'Crystal, Modern & Gold Rings'
+  },
+  {
     id: 'led-bulbs',
     titleAr: 'لمبات الإنارة بمختلف أشكالها واستخداماتها',
     titleEn: 'Diverse LED Bulbs & Light Sources',
@@ -184,19 +196,6 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     isPending: true,
     tagAr: 'في انتظار إدراج الصورة',
     tagEn: 'Awaiting Photo'
-  },
-  {
-    id: 'chandeliers',
-    titleAr: 'ثريات مودرن وإضاءات ديكورية',
-    titleEn: 'Modern Chandeliers & Decor',
-    categoryAr: 'ثريات فاخرة',
-    categoryEn: 'Luxury Chandeliers',
-    descAr: 'مجموعات راقية من الثريات الكريستالية والمودرن لإضفاء لمسة الفخامة على الصالونات والقاعات.',
-    descEn: 'Exceptional modern & crystal chandelier collections for luxury halls and villas.',
-    image: '/images/project-villa.jpg',
-    isPending: true,
-    tagAr: 'في انتظار إدراج الصورة',
-    tagEn: 'Awaiting Photo'
   }
 ]
 
@@ -306,6 +305,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
                   : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50/60'
               }`}
             >
+              {p.id === 'chandeliers' && <span>✨</span>}
               {p.id === 'led-bulbs' && <span>💡</span>}
               {p.id === 'lighting-poles' && <span>🏛️</span>}
               {p.id === 'lanterns' && <span>🏮</span>}
