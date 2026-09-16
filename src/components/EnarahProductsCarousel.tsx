@@ -53,6 +53,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Integrated LED & Sockets'
   },
   {
+    id: 'lanterns',
+    titleAr: 'فوانيس الإنارة بأشكالها وتصاميمها المختلفة',
+    titleEn: 'Diverse Outdoor & Architectural Lanterns',
+    categoryAr: 'فوانيس وإنارة أسوار',
+    categoryEn: 'Outdoor Lanterns',
+    descAr: 'تشكيلة راقية من الفوانيس المعمارية والخارجية المقاومة للعوامل الجوية، تشمل الفوانيس الجدارية الكلاسيكية، الفوانيس المتدلية، إضاءات الأسوار والمداخل، ومصابيح الممرات بهياكل متينة وزجاج عالي النقاء.',
+    descEn: 'A distinguished collection of weather-resistant outdoor lanterns and sconces, including classic wall fixtures, hanging pendants, pillar/post tops, and pathway bollards crafted with durable frames and premium glass.',
+    image: '/images/product-outdoor-lanterns.jpg',
+    tagAr: 'جدارية ومعلقة وأسوار وممرات',
+    tagEn: 'Wall, Pendant, Post & Path'
+  },
+  {
     id: 'solar-lighting',
     titleAr: 'كشافات وإنارة الطاقة الشمسية',
     titleEn: 'Solar Floodlights & Outdoor Lighting',
@@ -271,6 +283,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               }`}
             >
               {p.id === 'lighting-poles' && <span>💡</span>}
+              {p.id === 'lanterns' && <span>🏮</span>}
               {p.id === 'solar-lighting' && <span>☀️</span>}
               {p.id === 'floodlights' && <span>🏟️</span>}
               {p.id === 'regulators' && <span>⚡</span>}
