@@ -53,6 +53,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Integrated LED & Sockets'
   },
   {
+    id: 'solar-lighting',
+    titleAr: 'كشافات وإنارة الطاقة الشمسية',
+    titleEn: 'Solar Floodlights & Outdoor Lighting',
+    categoryAr: 'طاقة شمسية وإنارة',
+    categoryEn: 'Solar Lighting',
+    descAr: 'منظومة إنارة شمسية متكاملة تشمل كشافات الشوارع والملاعب، إضاءات الأسوار والحدائق بمستشعرات ذكية، كشافات العمل، وفوانيس وعقود الديكور بأعلى كفاءة تخزين ومقاومة للعوامل الجوية.',
+    descEn: 'A comprehensive range of solar lighting solutions including street and flood lights, smart motion-sensor wall and garden lights, portable work fixtures, and decorative lanterns with high weather resistance.',
+    image: '/images/product-solar-lighting.jpg',
+    tagAr: 'كشافات شوارع وحدائق وديكور',
+    tagEn: 'Street, Garden & Decor'
+  },
+  {
     id: 'regulators',
     titleAr: 'منظمات الجهد الكهربائي بأحجامها وقدراتها',
     titleEn: 'Automatic Voltage Regulators (1 to 10 KVA)',
@@ -260,6 +272,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               }`}
             >
               {p.id === 'lighting-poles' && <span>💡</span>}
+              {p.id === 'solar-lighting' && <span>☀️</span>}
               {p.id === 'regulators' && <span>⚡</span>}
               <span>{isAr ? p.categoryAr : p.categoryEn}</span>
             </button>
