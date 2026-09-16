@@ -41,6 +41,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Full Channels & Accessories'
   },
   {
+    id: 'led-bulbs',
+    titleAr: 'لمبات الإنارة بمختلف أشكالها واستخداماتها',
+    titleEn: 'Diverse LED Bulbs & Light Sources',
+    categoryAr: 'لمبات ومصادر إضاءة',
+    categoryEn: 'LED Bulbs & Lamps',
+    descAr: 'تشكيلة متكاملة من لمبات LED الموفرة للطاقة بمختلف القواعد والقدرات، تشمل لمبات الشمعة الديكورية للثريات، لمبات الفيلامنت الكلاسيكية، لمبات T-Bulb عالية السطوع، ومصابيح السبوت العاكسة بعمر تشغيلي طويل.',
+    descEn: 'A comprehensive range of energy-saving LED bulbs across diverse wattages and bases, including decorative candle bulbs for chandeliers, vintage filament lamps, high-lumen T-bulbs, and reflector spotlights.',
+    image: '/images/product-led-bulbs.jpg',
+    tagAr: 'شمعة وفيلامنت وT-Bulb وسبوت',
+    tagEn: 'Candle, Filament, T-Bulb & Spot'
+  },
+  {
     id: 'lighting-poles',
     titleAr: 'عمدان وأعمدة الإنارة بأشكالها وأطوالها',
     titleEn: 'Diverse Lighting Poles & Garden Bollards',
@@ -294,7 +306,8 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
                   : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50/60'
               }`}
             >
-              {p.id === 'lighting-poles' && <span>💡</span>}
+              {p.id === 'led-bulbs' && <span>💡</span>}
+              {p.id === 'lighting-poles' && <span>🏛️</span>}
               {p.id === 'lanterns' && <span>🏮</span>}
               {p.id === 'solar-lighting' && <span>☀️</span>}
               {p.id === 'floodlights' && <span>🏟️</span>}
