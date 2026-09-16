@@ -53,6 +53,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Integrated LED & Sockets'
   },
   {
+    id: 'regulators',
+    titleAr: 'منظمات الجهد الكهربائي بأحجامها وقدراتها',
+    titleEn: 'Automatic Voltage Regulators (1 to 10 KVA)',
+    categoryAr: 'منظمات وحماية الجهد',
+    categoryEn: 'Voltage Regulators',
+    descAr: 'منظمات جهد أوتوماتيكية متطورة بقدرات تبدأ من 1 KVA حتى 10 KVA، مزودة بشاشات رقمية مزدوجة ومؤشرات حماية ذكية لتثبيت التيار وحماية الأجهزة من تذبذب وانخفاض الكهرباء.',
+    descEn: 'Advanced automatic voltage regulators ranging from 1 KVA up to 10 KVA, featuring dual digital displays and intelligent protection circuits to stabilize power and safeguard equipment against voltage fluctuations.',
+    image: '/images/product-voltage-regulators.jpg',
+    tagAr: 'قدرات من 1KVA حتى 10KVA',
+    tagEn: '1 KVA to 10 KVA Capacity'
+  },
+  {
     id: 'electrical-foundation',
     titleAr: 'مواد التأسيس الكهربائي',
     titleEn: 'Electrical Foundation Materials',
@@ -109,19 +121,6 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     descAr: 'أسلاك نحاسية معتمدة ومقاومة للحرارة تلبي متطلبات المشاريع السكنية والتجارية بأعلى موثوقية.',
     descEn: 'Certified heat-resistant copper wires for residential and commercial projects.',
     image: '/images/cat-cables.jpg',
-    isPending: true,
-    tagAr: 'في انتظار إدراج الصورة',
-    tagEn: 'Awaiting Photo'
-  },
-  {
-    id: 'regulators',
-    titleAr: 'منظمات الجهد الكهربائي',
-    titleEn: 'Voltage Regulators & Stabilizers',
-    categoryAr: 'تنظيم وحماية الجهد',
-    categoryEn: 'Voltage Regulation',
-    descAr: 'منظمات دقيقة لحماية الأجهزة الحساسة والمنشآت من تقلبات وانخفاض التيار الكهربائي المفاجئ.',
-    descEn: 'Precision stabilizers safeguarding sensitive equipment from voltage fluctuations.',
-    image: '/images/cat-spotlight.jpg',
     isPending: true,
     tagAr: 'في انتظار إدراج الصورة',
     tagEn: 'Awaiting Photo'
@@ -261,6 +260,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               }`}
             >
               {p.id === 'lighting-poles' && <span>💡</span>}
+              {p.id === 'regulators' && <span>⚡</span>}
               <span>{isAr ? p.categoryAr : p.categoryEn}</span>
             </button>
           )
