@@ -113,6 +113,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Boxes, Conduits & Fittings'
   },
   {
+    id: 'sockets-switches',
+    titleAr: 'البرائز والمفاتيح الكهربائية الديكورية بألوانها',
+    titleEn: 'Architectural Wall Sockets & Switches',
+    categoryAr: 'برائز ومفاتيح ديكورية',
+    categoryEn: 'Sockets & Switches',
+    descAr: 'تشكيلة فاخرة من البرائز والمفاتيح الكهربائية بتشطيبات راقية تشمل الذهبي والأسود والأبيض، متوفرة بمنافذ شحن USB وType-C سريعة، مفاتيح إنارة، ديمر مراوح، ومخارج دش وشبكات بأعلى معايير الأمان.',
+    descEn: 'A luxury collection of architectural wall sockets and switches in gold, matte black, and pure white finishes, featuring fast USB & Type-C chargers, lighting switches, fan dimmers, and data ports.',
+    image: '/images/product-sockets-switches.jpg',
+    tagAr: 'ذهبي وأسود وأبيض مع USB وType-C',
+    tagEn: 'Gold, Black & White | USB & Type-C'
+  },
+  {
     id: 'power-extensions',
     titleAr: 'المطولات الكهربائية بأشكالها المختلفة',
     titleEn: 'Diverse Power Strips & Cable Reels',
@@ -286,6 +298,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               {p.id === 'lanterns' && <span>🏮</span>}
               {p.id === 'solar-lighting' && <span>☀️</span>}
               {p.id === 'floodlights' && <span>🏟️</span>}
+              {p.id === 'sockets-switches' && <span>🔘</span>}
               {p.id === 'regulators' && <span>⚡</span>}
               <span>{isAr ? p.categoryAr : p.categoryEn}</span>
             </button>
