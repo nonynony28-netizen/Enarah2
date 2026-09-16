@@ -22,7 +22,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'Diverse Architectural Spotlights',
     categoryAr: 'سبوت لايت',
     categoryEn: 'Spotlight',
-    descAr: 'تقوم شركة الإنارة بتصنيع السبوت لايت بمختلف أنواعه وبأعلى معايير الجودة، بما يشمل أنظمة LED، إطارات التثبيت المنفصلة، والسبوتات الموجهة والمانعة للتوهج.',
+    descAr: 'تشكيلة معمارية راقية من السبوت لايت وأنظمة LED الموفرة، تشمل إطارات التثبيت الديكورية، الإضاءات الموجهة، والعدسات المانعة للتوهج بأعلى معايير الجودة.',
     descEn: 'ENARAH manufactures premium spotlights of all types to the highest standards, including advanced LED systems, modular frames, and directional anti-glare optics.',
     image: '/images/product-spotlights.png',
     tagAr: 'متوفر بمقاسات وأشكال متعددة',
@@ -34,7 +34,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'LED Strips & Profile Tracks',
     categoryAr: 'سكك وبروفايل',
     categoryEn: 'LED Profiles',
-    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد عقود الليد وسكك البروفايل بأعلى معايير الدقة، بما يشمل شرائط LED بقدرات متنوعة، سكك ألمنيوم معمارية، وتوصيلات وإكسسوارات متكاملة.',
+    descAr: 'حلول متكاملة من عقود الليد وسكك البروفايل المعمارية، تشمل شرائط LED عالية السطوع، مجاري ألمنيوم مصقولة، وكافة ملحقات وتوصيلات الإنارة الخطية المخفية.',
     descEn: 'ENARAH manufactures and supplies architectural LED strips and aluminum profiles to the highest standards, including diverse wattages, channels, and complete accessories.',
     image: '/images/product-led-profile.jpg',
     tagAr: 'إكسسوارات وسكك متكاملة',
@@ -65,6 +65,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Street, Garden & Decor'
   },
   {
+    id: 'floodlights',
+    titleAr: 'كشافات الكهرباء بمختلف أشكالها واستخداماتها',
+    titleEn: 'Electrical & Industrial Floodlights',
+    categoryAr: 'كشافات كهربائية وملاعب',
+    categoryEn: 'Electrical Floodlights',
+    descAr: 'تشكيلة متكاملة من كشافات LED الكهربائية عالية القدرة والمقاومة للعوامل الجوية، تشمل كشافات الشوارع الإيروديناميكية، كشافات الملاعب والواجهات بنظام COB المركز، ومصابيح الهاي باي الصناعية.',
+    descEn: 'High-power energy-efficient electrical LED floodlights for stadiums, architectural facades, and street illumination, featuring aerodynamic street fixtures, multi-lens COB optics, and robust industrial high-bays.',
+    image: '/images/product-electrical-floodlights.jpg',
+    tagAr: 'شوارع وملاعب وواجهات صناعية',
+    tagEn: 'Street, Stadiums & Facades'
+  },
+  {
     id: 'regulators',
     titleAr: 'منظمات الجهد الكهربائي بأحجامها وقدراتها',
     titleEn: 'Automatic Voltage Regulators (1 to 10 KVA)',
@@ -82,7 +94,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'Electrical Foundation Materials',
     categoryAr: 'تأسيس وتمديدات',
     categoryEn: 'Foundation Materials',
-    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد مواد التأسيس الكهربائي بأعلى معايير المتانة والأمان، بما يشمل علب الدفن، بواطات التوزيع، الخراطيم المرنة، ومستلزمات التثبيت المتكاملة.',
+    descAr: 'منتجات التأسيس الكهربائي المعتمدة للمشاريع الإنشائية، تشمل علب الدفن، وبواطات التوزيع المتينة، والخراطيم المرنة ومستلزمات التثبيت المتكاملة بأعلى معايير الأمان.',
     descEn: 'ENARAH manufactures and supplies electrical foundation materials to the highest safety and durability standards, including flush boxes, junction boxes, flexible conduits, and complete fittings.',
     image: '/images/product-electrical-foundation.jpg',
     tagAr: 'علب وبواطات وتمديدات',
@@ -94,7 +106,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'Diverse Power Strips & Cable Reels',
     categoryAr: 'مطولات وتوصيل',
     categoryEn: 'Extension Cords',
-    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد المطولات الكهربائية بمختلف أنواعها، بما يشمل المطولات العادية، البكرات الحرارية عالية التحمل، والنماذج المزودة بمنافذ USB وقواطع أمان متطورة.',
+    descAr: 'مجموعة متطورة من المطولات الكهربائية وبكرات الكابلات الحرارية عالية التحمل، مزودة بقواطع أمان ذكية، منافذ USB، وحماية فائقة ضد زيادة الأحمال.',
     descEn: 'ENARAH manufactures and supplies a versatile line of power extensions, including standard strips, heavy-duty thermal cable reels, and models with USB ports and surge protection.',
     image: '/images/product-power-extensions.jpg',
     tagAr: 'حرارية وعادية وبكرات',
@@ -106,7 +118,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     titleEn: 'Ventilation & Exhaust Fans',
     categoryAr: 'تهوية وشفاطات',
     categoryEn: 'Ventilation Fans',
-    descAr: 'تقوم شركة الإنارة بتصنيع وتوريد شفاطات التهوية بمختلف المقاسات، بما يشمل الشفاطات الجدارية والمدفونة (الدكت)، بألوان عصرية وتشطيبات خشبية راقية مع تشغيل هادئ وعالي الكفاءة.',
+    descAr: 'شفاطات تهوية فائقة الكفاءة والهدوء بمقاسات متعددة وتصاميم جدارية ومدفونة (دكت)، متوفرة بتشطيبات عصرية وألوان خشبية فاخرة تناسب كافة الديكورات.',
     descEn: 'ENARAH manufactures and supplies a versatile line of ventilation fans, including wall-mounted and concealed inline duct models, in modern colors and wood finishes with quiet, high-efficiency performance.',
     image: '/images/product-exhaust-fans.jpg',
     tagAr: 'جدارية ومدفونة وتشطيب خشبي',
@@ -146,19 +158,6 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     descAr: 'مجموعات راقية من الثريات الكريستالية والمودرن لإضفاء لمسة الفخامة على الصالونات والقاعات.',
     descEn: 'Exceptional modern & crystal chandelier collections for luxury halls and villas.',
     image: '/images/project-villa.jpg',
-    isPending: true,
-    tagAr: 'في انتظار إدراج الصورة',
-    tagEn: 'Awaiting Photo'
-  },
-  {
-    id: 'floodlights',
-    titleAr: 'كشافات إنارة خارجية وصناعية',
-    titleEn: 'Outdoor & Industrial Floodlights',
-    categoryAr: 'كشافات وإضاءة خارجية',
-    categoryEn: 'Floodlights & Industrial',
-    descAr: 'كشافات LED عالية الكفاءة للملاعب والواجهات المعمارية والمستودعات مقاومة للعوامل الجوية.',
-    descEn: 'High-power weather-resistant LED floodlights for facades, stadiums, and warehouses.',
-    image: '/images/project-facade.jpg',
     isPending: true,
     tagAr: 'في انتظار إدراج الصورة',
     tagEn: 'Awaiting Photo'
@@ -273,6 +272,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
             >
               {p.id === 'lighting-poles' && <span>💡</span>}
               {p.id === 'solar-lighting' && <span>☀️</span>}
+              {p.id === 'floodlights' && <span>🏟️</span>}
               {p.id === 'regulators' && <span>⚡</span>}
               <span>{isAr ? p.categoryAr : p.categoryEn}</span>
             </button>
