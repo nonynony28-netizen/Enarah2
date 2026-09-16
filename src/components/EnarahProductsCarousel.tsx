@@ -41,6 +41,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Full Channels & Accessories'
   },
   {
+    id: 'lighting-poles',
+    titleAr: 'عمدان وأعمدة الإنارة بأشكالها وأطوالها',
+    titleEn: 'Diverse Lighting Poles & Garden Bollards',
+    categoryAr: 'عمدان وإنارة خارجية',
+    categoryEn: 'Poles & Bollards',
+    descAr: 'تشكيلة متكاملة من عمدان الإنارة للشوارع والحدائق والممرات، تتوفر بأنظمة LED مدمجة وخيارات اللمبات المتغيرة، بمقاسات متعددة وتصاميم هندسية وكلاسيكية مقاومة للعوامل الجوية.',
+    descEn: 'A versatile range of street, garden, and pathway lighting poles, featuring integrated high-efficiency LED systems and replaceable lamp fixtures in modern and classic weather-resistant designs.',
+    image: '/images/product-lighting-poles.jpg',
+    tagAr: 'عمدان LED ولمبات متغيرة',
+    tagEn: 'Integrated LED & Sockets'
+  },
+  {
     id: 'electrical-foundation',
     titleAr: 'مواد التأسيس الكهربائي',
     titleEn: 'Electrical Foundation Materials',
@@ -87,18 +99,6 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     image: '/images/product-breakers-protections.jpg',
     tagAr: 'قواطع وحمايات وقلابات معتمدة',
     tagEn: 'Certified Breakers & Protections'
-  },
-  {
-    id: 'lighting-poles',
-    titleAr: 'أعمدة الإنارة بأشكالها وأطوالها المختلفة',
-    titleEn: 'Diverse Lighting Poles & Garden Bollards',
-    categoryAr: 'إنارة خارجية وأعمدة',
-    categoryEn: 'Poles & Bollards',
-    descAr: 'تشكيلة متكاملة من أعمدة الإنارة للشوارع والحدائق والممرات، تتوفر بأنظمة LED مدمجة وخيارات اللمبات المتغيرة، بمقاسات متعددة وتصاميم هندسية وكلاسيكية مقاومة للعوامل الجوية.',
-    descEn: 'A versatile range of street, garden, and pathway lighting poles, featuring integrated high-efficiency LED systems and replaceable lamp fixtures in modern and classic weather-resistant designs.',
-    image: '/images/product-lighting-poles.jpg',
-    tagAr: 'أنظمة LED ولمبات متغيرة',
-    tagEn: 'Integrated LED & Sockets'
   },
   {
     id: 'cables',
@@ -161,6 +161,7 @@ interface Props {
 
 export default function EnarahProductsCarousel({ isAr, className = '' }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [activeId, setActiveId] = useState<string>('lighting-poles')
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
 
@@ -169,7 +170,6 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
     if (!el) return
     const { scrollLeft, scrollWidth, clientWidth } = el
     
-    // In RTL vs LTR, scrollLeft can be negative or positive depending on browser implementation
     const maxScroll = scrollWidth - clientWidth
     const absScroll = Math.abs(scrollLeft)
     
@@ -192,15 +192,23 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
   const handleScroll = (direction: 'next' | 'prev') => {
     const el = scrollContainerRef.current
     if (!el) return
-    const cardWidth = 320
-    const scrollAmount = direction === 'next' ? (isAr ? -cardWidth : cardWidth) : (isAr ? cardWidth : -cardWidth)
+    const cardStep = 340
+    const scrollAmount = direction === 'next' ? (isAr ? -cardStep : cardStep) : (isAr ? cardStep : -cardStep)
     el.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+  }
+
+  const scrollToProduct = (id: string) => {
+    setActiveId(id)
+    const el = document.getElementById(`enarah-product-${id}`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    }
   }
 
   return (
     <div className={`relative ${className}`}>
       {/* شريط العنوان وأزرار التنقل العالمية */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
           <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
             <SlidersHorizontal className="w-5 h-5 text-blue-600" />
@@ -238,7 +246,28 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
         </div>
       </div>
 
-      {/* الشريط الأفقي للمنتجات - بدون إشغال مساحة رأسية كبيرة */}
+      {/* أزرار الانتقال السريع للأصناف - تضمن ظهور كل منتج بضغطة زر */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none mb-4">
+        {ENARAH_PRODUCTS.filter(p => !p.isPending).map((p) => {
+          const isActive = activeId === p.id
+          return (
+            <button
+              key={p.id}
+              onClick={() => scrollToProduct(p.id)}
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                isActive
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-200'
+                  : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50/60'
+              }`}
+            >
+              {p.id === 'lighting-poles' && <span>💡</span>}
+              <span>{isAr ? p.categoryAr : p.categoryEn}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* الشريط الأفقي للمنتجات */}
       <div 
         ref={scrollContainerRef}
         className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 pt-1 px-1 snap-x snap-mandatory scrollbar-none scroll-smooth select-none"
@@ -247,6 +276,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
         {ENARAH_PRODUCTS.map((product) => (
           <div
             key={product.id}
+            id={`enarah-product-${product.id}`}
             className={`w-[280px] sm:w-[320px] shrink-0 snap-start bg-white border rounded-2xl overflow-hidden transition-all duration-300 flex flex-col group ${
               product.isPending 
                 ? 'border-slate-200/80 hover:border-blue-300 hover:shadow-md' 
@@ -264,8 +294,6 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
                 loading="lazy"
               />
 
-
-
               {/* وسم حالة الصورة */}
               {product.isPending && (
                 <div className="absolute bottom-2.5 left-2.5 bg-amber-500/90 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
@@ -274,7 +302,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               )}
             </div>
 
-            {/* تفاصيل المنتج البسيطة والراقية بدون حشو */}
+            {/* تفاصيل المنتج البسيطة والراقية */}
             <div className="p-4 flex flex-col flex-grow justify-between">
               <div>
                 <h4 className="font-bold text-slate-900 text-sm sm:text-base mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-1">
@@ -286,7 +314,10 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               </div>
 
               {/* شريط الحالة السفلي */}
-              <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-end text-[11px]">
+              <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                <span className="text-[10px] text-slate-400 font-medium">
+                  {isAr ? product.categoryAr : product.categoryEn}
+                </span>
                 <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100/80">
                   {isAr ? product.tagAr : product.tagEn}
                 </span>
@@ -310,6 +341,25 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
             {isAr ? 'جاهز للإضافة فوراً' : 'Ready to add'}
           </span>
         </div>
+      </div>
+
+      {/* مؤشرات التصفح السفلية (نقاط تفاعلية) */}
+      <div className="flex items-center justify-center gap-1.5 mt-2">
+        {ENARAH_PRODUCTS.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => scrollToProduct(p.id)}
+            title={isAr ? p.titleAr : p.titleEn}
+            aria-label={`Go to ${p.titleAr}`}
+            className={`h-2 rounded-full transition-all cursor-pointer ${
+              activeId === p.id 
+                ? 'w-7 bg-blue-600' 
+                : p.isPending 
+                  ? 'w-2 bg-slate-200 hover:bg-slate-300' 
+                  : 'w-2 bg-slate-300 hover:bg-blue-400'
+            }`}
+          />
+        ))}
       </div>
     </div>
   )
