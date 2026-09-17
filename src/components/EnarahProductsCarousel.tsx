@@ -89,6 +89,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Wall, Pendant, Post & Path'
   },
   {
+    id: 'wall-lights',
+    titleAr: 'الإضاءات الجانبية والأبليكات الجدارية',
+    titleEn: 'Architectural Wall Lights & Sconces',
+    categoryAr: 'إضاءات جانبية وأبليكات',
+    categoryEn: 'Wall Lights & Sconces',
+    descAr: 'تشكيلة معمارية واسعة من الإضاءات الجانبية والأبليكات المقاومة للعوامل الجوية، تشمل كشافات الإضاءة المزدوجة (Up & Down)، إضاءات الدرج والممرات المدفونة، والأبليكات الديكورية المودرن للواجهات والمساحات الداخلية.',
+    descEn: 'A versatile architectural collection of weather-resistant wall lights and sconces, featuring bi-directional up & down fixtures, recessed step and pathway lights, and contemporary decorative facade sconces.',
+    image: '/images/product-wall-lights.png',
+    tagAr: 'إضاءة مزدوجة Up&Down وإضاءات درج',
+    tagEn: 'Up & Down, Step & Facade Sconces'
+  },
+  {
     id: 'solar-lighting',
     titleAr: 'كشافات وإنارة الطاقة الشمسية',
     titleEn: 'Solar Floodlights & Outdoor Lighting',
@@ -309,6 +321,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               {p.id === 'led-bulbs' && <span>💡</span>}
               {p.id === 'lighting-poles' && <span>🏛️</span>}
               {p.id === 'lanterns' && <span>🏮</span>}
+              {p.id === 'wall-lights' && <span>🌓</span>}
               {p.id === 'solar-lighting' && <span>☀️</span>}
               {p.id === 'floodlights' && <span>🏟️</span>}
               {p.id === 'sockets-switches' && <span>🔘</span>}
