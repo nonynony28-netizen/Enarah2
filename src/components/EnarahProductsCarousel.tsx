@@ -1,8 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Sparkles, ImagePlus, SlidersHorizontal } from 'lucide-react'
+import { ChevronLeft, ChevronRight, SlidersHorizontal, Sparkles } from 'lucide-react'
+
+export type ProductGroup = 'all' | 'indoor' | 'outdoor' | 'electrical' | 'appliances'
 
 export interface EnarahProductItem {
   id: string
+  group: 'indoor' | 'outdoor' | 'electrical' | 'appliances'
   titleAr: string
   titleEn: string
   categoryAr: string
@@ -15,9 +18,31 @@ export interface EnarahProductItem {
   tagEn?: string
 }
 
+export const PRODUCT_GROUPS: { id: ProductGroup; labelAr: string; labelEn: string; icon: string }[] = [
+  { id: 'all', labelAr: 'كافة المنتجات', labelEn: 'All Lines', icon: '✨' },
+  { id: 'indoor', labelAr: 'إنارة معمارية وثريات', labelEn: 'Indoor & Chandeliers', icon: '💡' },
+  { id: 'outdoor', labelAr: 'إنارة خارجية وشوارع', labelEn: 'Outdoor & Street', icon: '🌙' },
+  { id: 'electrical', labelAr: 'تأسيس ومفاتيح', labelEn: 'Foundation & Switches', icon: '⚡' },
+  { id: 'appliances', labelAr: 'أجهزة وتجهيزات', labelEn: 'Appliances & Safety', icon: '🛡️' }
+]
+
 export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   {
+    id: 'chandeliers',
+    group: 'indoor',
+    titleAr: 'ثريات مودرن وكريستال وإضاءات ديكورية',
+    titleEn: 'Luxury Modern & Crystal Chandeliers',
+    categoryAr: 'ثريات فاخرة وديكورية',
+    categoryEn: 'Luxury Chandeliers',
+    descAr: 'مجموعات استثنائية من الثريات الكريستالية والمودرن المعلقة، تشمل تصاميم الحلقات الذهبية الذكية، الثريات الكريستالية متدرجة الطبقات، والتصاميم الريفية والكروية لإضفاء الفخامة على القصور والصالونات.',
+    descEn: 'An exceptional collection of luxury crystal and modern chandeliers, featuring multi-tiered gold crystal fixtures, geometric LED rings, spherical sputnik designs, and classic pendants for villas and grand halls.',
+    image: '/images/product-chandeliers.jpg',
+    tagAr: 'كريستال ومودرن وحلقات ذهبية',
+    tagEn: 'Crystal, Modern & Gold Rings'
+  },
+  {
     id: 'spotlights',
+    group: 'indoor',
     titleAr: 'سبوت لايت بأشكاله المختلفة',
     titleEn: 'Diverse Architectural Spotlights',
     categoryAr: 'سبوت لايت',
@@ -30,6 +55,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'led-profile',
+    group: 'indoor',
     titleAr: 'عقود وسكك الليد بروفايل',
     titleEn: 'LED Strips & Profile Tracks',
     categoryAr: 'سكك وبروفايل',
@@ -41,19 +67,8 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Full Channels & Accessories'
   },
   {
-    id: 'chandeliers',
-    titleAr: 'ثريات مودرن وكريستال وإضاءات ديكورية',
-    titleEn: 'Luxury Modern & Crystal Chandeliers',
-    categoryAr: 'ثريات فاخرة وديكورية',
-    categoryEn: 'Luxury Chandeliers',
-    descAr: 'مجموعات استثنائية من الثريات الكريستالية والمودرن المعلقة، تشمل تصاميم الحلقات الذهبية الذكية، الثريات الكريستالية متدرجة الطبقات، والتصاميم الريفية والكروية لإضفاء الفخامة على القصور والصالونات.',
-    descEn: 'An exceptional collection of luxury crystal and modern chandeliers, featuring multi-tiered gold crystal fixtures, geometric LED rings, spherical sputnik designs, and classic pendants for villas and grand halls.',
-    image: '/images/product-chandeliers.jpg',
-    tagAr: 'كريستال ومودرن وحلقات ذهبية',
-    tagEn: 'Crystal, Modern & Gold Rings'
-  },
-  {
     id: 'led-bulbs',
+    group: 'indoor',
     titleAr: 'لمبات الإنارة بمختلف أشكالها واستخداماتها',
     titleEn: 'Diverse LED Bulbs & Light Sources',
     categoryAr: 'لمبات ومصادر إضاءة',
@@ -66,6 +81,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'lighting-poles',
+    group: 'outdoor',
     titleAr: 'عمدان وأعمدة الإنارة بأشكالها وأطوالها',
     titleEn: 'Diverse Lighting Poles & Garden Bollards',
     categoryAr: 'عمدان وإنارة خارجية',
@@ -78,6 +94,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'lanterns',
+    group: 'outdoor',
     titleAr: 'فوانيس الإنارة بأشكالها وتصاميمها المختلفة',
     titleEn: 'Diverse Outdoor & Architectural Lanterns',
     categoryAr: 'فوانيس وإنارة أسوار',
@@ -90,6 +107,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'wall-lights',
+    group: 'outdoor',
     titleAr: 'الإضاءات الجانبية والأبليكات الجدارية',
     titleEn: 'Architectural Wall Lights & Sconces',
     categoryAr: 'إضاءات جانبية وأبليكات',
@@ -102,6 +120,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'solar-lighting',
+    group: 'outdoor',
     titleAr: 'كشافات وإنارة الطاقة الشمسية',
     titleEn: 'Solar Floodlights & Outdoor Lighting',
     categoryAr: 'طاقة شمسية وإنارة',
@@ -114,6 +133,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'floodlights',
+    group: 'outdoor',
     titleAr: 'كشافات الكهرباء بمختلف أشكالها واستخداماتها',
     titleEn: 'Electrical & Industrial Floodlights',
     categoryAr: 'كشافات كهربائية وملاعب',
@@ -125,19 +145,8 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Street, Stadiums & Facades'
   },
   {
-    id: 'regulators',
-    titleAr: 'منظمات الجهد الكهربائي بأحجامها وقدراتها',
-    titleEn: 'Automatic Voltage Regulators (1 to 10 KVA)',
-    categoryAr: 'منظمات وحماية الجهد',
-    categoryEn: 'Voltage Regulators',
-    descAr: 'منظمات جهد أوتوماتيكية متطورة بقدرات تبدأ من 1 KVA حتى 10 KVA، مزودة بشاشات رقمية مزدوجة ومؤشرات حماية ذكية لتثبيت التيار وحماية الأجهزة من تذبذب وانخفاض الكهرباء.',
-    descEn: 'Advanced automatic voltage regulators ranging from 1 KVA up to 10 KVA, featuring dual digital displays and intelligent protection circuits to stabilize power and safeguard equipment against voltage fluctuations.',
-    image: '/images/product-voltage-regulators.jpg',
-    tagAr: 'قدرات من 1KVA حتى 10KVA',
-    tagEn: '1 KVA to 10 KVA Capacity'
-  },
-  {
     id: 'electrical-foundation',
+    group: 'electrical',
     titleAr: 'مواد التأسيس الكهربائي',
     titleEn: 'Electrical Foundation Materials',
     categoryAr: 'تأسيس وتمديدات',
@@ -150,6 +159,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'sockets-switches',
+    group: 'electrical',
     titleAr: 'البرائز والمفاتيح الكهربائية الديكورية بألوانها',
     titleEn: 'Architectural Wall Sockets & Switches',
     categoryAr: 'برائز ومفاتيح ديكورية',
@@ -161,43 +171,8 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Gold, Black & White | USB & Type-C'
   },
   {
-    id: 'power-extensions',
-    titleAr: 'المطولات الكهربائية بأشكالها المختلفة',
-    titleEn: 'Diverse Power Strips & Cable Reels',
-    categoryAr: 'مطولات وتوصيل',
-    categoryEn: 'Extension Cords',
-    descAr: 'مجموعة متطورة من المطولات الكهربائية وبكرات الكابلات الحرارية عالية التحمل، مزودة بقواطع أمان ذكية، منافذ USB، وحماية فائقة ضد زيادة الأحمال.',
-    descEn: 'ENARAH manufactures and supplies a versatile line of power extensions, including standard strips, heavy-duty thermal cable reels, and models with USB ports and surge protection.',
-    image: '/images/product-power-extensions.jpg',
-    tagAr: 'حرارية وعادية وبكرات',
-    tagEn: 'Thermal, Standard & Reels'
-  },
-  {
-    id: 'exhaust-fans',
-    titleAr: 'شفاطات التهوية بأشكالها وألوانها',
-    titleEn: 'Ventilation & Exhaust Fans',
-    categoryAr: 'تهوية وشفاطات',
-    categoryEn: 'Ventilation Fans',
-    descAr: 'شفاطات تهوية فائقة الكفاءة والهدوء بمقاسات متعددة وتصاميم جدارية ومدفونة (دكت)، متوفرة بتشطيبات عصرية وألوان خشبية فاخرة تناسب كافة الديكورات.',
-    descEn: 'ENARAH manufactures and supplies a versatile line of ventilation fans, including wall-mounted and concealed inline duct models, in modern colors and wood finishes with quiet, high-efficiency performance.',
-    image: '/images/product-exhaust-fans.jpg',
-    tagAr: 'جدارية ومدفونة وتشطيب خشبي',
-    tagEn: 'Wall, Duct & Wood Finish'
-  },
-  {
-    id: 'insect-killers',
-    titleAr: 'صواعق الحشرات والناموس الكهربائية بأحجامها',
-    titleEn: 'Electric Insect Killers & Pest Zappers',
-    categoryAr: 'صواعق حشرات كهربائية',
-    categoryEn: 'Insect Killers',
-    descAr: 'صواعق كهربائية متطورة لمكافحة الحشرات والناموس بأربعة أحجام ومقاسات متنوعة، مزودة بأنابيب UV جاذبة مزدوجة، شبكة صعق عالية الكفاءة مع شبك أمان خارجي، وصينية تجميع سفلية سهلة التنظيف.',
-    descEn: 'Heavy-duty electric insect and mosquito killers available in four versatile sizes, featuring dual high-efficiency UV attractant tubes, high-voltage electrocution grids with protective mesh, and removable collection trays.',
-    image: '/images/product-insect-killers.jpg',
-    tagAr: '4 أحجام وأنابيب UV وشبك أمان',
-    tagEn: '4 Sizes, Dual UV Tubes & Safety Mesh'
-  },
-  {
     id: 'breakers-protections',
+    group: 'electrical',
     titleAr: 'مفاتيح الكهرباء والحمايات والقلابات',
     titleEn: 'Circuit Breakers, Protections & Changeovers',
     categoryAr: 'حماية وتحكم وقواطع',
@@ -210,6 +185,7 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   },
   {
     id: 'cables',
+    group: 'electrical',
     titleAr: 'كابلات وأسلاك التوصيل النحاسية',
     titleEn: 'Certified Copper Cables & Wires',
     categoryAr: 'كابلات معتمدة',
@@ -220,6 +196,58 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     isPending: true,
     tagAr: 'في انتظار إدراج الصورة',
     tagEn: 'Awaiting Photo'
+  },
+  {
+    id: 'regulators',
+    group: 'appliances',
+    titleAr: 'منظمات الجهد الكهربائي بأحجامها وقدراتها',
+    titleEn: 'Automatic Voltage Regulators (1 to 10 KVA)',
+    categoryAr: 'منظمات وحماية الجهد',
+    categoryEn: 'Voltage Regulators',
+    descAr: 'منظمات جهد أوتوماتيكية متطورة بقدرات تبدأ من 1 KVA حتى 10 KVA، مزودة بشاشات رقمية مزدوجة ومؤشرات حماية ذكية لتثبيت التيار وحماية الأجهزة من تذبذب وانخفاض الكهرباء.',
+    descEn: 'Advanced automatic voltage regulators ranging from 1 KVA up to 10 KVA, featuring dual digital displays and intelligent protection circuits to stabilize power and safeguard equipment against voltage fluctuations.',
+    image: '/images/product-voltage-regulators.jpg',
+    tagAr: 'قدرات من 1KVA حتى 10KVA',
+    tagEn: '1 KVA to 10 KVA Capacity'
+  },
+  {
+    id: 'power-extensions',
+    group: 'appliances',
+    titleAr: 'المطولات الكهربائية بأشكالها المختلفة',
+    titleEn: 'Diverse Power Strips & Cable Reels',
+    categoryAr: 'مطولات وتوصيل',
+    categoryEn: 'Extension Cords',
+    descAr: 'مجموعة متطورة من المطولات الكهربائية وبكرات الكابلات الحرارية عالية التحمل، مزودة بقواطع أمان ذكية، منافذ USB، وحماية فائقة ضد زيادة الأحمال.',
+    descEn: 'ENARAH manufactures and supplies a versatile line of power extensions, including standard strips, heavy-duty thermal cable reels, and models with USB ports and surge protection.',
+    image: '/images/product-power-extensions.jpg',
+    tagAr: 'حرارية وعادية وبكرات',
+    tagEn: 'Thermal, Standard & Reels'
+  },
+  {
+    id: 'exhaust-fans',
+    group: 'appliances',
+    titleAr: 'شفاطات التهوية بأشكالها وألوانها',
+    titleEn: 'Ventilation & Exhaust Fans',
+    categoryAr: 'تهوية وشفاطات',
+    categoryEn: 'Ventilation Fans',
+    descAr: 'شفاطات تهوية فائقة الكفاءة والهدوء بمقاسات متعددة وتصاميم جدارية ومدفونة (دكت)، متوفرة بتشطيبات عصرية وألوان خشبية فاخرة تناسب كافة الديكورات.',
+    descEn: 'ENARAH manufactures and supplies a versatile line of ventilation fans, including wall-mounted and concealed inline duct models, in modern colors and wood finishes with quiet, high-efficiency performance.',
+    image: '/images/product-exhaust-fans.jpg',
+    tagAr: 'جدارية ومدفونة وتشطيب خشبي',
+    tagEn: 'Wall, Duct & Wood Finish'
+  },
+  {
+    id: 'insect-killers',
+    group: 'appliances',
+    titleAr: 'صواعق الحشرات والناموس الكهربائية بأحجامها',
+    titleEn: 'Electric Insect Killers & Pest Zappers',
+    categoryAr: 'صواعق حشرات كهربائية',
+    categoryEn: 'Insect Killers',
+    descAr: 'صواعق كهربائية متطورة لمكافحة الحشرات والناموس بأربعة أحجام ومقاسات متنوعة، مزودة بأنابيب UV جاذبة مزدوجة، شبكة صعق عالية الكفاءة مع شبك أمان خارجي، وصينية تجميع سفلية سهلة التنظيف.',
+    descEn: 'Heavy-duty electric insect and mosquito killers available in four versatile sizes, featuring dual high-efficiency UV attractant tubes, high-voltage electrocution grids with protective mesh, and removable collection trays.',
+    image: '/images/product-insect-killers.jpg',
+    tagAr: '4 أحجام وأنابيب UV وشبك أمان',
+    tagEn: '4 Sizes, Dual UV Tubes & Safety Mesh'
   }
 ]
 
@@ -230,18 +258,21 @@ interface Props {
 
 export default function EnarahProductsCarousel({ isAr, className = '' }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [activeId, setActiveId] = useState<string>('lighting-poles')
+  const [selectedGroup, setSelectedGroup] = useState<ProductGroup>('all')
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
+
+  // تصفية المنتجات بحسب التبويب المحدد
+  const displayedProducts = selectedGroup === 'all'
+    ? ENARAH_PRODUCTS
+    : ENARAH_PRODUCTS.filter(p => p.group === selectedGroup)
 
   const updateScrollButtons = () => {
     const el = scrollContainerRef.current
     if (!el) return
     const { scrollLeft, scrollWidth, clientWidth } = el
-    
     const maxScroll = scrollWidth - clientWidth
     const absScroll = Math.abs(scrollLeft)
-    
     setCanScrollLeft(absScroll > 10)
     setCanScrollRight(absScroll < maxScroll - 10)
   }
@@ -256,189 +287,167 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
       el.removeEventListener('scroll', updateScrollButtons)
       window.removeEventListener('resize', updateScrollButtons)
     }
-  }, [])
+  }, [displayedProducts.length])
+
+  const handleGroupChange = (groupId: ProductGroup) => {
+    setSelectedGroup(groupId)
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ left: 0, behavior: 'smooth' })
+    }
+  }
 
   const handleScroll = (direction: 'next' | 'prev') => {
     const el = scrollContainerRef.current
     if (!el) return
-    const cardStep = 340
+    const cardStep = 260
     const scrollAmount = direction === 'next' ? (isAr ? -cardStep : cardStep) : (isAr ? cardStep : -cardStep)
     el.scrollBy({ left: scrollAmount, behavior: 'smooth' })
   }
 
-  const scrollToProduct = (id: string) => {
-    setActiveId(id)
-    const el = document.getElementById(`enarah-product-${id}`)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-    }
-  }
-
   return (
-    <div className={`relative ${className}`}>
-      {/* شريط العنوان وأزرار التنقل العالمية */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+    <section className={`relative bg-gradient-to-b from-slate-50/80 via-white to-slate-50/60 border border-slate-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs ${className}`}>
+      {/* شريط العنوان المنسق وأزرار التصفح */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
         <div>
-          <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
-            <SlidersHorizontal className="w-5 h-5 text-blue-600" />
-            <span>{isAr ? 'منتجات وتصنيع شركة الإنارة' : 'ENARAH Manufacturing Lines'}</span>
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100/80">
+              <SlidersHorizontal className="w-4 h-4" />
+            </span>
+            <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+              {isAr ? 'منتجات وتصنيع شركة الإنارة' : 'ENARAH Manufacturing Lines'}
+            </h3>
+            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100/80">
+              {isAr ? `${displayedProducts.length} خط معتمد` : `${displayedProducts.length} Lines`}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
             {isAr 
               ? 'صناعة وطنية وتوريد متكامل بأعلى معايير الجودة والمواصفات المعتمدة.'
               : 'National manufacturing and integrated supply complying with the highest quality standards.'}
           </p>
         </div>
 
-        {/* أزرار التحكم الأفقية المستوحاة من المواقع العالمية */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
-          <div className="hidden sm:flex items-center gap-1 text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full mr-2">
-            <span>{isAr ? 'تصفح أفقي' : 'Horizontal View'}</span>
-            <span className="text-[11px] text-blue-600">↔</span>
-          </div>
-          
+        {/* أزرار الأسهم المصغرة والأنيقة */}
+        <div className="flex items-center gap-1.5 self-end sm:self-auto">
           <button
             onClick={() => handleScroll('prev')}
             aria-label={isAr ? 'السابق' : 'Previous'}
-            className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 shadow-xs flex items-center justify-center transition-all active:scale-95 cursor-pointer"
+            disabled={!canScrollLeft}
+            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
+              canScrollLeft
+                ? 'bg-white border-slate-200 text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 shadow-xs active:scale-95'
+                : 'bg-slate-50 border-slate-200/50 text-slate-300 cursor-not-allowed'
+            }`}
           >
-            {isAr ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
 
           <button
             onClick={() => handleScroll('next')}
             aria-label={isAr ? 'التالي' : 'Next'}
-            className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 shadow-xs flex items-center justify-center transition-all active:scale-95 cursor-pointer"
+            disabled={!canScrollRight}
+            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
+              canScrollRight
+                ? 'bg-white border-slate-200 text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 shadow-xs active:scale-95'
+                : 'bg-slate-50 border-slate-200/50 text-slate-300 cursor-not-allowed'
+            }`}
           >
-            {isAr ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+            {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* أزرار الانتقال السريع للأصناف - تضمن ظهور كل منتج بضغطة زر */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none mb-4">
-        {ENARAH_PRODUCTS.filter(p => !p.isPending).map((p) => {
-          const isActive = activeId === p.id
+      {/* التبويبات الرئيسية المرتبة والمريحة للعين - بدون أي شريط تمرير مزعج */}
+      <div 
+        className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 mb-4 select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {PRODUCT_GROUPS.map((group) => {
+          const isSelected = selectedGroup === group.id
+          const count = group.id === 'all'
+            ? ENARAH_PRODUCTS.length
+            : ENARAH_PRODUCTS.filter(p => p.group === group.id).length
+
           return (
             <button
-              key={p.id}
-              onClick={() => scrollToProduct(p.id)}
-              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
-                isActive
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-200'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50/60'
+              key={group.id}
+              onClick={() => handleGroupChange(group.id)}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                isSelected
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-100'
+                  : 'bg-white text-slate-700 border-slate-200/90 hover:border-blue-300 hover:bg-blue-50/40 hover:text-blue-600'
               }`}
             >
-              {p.id === 'chandeliers' && <span>✨</span>}
-              {p.id === 'led-bulbs' && <span>💡</span>}
-              {p.id === 'lighting-poles' && <span>🏛️</span>}
-              {p.id === 'lanterns' && <span>🏮</span>}
-              {p.id === 'wall-lights' && <span>🌓</span>}
-              {p.id === 'solar-lighting' && <span>☀️</span>}
-              {p.id === 'floodlights' && <span>🏟️</span>}
-              {p.id === 'sockets-switches' && <span>🔘</span>}
-              {p.id === 'regulators' && <span>⚡</span>}
-              {p.id === 'insect-killers' && <span>🦟</span>}
-              <span>{isAr ? p.categoryAr : p.categoryEn}</span>
+              <span className="text-[13px]">{group.icon}</span>
+              <span>{isAr ? group.labelAr : group.labelEn}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-semibold ${
+                isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+              }`}>
+                {count}
+              </span>
             </button>
           )
         })}
       </div>
 
-      {/* الشريط الأفقي للمنتجات */}
+      {/* شريط البطاقات الأفقي المصغر والمريح للعين (حجم مثالي ومدروس) */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 pt-1 px-1 snap-x snap-mandatory scrollbar-none scroll-smooth select-none"
+        className="flex gap-3 sm:gap-3.5 overflow-x-auto pb-2 pt-1 px-0.5 snap-x snap-mandatory scroll-smooth select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {ENARAH_PRODUCTS.map((product) => (
+        {displayedProducts.map((product) => (
           <div
             key={product.id}
             id={`enarah-product-${product.id}`}
-            className={`w-[280px] sm:w-[320px] shrink-0 snap-start bg-white border rounded-2xl overflow-hidden transition-all duration-300 flex flex-col group ${
+            className={`w-[220px] sm:w-[245px] shrink-0 snap-start bg-white border rounded-xl overflow-hidden transition-all duration-300 flex flex-col group ${
               product.isPending 
-                ? 'border-slate-200/80 hover:border-blue-300 hover:shadow-md' 
-                : 'border-slate-200 hover:border-blue-500 hover:shadow-xl shadow-xs hover:-translate-y-1'
+                ? 'border-slate-200/80 hover:border-blue-300' 
+                : 'border-slate-200 hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5'
             }`}
           >
-            {/* حاوية الصورة الفاخرة بحجم كامل يملأ الإطار */}
-            <div className="h-52 sm:h-60 w-full bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
+            {/* إطار الصورة المدمج والأنيق بارتفاع مريح (144px-160px) */}
+            <div className="h-36 sm:h-40 w-full bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
               <img
                 src={product.image}
                 alt={isAr ? product.titleAr : product.titleEn}
-                className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-108 ${
+                className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 ${
                   product.isPending ? 'opacity-85 filter contrast-90' : ''
                 }`}
                 loading="lazy"
               />
 
-              {/* وسم حالة الصورة */}
               {product.isPending && (
-                <div className="absolute bottom-2.5 left-2.5 bg-amber-500/90 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
-                  {isAr ? 'في انتظار الصورة 📷' : 'Awaiting Photo 📷'}
+                <div className="absolute bottom-2 left-2 bg-amber-500/95 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-xs">
+                  {isAr ? 'قريباً 📷' : 'Coming Soon'}
                 </div>
               )}
             </div>
 
-            {/* تفاصيل المنتج البسيطة والراقية */}
-            <div className="p-4 flex flex-col flex-grow justify-between">
+            {/* محتوى البطاقة المنسق بحجم خطوط مريح وغير عشوائي */}
+            <div className="p-3 sm:p-3.5 flex flex-col flex-grow justify-between gap-2.5">
               <div>
-                <h4 className="font-bold text-slate-900 text-sm sm:text-base mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-1">
+                <span className="text-[10px] font-bold text-blue-600 tracking-wide block mb-1">
+                  {isAr ? product.categoryAr : product.categoryEn}
+                </span>
+                <h4 className="font-bold text-slate-900 text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-blue-600 transition-colors">
                   {isAr ? product.titleAr : product.titleEn}
                 </h4>
-                <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 min-h-[52px]">
+                <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mt-1 min-h-[32px]">
                   {isAr ? product.descAr : product.descEn}
                 </p>
               </div>
 
-              {/* شريط الحالة السفلي */}
-              <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span className="text-[10px] text-slate-400 font-medium">
-                  {isAr ? product.categoryAr : product.categoryEn}
-                </span>
-                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100/80">
+              {/* الوسم الفني الأنيق في الأسفل */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[10px] font-medium text-slate-600 bg-slate-100/80 px-2 py-0.5 rounded border border-slate-200/50 truncate max-w-full">
                   {isAr ? product.tagAr : product.tagEn}
                 </span>
               </div>
             </div>
           </div>
         ))}
-
-        {/* خانة مخصصة لإضافة أصناف وصور جديدة (بنفس المقاس الأفقي) */}
-        <div className="w-[240px] sm:w-[270px] shrink-0 snap-start border-2 border-dashed border-blue-200 hover:border-blue-400 rounded-2xl p-6 bg-blue-50/20 hover:bg-blue-50/40 transition-all flex flex-col items-center justify-center text-center group min-h-[300px]">
-          <div className="w-12 h-12 rounded-2xl bg-white border border-blue-200 flex items-center justify-center text-blue-600 shadow-xs mb-3 group-hover:scale-110 transition-transform">
-            <ImagePlus className="w-6 h-6" />
-          </div>
-          <h4 className="text-xs sm:text-sm font-bold text-slate-900 mb-1">
-            {isAr ? 'صنف أو صورة جديدة' : 'Add New Category'}
-          </h4>
-          <p className="text-[11px] text-slate-500 leading-relaxed mb-3">
-            {isAr ? 'مكان مجهز لإدراج أي صنف إضافي فور إرسال الصورة والعنوان.' : 'Ready for additional products and lines.'}
-          </p>
-          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-            {isAr ? 'جاهز للإضافة فوراً' : 'Ready to add'}
-          </span>
-        </div>
       </div>
-
-      {/* مؤشرات التصفح السفلية (نقاط تفاعلية) */}
-      <div className="flex items-center justify-center gap-1.5 mt-2">
-        {ENARAH_PRODUCTS.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => scrollToProduct(p.id)}
-            title={isAr ? p.titleAr : p.titleEn}
-            aria-label={`Go to ${p.titleAr}`}
-            className={`h-2 rounded-full transition-all cursor-pointer ${
-              activeId === p.id 
-                ? 'w-7 bg-blue-600' 
-                : p.isPending 
-                  ? 'w-2 bg-slate-200 hover:bg-slate-300' 
-                  : 'w-2 bg-slate-300 hover:bg-blue-400'
-            }`}
-          />
-        ))}
-      </div>
-    </div>
+    </section>
   )
 }
