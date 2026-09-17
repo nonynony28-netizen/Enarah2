@@ -185,6 +185,18 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Wall, Duct & Wood Finish'
   },
   {
+    id: 'insect-killers',
+    titleAr: 'صواعق الحشرات والناموس الكهربائية بأحجامها',
+    titleEn: 'Electric Insect Killers & Pest Zappers',
+    categoryAr: 'صواعق حشرات كهربائية',
+    categoryEn: 'Insect Killers',
+    descAr: 'صواعق كهربائية متطورة لمكافحة الحشرات والناموس بأربعة أحجام ومقاسات متنوعة، مزودة بأنابيب UV جاذبة مزدوجة، شبكة صعق عالية الكفاءة مع شبك أمان خارجي، وصينية تجميع سفلية سهلة التنظيف.',
+    descEn: 'Heavy-duty electric insect and mosquito killers available in four versatile sizes, featuring dual high-efficiency UV attractant tubes, high-voltage electrocution grids with protective mesh, and removable collection trays.',
+    image: '/images/product-insect-killers.jpg',
+    tagAr: '4 أحجام وأنابيب UV وشبك أمان',
+    tagEn: '4 Sizes, Dual UV Tubes & Safety Mesh'
+  },
+  {
     id: 'breakers-protections',
     titleAr: 'مفاتيح الكهرباء والحمايات والقلابات',
     titleEn: 'Circuit Breakers, Protections & Changeovers',
@@ -326,6 +338,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               {p.id === 'floodlights' && <span>🏟️</span>}
               {p.id === 'sockets-switches' && <span>🔘</span>}
               {p.id === 'regulators' && <span>⚡</span>}
+              {p.id === 'insect-killers' && <span>🦟</span>}
               <span>{isAr ? p.categoryAr : p.categoryEn}</span>
             </button>
           )
