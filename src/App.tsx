@@ -64,20 +64,20 @@ function App() {
         document.body.style.backgroundColor = '#f8fafc';
         window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
       }
-    }, 2650);
+    }, 2150);
 
     return () => {
       clearTimeout(timer);
     };
   }, [showSplash]);
 
-  // التحميل المسبق لصفحة المنتجات وباقي الصفحات لفتحها فوراً بـ 0 ثانية بدلاً من التأخير
+  // التحميل المسبق للصفحات بعد انتهاء شاشة البداية لتوفير 100% من أداء المعالج أثناء الأنيميشن
   useEffect(() => {
     const prefetchTimer = setTimeout(() => {
       import('./pages/Products')
       import('./pages/Projects')
       import('./pages/Contact')
-    }, 500)
+    }, 2800)
 
     return () => {
       clearTimeout(prefetchTimer)

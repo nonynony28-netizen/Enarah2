@@ -285,49 +285,47 @@ html {
 
 #splash-screen h1,
 .splash-screen-container h1 {
-  background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 45%, #1d4ed8 100%) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #bae6fd 45%, #60a5fa 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 0 22px rgba(59, 130, 246, 0.85)) drop-shadow(0 0 45px rgba(37, 99, 235, 0.45)) !important;
+  filter: drop-shadow(0 2px 10px rgba(37, 99, 235, 0.45)) !important;
 }
 
 #splash-screen p,
 .splash-screen-container p {
   color: #f8fafc !important;
   -webkit-text-fill-color: #f8fafc !important;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7)) !important;
+  filter: drop-shadow(0 1px 6px rgba(255, 255, 255, 0.4)) !important;
 }
 
-/* فريمات الحركة السينمائية الفاخرة فائقة النعومة على مسار GPU بدون أي تكسير في الخطوط */
+/* فريمات الحركة فائقة السلاسة المعالجة عتادياً بالكامل (Hardware Accelerated 60/120 FPS بدون أي Layout Reflow) */
 @keyframes splashLampDropSmooth {
-  0% { transform: translate3d(0, -170px, 0); opacity: 0; }
-  40% { opacity: 1; }
+  0% { transform: translate3d(0, -50px, 0); opacity: 0; }
   100% { transform: translate3d(0, 0, 0); opacity: 1; }
 }
 
 @keyframes splashBulbIgnite {
-  0% { opacity: 0; transform: scale(0.65); }
-  50% { opacity: 0.5; transform: scale(0.9); }
+  0% { opacity: 0; transform: scale(0.7); }
   100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes splashBeamFadeIn {
-  0% { opacity: 0; transform: translate3d(0, -6px, 0); }
+  0% { opacity: 0; transform: translate3d(0, -4px, 0); }
   100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes splashTextRevealSmooth {
-  0% { opacity: 0; transform: translate3d(0, 15px, 0); }
+  0% { opacity: 0; transform: translate3d(0, 10px, 0); }
   100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes splashDividerExpandSmooth {
-  0% { width: 0; opacity: 0; }
-  100% { width: 220px; opacity: 0.95; }
+  0% { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 0.95; }
 }
 
 @keyframes splashSloganRevealSmooth {
-  0% { opacity: 0; transform: translate3d(0, 8px, 0); }
+  0% { opacity: 0; transform: translate3d(0, 6px, 0); }
   100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
