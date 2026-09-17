@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, SlidersHorizontal, Sparkles } from 'lucide-react'
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react'
 
 export type ProductGroup = 'all' | 'indoor' | 'outdoor' | 'electrical' | 'appliances'
 
@@ -18,13 +18,6 @@ export interface EnarahProductItem {
   tagEn?: string
 }
 
-export const PRODUCT_GROUPS: { id: ProductGroup; labelAr: string; labelEn: string; icon: string }[] = [
-  { id: 'all', labelAr: 'كافة المنتجات', labelEn: 'All Lines', icon: '✨' },
-  { id: 'indoor', labelAr: 'إنارة معمارية وثريات', labelEn: 'Indoor & Chandeliers', icon: '💡' },
-  { id: 'outdoor', labelAr: 'إنارة خارجية وشوارع', labelEn: 'Outdoor & Street', icon: '🌙' },
-  { id: 'electrical', labelAr: 'تأسيس ومفاتيح', labelEn: 'Foundation & Switches', icon: '⚡' },
-  { id: 'appliances', labelAr: 'أجهزة وتجهيزات', labelEn: 'Appliances & Safety', icon: '🛡️' }
-]
 
 export const ENARAH_PRODUCTS: EnarahProductItem[] = [
   {
@@ -258,14 +251,10 @@ interface Props {
 
 export default function EnarahProductsCarousel({ isAr, className = '' }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [selectedGroup, setSelectedGroup] = useState<ProductGroup>('all')
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
 
-  // تصفية المنتجات بحسب التبويب المحدد
-  const displayedProducts = selectedGroup === 'all'
-    ? ENARAH_PRODUCTS
-    : ENARAH_PRODUCTS.filter(p => p.group === selectedGroup)
+  const displayedProducts = ENARAH_PRODUCTS
 
   const updateScrollButtons = () => {
     const el = scrollContainerRef.current
@@ -288,13 +277,6 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
       window.removeEventListener('resize', updateScrollButtons)
     }
   }, [displayedProducts.length])
-
-  const handleGroupChange = (groupId: ProductGroup) => {
-    setSelectedGroup(groupId)
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ left: 0, behavior: 'smooth' })
-    }
-  }
 
   const handleScroll = (direction: 'next' | 'prev') => {
     const el = scrollContainerRef.current
@@ -357,39 +339,6 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
         </div>
       </div>
 
-      {/* التبويبات الرئيسية المرتبة والمريحة للعين - بدون أي شريط تمرير مزعج */}
-      <div 
-        className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 mb-4 select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {PRODUCT_GROUPS.map((group) => {
-          const isSelected = selectedGroup === group.id
-          const count = group.id === 'all'
-            ? ENARAH_PRODUCTS.length
-            : ENARAH_PRODUCTS.filter(p => p.group === group.id).length
-
-          return (
-            <button
-              key={group.id}
-              onClick={() => handleGroupChange(group.id)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
-                isSelected
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-100'
-                  : 'bg-white text-slate-700 border-slate-200/90 hover:border-blue-300 hover:bg-blue-50/40 hover:text-blue-600'
-              }`}
-            >
-              <span className="text-[13px]">{group.icon}</span>
-              <span>{isAr ? group.labelAr : group.labelEn}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-semibold ${
-                isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-              }`}>
-                {count}
-              </span>
-            </button>
-          )
-        })}
-      </div>
-
       {/* شريط البطاقات الأفقي المصغر والمريح للعين (حجم مثالي ومدروس) */}
       <div 
         ref={scrollContainerRef}
@@ -425,25 +374,16 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
             </div>
 
             {/* محتوى البطاقة المنسق بحجم خطوط مريح وغير عشوائي */}
-            <div className="p-3 sm:p-3.5 flex flex-col flex-grow justify-between gap-2.5">
-              <div>
-                <span className="text-[10px] font-bold text-blue-600 tracking-wide block mb-1">
-                  {isAr ? product.categoryAr : product.categoryEn}
-                </span>
-                <h4 className="font-bold text-slate-900 text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-blue-600 transition-colors">
-                  {isAr ? product.titleAr : product.titleEn}
-                </h4>
-                <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mt-1 min-h-[32px]">
-                  {isAr ? product.descAr : product.descEn}
-                </p>
-              </div>
-
-              {/* الوسم الفني الأنيق في الأسفل */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[10px] font-medium text-slate-600 bg-slate-100/80 px-2 py-0.5 rounded border border-slate-200/50 truncate max-w-full">
-                  {isAr ? product.tagAr : product.tagEn}
-                </span>
-              </div>
+            <div className="p-3 sm:p-3.5 flex flex-col flex-grow justify-start">
+              <span className="text-[10px] font-bold text-blue-600 tracking-wide block mb-1">
+                {isAr ? product.categoryAr : product.categoryEn}
+              </span>
+              <h4 className="font-bold text-slate-900 text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-blue-600 transition-colors">
+                {isAr ? product.titleAr : product.titleEn}
+              </h4>
+              <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mt-1">
+                {isAr ? product.descAr : product.descEn}
+              </p>
             </div>
           </div>
         ))}
