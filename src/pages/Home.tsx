@@ -10,7 +10,7 @@ import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
   Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone, Headphones, Gamepad2,
-  Layers, ImagePlus
+  Layers, ImagePlus, FileText
 } from 'lucide-react'
 import EnarahProductsCarousel from '../components/EnarahProductsCarousel'
 
@@ -425,12 +425,13 @@ export default function Home() {
                     <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
                   </Link>
 
-                  <a
-                    href="#wires-import-showcase"
+                  <Link
+                    to="/contractors"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-semibold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
                   >
-                    <span>{isAr ? 'أسلاك إيطالية معتمدة' : 'Certified Italian Wires'}</span>
-                  </a>
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
+                  </Link>
                 </div>
               </motion.div>
             </div>
