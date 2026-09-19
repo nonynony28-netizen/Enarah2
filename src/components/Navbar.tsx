@@ -288,7 +288,7 @@ export default function Navbar() {
                 }`}
               >
                 <Gamepad2 className="w-4 h-4 text-blue-600" />
-                <span>{isAr ? 'رحلة النور' : 'Light Quest'}</span>
+                <span>{isAr ? 'بطل الإنارة' : 'Enarah Hero'}</span>
               </Link>
 
               {/* Shopping Cart Button (Desktop) */}
@@ -458,7 +458,7 @@ export default function Navbar() {
                     })}
                   </div>
 
-                  {/* رحلة النور (عنصر تفاعلي منضبط بدون إيموجي وبدون تكرار) */}
+                  {/* بطل الإنارة (عنصر تفاعلي منضبط) */}
                   <Link
                     to="/game"
                     onClick={() => setIsOpen(false)}
@@ -470,10 +470,10 @@ export default function Navbar() {
                   >
                     <div className="flex items-center gap-3">
                       <Gamepad2 className="w-4 h-4 text-blue-600" />
-                      <span>{isAr ? 'رحلة النور' : 'Light Quest'}</span>
+                      <span>{isAr ? 'بطل الإنارة' : 'Enarah Hero'}</span>
                     </div>
                     <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
-                      {isAr ? 'كود خصم' : 'Discount Code'}
+                      {isAr ? 'العب واكسب خصم' : 'Play & Win Discount'}
                     </span>
                   </Link>
                 </div>
