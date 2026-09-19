@@ -429,7 +429,7 @@ export default function HomeCleanWhitePreview() {
                     href="#wires-import-showcase"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-bold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
                   >
-                    <span>{isAr ? 'أسلاك إيطالية 🇮🇹' : 'Italian Wires 🇮🇹'}</span>
+                    <span>{isAr ? 'أسلاك إيطالية معتمدة' : 'Certified Italian Wires'}</span>
                   </a>
                 </div>
               </motion.div>
