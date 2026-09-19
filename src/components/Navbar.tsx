@@ -19,10 +19,22 @@ export default function Navbar() {
   const servicesDropdownLabel = t('nav.servicesDropdown') || 'الأقسام والخدمات';
   const servicesDropdownItems = [
     { path: '/products', label: t('nav.products'), desc: isAr ? 'تصفح أحدث حلول الإضاءة ومواد الكهرباء الذكية بجودة عالية.' : 'Browse the latest lighting solutions and smart electrical materials.', icon: Lightbulb },
+    { path: '/contractors', label: t('nav.contractors'), desc: isAr ? 'بوابة مخصصة للمقاولين وشركات التشطيب لطلب عروض أسعار للكميات والتوريدات.' : 'Dedicated portal for contractors and finishing companies to request custom bulk quotes.', icon: Sliders },
     { path: '/brands', label: t('nav.brands'), desc: isAr ? 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.' : 'Our partners and top certified global brands.', icon: Award },
     { path: '/projects', label: t('nav.projects'), desc: isAr ? 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.' : 'Explore some of our executed electrical and engineering projects.', icon: Sparkles },
-    { path: '/contractors', label: t('nav.contractors'), desc: isAr ? 'بوابة مخصصة للمقاولين وشركات التشطيب لطلب عروض أسعار للكميات والتوريدات.' : 'Dedicated portal for contractors and finishing companies to request custom bulk quotes.', icon: Sliders },
-    { path: '/game', label: isAr ? 'رحلة النور (لعبة الأبطال 🎮)' : 'Light Quest (Game 🎮)', desc: isAr ? 'لعبة تفاعلية حصرية: تحكم ببطل الإنارة وأنر المدينة واكسب كود خصم حقيقي!' : 'Exclusive interactive game: Guide our hero to light up the city and win a discount code!', icon: Gamepad2 },
+  ];
+
+  const commercialLinks = [
+    { path: '/products', label: t('nav.products'), icon: Lightbulb },
+    { path: '/contractors', label: t('nav.contractors'), icon: Sliders },
+    { path: '/brands', label: t('nav.brands'), icon: Award },
+    { path: '/projects', label: t('nav.projects'), icon: Sparkles },
+  ];
+
+  const corporateLinks = [
+    { path: '/about', label: t('nav.about'), icon: Info },
+    { path: '/branches', label: t('nav.branches'), icon: MapPin },
+    { path: '/blog', label: t('nav.blog'), icon: BookOpen },
   ];
 
   const localizedOtherLinks = [
@@ -276,7 +288,7 @@ export default function Navbar() {
                 }`}
               >
                 <Gamepad2 className="w-4 h-4 text-blue-600" />
-                <span>{isAr ? '🎮 رحلة النور' : '🎮 Light Quest'}</span>
+                <span>{isAr ? 'رحلة النور' : 'Light Quest'}</span>
               </Link>
 
               {/* Shopping Cart Button (Desktop) */}
@@ -380,124 +392,121 @@ export default function Navbar() {
                   </button>
                 </div>
 
-                {/* روابط القائمة */}
-                <div className="flex flex-col px-5 pt-6 gap-2">
+                {/* روابط القائمة المباشرة والمنظمة بدون تكرار */}
+                <div className="flex flex-col px-4 pt-5 pb-6 gap-4">
                   {/* الرئيسية */}
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 }}>
-                    <Link
-                      to="/"
-                      onClick={() => setIsOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold transition-all ${
-                        location.pathname === '/' 
-                          ? 'text-blue-700 bg-blue-50 border border-blue-200' 
-                          : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <Home className="w-5 h-5 text-blue-600" />
-                      <span>{t('nav.home')}</span>
-                    </Link>
-                  </motion.div>
+                  <Link
+                    to="/"
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                      location.pathname === '/' 
+                        ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-2xs' 
+                        : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Home className="w-4 h-4 text-blue-600" />
+                    <span>{t('nav.home')}</span>
+                  </Link>
 
-                  {/* لعبة رحلة النور (بارز للجوال) */}
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 }}>
-                    <Link
-                      to="/game"
-                      onClick={() => setIsOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold transition-all ${
-                        location.pathname === '/game' 
-                          ? 'text-white bg-blue-600 shadow-md' 
-                          : 'text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100'
-                      }`}
-                    >
-                      <Gamepad2 className="w-5 h-5 text-blue-600" />
-                      <span>{isAr ? '🎮 رحلة النور (لعبة واكسب خصم)' : '🎮 Light Quest Game'}</span>
-                    </Link>
-                  </motion.div>
-
-                  {/* قائمة الأكورديون للجوال (الأقسام والأسعار) */}
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-                    <div className="border border-slate-200 rounded-xl bg-slate-50 p-2 transition-all">
-                      <button
-                        onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                        className="w-full flex items-center justify-between px-3 py-2 text-base font-semibold text-slate-800 outline-none hover:text-blue-600 cursor-pointer"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Award className="w-5 h-5 text-blue-600" />
-                          <span>{servicesDropdownLabel}</span>
-                        </div>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMobileDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
-                      </button>
-
-                      <div 
-                        className={`overflow-hidden transition-all duration-200 ease-in-out flex flex-col gap-1 px-1 ${
-                          isMobileDropdownOpen 
-                            ? 'max-h-[300px] opacity-100 border-t border-slate-200 pt-2 mt-1' 
-                            : 'max-h-0 opacity-0 pointer-events-none border-transparent pt-0 mt-0'
-                        }`}
-                      >
-                        {servicesDropdownItems.map((item) => {
-                          const isSubActive = location.pathname === item.path;
-                          return (
-                            <Link
-                              key={item.path}
-                              to={item.path}
-                              onClick={() => setIsOpen(false)}
-                              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                isSubActive ? 'text-blue-700 bg-blue-50 font-bold' : 'text-slate-600 hover:text-blue-600 hover:bg-slate-100'
-                              }`}
-                            >
-                              <item.icon className="w-4 h-4 text-blue-600" />
-                              <span>{item.label}</span>
-                            </Link>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* باقي الروابط للجوال */}
-                  {localizedOtherLinks.map((link, index) => {
-                    const isActive = location.pathname === link.path;
-                    return (
-                      <motion.div
-                        key={link.path}
-                        initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: (index + 3) * 0.05 }}
-                      >
+                  {/* مجموعة: التسوق والتوريدات (مباشرة وبدون أكورديون) */}
+                  <div className="flex flex-col gap-1 pt-1">
+                    <span className="text-[11px] font-bold text-slate-400 px-3 pb-1 tracking-wider">
+                      {isAr ? 'التسوق والتوريدات' : 'Products & Services'}
+                    </span>
+                    {commercialLinks.map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
                         <Link
-                          to={link.path}
+                          key={item.path}
+                          to={item.path}
                           onClick={() => setIsOpen(false)}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold transition-all ${
+                          className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                             isActive
-                              ? 'text-blue-700 bg-blue-50 border border-blue-200 font-bold'
-                              : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
+                              ? 'text-blue-700 bg-blue-50 border border-blue-200 font-bold shadow-2xs'
+                              : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50'
                           }`}
                         >
-                          <link.icon className="w-5 h-5 text-blue-600" />
+                          <item.icon className="w-4 h-4 text-blue-600 shrink-0" />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  {/* مجموعة: عن الشركة */}
+                  <div className="flex flex-col gap-1 pt-1">
+                    <span className="text-[11px] font-bold text-slate-400 px-3 pb-1 tracking-wider">
+                      {isAr ? 'عن الشركة والمحتوى' : 'Company & Info'}
+                    </span>
+                    {corporateLinks.map((link) => {
+                      const isActive = location.pathname === link.path;
+                      return (
+                        <Link
+                          key={link.path}
+                          to={link.path}
+                          onClick={() => setIsOpen(false)}
+                          className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                            isActive
+                              ? 'text-blue-700 bg-blue-50 border border-blue-200 font-bold shadow-2xs'
+                              : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <link.icon className="w-4 h-4 text-blue-600 shrink-0" />
                           <span>{link.label}</span>
                         </Link>
-                      </motion.div>
-                    )
-                  })}
+                      );
+                    })}
+                  </div>
+
+                  {/* رحلة النور (عنصر تفاعلي منضبط بدون إيموجي وبدون تكرار) */}
+                  <Link
+                    to="/game"
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+                      location.pathname === '/game'
+                        ? 'text-white bg-blue-600 border-blue-600 shadow-sm'
+                        : 'text-blue-700 bg-blue-50/70 border-blue-200/80 hover:bg-blue-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Gamepad2 className="w-4 h-4 text-blue-600" />
+                      <span>{isAr ? 'رحلة النور' : 'Light Quest'}</span>
+                    </div>
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
+                      {isAr ? 'كود خصم' : 'Discount Code'}
+                    </span>
+                  </Link>
                 </div>
               </div>
 
-              {/* ذيل القائمة الجانبية (بيانات التواصل والروابط الاجتماعية) */}
-              <div className="relative z-10 p-6 border-t border-slate-200 bg-slate-50 flex flex-col gap-4">
-                <div className={isAr ? 'text-right' : 'text-left'}>
-                  <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-500 block mb-1">
-                    {isAr ? 'مركز الاتصال' : 'Call Center'}
-                  </span>
-                  <a 
-                    href="tel:0916580068" 
-                    className={`text-sm font-bold text-slate-900 flex items-center gap-2 hover:text-blue-600 transition-colors ${
-                      isAr ? 'justify-end' : 'justify-start'
+              {/* تذييل القائمة الجانبية الموحد: تواصل مباشر وسريع بدون تكرار */}
+              <div className="relative z-10 p-4 border-t border-slate-200 bg-slate-50 flex flex-col gap-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <Link
+                    to="/contact"
+                    onClick={() => setIsOpen(false)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border ${
+                      location.pathname === '/contact'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <span>0916580068</span>
-                    <Phone className="w-4 h-4 text-blue-600" />
+                    <PhoneCall className="w-3.5 h-3.5 text-blue-600" />
+                    <span>{t('nav.contact')}</span>
+                  </Link>
+
+                  <a
+                    href="tel:0916580068"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-all active:scale-95"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-blue-600" />
+                    <span dir="ltr">0916580068</span>
                   </a>
                 </div>
+                
+                <span className="text-[11px] text-center text-slate-500 font-normal">
+                  {isAr ? 'خدمة مبيعات واستفسارات فورية' : 'Direct sales & inquiries'}
+                </span>
               </div>
             </motion.div>
           </motion.div>
