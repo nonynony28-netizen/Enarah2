@@ -355,12 +355,12 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
                 : 'border-slate-200 hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5'
             }`}
           >
-            {/* إطار الصورة المدمج والأنيق بارتفاع مريح (144px-160px) */}
-            <div className="h-36 sm:h-40 w-full bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
+            {/* إطار الصورة المدمج والمتناسق وغير المقصوص بنسبة مربعة متناغمة */}
+            <div className="w-full aspect-square bg-white relative overflow-hidden flex items-center justify-center p-2.5 border-b border-slate-100">
               <img
                 src={product.image}
                 alt={isAr ? product.titleAr : product.titleEn}
-                className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 ${
+                className={`w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105 ${
                   product.isPending ? 'opacity-85 filter contrast-90' : ''
                 }`}
                 loading="lazy"
