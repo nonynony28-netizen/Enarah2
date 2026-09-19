@@ -150,6 +150,29 @@ export default function HomeCleanWhitePreview() {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const secondaryVideoRef = useRef<HTMLVideoElement>(null)
+  const whyUsScrollRef = useRef<HTMLDivElement>(null)
+  const [activeWhyUsIndex, setActiveWhyUsIndex] = useState(0)
+
+  const handleWhyUsScroll = () => {
+    const el = whyUsScrollRef.current
+    if (!el) return
+    const scrollLeft = Math.abs(el.scrollLeft)
+    const cardWidth = el.clientWidth * 0.8
+    if (cardWidth > 0) {
+      const index = Math.min(2, Math.max(0, Math.round(scrollLeft / cardWidth)))
+      setActiveWhyUsIndex(index)
+    }
+  }
+
+  const scrollToWhyUsCard = (index: number) => {
+    const el = whyUsScrollRef.current
+    if (!el) return
+    const targetCard = el.children[index] as HTMLElement | undefined
+    if (targetCard) {
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    }
+    setActiveWhyUsIndex(index)
+  }
 
   const [heroVideoUrl, setHeroVideoUrl] = useState<string>(() => {
     if (typeof window !== 'undefined') {
@@ -415,24 +438,24 @@ export default function HomeCleanWhitePreview() {
         </HeroAutoCanvas>
       </section>
 
-      {/* 2. لماذا نحن - ميزات موحدة ومختصرة مع حركة انسيابية خفيفة */}
-      <section id="about" className="py-12 md:py-16 relative overflow-hidden border-t border-slate-200 bg-white">
+      {/* 2. لماذا نحن - ميزات موحدة بالعرض على الهواتف بتصميم خفيف ومنضبط واحترافي */}
+      <section id="about" className="py-10 md:py-16 relative overflow-hidden border-t border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          {/* عنوان قسم لماذا نحن بتنظيم مدمج ومريح مع حركة ظهور ناعمة */}
+          {/* عنوان قسم لماذا نحن بتنظيم منضبط واحترافي بدون أي إيموجي */}
           <motion.div 
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-30px" }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="text-center mb-8 sm:mb-10"
+            className="text-center mb-6 sm:mb-8"
           >
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-3 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-semibold mb-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
               <span>{isAr ? 'الثقة والجودة في مكان واحد' : 'Trust & Quality in One Place'}</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2.5 tracking-tight text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 tracking-tight text-slate-900">
               {isAr ? 'لماذا' : 'Why'}{' '}
               <span className="text-blue-600">
                 {isAr ? 'نحن؟' : 'Choose Us?'}
@@ -441,50 +464,51 @@ export default function HomeCleanWhitePreview() {
 
             <p className="text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal leading-relaxed">
               {isAr 
-                ? 'أصالة معتمدة 100%، جاهزية كبرى للتوريد الفوري للمشاريع، وخدمة دعم فني سريع.' 
-                : '100% certified authenticity, large-scale immediate project supply, and fast technical support.'}
+                ? 'أصالة معتمدة 100%، جاهزية للتوريد الفوري للمشاريع، وخدمة دعم فني سريع.' 
+                : '100% certified authenticity, project-ready immediate supply, and fast technical support.'}
             </p>
 
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <div className="w-10 h-[1.5px] bg-slate-200" />
-              <div className="w-2 h-2 rounded-full bg-blue-600 ring-4 ring-blue-100 animate-pulse" />
-              <div className="w-10 h-[1.5px] bg-slate-200" />
-            </div>
+            <div className="w-10 h-0.5 bg-blue-600/30 mx-auto mt-3 rounded-full" />
           </motion.div>
 
-          {/* شبكة البطاقات الثلاث المدمجة بحركة انسيابية متتابعة */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-7 relative z-10 items-stretch">
+          {/* شبكة البطاقات: بالعرض كشريط أفقي انسيابي وخفيف على الهواتف، وشبكة متناسقة على الشاشات الكبيرة */}
+          <div 
+            ref={whyUsScrollRef}
+            onScroll={handleWhyUsScroll}
+            className="flex md:grid md:grid-cols-3 gap-3 sm:gap-5 lg:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-3 pt-1 px-4 -mx-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative z-10 items-stretch"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             
             {/* البطاقة الأولى: وكالات عالمية حصرية */}
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
-              transition={{ duration: 0.45, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="relative p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-xs hover:shadow-lg hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full"
+              transition={{ duration: 0.4, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -3, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-2xs hover:shadow-md flex flex-col justify-between group transition-all duration-300 h-full"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-[11px] font-bold">
-                    {isAr ? 'وكالة معتمدة 100%' : 'Official Agency'}
+                <div className="flex items-center justify-between gap-2 mb-3.5">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold">
+                    {isAr ? 'وكالة معتمدة' : 'Official Agency'}
                   </span>
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/60 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-xs">
-                    <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                    <Globe className="w-4 h-4" />
                   </div>
                 </div>
 
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 mb-1.5 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'وكالات عالمية حصرية' : 'Exclusive Global Agencies'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-4 font-normal">
+                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
                   {isAr 
                     ? 'استيراد وتوريد مباشر من كبرى المصانع العالمية مع ضمان أصالة 100%.' 
                     : 'Direct import from leading global manufacturers with 100% authenticity guarantee.'}
                 </p>
 
-                <div className="space-y-2 mb-5">
+                <div className="space-y-1.5 mb-4">
                   {(isAr ? [
                     'منتجات أصلية معتمدة ومطابقة للمواصفات',
                     'استيراد مباشر من المصانع الأوروبية والعالمية'
@@ -493,16 +517,16 @@ export default function HomeCleanWhitePreview() {
                     'Direct import from certified international factories'
                   ]).map((feat, idx) => (
                     <div key={idx} className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
-                        <Check className="w-2.5 h-2.5 text-blue-600 stroke-[3]" />
+                      <div className="w-3.5 h-3.5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
+                        <Check className="w-2 h-2 text-blue-600 stroke-[3]" />
                       </div>
-                      <span className="text-xs sm:text-[13px] text-slate-700 font-medium leading-snug">{feat}</span>
+                      <span className="text-xs text-slate-700 font-medium leading-snug">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
                 <span>{isAr ? 'الأصالة والاعتماد' : 'Authenticity'}</span>
                 <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? '100% مضمون' : '100% Guaranteed'}</span>
               </div>
@@ -510,34 +534,34 @@ export default function HomeCleanWhitePreview() {
 
             {/* البطاقة الثانية: توريد كبرى المشاريع والجملة (البطاقة البارزة) */}
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
-              transition={{ duration: 0.45, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              className="relative p-5 sm:p-6 rounded-2xl bg-white border-2 border-blue-600 shadow-md hover:shadow-xl hover:shadow-blue-500/15 flex flex-col justify-between group transition-all duration-300 h-full ring-4 ring-blue-50"
+              transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -3, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-4 sm:p-5 rounded-2xl bg-white border-2 border-blue-600 shadow-sm hover:shadow-md flex flex-col justify-between group transition-all duration-300 h-full ring-2 ring-blue-50"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[11px] font-bold tracking-wide shadow-2xs">
+                <div className="flex items-center justify-between gap-2 mb-3.5">
+                  <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[11px] font-bold tracking-wide">
                     {isAr ? 'توريد تجاري ومشاريع' : 'Commercial Supply'}
                   </span>
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-xs">
-                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                    <ShieldCheck className="w-4 h-4" />
                   </div>
                 </div>
 
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 mb-1.5 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'توريد كبرى المشاريع والجملة' : 'Bulk & Project Supply'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-4 font-normal">
+                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
                   {isAr 
                     ? 'تجهيز فوري وشامل لطلبيات المقاولين والشركات ومحلات الكهرباء.' 
                     : 'Immediate fulfillment for contractors, companies, and retail shops.'}
                 </p>
 
-                <div className="space-y-2 mb-5">
+                <div className="space-y-1.5 mb-4">
                   {(isAr ? [
                     'أسعار جملة تنافسية وأسلاك إيطالية معتمدة',
                     'جاهزية مخازن لتغطية كافة المخططات الكبرى'
@@ -546,16 +570,16 @@ export default function HomeCleanWhitePreview() {
                     'Full warehouse readiness for large-scale plans'
                   ]).map((feat, idx) => (
                     <div key={idx} className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                        <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
+                      <div className="w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0">
+                        <Check className="w-2 h-2 text-blue-600 stroke-[3]" />
                       </div>
-                      <span className="text-xs sm:text-[13px] text-slate-800 font-bold leading-snug">{feat}</span>
+                      <span className="text-xs text-slate-800 font-bold leading-snug">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
                 <span>{isAr ? 'جاهزية المستودعات' : 'Warehouse Readiness'}</span>
                 <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? 'كميات متوفرة دائماً' : 'Always in Stock'}</span>
               </div>
@@ -563,34 +587,34 @@ export default function HomeCleanWhitePreview() {
 
             {/* البطاقة الثالثة: خدمة دعم فني سريع */}
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
-              transition={{ duration: 0.45, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="relative p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-xs hover:shadow-lg hover:shadow-blue-500/10 flex flex-col justify-between group transition-all duration-300 h-full"
+              transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -3, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-2xs hover:shadow-md flex flex-col justify-between group transition-all duration-300 h-full"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-[11px] font-bold">
+                <div className="flex items-center justify-between gap-2 mb-3.5">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold">
                     {isAr ? 'استجابة سريعة' : 'Fast Response'}
                   </span>
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/60 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-xs">
-                    <Headphones className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                    <Headphones className="w-4 h-4" />
                   </div>
                 </div>
 
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 mb-1.5 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'خدمة دعم فني سريع' : 'Fast Technical Support'}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-4 font-normal">
+                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
                   {isAr 
                     ? 'فريق فني متخصص جاهز لمساعدتكم والإجابة على الاستفسارات وحل أي مسألة فنية.' 
                     : 'Specialized technical team ready to assist, answer questions, and resolve technical inquiries.'}
                 </p>
 
-                <div className="space-y-2 mb-5">
+                <div className="space-y-1.5 mb-4">
                   {(isAr ? [
                     'استجابة فورية ومتابعة مباشرة لكافة احتياجاتكم',
                     'إرشادات هندسية وفنية دقيقة قبل وبعد الشراء'
@@ -599,21 +623,35 @@ export default function HomeCleanWhitePreview() {
                     'Expert technical guidance before and after purchase'
                   ]).map((feat, idx) => (
                     <div key={idx} className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
-                        <Check className="w-2.5 h-2.5 text-blue-600 stroke-[3]" />
+                      <div className="w-3.5 h-3.5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
+                        <Check className="w-2 h-2 text-blue-600 stroke-[3]" />
                       </div>
-                      <span className="text-xs sm:text-[13px] text-slate-700 font-medium leading-snug">{feat}</span>
+                      <span className="text-xs text-slate-700 font-medium leading-snug">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
                 <span>{isAr ? 'سرعة الاستجابة' : 'Response Time'}</span>
                 <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? 'فوري ومباشر' : 'Instant & Direct'}</span>
               </div>
             </motion.div>
 
+          </div>
+
+          {/* مؤشرات التمرير التفاعلية للهواتف فقط */}
+          <div className="flex items-center justify-center gap-1.5 mt-3 md:hidden">
+            {[0, 1, 2].map((idx) => (
+              <button
+                key={idx}
+                onClick={() => scrollToWhyUsCard(idx)}
+                aria-label={`Card ${idx + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  activeWhyUsIndex === idx ? 'w-6 bg-blue-600' : 'w-1.5 bg-slate-300'
+                }`}
+              />
+            ))}
           </div>
 
         </div>
@@ -916,7 +954,7 @@ export default function HomeCleanWhitePreview() {
                 isAr ? 'right-4' : 'left-4'
               }`}>
                 <span className="text-[11px] font-bold text-white">
-                  {!simSpot && !simLed ? (isAr ? 'الإنارة مطفأة 🌑' : 'Lights Off 🌑') : `${isAr ? 'حرارة اللون:' : 'Color Temp:'} ${
+                  {!simSpot && !simLed ? (isAr ? 'الإنارة مطفأة' : 'Lights Off') : `${isAr ? 'حرارة اللون:' : 'Color Temp:'} ${
                     simColor === 'warm' ? (isAr ? 'أصفر دافئ (3000K)' : 'Warm Yellow (3000K)') : 
                     simColor === 'natural' ? (isAr ? 'شمسي طبيعي (4000K)' : 'Natural Sun (4000K)') : 
                     (isAr ? 'أبيض بارد (6000K)' : 'Cool White (6000K)')
@@ -986,7 +1024,9 @@ export default function HomeCleanWhitePreview() {
               <div className={`bg-white border border-blue-200 rounded-xl p-4 flex gap-3 text-xs leading-relaxed text-slate-700 shadow-sm ${
                 isAr ? 'text-right flex-row' : 'text-left flex-row-reverse'
               }`}>
-                <div className="text-xl">💡</div>
+                <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+                  <Lightbulb className="w-4 h-4" />
+                </div>
                 <div className="flex-grow">
                   <span className="font-bold text-blue-900 block mb-0.5">{t('sim.tip')}</span>
                   {simColor === 'warm' && (isAr ? 'الإنارة الصفراء (3000K) تضفي حميمية ودفئاً، وهي مثالية لغرف النوم والمجالس لتعزز الشعور بالاسترخاء.' : 'Yellow lighting (3000K) adds intimacy and warmth, ideal for bedrooms and living rooms to promote relaxation.')}
@@ -1143,14 +1183,14 @@ export default function HomeCleanWhitePreview() {
                   onClick={async () => {
                     const granted = await requestPermission()
                     if (granted) {
-                      alert(isAr ? "تم تفعيل ميزة هز الهاتف لتغيير الإضاءة! جرب هز هاتفك الآن. 📱" : "Phone shake feature enabled! Try shaking your phone now. 📱")
+                      alert(isAr ? "تم تفعيل ميزة هز الهاتف لتغيير الإضاءة! جرب هز هاتفك الآن." : "Phone shake feature enabled! Try shaking your phone now.")
                     } else {
                       alert(isAr ? "لم نتمكن من تفعيل مستشعرات الحركة بجهازك أو تصفحك عبر جهاز لا يدعمها." : "Could not activate motion sensors on your device.")
                     }
                   }}
                   className="absolute bottom-4 right-4 z-20 flex md:hidden items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-600 border border-blue-500 text-[9px] text-white font-bold transition-all active:scale-95 cursor-pointer shadow-md"
                 >
-                  <span>{isAr ? 'تفعيل هز الهاتف 📱' : 'Enable Phone Shake 📱'}</span>
+                  <span>{isAr ? 'تفعيل هز الهاتف' : 'Enable Phone Shake'}</span>
                 </button>
               </div>
 
@@ -1222,7 +1262,9 @@ export default function HomeCleanWhitePreview() {
 
               {/* النصيحة الهندسية الذكية */}
               <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-4 flex gap-3 text-xs leading-relaxed text-slate-800 shadow-sm">
-                <div className="text-xl">📐</div>
+                <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+                  <Layers className="w-4 h-4" />
+                </div>
                 <div>
                   <span className="font-bold text-blue-900 block mb-1">
                     {isAr ? 'رأي مهندس الديكور والتصميم الداخلي:' : 'Interior Designer & Decorator Advice:'}
@@ -1390,7 +1432,8 @@ export default function HomeCleanWhitePreview() {
                 {/* شارة طافية بالأسفل */}
                 <div className="absolute bottom-4 left-4 z-20">
                   <span className="px-3.5 py-1.5 rounded-full bg-slate-900/90 text-white text-[11px] sm:text-xs font-bold border border-white/20 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
-                    <span>⚡ {isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Metal'}</span>
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{isAr ? 'نحاس وألومنيوم صافي 100%' : '100% Pure Metal'}</span>
                   </span>
                 </div>
               </div>
@@ -1425,22 +1468,28 @@ export default function HomeCleanWhitePreview() {
 
               {/* كروت المواصفات الفاخرة */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-1">
-                  <span className="text-xl">🇮🇹 🇹🇷</span>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-1.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                    <Globe className="w-4 h-4" />
+                  </div>
                   <span className="text-xs font-bold text-slate-900">{isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
-                  <span className="text-[10px] text-slate-500">{isAr ? 'من كبرى المصانع' : 'From Top Factories'}</span>
+                  <span className="text-[10px] text-slate-500">{isAr ? 'من كبرى المصانع الأوروبية' : 'From Top Factories'}</span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-1">
-                  <span className="text-xl">⚡</span>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-1.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+                    <Zap className="w-4 h-4" />
+                  </div>
                   <span className="text-xs font-bold text-slate-900">{isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}</span>
                   <span className="text-[10px] text-slate-500">{isAr ? 'نقاء وتوصيل 100%' : '100% Conductivity'}</span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-1">
-                  <span className="text-xl">🛡️</span>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-1.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
                   <span className="text-xs font-bold text-slate-900">{isAr ? 'عزل معتمد' : 'Certified PVC'}</span>
-                  <span className="text-[10px] text-slate-500">{isAr ? 'مقاوم للحرارة' : 'Flame Retardant'}</span>
+                  <span className="text-[10px] text-slate-500">{isAr ? 'مقاوم للحرارة والأكسدة' : 'Flame Retardant'}</span>
                 </div>
               </div>
 
@@ -1478,7 +1527,7 @@ export default function HomeCleanWhitePreview() {
                   <span>{isAr ? 'لعبة تفاعلية حصرية' : 'Exclusive Game'}</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                  {isAr ? 'رحلة النور | بطل الإنارة الحديثة 🎮' : 'Light Quest | Modern Enarah Hero 🎮'}
+                  {isAr ? 'رحلة النور | بطل الإنارة الحديثة' : 'Light Quest | Modern Enarah Hero'}
                 </h3>
                 <p className="text-slate-600 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
                   {isAr

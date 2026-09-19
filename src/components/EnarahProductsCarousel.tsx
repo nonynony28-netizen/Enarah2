@@ -368,7 +368,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
 
               {product.isPending && (
                 <div className="absolute bottom-2 left-2 bg-amber-500/95 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-xs">
-                  {isAr ? 'قريباً 📷' : 'Coming Soon'}
+                  {isAr ? 'قريباً' : 'Coming Soon'}
                 </div>
               )}
             </div>
