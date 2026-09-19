@@ -1,8 +1,6 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
 
-import SplashScreen from './components/SplashScreen'
 import WhatsAppButton from './components/WhatsAppButton'
 import AIChatWidget from './components/AIChatWidget'
 import OfflineNotice from './components/OfflineNotice'
@@ -29,11 +27,8 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 
 // مؤشر تحميل مخصص خفيف وسريع للصفحات الثانوية
 const PageLoader = () => (
-  <div className="min-h-[60vh] w-full flex items-center justify-center bg-transparent">
-    <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-white border border-slate-200 text-blue-600 shadow-md text-sm font-semibold">
-      <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping" />
-      <span>جاري الفتح السريع...</span>
-    </div>
+  <div className="flex items-center justify-center min-h-[50vh]">
+    <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
   </div>
 )
 
@@ -41,43 +36,22 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 0. تهيئة الجلسة
+  // 0. تهيئة الجلسة وضبط الخلفية البيضاء الفاخرة فوراً
   useEffect(() => {
     sessionStorage.setItem('enarah_session_active', 'true');
+    if (typeof window !== 'undefined') {
+      document.body.style.backgroundColor = '#f8fafc';
+      window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
+    }
   }, []);
 
-  const [showSplash, setShowSplash] = useState(true);
-
-  // 1. شاشة البداية السينمائية المتوهجة السلسة
-  useEffect(() => {
-    if (!showSplash) {
-      if (typeof window !== 'undefined') {
-        document.body.style.backgroundColor = '#f8fafc';
-        window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
-      }
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-      if (typeof window !== 'undefined') {
-        document.body.style.backgroundColor = '#f8fafc';
-        window.dispatchEvent(new CustomEvent('enarah_splash_finished'));
-      }
-    }, 2150);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSplash]);
-
-  // التحميل المسبق للصفحات بعد انتهاء شاشة البداية لتوفير 100% من أداء المعالج أثناء الأنيميشن
+  // التحميل المسبق للصفحات في وقت الخمول لفتحها فوراً بـ 0 ثانية بدلاً من أي تأخير
   useEffect(() => {
     const prefetchTimer = setTimeout(() => {
       import('./pages/Products')
       import('./pages/Projects')
       import('./pages/Contact')
-    }, 2800)
+    }, 1200)
 
     return () => {
       clearTimeout(prefetchTimer)
@@ -117,9 +91,6 @@ function App() {
   return (
     <>
       <OfflineNotice />
-      <AnimatePresence>
-        {showSplash && <SplashScreen key="splash" />}
-      </AnimatePresence>
 
       <Suspense fallback={<PageLoader />}>
         <Routes>

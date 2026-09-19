@@ -40,21 +40,8 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
       }
     };
 
-    // الاستماع لحدث انتهاء شاشة البداية (Splash Screen) لبدء خروج اللمبة من 0:00 مباشرة
-    const handleSplashFinished = () => {
-      startFromBeginning();
-    };
-
-    window.addEventListener("enarah_splash_finished", handleSplashFinished);
-
-    // إذا كانت شاشة البداية معروضة حالياً، قف عند الإطار 0:00 حتى تنتهي
-    const isSplashActive = typeof document !== "undefined" && !!document.getElementById("splash-screen");
-    if (!isSplashActive) {
-      startFromBeginning();
-    } else {
-      video.pause();
-      video.currentTime = 0;
-    }
+    // بدء تشغيل فيديو اللمبة الترحيبية فوراً بـ 0 ثانية
+    startFromBeginning();
 
     const handleUserInteraction = () => {
       if (video && video.paused) {
@@ -81,7 +68,6 @@ export const HeroAutoCanvas: React.FC<HeroAutoCanvasProps> = ({
     }
 
     return () => {
-      window.removeEventListener("enarah_splash_finished", handleSplashFinished);
       window.removeEventListener("touchstart", handleUserInteraction);
       window.removeEventListener("scroll", handleUserInteraction);
       window.removeEventListener("pointerdown", handleUserInteraction);
