@@ -298,8 +298,8 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
             <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
               {isAr ? 'منتجات وتصنيع شركة الإنارة' : 'ENARAH Manufacturing Lines'}
             </h3>
-            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100/80">
-              {isAr ? `${displayedProducts.length} خط معتمد` : `${displayedProducts.length} Lines`}
+            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100/80 shadow-2xs">
+              {isAr ? 'أكثر من 17 صنف' : '17+ Categories'}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
