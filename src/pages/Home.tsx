@@ -9,7 +9,7 @@ import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
-  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone, Gamepad2,
+  Facebook, Instagram, ChevronRight, ChevronLeft, PlayCircle, Check, Calculator, Video, Phone, Headphones, Gamepad2,
   Layers, ImagePlus
 } from 'lucide-react'
 import EnarahProductsCarousel from '../components/EnarahProductsCarousel'
@@ -441,8 +441,8 @@ export default function Home() {
 
             <p className="text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal leading-relaxed">
               {isAr 
-                ? 'أصالة معتمدة 100%، جاهزية كبرى للتوريد الفوري للمشاريع، ودعم هندسي واستشاري متواصل.' 
-                : '100% certified authenticity, large-scale immediate project supply, and continuous engineering support.'}
+                ? 'أصالة معتمدة 100%، جاهزية كبرى للتوريد الفوري للمشاريع، وخدمة دعم فني سريع.' 
+                : '100% certified authenticity, large-scale immediate project supply, and fast technical support.'}
             </p>
 
             <div className="flex items-center justify-center gap-2 mt-4">
@@ -561,7 +561,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* البطاقة الثالثة: استشارات ودعم هندسي مجاناً */}
+            {/* البطاقة الثالثة: خدمة دعم فني سريع */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -573,30 +573,30 @@ export default function Home() {
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-[11px] font-bold">
-                    {isAr ? 'استشارات ودعم فني' : 'Technical Support'}
+                    {isAr ? 'استجابة سريعة' : 'Fast Response'}
                   </span>
                   <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/60 border border-blue-200 flex items-center justify-center text-blue-600 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-xs">
-                    <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <Headphones className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
 
                 <h3 className="text-lg sm:text-xl font-black text-slate-900 mb-1.5 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'استشارات ودعم هندسي مجاناً' : 'Free Engineering Support'}
+                  {isAr ? 'خدمة دعم فني سريع' : 'Fast Technical Support'}
                 </h3>
 
                 <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-4 font-normal">
                   {isAr 
-                    ? 'فريقنا متواجد دائماً لإرشادك لاختيار المنتجات المناسبة وتجهيز طلبيتك.' 
-                    : 'Our team is always available to guide you to the right products and orders.'}
+                    ? 'فريق فني متخصص جاهز لمساعدتكم والإجابة على الاستفسارات وحل أي مسألة فنية.' 
+                    : 'Specialized technical team ready to assist, answer questions, and resolve technical inquiries.'}
                 </p>
 
                 <div className="space-y-2 mb-5">
                   {(isAr ? [
-                    'اقتراح حلول الإنارة والتأسيس المناسبة لمشروعك',
-                    'متابعة وتنسيق مباشر وسرعة توصيل لموقع العمل'
+                    'استجابة فورية ومتابعة مباشرة لكافة احتياجاتكم',
+                    'إرشادات هندسية وفنية دقيقة قبل وبعد الشراء'
                   ] : [
-                    'Curated architectural & electrical solutions for your site',
-                    'Direct coordination & fast delivery to job locations'
+                    'Rapid response and direct follow-up for all inquiries',
+                    'Expert technical guidance before and after purchase'
                   ]).map((feat, idx) => (
                     <div key={idx} className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
@@ -609,8 +609,8 @@ export default function Home() {
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'خدمة واستشارات' : 'Consultation'}</span>
-                <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? 'مجاناً 100%' : '100% Free'}</span>
+                <span>{isAr ? 'سرعة الاستجابة' : 'Response Time'}</span>
+                <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? 'فوري ومباشر' : 'Instant & Direct'}</span>
               </div>
             </motion.div>
 
