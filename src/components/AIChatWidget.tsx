@@ -22,15 +22,15 @@ export default function AIChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const QUICK_QUESTIONS = isAr ? [
-    'ما هو لون السبوت المناسب للصالة؟ 💡',
-    'كيف أختار إنارة السكة (Track Light)؟ 🎛️',
-    'ما هو مقاس السلك المناسب لشقة كاملة أو مكيف؟ ⚡',
-    'ما الفرق بين الإضاءة الصفراء والبيضاء والذهبية؟ 🌟'
+    'ما هو لون السبوت المناسب للصالة؟',
+    'كيف أختار إنارة السكة (Track Light)؟',
+    'ما هو مقاس السلك المناسب لشقة كاملة أو مكيف؟',
+    'ما الفرق بين الإضاءة الصفراء والبيضاء والذهبية؟'
   ] : [
-    'What is the best spotlight color for the living room? 💡',
-    'How do I choose track lighting? 🎛️',
-    'What wire size is suitable for a whole apartment or AC? ⚡',
-    'What is the difference between yellow, white, and golden light? 🌟'
+    'What is the best spotlight color for the living room?',
+    'How do I choose track lighting?',
+    'What wire size is suitable for a whole apartment or AC?',
+    'What is the difference between yellow, white, and golden light?'
   ];
 
   // استرجاع الرسائل السابقة من الـ sessionStorage لمنع فقدان البيانات عند التصفح
@@ -53,8 +53,8 @@ export default function AIChatWidget() {
           id: 'welcome',
           role: 'assistant',
           content: isAr 
-            ? 'مرحباً بك في الإنارة الحديثة! 💡 أنا مساعدك الذكي المتخصص في مواد التأسيس الكهربائي، الإنارة، التشطيبات والديكور. اسألني عن أي شيء تحتاجه وسأجيبك فوراً!'
-            : 'Welcome to Modern Enarah! 💡 I am your smart assistant specializing in electrical foundation materials, lighting, finishes, and decoration. Ask me anything you need and I will reply instantly!',
+            ? 'مرحباً بك في الإنارة الحديثة! أنا مساعدك الذكي المتخصص في مواد التأسيس الكهربائي، الإنارة، التشطيبات والديكور. اسألني عن أي شيء تحتاجه وسأجيبك فوراً.'
+            : 'Welcome to Modern Enarah! I am your smart assistant specializing in electrical foundation materials, lighting, finishes, and decoration. Ask me anything you need and I will reply instantly.',
           timestamp: new Date()
         }
       ])
@@ -152,7 +152,7 @@ export default function AIChatWidget() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
               </span>
-              <span>{isAr ? 'اسأل مساعدك الذكي 💡' : 'Ask your AI assistant 💡'}</span>
+              <span>{isAr ? 'اسأل مساعدك الذكي' : 'Ask your AI assistant'}</span>
               {/* ذيل الفقاعة الصغير */}
               <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent ${
                 isAr 
