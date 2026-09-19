@@ -609,13 +609,13 @@ export default function Home() {
             <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-emerald-500/5 via-orange-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-            {/* الجزء الرئيسي: الشعار الرسمي + بطاقة التعريف التاريخية */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-12 relative z-10">
+            {/* الجزء الرئيسي: تصميم ثنائي متناسق جنباً إلى جنب على الهواتف والشاشات الكبيرة */}
+            <div className="flex flex-row items-start gap-3 sm:gap-6 lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center mb-8 sm:mb-12 relative z-10" dir={isAr ? 'rtl' : 'ltr'}>
               
-              {/* عمود الشعار الدائري للشركة */}
-              <div className="lg:col-span-4 flex flex-col items-center text-center">
+              {/* عمود الشعار الدائري للشركة (جزء اليمين) */}
+              <div className="w-[95px] sm:w-[130px] lg:w-auto lg:col-span-4 shrink-0 flex flex-col items-center text-center">
                 <div className="relative group">
-                  <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-full bg-white border-2 border-slate-200 shadow-md p-2.5 sm:p-3 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105">
+                  <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-52 lg:h-52 rounded-full bg-white border-2 border-slate-200 shadow-md p-1.5 sm:p-3 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105">
                     <img 
                       src="/images/company-enarah-logo.jpg" 
                       alt="شعار شركة الإنارة - ENARAH" 
@@ -623,53 +623,54 @@ export default function Home() {
                     />
                   </div>
                   {/* شارة سنة التأسيس */}
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-xs font-black px-4 py-1 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
-                    {isAr ? 'تأسست عام 1988' : 'EST. 1988'}
+                  <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-[9px] sm:text-xs font-black px-2 sm:px-4 py-0.5 sm:py-1 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
+                    {isAr ? 'تأسست 1988' : 'EST. 1988'}
                   </div>
                 </div>
               </div>
 
-              {/* عمود البيانات والنصوص الرسمية */}
-              <div className="lg:col-span-8 space-y-4 text-center lg:text-right" dir={isAr ? 'rtl' : 'ltr'}>
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-bold">
-                  <Sparkles className="w-3.5 h-3.5" />
+              {/* عمود البيانات والشرح الرسمي المتكامل (جزء اليسار جنباً إلى جنب) */}
+              <div className="flex-1 min-w-0 space-y-2 sm:space-y-4 lg:col-span-8 text-right">
+                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-[10px] sm:text-xs font-bold">
+                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   <span>{isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}</span>
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                <h2 className="text-lg sm:text-2xl lg:text-4xl font-black text-slate-900 tracking-tight">
                   {isAr ? 'شركة الإنارة' : 'ENARAH Company'}
                 </h2>
 
-                <div className="space-y-3.5 text-slate-700 leading-relaxed text-sm sm:text-base font-normal text-right">
-                  <p className="p-4 sm:p-5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-xs">
+                {/* بطاقة الشرح المتكامل عن الشركة بدون مظهر طولي أو تكرار */}
+                <div className="p-3 sm:p-5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-xs text-slate-700 leading-relaxed text-[11px] sm:text-sm lg:text-base font-normal space-y-2">
+                  <p className="font-semibold text-slate-900">
                     {isAr 
-                      ? 'شركة الإنارة لتجارة وتصنيع  مواد التأسيس الكهربائي والاضاءات المختلفة، إحدى الشركات الرائدة في السوق الليبي منذ تأسيسها عام 1988.'
+                      ? 'شركة الإنارة لتجارة وتصنيع مواد التأسيس الكهربائي والاضاءات المختلفة، إحدى الشركات الرائدة في السوق الليبي منذ تأسيسها عام 1988.'
                       : 'Enarah Company for trading and manufacturing electrical foundation materials and various lightings, one of the leading companies in the Libyan market since its establishment in 1988.'}
                   </p>
-                  <p className="p-4 sm:p-5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-xs">
+                  <p className="text-slate-600 text-[10.5px] sm:text-sm leading-normal">
                     {isAr 
-                      ? 'نمتلك خبرة طويلة في مجال استيراد وتصنيع وتوزيع المنتجات الكهربائية، ونحرص دائمًا على توفير أحدث المنتجات ذات الجودة العالية التي تلبي احتياجات السوق الليبي. على مدار أكثر من ثلاثة عقود، بنينا شبكة واسعة من الفروع ونقاط التوزيع في مختلف المدن الليبية، مما مكّننا من خدمة عملائنا بسرعة وكفاءة وموثوقية عالية. كما نفخر بكوننا موزعين ووكلاء لعدد من العلامات التجارية العالمية المعروفة في مجال الإنارة والتجهيزات الكهربائية.'
-                      : 'We have extensive experience in importing, manufacturing, and distributing electrical products, always ensuring modern high-quality products meeting Libyan market demands. Across over three decades, we established a widespread network of branches and distribution centers in various Libyan cities, serving our clients with speed, efficiency, and reliability. We are also proud distributors and agents for world-renowned international brands in lighting and electrical equipment.'}
+                      ? 'نمتلك خبرة طويلة في استيراد وتصنيع وتوزيع المنتجات الكهربائية، ونحرص دائماً على توفير أحدث المنتجات ذات الجودة العالية. بنينا شبكة واسعة من الفروع ونقاط التوزيع في مختلف المدن الليبية لخدمة عملائنا بكفاءة وموثوقية، ونفخر بكوننا موزعين ووكلاء معتمدين لنخبة من كبرى العلامات التجارية العالمية.'
+                      : 'We possess extensive experience in importing, manufacturing, and distributing top-tier electrical products across a nationwide branch network serving clients with speed and reliability, and we are proud authorized distributors for world-renowned brands.'}
                   </p>
                 </div>
 
-                {/* كروت الأرقام والمزايا الرئيسية */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-base sm:text-lg font-black text-slate-900">+36</span>
-                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'عاماً من الخبرة' : 'Years Experience'}</span>
+                {/* كروت الأرقام والمزايا الأربعة */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
+                  <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-sm sm:text-base lg:text-lg font-black text-slate-900">+36</span>
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'عاماً خبرة' : 'Years Experience'}</span>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-base sm:text-lg font-black text-emerald-600">1988</span>
-                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'سنة التأسيس' : 'Established'}</span>
+                  <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-sm sm:text-base lg:text-lg font-black text-emerald-600">1988</span>
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'سنة التأسيس' : 'Established'}</span>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-base sm:text-lg font-black text-blue-600">{isAr ? 'فروع ليبيا' : 'Libya Branches'}</span>
-                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'تغطية شاملة' : 'Nationwide'}</span>
+                  <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-sm sm:text-base lg:text-lg font-black text-blue-600">{isAr ? 'فروع ليبيا' : 'Libya Branches'}</span>
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'تغطية شاملة' : 'Nationwide'}</span>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-base sm:text-lg font-black text-orange-500">100%</span>
-                    <span className="text-[11px] font-semibold text-slate-600">{isAr ? 'وكلاء وموزعون' : 'Certified Agency'}</span>
+                  <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+                    <span className="block text-sm sm:text-base lg:text-lg font-black text-orange-500">100%</span>
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'وكلاء وموزعون' : 'Certified Agency'}</span>
                   </div>
                 </div>
 
