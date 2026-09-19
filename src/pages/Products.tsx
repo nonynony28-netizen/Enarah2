@@ -382,7 +382,7 @@ export default function Products() {
 
         {/* عنوان المعرض الرئيسي */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-10 md:mb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
             {isAr ? (
               <>متجر <span className="text-blue-600">الإنارة والكهرباء</span></>
             ) : (

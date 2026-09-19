@@ -47,7 +47,7 @@ export default function Game() {
             <span>{isAr ? 'لعبة تفاعلية حصرية' : 'Exclusive Mini Game'}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 mb-3">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-3">
             {isAr ? 'رحلة النور | بطل' : 'Light Quest | Hero of'} <span className="text-blue-600">{isAr ? 'الإنارة الحديثة' : 'Modern Enarah'}</span>
           </h1>
 

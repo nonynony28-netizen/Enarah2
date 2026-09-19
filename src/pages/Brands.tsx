@@ -218,7 +218,7 @@ export default function Brands() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? (
                 <>شركاؤنا من <span className="text-blue-600">العلامات العالمية</span></>
               ) : (
@@ -263,7 +263,7 @@ export default function Brands() {
                     />
                   </div>
                   {/* شارة سنة التأسيس */}
-                  <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-[9px] sm:text-xs font-black px-2 sm:px-4 py-0.5 sm:py-1 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
+                  <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-[9px] sm:text-xs font-bold px-2 sm:px-4 py-0.5 sm:py-1 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
                     {isAr ? 'تأسست 1988' : 'EST. 1988'}
                   </div>
                 </div>
@@ -276,7 +276,7 @@ export default function Brands() {
                   <span>{isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}</span>
                 </div>
 
-                <h2 className="text-lg sm:text-2xl lg:text-4xl font-black text-slate-900 tracking-tight">
+                <h2 className="text-lg sm:text-2xl lg:text-4xl font-bold text-slate-900 tracking-tight">
                   {isAr ? 'شركة الإنارة' : 'ENARAH Company'}
                 </h2>
 
@@ -297,19 +297,19 @@ export default function Brands() {
                 {/* كروت الأرقام والمزايا الأربعة */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-slate-900">+36</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-slate-900">+36</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'عاماً خبرة' : 'Years'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-emerald-600">1988</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-emerald-600">1988</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'سنة التأسيس' : 'Founded'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-blue-600">{isAr ? 'فروع ليبيا' : 'Branches'}</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-blue-600">{isAr ? 'فروع ليبيا' : 'Branches'}</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'كافة المدن' : 'Nationwide'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-orange-500">100%</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-orange-500">100%</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'وكالات معتمدة' : 'Official Agency'}</span>
                   </div>
                 </div>

@@ -55,7 +55,7 @@ export default function Contractors() {
           <div className="inline-flex p-3 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 mb-2 shadow-sm">
             <Building2 className="w-7 h-7" />
           </div>
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-none text-slate-900">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-none text-slate-900">
             {isAr ? 'بوابة المقاولين والكميات' : 'Contractors & Bulk Portal'}
           </h1>
           <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto leading-relaxed font-normal">

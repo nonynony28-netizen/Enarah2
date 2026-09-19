@@ -210,7 +210,7 @@ export default function WirePrices() {
               <Zap className="w-7 h-7 text-blue-600" />
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? 'أسعار الأسلاك' : 'Wire Prices'}{' '}
               <span className="text-blue-600">
                 {isAr ? 'الإيطالية' : 'Italian'}

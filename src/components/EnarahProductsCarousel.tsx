@@ -295,7 +295,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
             <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100/80">
               <SlidersHorizontal className="w-4 h-4" />
             </span>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 tracking-tight">
               {isAr ? 'منتجات وتصنيع شركة الإنارة' : 'ENARAH Manufacturing Lines'}
             </h3>
             <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100/80 shadow-2xs">

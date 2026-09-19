@@ -27,7 +27,7 @@ export default function WireAnatomyScroll() {
   return (
     <div ref={containerRef} className="relative w-full min-h-[130vh] lg:min-h-[160vh] py-10 my-10">
       <div className="text-center mb-10 max-w-2xl mx-auto px-4">
-        <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-3">
+        <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-3">
           {isAr ? 'التشريح التفاعلي للأسلاك الإيطالية' : 'Interactive Anatomy of Italian Wires'}
         </h3>
         <p className="text-xs md:text-sm text-slate-500">

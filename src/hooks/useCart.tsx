@@ -227,7 +227,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
               }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.85, ease: [0.25, 1, 0.5, 1] }}
-              className="fixed z-[9999] pointer-events-none w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-[10px] font-black text-white shadow-[0_0_12px_rgba(59,130,246,0.8)] border border-blue-300/40"
+              className="fixed z-[9999] pointer-events-none w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shadow-[0_0_12px_rgba(59,130,246,0.8)] border border-blue-300/40"
             >
               +1
             </motion.div>

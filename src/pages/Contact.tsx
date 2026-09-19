@@ -109,7 +109,7 @@ export default function Contact() {
         {/* Header */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? 'تواصل' : 'Contact'} <span className="text-blue-600">{isAr ? 'معنا' : 'Us'}</span>
             </h1>
 

@@ -300,7 +300,7 @@ export default function CartPanel() {
               {pricedTotal > 0 && (
                 <div className="flex items-center justify-between border-t border-slate-200 pt-2.5">
                   <span className="text-slate-800 font-bold text-sm">{isAr ? 'إجمالي المواد المسعرة:' : 'Total priced items:'}</span>
-                  <span className="text-blue-700 font-black text-xl">
+                  <span className="text-blue-700 font-bold text-xl">
                     {pricedTotal.toFixed(2)} <span className="text-xs font-normal text-slate-500">{isAr ? 'د.ل' : 'LYD'}</span>
                   </span>
                 </div>

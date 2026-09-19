@@ -198,7 +198,7 @@ export default function Projects() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? 'جزء من' : 'Part of'} <span className="text-blue-600">{isAr ? 'مشاريعنا' : 'Our Projects'}</span>
             </h1>
             <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg mb-6 font-normal">
@@ -400,7 +400,7 @@ export default function Projects() {
                       <span className="px-3 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-md inline-block mb-3">
                         {selectedProject.category}
                       </span>
-                      <h2 className="text-xl md:text-2xl font-black text-slate-900 leading-tight">{selectedProject.name}</h2>
+                      <h2 className="text-xl md:text-2xl font-bold text-slate-900 leading-tight">{selectedProject.name}</h2>
                     </div>
 
                     <div className="h-px bg-slate-200 w-full" />
@@ -417,7 +417,7 @@ export default function Projects() {
                         href={selectedProject.video}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-500/25 active:scale-95 cursor-pointer"
+                        className="inline-flex items-center justify-center gap-2 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-500/25 active:scale-95 cursor-pointer"
                       >
                         <PlayCircle className="w-4 h-4" />
                         {isAr ? 'شاهد فيديو المشروع' : 'Watch Project Video'}

@@ -5,8 +5,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        cairo: ['Cairo', 'sans-serif'],
-        tajawal: ['Tajawal', 'sans-serif'],
+        sans: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
+        arabic: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
+        cairo: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
+        tajawal: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -51,6 +53,13 @@ module.exports = {
           DEFAULT: "#d4a017",
           light: "#e8c766",
           dark: "#a67c00",
+        },
+        'brand-blue': {
+          DEFAULT: "var(--brand-blue, #2563eb)",
+          hover: "var(--brand-blue-hover, #1d4ed8)",
+          active: "var(--brand-blue-active, #1e40af)",
+          light: "var(--brand-blue-light, #eff6ff)",
+          soft: "var(--brand-blue-soft, #dbeafe)",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

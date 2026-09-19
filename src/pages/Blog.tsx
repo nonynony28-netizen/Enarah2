@@ -137,7 +137,7 @@ export default function Blog() {
         {/* عنوان الصفحة */}
         <FadeIn delay={0.1}>
           <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? (
                 <>مدونة <span className="text-blue-600">الإنارة</span></>
               ) : (

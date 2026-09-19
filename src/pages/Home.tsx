@@ -406,7 +406,7 @@ export default function Home() {
                 className="max-w-4xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
               >
 
-                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
                   <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.8)]">{t('hero.title.part1')}</span>{' '}
                   <span className="text-blue-400 drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]">{t('hero.title.part2')}</span>
                 </h1>
@@ -419,7 +419,7 @@ export default function Home() {
                 <div className="flex items-center justify-center gap-3">
                   <Link
                     to="/products"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
                   >
                     <ShoppingCart className="w-4 h-4" />
                     <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
@@ -427,7 +427,7 @@ export default function Home() {
 
                   <a
                     href="#wires-import-showcase"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-bold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-semibold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
                   >
                     <span>{isAr ? 'أسلاك إيطالية معتمدة' : 'Certified Italian Wires'}</span>
                   </a>
@@ -455,7 +455,7 @@ export default function Home() {
               <span>{isAr ? 'الثقة والجودة في مكان واحد' : 'Trust & Quality in One Place'}</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 tracking-tight text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 tracking-tight text-slate-900">
               {isAr ? 'لماذا' : 'Why'}{' '}
               <span className="text-blue-600">
                 {isAr ? 'نحن؟' : 'Choose Us?'}
@@ -498,7 +498,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'وكالات عالمية حصرية' : 'Exclusive Global Agencies'}
                 </h3>
 
@@ -528,7 +528,7 @@ export default function Home() {
 
               <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
                 <span>{isAr ? 'الأصالة والاعتماد' : 'Authenticity'}</span>
-                <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? '100% مضمون' : '100% Guaranteed'}</span>
+                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? '100% مضمون' : '100% Guaranteed'}</span>
               </div>
             </motion.div>
 
@@ -551,7 +551,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'توريد كبرى المشاريع والجملة' : 'Bulk & Project Supply'}
                 </h3>
 
@@ -581,7 +581,7 @@ export default function Home() {
 
               <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
                 <span>{isAr ? 'جاهزية المستودعات' : 'Warehouse Readiness'}</span>
-                <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? 'كميات متوفرة دائماً' : 'Always in Stock'}</span>
+                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? 'كميات متوفرة دائماً' : 'Always in Stock'}</span>
               </div>
             </motion.div>
 
@@ -604,7 +604,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'خدمة دعم فني سريع' : 'Fast Technical Support'}
                 </h3>
 
@@ -634,7 +634,7 @@ export default function Home() {
 
               <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
                 <span>{isAr ? 'سرعة الاستجابة' : 'Response Time'}</span>
-                <span className="text-blue-600 font-black text-xs sm:text-sm">{isAr ? 'فوري ومباشر' : 'Instant & Direct'}</span>
+                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? 'فوري ومباشر' : 'Instant & Direct'}</span>
               </div>
             </motion.div>
 
@@ -682,7 +682,7 @@ export default function Home() {
                     />
                   </div>
                   {/* شارة سنة التأسيس */}
-                  <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-[9px] sm:text-xs font-black px-2 sm:px-4 py-0.5 sm:py-1 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
+                  <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-[9px] sm:text-xs font-bold px-2 sm:px-4 py-0.5 sm:py-1 rounded-full shadow-md border border-slate-700 whitespace-nowrap">
                     {isAr ? 'تأسست 1988' : 'EST. 1988'}
                   </div>
                 </div>
@@ -695,7 +695,7 @@ export default function Home() {
                   <span>{isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}</span>
                 </div>
 
-                <h2 className="text-lg sm:text-2xl lg:text-4xl font-black text-slate-900 tracking-tight">
+                <h2 className="text-lg sm:text-2xl lg:text-4xl font-bold text-slate-900 tracking-tight">
                   {isAr ? 'شركة الإنارة' : 'ENARAH Company'}
                 </h2>
 
@@ -716,19 +716,19 @@ export default function Home() {
                 {/* كروت الأرقام والمزايا الأربعة */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-slate-900">+36</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-slate-900">+36</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'عاماً خبرة' : 'Years Experience'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-emerald-600">1988</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-emerald-600">1988</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'سنة التأسيس' : 'Established'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-blue-600">{isAr ? 'فروع ليبيا' : 'Libya Branches'}</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-blue-600">{isAr ? 'فروع ليبيا' : 'Libya Branches'}</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'تغطية شاملة' : 'Nationwide'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
-                    <span className="block text-sm sm:text-base lg:text-lg font-black text-orange-500">100%</span>
+                    <span className="block text-sm sm:text-base lg:text-lg font-bold text-orange-500">100%</span>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'وكلاء وموزعون' : 'Certified Agency'}</span>
                   </div>
                 </div>
@@ -752,7 +752,7 @@ export default function Home() {
           
           {/* عنوان القسم */}
           <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? (
                 <>شركاؤنا من <span className="text-blue-600">العلامات العالمية</span></>
               ) : (
@@ -802,7 +802,7 @@ export default function Home() {
 
                 {/* Brand Name & Origin */}
                 <div className="w-full">
-                  <h3 className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors mb-1 truncate">
+                  <h3 className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 truncate">
                     {brand.name}
                   </h3>
                   <span className="inline-block text-[10px] px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 font-bold">
@@ -859,7 +859,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
               {t('sim.title.part1')} <span className="text-blue-600">{t('sim.title.part2')}</span>
             </h2>
             <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal">
@@ -1046,7 +1046,7 @@ export default function Home() {
       <section id="paint-matching" className="py-20 md:py-28 relative overflow-hidden border-t border-slate-200 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
               {isAr ? (
                 <>دليل تطابق <span className="text-blue-600">الطلاء والإضاءة</span></>
               ) : (
@@ -1285,7 +1285,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 md:mb-18 gap-6">
             <div>
-              <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-slate-900">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
                 {isAr ? (
                   <>جزء من <span className="text-blue-600">مشاريعنا</span></>
                 ) : (
@@ -1326,7 +1326,7 @@ export default function Home() {
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent z-10" />
                         
                         <div className="absolute top-3 right-3 z-20">
-                          <span className="px-3 py-1 bg-white/95 border border-blue-200 text-blue-700 text-[10px] font-black rounded-full shadow-sm">
+                          <span className="px-3 py-1 bg-white/95 border border-blue-200 text-blue-700 text-[10px] font-bold rounded-full shadow-sm">
                             {project.category}
                           </span>
                         </div>
@@ -1366,7 +1366,7 @@ export default function Home() {
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent z-10" />
                       
                       <div className="absolute top-3 right-3 z-20">
-                        <span className="px-3 py-1 bg-white/95 border border-blue-200 text-blue-700 text-[10px] font-black rounded-full shadow-sm">
+                        <span className="px-3 py-1 bg-white/95 border border-blue-200 text-blue-700 text-[10px] font-bold rounded-full shadow-sm">
                           {project.category}
                         </span>
                       </div>
@@ -1423,9 +1423,9 @@ export default function Home() {
 
                 {/* شارة طافية بالأعلى */}
                 <div className="absolute top-4 right-4 z-20">
-                  <span className="px-3.5 py-1.5 rounded-full bg-blue-600 text-white text-[11px] sm:text-xs font-black border border-blue-400 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+                  <span className="px-3.5 py-1.5 rounded-full bg-blue-600 text-white text-[11px] sm:text-xs font-bold border border-blue-400 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
                     <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                    <span>{isAr ? '🇮🇹 🇹🇷 استيراد مباشر' : 'Direct Import'}</span>
+                    <span>{isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
                   </span>
                 </div>
 
@@ -1452,7 +1452,7 @@ export default function Home() {
                 <span>{isAr ? 'معايير الجودة والتأسيس الكهربائي' : 'Electrical Standards & Cables'}</span>
               </div>
 
-              <h3 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 leading-tight">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 mb-4 leading-tight">
                 {isAr ? (
                   <>أسلاك وكوابل إيطالية وتركية <br /><span className="text-blue-600">من المصنع مباشرة</span></>
                 ) : (
@@ -1526,7 +1526,7 @@ export default function Home() {
                   <Sparkles className="w-3 h-3" />
                   <span>{isAr ? 'لعبة تفاعلية حصرية' : 'Exclusive Game'}</span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900">
                   {isAr ? 'رحلة النور | بطل الإنارة الحديثة' : 'Light Quest | Modern Enarah Hero'}
                 </h3>
                 <p className="text-slate-600 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
@@ -1539,7 +1539,7 @@ export default function Home() {
 
             <Link
               to="/game"
-              className="w-full md:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 shadow-md shadow-blue-500/25 cursor-pointer"
+              className="w-full md:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 shadow-md shadow-blue-500/25 cursor-pointer"
             >
               <span>{isAr ? 'العب واكسب الخصم الآن' : 'Play & Win Discount'}</span>
               <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
@@ -1561,7 +1561,7 @@ export default function Home() {
           >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.06),transparent_70%)] pointer-events-none" />
 
-            <h2 className="relative z-10 text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 tracking-tight">
+            <h2 className="relative z-10 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
               {isAr ? (
                 <>ابدأ مشروعك معنا <span className="text-blue-600">اليوم</span></>
               ) : (
@@ -1718,7 +1718,7 @@ export default function Home() {
                       <span className="px-4 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-full inline-block mb-3">
                         {selectedProject.category}
                       </span>
-                      <h2 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{selectedProject.name}</h2>
+                      <h2 className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight">{selectedProject.name}</h2>
                     </div>
 
                     <div className="h-px bg-slate-200 w-full" />
@@ -1735,7 +1735,7 @@ export default function Home() {
                         href={selectedProject.video}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-base rounded-2xl transition-all duration-300 shadow-lg shadow-blue-500/30 active:scale-98"
+                        className="inline-flex items-center justify-center gap-2 w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-2xl transition-all duration-300 shadow-lg shadow-blue-500/30 active:scale-98"
                       >
                         <PlayCircle className="w-5.5 h-5.5" />
                         شاهد فيديو المشروع
