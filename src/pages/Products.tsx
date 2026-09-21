@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search, X, ShoppingCart, Check, Image as ImageIcon, 
-  ArrowRight, Sparkles, Layers, Zap, Eye, Video, 
+  ArrowRight, Layers, Zap, Eye, Video, 
   ChevronLeft, SlidersHorizontal, Package, Star,
   Flame, Tag, BadgePercent 
 } from 'lucide-react'
@@ -117,65 +117,6 @@ const defaultFallbackProducts: ProductItem[] = [
     stockStatus: 'available',
     stockQty: 20,
     category: 'الأسلاك والكوابل الإيطالية والتركية'
-  }
-]
-
-// 🔮 قائمة الأقسام القادمة قريباً (Coming Soon Categories)
-const COMING_SOON_CATEGORIES = [
-  {
-    id: 'soon-chandeliers',
-    nameAr: 'الثريات المودرن والإنارة الفاخرة',
-    nameEn: 'Modern & Crystal Chandeliers',
-    descriptionAr: 'تشكيلة حصرية من أرقى الثريات الكريستالية والمودرن للمجالس والصالونات.',
-    descriptionEn: 'Luxury crystal and modern chandeliers to elevate your living spaces.',
-    image: 'https://i.postimg.cc/QxrShKw7/IMG-3394.webp',
-    badgeAr: 'قريباً',
-    badgeEn: 'Coming Soon',
-    tag: 'ثريات فاخرة'
-  },
-  {
-    id: 'soon-spots',
-    nameAr: 'سبوت لايت وسكك الليد المغناطيسية',
-    nameEn: 'Spotlights & Magnetic Track Lights',
-    descriptionAr: 'سبوتات مضادة للتوهج Anti-Glare وأنظمة إنارة خطية مغناطيسية متطورة.',
-    descriptionEn: 'Anti-glare spotlights and modern magnetic track lighting systems.',
-    image: 'https://i.postimg.cc/9XDrxxfX/IMG-3399.webp',
-    badgeAr: 'قريباً',
-    badgeEn: 'Coming Soon',
-    tag: 'إنارة معمارية'
-  },
-  {
-    id: 'soon-switches',
-    nameAr: 'المفاتيح والبريزات الذكية',
-    nameEn: 'Smart Switches & Sockets',
-    descriptionAr: 'مفاتيح لمس ذكية وتصاميم عصرية ومآخذ شحن سريع بأعلى معايير الأمان.',
-    descriptionEn: 'Modern touch smart switches and high-speed fast charging sockets.',
-    image: 'https://i.postimg.cc/rFdZwLwK/IMG-3396.webp',
-    badgeAr: 'قريباً',
-    badgeEn: 'Coming Soon',
-    tag: 'مفاتيح ذكية'
-  },
-  {
-    id: 'soon-intercom',
-    nameAr: 'أنظمة الإنترفون المرئي والأمان',
-    nameEn: 'Smart Video Intercom Systems',
-    descriptionAr: 'أحدث أجهزة الإنترفون الذكية بشاشات HD وخاصية الاتصال بالهاتف.',
-    descriptionEn: 'Smart HD video intercom systems with mobile connectivity for home security.',
-    image: 'https://i.postimg.cc/pLN7ftsB/IMG-3725.webp',
-    badgeAr: 'قريباً',
-    badgeEn: 'Coming Soon',
-    tag: 'أمان وحماية'
-  },
-  {
-    id: 'soon-foundation',
-    nameAr: 'مواد التأسيس والعلب والمواسير',
-    nameEn: 'Electrical Installation Materials',
-    descriptionAr: 'مواسير وعلب وقواطع حماية معتمدة شديدة التحمل للمباني والمشاريع.',
-    descriptionEn: 'Heavy-duty certified pipes, junction boxes, and installation essentials.',
-    image: 'https://i.postimg.cc/zDy4VhdZ/IMG-3395.webp',
-    badgeAr: 'قريباً',
-    badgeEn: 'Coming Soon',
-    tag: 'تأسيس معتمد'
   }
 ]
 
@@ -605,88 +546,8 @@ export default function Products() {
               )
             })}
 
-            {/* 🔮 قسم قريباً... (Coming Soon Section) */}
-            <section id="coming-soon-section" className="pt-12 border-t border-slate-200">
-              {/* رأس قسم قريباً */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
-                    <Sparkles className="w-5 h-5 animate-pulse" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2.5">
-                      <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-                        {isAr ? 'قريباً في متجرنا...' : 'Coming Soon...'}
-                      </h2>
-                      <span className="px-3 py-0.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-full">
-                        {isAr ? 'تشكيلات جديدة' : 'New Collections'}
-                      </span>
-                    </div>
-                    <p className="text-slate-500 text-xs mt-1 font-normal">
-                      {isAr 
-                        ? 'نعمل حالياً على تجهيز وإضافة تشكيلات حصرية من أرقى منتجات الإنارة والتأسيس الذكي:'
-                        : 'We are curating and adding premium exclusive collections for lighting and smart installation:'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* شبكة بطاقات الأقسام القادمة قريباً */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10">
-                {COMING_SOON_CATEGORIES.map((soonCat) => (
-                  <motion.div
-                    key={soonCat.id}
-                    whileHover={{ y: -5 }}
-                    className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-xl transition-all duration-300 shadow-sm flex flex-col justify-between"
-                  >
-                    <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-                      <img 
-                        src={soonCat.image} 
-                        alt={isAr ? soonCat.nameAr : soonCat.nameEn}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
-                      
-                      {/* شارة قريباً */}
-                      <div className="absolute top-3 right-3 z-10">
-                        <span className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-[10px] font-bold shadow-md flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                          <span>{isAr ? soonCat.badgeAr : soonCat.badgeEn}</span>
-                        </span>
-                      </div>
-
-                      <div className="absolute bottom-3 right-3 z-10">
-                        <span className="px-2 py-0.5 rounded-md bg-white/90 text-slate-800 text-[10px] font-semibold backdrop-blur-sm shadow-sm">
-                          {soonCat.tag}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-4 flex flex-col justify-between flex-grow">
-                      <div>
-                        <h3 className="text-sm font-bold text-slate-900 mb-1.5 group-hover:text-blue-600 transition-colors">
-                          {isAr ? soonCat.nameAr : soonCat.nameEn}
-                        </h3>
-                        <p className="text-[11px] text-slate-500 leading-relaxed font-normal line-clamp-2">
-                          {isAr ? soonCat.descriptionAr : soonCat.descriptionEn}
-                        </p>
-                      </div>
-
-                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[10px] text-slate-400 font-medium">
-                          {isAr ? 'قيد التجهيز والإدراج' : 'Under preparation'}
-                        </span>
-                        <span className="text-[11px] text-blue-600 font-bold flex items-center gap-1">
-                          <span>{isAr ? 'ترقبوا' : 'Stay tuned'}</span>
-                          <span>✨</span>
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* بنر الاستفسارات والطلبات الخاصة عبر الواتساب */}
+            {/* بنر الاستفسارات والطلبات الخاصة عبر الواتساب */}
+            <div className="mt-12 pt-8 border-t border-slate-200">
               <div className="relative rounded-2xl bg-gradient-to-r from-blue-50 via-white to-blue-50 border border-blue-200 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden shadow-sm">
                 <div className="text-right">
                   <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold inline-block mb-2">
@@ -703,7 +564,7 @@ export default function Products() {
                 </div>
 
                 <a 
-                  href="https://wa.me/218915079140?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%B7%D9%84%D8%A8%D9%8A%D8%A9%20%D8%AE%D8%A7%D8%B5%D8%A9%20%D9%85%D9%86%20%D9%85%D8%AA%D8%AC%D8%B1%20%D8%A7%D9%84%D8%A5%D9%86%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%D8%A9"
+                  href="https://wa.me/218915079140?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%B7%D9%84%D8%A8%D9%8A%D8%A9%20%D8%AE%D8%A7%D8%B3%D8%A9%20%D9%85%D9%86%20%D9%85%D8%AA%D8%AC%D8%B1%20%D8%A7%D9%84%D8%A5%D9%86%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%D8%A9"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm whitespace-nowrap shadow-lg shadow-emerald-600/25 transition-all active:scale-95 cursor-pointer"
@@ -712,7 +573,7 @@ export default function Products() {
                   <span>{isAr ? 'تواصل معنا فوراً عبر الواتساب' : 'Contact via WhatsApp'}</span>
                 </a>
               </div>
-            </section>
+            </div>
           </div>
         )}
 
