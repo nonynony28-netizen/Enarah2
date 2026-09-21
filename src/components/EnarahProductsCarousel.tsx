@@ -177,20 +177,6 @@ export const ENARAH_PRODUCTS: EnarahProductItem[] = [
     tagEn: 'Certified Breakers & Protections'
   },
   {
-    id: 'cables',
-    group: 'electrical',
-    titleAr: 'كابلات وأسلاك التوصيل النحاسية',
-    titleEn: 'Certified Copper Cables & Wires',
-    categoryAr: 'كابلات معتمدة',
-    categoryEn: 'Cables & Wires',
-    descAr: 'أسلاك نحاسية معتمدة ومقاومة للحرارة تلبي متطلبات المشاريع السكنية والتجارية بأعلى موثوقية.',
-    descEn: 'Certified heat-resistant copper wires for residential and commercial projects.',
-    image: '/images/cat-cables.jpg',
-    isPending: true,
-    tagAr: 'في انتظار إدراج الصورة',
-    tagEn: 'Awaiting Photo'
-  },
-  {
     id: 'regulators',
     group: 'appliances',
     titleAr: 'منظمات الجهد الكهربائي بأحجامها وقدراتها',
@@ -299,7 +285,7 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
               {isAr ? 'منتجات وتصنيع شركة الإنارة' : 'ENARAH Manufacturing Lines'}
             </h3>
             <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100/80 shadow-2xs">
-              {isAr ? 'أكثر من 17 صنف' : '17+ Categories'}
+              {isAr ? `أكثر من ${ENARAH_PRODUCTS.length} صنف` : `${ENARAH_PRODUCTS.length}+ Categories`}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
