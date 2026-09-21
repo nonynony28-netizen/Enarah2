@@ -134,8 +134,8 @@ export default function AIChatWidget() {
   return (
     <>
       {/* زر الشات العائم */}
-      <div className={`fixed bottom-6 z-50 flex items-center ${
-        isAr ? 'left-6 flex-row-reverse md:flex-row md:right-[96px] md:left-auto' : 'right-6 flex-row md:flex-row-reverse md:left-[96px] md:right-auto'
+      <div className={`fixed bottom-5 z-50 flex items-center ${
+        isAr ? 'left-5 flex-row-reverse md:flex-row md:right-[78px] md:left-auto' : 'right-5 flex-row md:flex-row-reverse md:left-[78px] md:right-auto'
       }`}>
         {/* فقاعة المحادثة الإبداعية "مساعدك الذكي" */}
         <AnimatePresence>
@@ -146,7 +146,7 @@ export default function AIChatWidget() {
               exit={{ opacity: 0, x: isAr ? 10 : -10, scale: 0.9 }}
               transition={{ delay: 0.5, duration: 0.4 }}
               onClick={() => setIsOpen(true)}
-              className="relative px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-800 text-xs font-bold whitespace-nowrap shadow-xl flex items-center gap-2 select-none cursor-pointer hover:bg-slate-50 hover:border-blue-500/50 transition-all duration-300"
+              className="relative px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-800 text-[11px] font-bold whitespace-nowrap shadow-lg flex items-center gap-1.5 select-none cursor-pointer hover:bg-slate-50 hover:border-blue-500/50 transition-all duration-300"
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -154,10 +154,10 @@ export default function AIChatWidget() {
               </span>
               <span>{isAr ? 'اسأل مساعدك الذكي' : 'Ask your AI assistant'}</span>
               {/* ذيل الفقاعة الصغير */}
-              <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent ${
+              <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[5px] border-y-transparent ${
                 isAr 
-                  ? 'right-auto -left-[6px] border-r-[6px] border-r-white'
-                  : 'left-auto -right-[6px] border-l-[6px] border-l-white'
+                  ? 'right-auto -left-[5px] border-r-[5px] border-r-white'
+                  : 'left-auto -right-[5px] border-l-[5px] border-l-white'
               }`} />
             </motion.div>
           )}
@@ -165,7 +165,7 @@ export default function AIChatWidget() {
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:scale-105 active:scale-95 transition-all duration-300 group"
+          className="relative w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center text-white shadow-md shadow-blue-600/30 hover:shadow-lg hover:shadow-blue-600/40 hover:scale-108 active:scale-95 transition-all duration-300 group"
           aria-label="مساعد الذكاء الاصطناعي"
         >
           <AnimatePresence mode="wait">
@@ -177,7 +177,7 @@ export default function AIChatWidget() {
                 exit={{ rotate: 90, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <X className="w-7 h-7" />
+                <X className="w-5 h-5" />
               </motion.div>
             ) : (
               <motion.div
@@ -188,8 +188,8 @@ export default function AIChatWidget() {
                 transition={{ duration: 0.2 }}
                 className="relative flex items-center justify-center"
               >
-                <Lightbulb className="w-7 h-7 text-white animate-pulse" />
-                <span className="absolute -top-1 -left-1 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full"></span>
+                <Lightbulb className="w-5.5 h-5.5 text-white animate-pulse" />
+                <span className="absolute -top-0.5 -left-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-white rounded-full"></span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -204,8 +204,8 @@ export default function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className={`fixed bottom-[90px] z-50 w-auto md:w-[400px] h-[#460px] md:h-[600px] bg-white/98 backdrop-blur-xl border border-slate-200 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
-              isAr ? 'left-4 right-4 md:left-auto md:right-[96px] text-right' : 'left-4 right-4 md:right-auto md:left-[96px] text-left'
+            className={`fixed bottom-[74px] z-50 w-auto md:w-[400px] h-[#460px] md:h-[600px] bg-white/98 backdrop-blur-xl border border-slate-200 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
+              isAr ? 'left-4 right-4 md:left-auto md:right-[78px] text-right' : 'left-4 right-4 md:right-auto md:left-[78px] text-left'
             }`}
           >
             {/* رأس شات نافذة المساعد الذكي */}
