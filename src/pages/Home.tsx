@@ -209,7 +209,7 @@ export default function Home() {
   }, [heroVideoUrl, secondaryVideoUrl])
 
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
-    return INITIAL_PROJECTS.slice(0, 4).map((p) => {
+    return INITIAL_PROJECTS.map((p) => {
       const localized = getLocalizedProject(p, isAr)
       return {
         ...p,
@@ -310,7 +310,7 @@ export default function Home() {
               }
             })
           if (projectsOnly.length > 0) {
-            const loadedProjects = projectsOnly.reverse().slice(0, 4)
+            const loadedProjects = projectsOnly.reverse()
             setFeaturedProjects(loadedProjects)
           }
 
@@ -1336,7 +1336,7 @@ export default function Home() {
               </div>
 
               {/* Desktop Grid Layout */}
-              <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
                 {featuredProjects.map((project) => (
                   <motion.div 
                     key={project.id} 
