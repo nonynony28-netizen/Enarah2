@@ -26,53 +26,13 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   )
 }
 
-// تعريف نوع المشروع
-type ProjectItem = {
-  id: string
-  name: string
-  description: string
-  image: string
-  coverImage: string
-  video?: string
-  category: string
-}
-
-const getLocalizedProject = (project: { name: string; category: string; description: string }, isAr: boolean) => {
-  if (isAr) return project
-
-  let name = project.name
-  let category = project.category
-  let description = project.description
-
-  const nameTrim = project.name.trim()
-  if (nameTrim === 'مول الماسة') name = 'Al-Masa Mall'
-  else if (nameTrim === 'معرض كواترو موتورز') name = 'Quattro Motors Showroom'
-  else if (nameTrim === 'مصحة الحياة الطبية') name = 'Al-Hayat Medical Clinic'
-  else if (nameTrim === 'قاعة جمانة للمناسبات') name = 'Jumana Events Hall'
-  else if (nameTrim === 'panyoti cafe') name = 'Panyoti Cafe'
-
-  const catTrim = project.category.trim()
-  if (catTrim === 'مقهي') category = 'Cafe'
-  else if (catTrim === 'مول تجاري') category = 'Commercial Mall'
-  else if (catTrim === 'معرض سيارات') category = 'Car Showroom'
-  else if (catTrim === 'طبي') category = 'Medical'
-  else if (catTrim === 'اجتماعي') category = 'Social'
-
-  const descTrim = project.description.trim()
-  if (descTrim.includes('الاضاءات الداخلية والخارجية وعمدان الانارة')) {
-    description = 'Execution of indoor & outdoor lighting and lighting poles for Al-Masa Mall.'
-  } else if (descTrim.includes('توريد كافه الاضاءات والاعمده والسكك')) {
-    description = 'Supply of all lighting, poles, and tracks to showcase the showroom in the best way.'
-  } else if (descTrim.includes('تنفيذ وتسليم كامل من بريزات والاضاءات')) {
-    description = 'Execution and complete handover of outlets, lighting, voltage regulators, and wiring to ensure smooth operation under all conditions.'
-  } else if (descTrim.includes('توريد الثريات والإضاءات المختلفة لصالة جمانة')) {
-    description = 'Supply of chandeliers and various custom lighting for Jumana Hall to complete your wedding luxury and live the most beautiful moments.'
-  } else if (descTrim.includes('تجهيز الثريات والاضاءات في المقهي')) {
-    description = 'Supplying chandeliers and custom lighting for the cafe, which all customers agreed was stunning.'
-  }
-
-  return { name, category, description }
-}
+import type { ProjectItem } from '../data/projectsData'
+import { 
+  getLocalizedProject, 
+  INITIAL_PROJECTS, 
+  getOptimizedProjectImages, 
+  getOptimizedProjectImageUrl 
+} from '../data/projectsData'
 
 export default function Projects() {
   const { t, isAr } = useLanguage()
@@ -88,17 +48,23 @@ export default function Projects() {
            desc.includes('الاسلاك الايطاليه') || desc.includes('مواد التاسيس') || desc.includes('تشكيله كبيره من المفاتيح')
   }
 
+  // تهيئة فورية بالمشاريع والصور المحلية المضغوطة لتفتح بأقصى سرعة بدون انتظار
   const [projects, setProjects] = useState<ProjectItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('enarah_cached_projects')
-    }
-    return []
+    return INITIAL_PROJECTS.map((p) => {
+      const localized = getLocalizedProject(p, isAr)
+      return {
+        ...p,
+        name: localized.name,
+        category: localized.category,
+        description: localized.description,
+      }
+    })
   })
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
-  // جلب المشاريع من لوحة التحكم ديناميكياً
+  // جلب المشاريع من لوحة التحكم ديناميكياً مع المزامنة الذكية
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -125,9 +91,9 @@ export default function Projects() {
               let mediaData: any = {}
               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
 
-              const rawImage = mediaData.imageUrl || '/images/default-product.jpg'
+              const rawImage = getOptimizedProjectImages(mediaData.imageUrl || '/images/default-product.jpg')
               const imageUrls = rawImage.split(',').map((url: string) => url.trim()).filter(Boolean)
-              const coverImage = imageUrls[0] || '/images/default-product.jpg'
+              const coverImage = getOptimizedProjectImageUrl(imageUrls[0] || '/images/default-product.jpg')
 
               const rawName = item.name || 'مشروع مميز'
               const rawCategory = mediaData.category || 'مشاريعنا'
@@ -146,9 +112,10 @@ export default function Projects() {
               }
             })
           
-          const loadedProjects = formattedProjects.reverse()
-          setProjects(loadedProjects)
-          localStorage.setItem('enarah_cached_projects', JSON.stringify(loadedProjects))
+          if (formattedProjects.length > 0) {
+            const loadedProjects = formattedProjects.reverse()
+            setProjects(loadedProjects)
+          }
         }
       } catch (error) {
         console.error('Fetch Error:', error)
@@ -252,7 +219,14 @@ export default function Projects() {
                   }`}
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 border-b border-slate-200">
-                    <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                    <img 
+                      src={getOptimizedProjectImageUrl(project.coverImage)} 
+                      alt={project.name} 
+                      loading={i < 4 ? "eager" : "lazy"} 
+                      decoding="async" 
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} 
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 z-10" />
                     
                     {/* شارة التصنيف */}
@@ -302,7 +276,7 @@ export default function Projects() {
         {selectedProject && (() => {
           const imageUrls = selectedProject.image
             .split(',')
-            .map((url) => url.trim())
+            .map((url) => getOptimizedProjectImageUrl(url.trim()))
             .filter(Boolean)
 
           return (

@@ -13,8 +13,14 @@ import {
   Layers, ImagePlus, FileText
 } from 'lucide-react'
 import EnarahProductsCarousel from '../components/EnarahProductsCarousel'
+import type { ProjectItem } from '../data/projectsData'
+import {
+  getLocalizedProject,
+  INITIAL_PROJECTS,
+  getOptimizedProjectImages,
+  getOptimizedProjectImageUrl
+} from '../data/projectsData'
 
-type ProjectItem = { id: string; name: string; description: string; image: string; coverImage: string; video?: string; category: string }
 type TrendType = 'up' | 'down' | 'same'
 
 const defaultWireData = [
@@ -106,42 +112,6 @@ const getHomeBrands = (isAr: boolean) => [
   { id: 'sharm', name: 'Sharm', origin: isAr ? 'الصين 🇨🇳' : 'China 🇨🇳', description: isAr ? 'نجف حديث وإنارة ديكورية معاصرة' : 'Modern chandeliers & decor', logoUrl: '/images/brand-sharm.png?v=2' }
 ]
 
-const getLocalizedProject = (project: { name: string; category: string; description: string }, isAr: boolean) => {
-  if (isAr) return project
-
-  let name = project.name
-  let category = project.category
-  let description = project.description
-
-  const nameTrim = project.name.trim()
-  if (nameTrim === 'مول الماسة') name = 'Al-Masa Mall'
-  else if (nameTrim === 'معرض كواترو موتورز') name = 'Quattro Motors Showroom'
-  else if (nameTrim === 'مصحة الحياة الطبية') name = 'Al-Hayat Medical Clinic'
-  else if (nameTrim === 'قاعة جمانة للمناسبات') name = 'Jumana Events Hall'
-  else if (nameTrim === 'panyoti cafe') name = 'Panyoti Cafe'
-
-  const catTrim = project.category.trim()
-  if (catTrim === 'مقهي') category = 'Cafe'
-  else if (catTrim === 'مول تجاري') category = 'Commercial Mall'
-  else if (catTrim === 'معرض سيارات') category = 'Car Showroom'
-  else if (catTrim === 'طبي') category = 'Medical'
-  else if (catTrim === 'اجتماعي') category = 'Social'
-
-  const descTrim = project.description.trim()
-  if (descTrim.includes('الاضاءات الداخلية والخارجية وعمدان الانارة')) {
-    description = 'Execution of indoor & outdoor lighting and lighting poles for Al-Masa Mall.'
-  } else if (descTrim.includes('توريد كافه الاضاءات والاعمده والسكك')) {
-    description = 'Supply of all lighting, poles, and tracks to showcase the showroom in the best way.'
-  } else if (descTrim.includes('تنفيذ وتسليم كامل من بريزات والاضاءات')) {
-    description = 'Execution and complete handover of outlets, lighting, voltage regulators, and wiring to ensure smooth operation under all conditions.'
-  } else if (descTrim.includes('توريد الثريات والإضاءات المختلفة لصالة جمانة')) {
-    description = 'Supply of chandeliers and various custom lighting for Jumana Hall to complete your wedding luxury and live the most beautiful moments.'
-  } else if (descTrim.includes('تجهيز الثريات والاضاءات في المقهي')) {
-    description = 'Supplying chandeliers and custom lighting for the cafe, which all customers agreed was stunning.'
-  }
-
-  return { name, category, description }
-}
 
 export default function Home() {
   const { t, isAr } = useLanguage()
@@ -238,8 +208,18 @@ export default function Home() {
     }
   }, [heroVideoUrl, secondaryVideoUrl])
 
-  const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>([])
-  const [loadingProjects, setLoadingProjects] = useState(true)
+  const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
+    return INITIAL_PROJECTS.slice(0, 4).map((p) => {
+      const localized = getLocalizedProject(p, isAr)
+      return {
+        ...p,
+        name: localized.name,
+        category: localized.category,
+        description: localized.description,
+      }
+    })
+  })
+  const [loadingProjects, setLoadingProjects] = useState(false)
   const [wirePrices, setWirePrices] = useState<typeof defaultWireData>(defaultWireData)
 
   const { addToCart, triggerFlyAnimation } = useCart()
@@ -309,9 +289,9 @@ export default function Home() {
               let mediaData: any = {}
               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
 
-              const rawImage = mediaData.imageUrl || '/images/default-product.jpg'
+              const rawImage = getOptimizedProjectImages(mediaData.imageUrl || '/images/default-product.jpg')
               const imageUrls = rawImage.split(',').map((url: string) => url.trim()).filter(Boolean)
-              const coverImage = imageUrls[0] || '/images/default-product.jpg'
+              const coverImage = getOptimizedProjectImageUrl(imageUrls[0] || '/images/default-product.jpg')
 
               const rawName = item.name || 'مشروع مميز'
               const rawCategory = mediaData.category || 'مشاريعنا'
@@ -329,8 +309,10 @@ export default function Home() {
                 category: localized.category,
               }
             })
-          const loadedProjects = projectsOnly.reverse().slice(0, 4)
-          setFeaturedProjects(loadedProjects)
+          if (projectsOnly.length > 0) {
+            const loadedProjects = projectsOnly.reverse().slice(0, 4)
+            setFeaturedProjects(loadedProjects)
+          }
 
           const sortedItems = [...data.data].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
@@ -1323,7 +1305,7 @@ export default function Home() {
                       className="snap-start snap-always min-w-[280px] xs:min-w-[310px] w-[80vw] bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-200 cursor-pointer shadow-sm"
                     >
                       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 border-b border-slate-100">
-                        <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                        <img src={getOptimizedProjectImageUrl(project.coverImage)} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent z-10" />
                         
                         <div className="absolute top-3 right-3 z-20">
@@ -1363,7 +1345,7 @@ export default function Home() {
                     className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col h-full hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/15 transition-all duration-200 cursor-pointer shadow-sm"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 border-b border-slate-100">
-                      <img src={project.coverImage} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                      <img src={getOptimizedProjectImageUrl(project.coverImage)} alt={project.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent z-10" />
                       
                       <div className="absolute top-3 right-3 z-20">
@@ -1630,7 +1612,7 @@ export default function Home() {
         {selectedProject && (() => {
           const imageUrls = selectedProject.image
             .split(',')
-            .map((url) => url.trim())
+            .map((url) => getOptimizedProjectImageUrl(url.trim()))
             .filter(Boolean)
 
           return (
@@ -1705,7 +1687,7 @@ export default function Home() {
                               : 'border-white/20 opacity-60 hover:opacity-100'
                           }`}
                         >
-                          <img src={url} alt="thumbnail" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
+                          <img src={getOptimizedProjectImageUrl(url)} alt="thumbnail" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
                         </button>
                       ))}
                     </div>
