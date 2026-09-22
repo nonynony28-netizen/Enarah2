@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
-import HeroAutoCanvas from '../components/HeroAutoCanvas'
 import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
@@ -118,7 +117,6 @@ export default function Home() {
   const paintColors = getPaintColors(isAr)
   const homeBrands = getHomeBrands(isAr)
 
-  const videoRef = useRef<HTMLVideoElement>(null)
   const secondaryVideoRef = useRef<HTMLVideoElement>(null)
   const whyUsScrollRef = useRef<HTMLDivElement>(null)
   const [activeWhyUsIndex, setActiveWhyUsIndex] = useState(0)
@@ -175,38 +173,22 @@ export default function Home() {
       }
     }
 
-    const playAll = () => {
-      forcePlayMobileVideo(videoRef.current)
+    const playSecondary = () => {
       forcePlayMobileVideo(secondaryVideoRef.current)
     }
 
-    playAll()
+    playSecondary()
 
-    window.addEventListener('touchstart', playAll, { passive: true })
-    window.addEventListener('scroll', playAll, { passive: true })
-    window.addEventListener('pointerdown', playAll, { passive: true })
-
-    const heroEl = document.getElementById('hero')
-    let observer: IntersectionObserver | null = null
-    if (heroEl) {
-      observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && videoRef.current) {
-            videoRef.current.currentTime = 0
-            forcePlayMobileVideo(videoRef.current)
-          }
-        })
-      }, { threshold: 0.25 })
-      observer.observe(heroEl)
-    }
+    window.addEventListener('touchstart', playSecondary, { passive: true })
+    window.addEventListener('scroll', playSecondary, { passive: true })
+    window.addEventListener('pointerdown', playSecondary, { passive: true })
 
     return () => {
-      window.removeEventListener('touchstart', playAll)
-      window.removeEventListener('scroll', playAll)
-      window.removeEventListener('pointerdown', playAll)
-      if (observer) observer.disconnect()
+      window.removeEventListener('touchstart', playSecondary)
+      window.removeEventListener('scroll', playSecondary)
+      window.removeEventListener('pointerdown', playSecondary)
     }
-  }, [heroVideoUrl, secondaryVideoUrl])
+  }, [secondaryVideoUrl])
 
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>(() => {
     return INITIAL_PROJECTS.map((p) => {
@@ -376,49 +358,52 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
       
-      {/* 1. الواجهة الترحيبية السينمائية التلقائية (Hero Auto Canvas - Full Width/Height like original) */}
-      <section id="hero" className="relative min-h-[55vh] sm:min-h-[65vh] md:h-screen w-full overflow-hidden touch-pan-y select-none pointer-events-none">
-        <HeroAutoCanvas videoSrc={heroVideoUrl || '/bg-video.mp4'} posterSrc="/poster.jpg">
-          {() => (
-            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center pt-6 sm:pt-10 md:pt-14 z-10 px-4">
-              <motion.div 
-                initial={{ opacity: 0, y: 18, filter: "blur(6px)", scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-4xl mx-auto text-center pointer-events-auto flex flex-col items-center justify-center"
+      {/* 1. الواجهة الترحيبية الحديثة للموقع (Hero Section - بدون أي فيديو خلفية مع تباين ووضوح فائق) */}
+      <section id="hero" className="relative min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50 border-b border-slate-200/80 select-none">
+        {/* توهجات إضاءة هندسية حديثة وأنيقة بدون أي فيديو */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,rgba(37,99,235,0.12),transparent_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(245,158,11,0.06)_0%,transparent_60%)] pointer-events-none" />
+        
+        {/* شبكة خلفية معمارية خفيفة جداً تعكس طابع التأسيس الهندسي والإنارة */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-40 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_70%,transparent_100%)] pointer-events-none" />
+
+        {/* محتوى الهيرو: العنوان والأزرار مع تباين فائق وسرعة تحميل فورية */}
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 py-16 sm:py-20 md:py-24 flex flex-col items-center justify-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 18, filter: "blur(6px)", scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center justify-center"
+          >
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight py-1">
+              <span className="text-slate-900">{t('hero.title.part1')}</span>{' '}
+              <span className="text-blue-600">{t('hero.title.part2')}</span>
+            </h1>
+            
+            <p className="text-xs sm:text-base md:text-xl text-slate-600 mb-6 max-w-2xl mx-auto leading-relaxed font-medium">
+              {t('hero.subtitle')}
+            </p>
+
+            {/* أزرار الإجراء السريع في الهيرو */}
+            <div className="flex items-center justify-center gap-3">
+              <Link
+                to="/products"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/30 transition-all hover:scale-105 active:scale-95"
               >
+                <ShoppingCart className="w-4 h-4" />
+                <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
+              </Link>
 
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight text-white py-1">
-                  <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.8)]">{t('hero.title.part1')}</span>{' '}
-                  <span className="text-blue-400 drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]">{t('hero.title.part2')}</span>
-                </h1>
-                
-                <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-6 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-                  {t('hero.subtitle')}
-                </p>
-
-                {/* أزرار الإجراء السريع في الهيرو */}
-                <div className="flex items-center justify-center gap-3">
-                  <Link
-                    to="/products"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
-                  </Link>
-
-                  <Link
-                    to="/contractors"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-semibold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
-                  >
-                    <FileText className="w-4 h-4 text-blue-600" />
-                    <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
-                  </Link>
-                </div>
-              </motion.div>
+              <Link
+                to="/contractors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-900 font-semibold text-sm shadow-md border border-slate-200 transition-all hover:scale-105 active:scale-95"
+              >
+                <FileText className="w-4 h-4 text-blue-600" />
+                <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
+              </Link>
             </div>
-          )}
-        </HeroAutoCanvas>
+          </motion.div>
+        </div>
       </section>
 
       {/* 2. لماذا نحن - ميزات موحدة بالعرض على الهواتف بتصميم خفيف ومنضبط واحترافي */}
