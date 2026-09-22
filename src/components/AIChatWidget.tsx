@@ -155,19 +155,19 @@ export default function AIChatWidget() {
 
   return (
     <>
-      {/* زر الشات العائم */}
-      <div className={`fixed bottom-5 z-50 flex items-center transition-all duration-700 ${
+      {/* زر الشات العائم - مكدس عمودياً فوق زر الواتساب لتوفير المساحة */}
+      <div className={`fixed bottom-[76px] right-5 z-50 flex items-center gap-2.5 transition-all duration-700 ${
         heroVideoFinished ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-75 pointer-events-none'
       } ${
-        isAr ? 'left-5 flex-row-reverse md:flex-row md:right-[78px] md:left-auto' : 'right-5 flex-row md:flex-row-reverse md:left-[78px] md:right-auto'
+        isAr ? 'flex-row-reverse' : 'flex-row'
       }`}>
         {/* فقاعة المحادثة الإبداعية "مساعدك الذكي" */}
         <AnimatePresence>
           {!isOpen && (
             <motion.div
-              initial={{ opacity: 0, x: isAr ? 20 : -20, scale: 0.9 }}
+              initial={{ opacity: 0, x: 15, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: isAr ? 10 : -10, scale: 0.9 }}
+              exit={{ opacity: 0, x: 10, scale: 0.9 }}
               transition={{ delay: 0.5, duration: 0.4 }}
               onClick={() => setIsOpen(true)}
               className="relative px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-800 text-[11px] font-bold whitespace-nowrap shadow-lg flex items-center gap-1.5 select-none cursor-pointer hover:bg-slate-50 hover:border-blue-500/50 transition-all duration-300"
@@ -177,12 +177,8 @@ export default function AIChatWidget() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
               </span>
               <span>{isAr ? 'اسأل مساعدك الذكي' : 'Ask your AI assistant'}</span>
-              {/* ذيل الفقاعة الصغير */}
-              <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[5px] border-y-transparent ${
-                isAr 
-                  ? 'right-auto -left-[5px] border-r-[5px] border-r-white'
-                  : 'left-auto -right-[5px] border-l-[5px] border-l-white'
-              }`} />
+              {/* ذيل الفقاعة الصغير يشير إلى الزر الدائري في اليمين */}
+              <div className="absolute top-1/2 -translate-y-1/2 -right-[5px] w-0 h-0 border-y-[5px] border-y-transparent border-l-[5px] border-l-white" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -228,8 +224,8 @@ export default function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className={`fixed bottom-[74px] z-50 w-auto md:w-[400px] h-[#460px] md:h-[600px] bg-white/98 backdrop-blur-xl border border-slate-200 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
-              isAr ? 'left-4 right-4 md:left-auto md:right-[78px] text-right' : 'left-4 right-4 md:right-auto md:left-[78px] text-left'
+            className={`fixed bottom-5 z-50 w-auto md:w-[400px] h-[480px] md:h-[600px] max-h-[85vh] bg-white/98 backdrop-blur-xl border border-slate-200 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
+              isAr ? 'left-4 right-4 md:left-auto md:right-5 text-right' : 'left-4 right-4 md:right-auto md:left-5 text-left'
             }`}
           >
             {/* رأس شات نافذة المساعد الذكي */}
