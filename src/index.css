@@ -565,6 +565,20 @@ p {
   --tw-gradient-to: rgba(6, 17, 34, 0.85) var(--tw-gradient-to-position) !important;
 }
 
+/* حماية نصوص وقراءة قسم الهيرو السينمائي في الوضع المضيء لتبقى ناصعة البياض مع الفيديو */
+.light #hero h1,
+.light #hero h1 span,
+.light #hero p {
+  color: #ffffff !important;
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.9) !important;
+}
+
+.light #hero .text-blue-400,
+.light #hero [class*="text-blue-"] {
+  color: #60a5fa !important;
+  text-shadow: 0 0 25px rgba(59, 130, 246, 0.9) !important;
+}
+
 /* نصوص الواجهة والقوائم في الوضع المضيء بدقة عالية وتباين فائق */
 .light .text-white,
 .light nav .text-white,

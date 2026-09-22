@@ -117,6 +117,7 @@ export default function Home() {
   const paintColors = getPaintColors(isAr)
   const homeBrands = getHomeBrands(isAr)
 
+  const heroVideoRef = useRef<HTMLVideoElement>(null)
   const secondaryVideoRef = useRef<HTMLVideoElement>(null)
   const whyUsScrollRef = useRef<HTMLDivElement>(null)
   const [activeWhyUsIndex, setActiveWhyUsIndex] = useState(0)
@@ -173,20 +174,21 @@ export default function Home() {
       }
     }
 
-    const playSecondary = () => {
+    const playVideos = () => {
+      forcePlayMobileVideo(heroVideoRef.current)
       forcePlayMobileVideo(secondaryVideoRef.current)
     }
 
-    playSecondary()
+    playVideos()
 
-    window.addEventListener('touchstart', playSecondary, { passive: true })
-    window.addEventListener('scroll', playSecondary, { passive: true })
-    window.addEventListener('pointerdown', playSecondary, { passive: true })
+    window.addEventListener('touchstart', playVideos, { passive: true })
+    window.addEventListener('scroll', playVideos, { passive: true })
+    window.addEventListener('pointerdown', playVideos, { passive: true })
 
     return () => {
-      window.removeEventListener('touchstart', playSecondary)
-      window.removeEventListener('scroll', playSecondary)
-      window.removeEventListener('pointerdown', playSecondary)
+      window.removeEventListener('touchstart', playVideos)
+      window.removeEventListener('scroll', playVideos)
+      window.removeEventListener('pointerdown', playVideos)
     }
   }, [secondaryVideoUrl])
 
@@ -358,29 +360,42 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
       
-      {/* 1. الواجهة الترحيبية الحديثة للموقع (Hero Section - بدون أي فيديو خلفية مع تباين ووضوح فائق) */}
-      <section id="hero" className="relative min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50 border-b border-slate-200/80 select-none">
-        {/* توهجات إضاءة هندسية حديثة وأنيقة بدون أي فيديو */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,rgba(37,99,235,0.12),transparent_70%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(245,158,11,0.06)_0%,transparent_60%)] pointer-events-none" />
-        
-        {/* شبكة خلفية معمارية خفيفة جداً تعكس طابع التأسيس الهندسي والإنارة */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-40 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_70%,transparent_100%)] pointer-events-none" />
+      {/* 1. الواجهة الترحيبية السينمائية (Hero Section مع الفيديو الجديد في الخلفية) */}
+      <section id="hero" className="relative min-h-[55vh] sm:min-h-[65vh] md:min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-black select-none">
+        {/* الفيديو السينمائي الجديد بدقة عالية وبتسريع عتادي مباشر */}
+        <video
+          ref={heroVideoRef}
+          src="/hero-video.mp4"
+          poster="/hero-poster.jpg"
+          autoPlay
+          loop
+          muted
+          defaultMuted
+          playsInline
+          webkit-playsinline="true"
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover z-0 brightness-90 will-change-transform transform-gpu"
+          style={{ transform: 'translateZ(0)' }}
+        />
 
-        {/* محتوى الهيرو: العنوان والأزرار مع تباين فائق وسرعة تحميل فورية */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 py-16 sm:py-20 md:py-24 flex flex-col items-center justify-center">
+        {/* طبقة تظليل سينمائية لحماية وضوح وقراءة النصوص والأزرار بنسبة 100% */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/75 pointer-events-none z-1" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(37,99,235,0.25)_0%,rgba(245,158,11,0.08)_50%,transparent_75%)] pointer-events-none z-1" />
+
+        {/* محتوى الهيرو: العنوان والأزرار مع تباين فائق وأداء فوري */}
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 py-16 sm:py-20 md:py-24 flex flex-col items-center justify-center pointer-events-auto">
           <motion.div 
             initial={{ opacity: 0, y: 18, filter: "blur(6px)", scale: 0.98 }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center justify-center"
           >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight py-1">
-              <span className="text-slate-900">{t('hero.title.part1')}</span>{' '}
-              <span className="text-blue-600">{t('hero.title.part2')}</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight py-1 text-white">
+              <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
+              <span className="text-blue-400 drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]">{t('hero.title.part2')}</span>
             </h1>
             
-            <p className="text-xs sm:text-base md:text-xl text-slate-600 mb-6 max-w-2xl mx-auto leading-relaxed font-medium">
+            <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-6 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
               {t('hero.subtitle')}
             </p>
 
@@ -388,7 +403,7 @@ export default function Home() {
             <div className="flex items-center justify-center gap-3">
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/30 transition-all hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
               >
                 <ShoppingCart className="w-4 h-4" />
                 <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
@@ -396,7 +411,7 @@ export default function Home() {
 
               <Link
                 to="/contractors"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-900 font-semibold text-sm shadow-md border border-slate-200 transition-all hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-semibold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
               >
                 <FileText className="w-4 h-4 text-blue-600" />
                 <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
