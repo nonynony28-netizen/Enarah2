@@ -437,7 +437,7 @@ export default function Home() {
           }}
         />
 
-        {/* محتوى الهيرو: العنوان والأزرار يظهران بسلاسة في اليمين أثناء اللغة العربية */}
+        {/* محتوى الهيرو: العنوان والأزرار يظهران بشكل أصغر وبانسيابية ناعمة جداً من اليمين */}
         <div className={`relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 pt-20 pb-12 flex flex-col pointer-events-auto ${
           isAr ? 'items-start text-right' : 'items-center text-center'
         }`}>
@@ -445,39 +445,44 @@ export default function Home() {
             {showHeroContent && (
               <motion.div 
                 key="hero-content"
-                initial={{ opacity: 0, x: isAr ? 35 : 0, y: isAr ? 0 : 28, filter: "blur(8px)", scale: 0.96 }}
-                animate={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)", scale: 1 }}
-                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className={`flex flex-col max-w-2xl ${
+                initial={{ opacity: 0, x: isAr ? 50 : 0, y: isAr ? 0 : 20 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+                className={`flex flex-col max-w-lg md:max-w-xl will-change-transform transform-gpu ${
                   isAr ? 'items-start text-right' : 'items-center text-center mx-auto'
                 }`}
+                style={{
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                }}
               >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight py-1 text-white">
-                  <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
-                  <span className="text-blue-400 drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]">{t('hero.title.part2')}</span>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold mb-2.5 sm:mb-3 leading-tight tracking-tight py-0.5 text-white">
+                  <span className="text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
+                  <span className="text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.85)]">{t('hero.title.part2')}</span>
                 </h1>
                 
-                <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-6 leading-relaxed font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                <p className="text-xs sm:text-sm md:text-base text-slate-100/90 mb-4 sm:mb-5 leading-relaxed font-normal max-w-md drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
                   {t('hero.subtitle')}
                 </p>
 
-                {/* أزرار الإجراء السريع في الهيرو */}
-                <div className={`flex flex-wrap items-center gap-3 ${
+                {/* أزرار الإجراء السريع في الهيرو بتنسيق متناسق وأنيق */}
+                <div className={`flex flex-wrap items-center gap-2.5 sm:gap-3 ${
                   isAr ? 'justify-start' : 'justify-center'
                 }`}>
                   <Link
                     to="/products"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
+                    className="inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm shadow-lg shadow-blue-600/35 transition-all hover:scale-105 active:scale-95"
                   >
-                    <ShoppingCart className="w-4 h-4" />
+                    <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
                   </Link>
 
                   <Link
                     to="/contractors"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-semibold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                    className="inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-white/95 hover:bg-white text-slate-900 font-medium text-xs sm:text-sm shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95"
                   >
-                    <FileText className="w-4 h-4 text-blue-600" />
+                    <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                     <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
                   </Link>
                 </div>
