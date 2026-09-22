@@ -122,15 +122,14 @@ export default function Home() {
   const whyUsScrollRef = useRef<HTMLDivElement>(null)
   const [activeWhyUsIndex, setActiveWhyUsIndex] = useState(0)
   const [showHeroContent, setShowHeroContent] = useState(false)
+  const heroCompletedRef = useRef(false)
 
   const handleHeroVideoComplete = () => {
+    if (showHeroContent) return
     setShowHeroContent(true)
+    heroCompletedRef.current = true
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('enarah_hero_finished'))
-    }
-    if (heroVideoRef.current) {
-      heroVideoRef.current.loop = true
-      heroVideoRef.current.play().catch(() => {})
     }
   }
 
@@ -170,23 +169,20 @@ export default function Home() {
   })
 
   useEffect(() => {
-    // كخطة احتياطية في حال تعذر تشغيل الفيديو تلقائياً (مثل وضع توفير الطاقة): إظهار المحتوى بعد اكتمال المدة (11 ثانية)
+    // كخطة احتياطية في حال تعذر تشغيل الفيديو تلقائياً: إظهار المحتوى بعد اكتمال المدة (11 ثانية)
     const timer = setTimeout(() => {
-      setShowHeroContent(true)
+      handleHeroVideoComplete()
     }, 11000)
     return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
     const forcePlayMobileVideo = (el: HTMLVideoElement | null) => {
-      if (!el) return
+      if (!el || !el.paused) return // حماية: إذا كان الفيديو يعمل بسلاسة فلا تعيد تشغيله لمنع التقطيع
       el.defaultMuted = true
       el.muted = true
       el.volume = 0
       el.playsInline = true
-      el.setAttribute('muted', '')
-      el.setAttribute('playsinline', '')
-      el.setAttribute('webkit-playsinline', 'true')
       
       const promise = el.play()
       if (promise !== undefined) {
@@ -201,9 +197,9 @@ export default function Home() {
 
     playVideos()
 
-    window.addEventListener('touchstart', playVideos, { passive: true })
-    window.addEventListener('scroll', playVideos, { passive: true })
-    window.addEventListener('pointerdown', playVideos, { passive: true })
+    window.addEventListener('touchstart', playVideos, { passive: true, once: true })
+    window.addEventListener('scroll', playVideos, { passive: true, once: true })
+    window.addEventListener('pointerdown', playVideos, { passive: true, once: true })
 
     return () => {
       window.removeEventListener('touchstart', playVideos)
@@ -385,6 +381,11 @@ export default function Home() {
         id="hero" 
         onClick={handleHeroVideoComplete}
         className="relative h-screen min-h-[600px] sm:min-h-[680px] w-full flex items-center justify-center overflow-hidden bg-black select-none cursor-pointer"
+        style={{
+          contain: 'paint layout',
+          transform: 'translateZ(0)',
+          willChange: 'transform'
+        }}
       >
         {/* الفيديو السينمائي الجديد بدقة عالية وبتسريع عتادي مباشر */}
         <video
@@ -392,6 +393,7 @@ export default function Home() {
           src="/hero-video.mp4"
           poster="/hero-poster.jpg"
           autoPlay
+          loop
           muted
           defaultMuted
           playsInline
@@ -401,16 +403,17 @@ export default function Home() {
           preload="auto"
           onTimeUpdate={(e) => {
             const vid = e.currentTarget
-            if (!showHeroContent && vid.duration && vid.currentTime >= vid.duration - 0.25) {
+            if (!heroCompletedRef.current && (vid.currentTime >= 9.6 || (vid.duration && vid.currentTime >= vid.duration - 0.35))) {
+              heroCompletedRef.current = true
               handleHeroVideoComplete()
             }
           }}
-          onEnded={handleHeroVideoComplete}
-          className="absolute inset-0 w-full h-full object-cover z-0 brightness-95 will-change-transform transform-gpu pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover z-0 brightness-95 pointer-events-none"
           style={{ 
             transform: 'translateZ(0)',
             backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden'
+            WebkitBackfaceVisibility: 'hidden',
+            willChange: 'transform'
           }}
         />
 
