@@ -393,6 +393,8 @@ export default function Home() {
           defaultMuted
           playsInline
           webkit-playsinline="true"
+          disablePictureInPicture
+          disableRemotePlayback
           preload="auto"
           onTimeUpdate={(e) => {
             const vid = e.currentTarget
@@ -401,8 +403,12 @@ export default function Home() {
             }
           }}
           onEnded={handleHeroVideoComplete}
-          className="absolute inset-0 w-full h-full object-cover z-0 brightness-95 will-change-transform transform-gpu"
-          style={{ transform: 'translateZ(0)' }}
+          className="absolute inset-0 w-full h-full object-cover z-0 brightness-95 will-change-transform transform-gpu pointer-events-none"
+          style={{ 
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden'
+          }}
         />
 
         {/* طبقة تظليل سينمائية داكنة تظهر بسلاسة متزامنة مع ظهور النصوص لحماية القراءة والتباين */}
