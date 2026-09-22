@@ -431,32 +431,40 @@ export default function Home() {
             showHeroContent ? 'opacity-100' : 'opacity-0'
           }`} 
           style={{
-            background: 'radial-gradient(circle at 50% 40%, rgba(37, 99, 235, 0.25) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 75%)'
+            background: isAr
+              ? 'radial-gradient(circle at 80% 50%, rgba(37, 99, 235, 0.28) 0%, rgba(0, 0, 0, 0.4) 55%, transparent 80%)'
+              : 'radial-gradient(circle at 50% 40%, rgba(37, 99, 235, 0.25) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 75%)'
           }}
         />
 
-        {/* محتوى الهيرو: العنوان والأزرار يظهران بسلاسة بعد الـ 5 ثوانٍ */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 pt-16 sm:pt-20 pb-12 flex flex-col items-center justify-center pointer-events-auto">
+        {/* محتوى الهيرو: العنوان والأزرار يظهران بسلاسة في اليمين أثناء اللغة العربية */}
+        <div className={`relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 pt-20 pb-12 flex flex-col pointer-events-auto ${
+          isAr ? 'items-start text-right' : 'items-center text-center'
+        }`}>
           <AnimatePresence>
             {showHeroContent && (
               <motion.div 
                 key="hero-content"
-                initial={{ opacity: 0, y: 28, filter: "blur(8px)", scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+                initial={{ opacity: 0, x: isAr ? 35 : 0, y: isAr ? 0 : 28, filter: "blur(8px)", scale: 0.96 }}
+                animate={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)", scale: 1 }}
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col items-center justify-center"
+                className={`flex flex-col max-w-2xl ${
+                  isAr ? 'items-start text-right' : 'items-center text-center mx-auto'
+                }`}
               >
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight py-1 text-white">
                   <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
                   <span className="text-blue-400 drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]">{t('hero.title.part2')}</span>
                 </h1>
                 
-                <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-6 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-6 leading-relaxed font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
                   {t('hero.subtitle')}
                 </p>
 
                 {/* أزرار الإجراء السريع في الهيرو */}
-                <div className="flex items-center justify-center gap-3">
+                <div className={`flex flex-wrap items-center gap-3 ${
+                  isAr ? 'justify-start' : 'justify-center'
+                }`}>
                   <Link
                     to="/products"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
