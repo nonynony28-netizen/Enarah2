@@ -126,6 +126,36 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const isHomePage = location.pathname === '/' || location.pathname === '/preview'
+  const [heroVideoFinished, setHeroVideoFinished] = useState(!isHomePage)
+
+  useEffect(() => {
+    if (!isHomePage) {
+      setHeroVideoFinished(true)
+      return
+    }
+
+    const handleHeroDone = () => {
+      setHeroVideoFinished(true)
+    }
+
+    const handleScrollOrTouch = () => {
+      if (window.scrollY > 40) {
+        setHeroVideoFinished(true)
+      }
+    }
+
+    window.addEventListener('enarah_hero_finished', handleHeroDone)
+    window.addEventListener('scroll', handleScrollOrTouch, { passive: true })
+    window.addEventListener('touchstart', handleScrollOrTouch, { passive: true })
+
+    return () => {
+      window.removeEventListener('enarah_hero_finished', handleHeroDone)
+      window.removeEventListener('scroll', handleScrollOrTouch)
+      window.removeEventListener('touchstart', handleScrollOrTouch)
+    }
+  }, [isHomePage])
+
   useEffect(() => {
     setIsOpen(false)
     setIsDropdownOpen(false)
@@ -138,10 +168,15 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ 
+          y: heroVideoFinished ? 0 : -100,
+          opacity: heroVideoFinished ? 1 : 0
+        }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-500 ${
+          heroVideoFinished ? 'pointer-events-auto' : 'pointer-events-none'
+        } ${
           scrolled
             ? 'bg-white/95 backdrop-blur-xl shadow-md border-b border-slate-200 py-2.5'
             : 'bg-white/85 backdrop-blur-md border-b border-slate-200/60 py-3.5'

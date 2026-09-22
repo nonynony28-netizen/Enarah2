@@ -125,6 +125,9 @@ export default function Home() {
 
   const handleHeroVideoComplete = () => {
     setShowHeroContent(true)
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('enarah_hero_finished'))
+    }
     if (heroVideoRef.current) {
       heroVideoRef.current.loop = true
       heroVideoRef.current.play().catch(() => {})
@@ -380,7 +383,7 @@ export default function Home() {
       {/* 1. الواجهة الترحيبية السينمائية بكامل ارتفاع الشاشة (Full-Screen Cinematic Hero) */}
       <section 
         id="hero" 
-        onClick={() => setShowHeroContent(true)}
+        onClick={handleHeroVideoComplete}
         className="relative h-screen min-h-[600px] sm:min-h-[680px] w-full flex items-center justify-center overflow-hidden bg-black select-none cursor-pointer"
       >
         {/* الفيديو السينمائي الجديد بدقة عالية وبتسريع عتادي مباشر */}

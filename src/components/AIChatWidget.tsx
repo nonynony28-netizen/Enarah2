@@ -126,6 +126,28 @@ export default function AIChatWidget() {
     }
   }
 
+  const isHomePage = location.pathname === '/' || location.pathname === '/preview'
+  const [heroVideoFinished, setHeroVideoFinished] = useState(!isHomePage)
+
+  useEffect(() => {
+    if (!isHomePage) {
+      setHeroVideoFinished(true)
+      return
+    }
+    const handleHeroDone = () => setHeroVideoFinished(true)
+    const handleScroll = () => {
+      if (window.scrollY > 40) setHeroVideoFinished(true)
+    }
+    window.addEventListener('enarah_hero_finished', handleHeroDone)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('touchstart', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('enarah_hero_finished', handleHeroDone)
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('touchstart', handleScroll)
+    }
+  }, [isHomePage])
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     handleSendMessage(inputValue)
@@ -134,7 +156,9 @@ export default function AIChatWidget() {
   return (
     <>
       {/* زر الشات العائم */}
-      <div className={`fixed bottom-5 z-50 flex items-center ${
+      <div className={`fixed bottom-5 z-50 flex items-center transition-all duration-700 ${
+        heroVideoFinished ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-75 pointer-events-none'
+      } ${
         isAr ? 'left-5 flex-row-reverse md:flex-row md:right-[78px] md:left-auto' : 'right-5 flex-row md:flex-row-reverse md:left-[78px] md:right-auto'
       }`}>
         {/* فقاعة المحادثة الإبداعية "مساعدك الذكي" */}
