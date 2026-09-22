@@ -482,36 +482,36 @@ p {
   --tw-gradient-to: rgba(9, 19, 34, 0.95) var(--tw-gradient-to-position) !important;
 }
 
-/* تحويل التدرجات الداكنة على باقي البطاقات والواجهات إلى إضاءات ناعمة شفافة مع استثناء مسرح الأسلاك */
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="from-slate-950"],
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="from-[#0a192f]"],
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="from-[#050b14]"],
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="from-black"] {
+/* تحويل التدرجات الداكنة على باقي البطاقات والواجهات إلى إضاءات ناعمة شفافة مع استثناء مسرح الأسلاك وقسم الهيرو */
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="from-slate-950"],
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="from-[#0a192f]"],
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="from-[#050b14]"],
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="from-black"] {
   --tw-gradient-from: rgba(255, 255, 255, 0.95) var(--tw-gradient-from-position) !important;
   --tw-gradient-to: rgba(255, 255, 255, 0) var(--tw-gradient-to-position) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="via-slate-950"],
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="via-[#0a192f]"],
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="via-black"] {
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="via-slate-950"],
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="via-[#0a192f]"],
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="via-black"] {
   --tw-gradient-via: rgba(255, 255, 255, 0.5) var(--tw-gradient-via-position) !important;
 }
 
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="to-slate-950"],
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="to-[#0a192f]"],
-.light :not(#wires-import-showcase):not(#wires-import-showcase *)[class*="to-black"] {
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="to-slate-950"],
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="to-[#0a192f]"],
+.light :not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="to-black"] {
   --tw-gradient-to: #ffffff var(--tw-gradient-to-position) !important;
 }
 
-/* توحيد خلفيات البطاقات والحاويات بلون أبيض فاخر وحواف ناعمة (مع استثناء مسرح الأسلاك 3D) */
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#0a192f]"],
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#0d2342]"],
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#122540]"],
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#06152b]"],
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#0f213a]"],
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#0c1e38]"],
-.light .bg-\[\#0a192f\]:not(#wires-import-showcase),
+/* توحيد خلفيات البطاقات والحاويات بلون أبيض فاخر وحواف ناعمة (مع استثناء مسرح الأسلاك 3D وقسم الهيرو) */
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#0a192f]"],
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#0d2342]"],
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#122540]"],
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#06152b]"],
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#0f213a]"],
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#0c1e38]"],
+.light .bg-\[\#0a192f\]:not(#wires-import-showcase):not(#hero),
 .light .bg-\[\#0d2342\],
 .light .bg-\[\#122540\],
 .light .bg-\[\#06152b\],
@@ -524,9 +524,9 @@ p {
 }
 
 /* الشفافية للبطاقات الزجاجية في الوضع المضيء */
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-slate-900"],
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#0a192f]/"],
-.light div:not(#wires-import-showcase):not(#wires-import-showcase *)[class*="bg-[#0f213a]/"] {
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-slate-900"],
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#0a192f]/"],
+.light div:not(#wires-import-showcase):not(#wires-import-showcase *):not(#hero):not(#hero *)[class*="bg-[#0f213a]/"] {
   background-color: rgba(255, 255, 255, 0.95) !important;
   color: #0f172a !important;
   border-color: #e2e8f0 !important;

@@ -397,16 +397,22 @@ export default function Home() {
           style={{ transform: 'translateZ(0)' }}
         />
 
-        {/* طبقة تظليل سينمائية تظهر بسلاسة متزامنة مع ظهور النصوص لحماية القراءة والتباين */}
+        {/* طبقة تظليل سينمائية داكنة تظهر بسلاسة متزامنة مع ظهور النصوص لحماية القراءة والتباين */}
         <div 
-          className={`absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/80 pointer-events-none z-1 transition-opacity duration-1000 ${
+          className={`absolute inset-0 pointer-events-none z-1 transition-opacity duration-1000 ${
             showHeroContent ? 'opacity-100' : 'opacity-0'
           }`} 
+          style={{
+            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.4) 45%, rgba(0, 0, 0, 0.8) 100%)'
+          }}
         />
         <div 
-          className={`absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(37,99,235,0.25)_0%,rgba(245,158,11,0.08)_50%,transparent_75%)] pointer-events-none z-1 transition-opacity duration-1000 ${
+          className={`absolute inset-0 pointer-events-none z-1 transition-opacity duration-1000 ${
             showHeroContent ? 'opacity-100' : 'opacity-0'
           }`} 
+          style={{
+            background: 'radial-gradient(circle at 50% 40%, rgba(37, 99, 235, 0.25) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 75%)'
+          }}
         />
 
         {/* محتوى الهيرو: العنوان والأزرار يظهران بسلاسة بعد الـ 5 ثوانٍ */}
