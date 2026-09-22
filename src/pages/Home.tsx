@@ -123,6 +123,14 @@ export default function Home() {
   const [activeWhyUsIndex, setActiveWhyUsIndex] = useState(0)
   const [showHeroContent, setShowHeroContent] = useState(false)
 
+  const handleHeroVideoComplete = () => {
+    setShowHeroContent(true)
+    if (heroVideoRef.current) {
+      heroVideoRef.current.loop = true
+      heroVideoRef.current.play().catch(() => {})
+    }
+  }
+
   const handleWhyUsScroll = () => {
     const el = whyUsScrollRef.current
     if (!el) return
@@ -159,10 +167,10 @@ export default function Home() {
   })
 
   useEffect(() => {
-    // إظهار نصوص وأزرار الهيرو تلقائياً بعد 5.5 ثانية ليستمتع الزائر برؤية تفاصيل الفيديو أولاً
+    // كخطة احتياطية في حال تعذر تشغيل الفيديو تلقائياً (مثل وضع توفير الطاقة): إظهار المحتوى بعد اكتمال المدة (11 ثانية)
     const timer = setTimeout(() => {
       setShowHeroContent(true)
-    }, 5500)
+    }, 11000)
     return () => clearTimeout(timer)
   }, [])
 
@@ -381,18 +389,18 @@ export default function Home() {
           src="/hero-video.mp4"
           poster="/hero-poster.jpg"
           autoPlay
-          loop
           muted
           defaultMuted
           playsInline
           webkit-playsinline="true"
           preload="auto"
           onTimeUpdate={(e) => {
-            if (!showHeroContent && e.currentTarget.currentTime >= 5.0) {
-              setShowHeroContent(true)
+            const vid = e.currentTarget
+            if (!showHeroContent && vid.duration && vid.currentTime >= vid.duration - 0.25) {
+              handleHeroVideoComplete()
             }
           }}
-          onEnded={() => setShowHeroContent(true)}
+          onEnded={handleHeroVideoComplete}
           className="absolute inset-0 w-full h-full object-cover z-0 brightness-95 will-change-transform transform-gpu"
           style={{ transform: 'translateZ(0)' }}
         />
