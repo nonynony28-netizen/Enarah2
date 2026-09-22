@@ -121,6 +121,7 @@ export default function Home() {
   const secondaryVideoRef = useRef<HTMLVideoElement>(null)
   const whyUsScrollRef = useRef<HTMLDivElement>(null)
   const [activeWhyUsIndex, setActiveWhyUsIndex] = useState(0)
+  const [showHeroContent, setShowHeroContent] = useState(false)
 
   const handleWhyUsScroll = () => {
     const el = whyUsScrollRef.current
@@ -156,6 +157,14 @@ export default function Home() {
     }
     return '/bg-video.mp4'
   })
+
+  useEffect(() => {
+    // إظهار نصوص وأزرار الهيرو تلقائياً بعد 5.5 ثانية ليستمتع الزائر برؤية تفاصيل الفيديو أولاً
+    const timer = setTimeout(() => {
+      setShowHeroContent(true)
+    }, 5500)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     const forcePlayMobileVideo = (el: HTMLVideoElement | null) => {
@@ -360,8 +369,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
       
-      {/* 1. الواجهة الترحيبية السينمائية (Hero Section مع الفيديو الجديد في الخلفية) */}
-      <section id="hero" className="relative min-h-[55vh] sm:min-h-[65vh] md:min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-black select-none">
+      {/* 1. الواجهة الترحيبية السينمائية بكامل ارتفاع الشاشة (Full-Screen Cinematic Hero) */}
+      <section 
+        id="hero" 
+        onClick={() => setShowHeroContent(true)}
+        className="relative h-screen min-h-[600px] sm:min-h-[680px] w-full flex items-center justify-center overflow-hidden bg-black select-none cursor-pointer"
+      >
         {/* الفيديو السينمائي الجديد بدقة عالية وبتسريع عتادي مباشر */}
         <video
           ref={heroVideoRef}
@@ -374,51 +387,85 @@ export default function Home() {
           playsInline
           webkit-playsinline="true"
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover z-0 brightness-90 will-change-transform transform-gpu"
+          onTimeUpdate={(e) => {
+            if (!showHeroContent && e.currentTarget.currentTime >= 5.0) {
+              setShowHeroContent(true)
+            }
+          }}
+          onEnded={() => setShowHeroContent(true)}
+          className="absolute inset-0 w-full h-full object-cover z-0 brightness-95 will-change-transform transform-gpu"
           style={{ transform: 'translateZ(0)' }}
         />
 
-        {/* طبقة تظليل سينمائية لحماية وضوح وقراءة النصوص والأزرار بنسبة 100% */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/75 pointer-events-none z-1" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(37,99,235,0.25)_0%,rgba(245,158,11,0.08)_50%,transparent_75%)] pointer-events-none z-1" />
+        {/* طبقة تظليل سينمائية تظهر بسلاسة متزامنة مع ظهور النصوص لحماية القراءة والتباين */}
+        <div 
+          className={`absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/80 pointer-events-none z-1 transition-opacity duration-1000 ${
+            showHeroContent ? 'opacity-100' : 'opacity-0'
+          }`} 
+        />
+        <div 
+          className={`absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(37,99,235,0.25)_0%,rgba(245,158,11,0.08)_50%,transparent_75%)] pointer-events-none z-1 transition-opacity duration-1000 ${
+            showHeroContent ? 'opacity-100' : 'opacity-0'
+          }`} 
+        />
 
-        {/* محتوى الهيرو: العنوان والأزرار مع تباين فائق وأداء فوري */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 py-16 sm:py-20 md:py-24 flex flex-col items-center justify-center pointer-events-auto">
-          <motion.div 
-            initial={{ opacity: 0, y: 18, filter: "blur(6px)", scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center justify-center"
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight py-1 text-white">
-              <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
-              <span className="text-blue-400 drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]">{t('hero.title.part2')}</span>
-            </h1>
-            
-            <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-6 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
-              {t('hero.subtitle')}
-            </p>
-
-            {/* أزرار الإجراء السريع في الهيرو */}
-            <div className="flex items-center justify-center gap-3">
-              <Link
-                to="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
+        {/* محتوى الهيرو: العنوان والأزرار يظهران بسلاسة بعد الـ 5 ثوانٍ */}
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 pt-16 sm:pt-20 pb-12 flex flex-col items-center justify-center pointer-events-auto">
+          <AnimatePresence>
+            {showHeroContent && (
+              <motion.div 
+                key="hero-content"
+                initial={{ opacity: 0, y: 28, filter: "blur(8px)", scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col items-center justify-center"
               >
-                <ShoppingCart className="w-4 h-4" />
-                <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
-              </Link>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight tracking-tight py-1 text-white">
+                  <span className="text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
+                  <span className="text-blue-400 drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]">{t('hero.title.part2')}</span>
+                </h1>
+                
+                <p className="text-xs sm:text-base md:text-xl text-slate-100 mb-6 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                  {t('hero.subtitle')}
+                </p>
 
-              <Link
-                to="/contractors"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-semibold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
-              >
-                <FileText className="w-4 h-4 text-blue-600" />
-                <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
-              </Link>
-            </div>
-          </motion.div>
+                {/* أزرار الإجراء السريع في الهيرو */}
+                <div className="flex items-center justify-center gap-3">
+                  <Link
+                    to="/products"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
+                  </Link>
+
+                  <Link
+                    to="/contractors"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-slate-900 font-semibold text-sm shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                  >
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+
+        {/* إشعار خفيف أثناء تشغيل الثواني الأولى */}
+        {!showHeroContent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute bottom-8 inset-x-0 z-20 flex items-center justify-center pointer-events-none"
+          >
+            <span className="px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white/80 text-xs font-medium flex items-center gap-2 shadow-lg animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+              <span>{isAr ? 'انقر في أي مكان لعرض الروابط وتخطي العرض' : 'Click anywhere to view menu'}</span>
+            </span>
+          </motion.div>
+        )}
       </section>
 
       {/* 2. لماذا نحن - ميزات موحدة بالعرض على الهواتف بتصميم خفيف ومنضبط واحترافي */}
