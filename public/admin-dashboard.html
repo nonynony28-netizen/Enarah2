@@ -1626,6 +1626,17 @@
 
     // بدء التشغيل والفحص
     checkAuthAndInit();
+
+    // التحديث التلقائي الفوري أولاً بأول كل 15 ثانية (Real-time Background Live Updates)
+    setInterval(() => {
+      if (sessionStorage.getItem('admin_password')) {
+        loadItems(true);
+        const activeTab = document.querySelector('.nav-tab-btn.active')?.getAttribute('onclick');
+        if (activeTab?.includes('analytics')) loadAnalytics(currentAnalyticsDays);
+        if (activeTab?.includes('errors')) loadErrors(currentErrorStatus);
+        if (activeTab?.includes('leads')) renderLeads();
+      }
+    }, 15000);
   </script>
 </body>
 </html>
