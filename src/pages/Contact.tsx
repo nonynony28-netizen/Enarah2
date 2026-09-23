@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, Loader2 } from 'lucide-react'
+import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, Loader2, WifiOff, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
+import { trackConversionEvent } from '../utils/analytics'
 
 // نمط الوهج الأزرق للعناوين الفخمة
 const glowingTitleStyle = {
@@ -36,29 +37,94 @@ function FadeIn({
   )
 }
 
+const DRAFT_KEY = 'enarah_contact_draft'
+
 export default function Contact() {
   const { t, isAr } = useLanguage()
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    message: '',
+
+  // استرجاع المسودة التلقائية المحفوظة في حال انقطاع النت أو إعادة التحميل
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(DRAFT_KEY)
+        if (saved) return JSON.parse(saved)
+      } catch {}
+    }
+    return { name: '', phone: '', message: '' }
   })
+
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [offlineError, setOfflineError] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({})
+  const hasTrackedStartRef = useRef(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // حفظ المسودة تلقائياً عند الكتابة (Debounced Auto-save)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const timer = setTimeout(() => {
+      if (formData.name || formData.phone || formData.message) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(formData))
+        if (!hasTrackedStartRef.current) {
+          hasTrackedStartRef.current = true
+          trackConversionEvent('contact_form_started')
+        }
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [formData])
 
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.message.trim()) {
-      alert(isAr ? 'يرجى تعبئة جميع الحقول' : 'Please fill in all fields')
+  // الاستماع لعودة الإنترنت وإتاحة إعادة الإرسال الفوري
+  useEffect(() => {
+    const handleOnline = () => {
+      if (offlineError) {
+        setOfflineError(false)
+      }
+    }
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [offlineError])
+
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {}
+    if (!formData.name.trim()) {
+      errors.name = isAr ? 'يرجى إدخال الاسم بالكامل' : 'Please enter your full name'
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = isAr ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number'
+    } else if (formData.phone.trim().length < 8) {
+      errors.phone = isAr ? 'رقم الهاتف غير مكتمل' : 'Phone number is too short'
+    }
+    if (!formData.message.trim()) {
+      errors.message = isAr ? 'يرجى كتابة رسالتك أو استفسارك' : 'Please write your message'
+    }
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+
+    if (!validateForm()) return
+
+    // فحص الاتصال بالإنترنت قبل الإرسال لمنع فقدان البيانات
+    if (!navigator.onLine) {
+      setOfflineError(true)
       return
     }
 
     try {
       setLoading(true)
+      setOfflineError(false)
+
+      const idempotencyKey = `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+
       const res = await fetch('https://enarah2.vercel.app/api/save-user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': idempotencyKey
+        },
         body: JSON.stringify({
           name: formData.name,
           phone: formData.phone,
@@ -71,16 +137,24 @@ export default function Contact() {
 
       if (data.success) {
         setSubmitted(true)
+        localStorage.removeItem(DRAFT_KEY)
         setFormData({ name: '', phone: '', message: '' })
+        hasTrackedStartRef.current = false
+        trackConversionEvent('contact_form_submitted', { leadType: 'contact' })
+
         setTimeout(() => {
           setSubmitted(false)
-        }, 4000)
+        }, 5000)
       } else {
         alert(data.error || data.message || (isAr ? 'فشل إرسال الرسالة' : 'Failed to send message'))
       }
     } catch (error) {
       console.error('Submit Error:', error)
-      alert(isAr ? 'حدث خطأ أثناء الإرسال، حاول مرة أخرى' : 'An error occurred, please try again')
+      if (!navigator.onLine) {
+        setOfflineError(true)
+      } else {
+        alert(isAr ? 'حدث خطأ أثناء الإرسال، تم حفظ مسودتك. حاول مرة أخرى.' : 'Error occurred, draft is preserved. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -101,30 +175,29 @@ export default function Contact() {
               isAr ? 'flex-row' : 'flex-row-reverse'
             }`}>
               <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
+              <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
             </Link>
           </div>
         </FadeIn>
 
-        {/* Header */}
+        {/* Page Header */}
         <FadeIn delay={0.1}>
-          <div className="text-center mb-16">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
-              {isAr ? 'تواصل' : 'Contact'} <span className="text-blue-600">{isAr ? 'معنا' : 'Us'}</span>
+          <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+            <span className="text-blue-600 font-bold tracking-wider text-xs uppercase bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-200 shadow-sm inline-block mb-3">
+              {isAr ? 'خدمة العملاء والدعم الفني' : 'Customer Support & Inquiries'}
+            </span>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+              {isAr ? 'تواصل مع شركة' : 'Get in Touch with'}{' '}
+              <span className="text-blue-600" style={glowingTitleStyle}>
+                {isAr ? 'الإنارة الحديثة' : 'Modern Enarah'}
+              </span>
             </h1>
-
-            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
+            <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
               {isAr 
-                ? 'نحن هنا لخدمتك. تواصل معنا للاستفسارات، الطلبات، أو التعاقد على المشاريع بكل سهولة'
-                : 'We are here to help. Contact us for any inquiries, orders, or projects collaboration with ease'
+                ? 'فريقنا المتخصص في خدمتكم للإجابة على استفسارات الأسلاك الإيطالية المعتمدة، الثريات، حلول التأسيس، وطلبات التوريد والمشاريع.'
+                : 'Our dedicated team is here to answer your inquiries regarding certified Italian cables, chandeliers, electrical supplies, and bulk project quotes.'
               }
             </p>
-
-            <div className="flex items-center justify-center gap-1.5 mt-5">
-              <div className="w-16 h-[2px] bg-slate-300" />
-              <div className="w-2 h-2 rounded-full bg-blue-600 ring-4 ring-blue-100" />
-              <div className="w-16 h-[2px] bg-slate-300" />
-            </div>
           </div>
         </FadeIn>
 
@@ -142,6 +215,27 @@ export default function Contact() {
                 <span className="w-1.5 h-6 bg-blue-600 rounded-full" />
                 {isAr ? 'أرسل رسالتك' : 'Send Message'}
               </h2>
+
+              {/* تنبيه انقطاع الإنترنت وحفظ المسودة */}
+              {offlineError && (
+                <div className="mb-5 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <WifiOff className="w-4 h-4 text-amber-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">{isAr ? 'تعذر الإرسال لعدم وجود اتصال بالإنترنت' : 'Unable to send: No internet'}</div>
+                      <div className="text-slate-600 text-[11px]">{isAr ? 'تم حفظ بياناتك المدخلة بأمان. انقر لإعادة الإرسال.' : 'Your draft is saved. Click to retry.'}</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleSubmit()}
+                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>{isAr ? 'إعادة' : 'Retry'}</span>
+                  </button>
+                </div>
+              )}
 
               {submitted ? (
                 <motion.div
@@ -175,12 +269,20 @@ export default function Contact() {
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className={`w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all text-sm ${
+                      onChange={(e) => {
+                        setFormData({ ...formData, name: e.target.value })
+                        if (fieldErrors.name) setFieldErrors({ ...fieldErrors, name: '' })
+                      }}
+                      className={`w-full px-4 py-3 bg-slate-50 border ${
+                        fieldErrors.name ? 'border-red-500 focus:border-red-500' : 'border-slate-300 focus:border-blue-600'
+                      } rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all text-sm ${
                         isAr ? 'text-right' : 'text-left'
                       }`}
                       placeholder={isAr ? 'أدخل اسمك هنا' : 'Enter your name here'}
                     />
+                    {fieldErrors.name && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.name}</p>
+                    )}
                   </div>
 
                   {/* Phone */}
@@ -192,12 +294,20 @@ export default function Contact() {
                       type="tel"
                       required
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className={`w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all text-sm ${
+                      onChange={(e) => {
+                        setFormData({ ...formData, phone: e.target.value })
+                        if (fieldErrors.phone) setFieldErrors({ ...fieldErrors, phone: '' })
+                      }}
+                      className={`w-full px-4 py-3 bg-slate-50 border ${
+                        fieldErrors.phone ? 'border-red-500 focus:border-red-500' : 'border-slate-300 focus:border-blue-600'
+                      } rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all text-sm ${
                         isAr ? 'text-right' : 'text-left'
                       }`}
                       placeholder="09X XXX XXXX"
                     />
+                    {fieldErrors.phone && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.phone}</p>
+                    )}
                   </div>
 
                   {/* Message */}
@@ -209,12 +319,20 @@ export default function Contact() {
                       required
                       rows={5}
                       value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className={`w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all resize-none text-sm leading-relaxed ${
+                      onChange={(e) => {
+                        setFormData({ ...formData, message: e.target.value })
+                        if (fieldErrors.message) setFieldErrors({ ...fieldErrors, message: '' })
+                      }}
+                      className={`w-full px-4 py-3 bg-slate-50 border ${
+                        fieldErrors.message ? 'border-red-500 focus:border-red-500' : 'border-slate-300 focus:border-blue-600'
+                      } rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all resize-none text-sm leading-relaxed ${
                         isAr ? 'text-right' : 'text-left'
                       }`}
                       placeholder={isAr ? 'كيف يمكننا مساعدتك؟' : 'How can we help you?'}
                     />
+                    {fieldErrors.message && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.message}</p>
+                    )}
                   </div>
 
                   {/* Submit Button */}
@@ -257,9 +375,13 @@ export default function Contact() {
 
                 <div className="space-y-3.5">
                   {/* Phone */}
-                  <a href="tel:+218916580068" className={`flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200 transition-all duration-200 group cursor-pointer ${
-                    isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
-                  }`}>
+                  <a 
+                    href="tel:+218916580068" 
+                    onClick={() => trackConversionEvent('phone_click', { source: 'contact_page' })}
+                    className={`flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200 transition-all duration-200 group cursor-pointer ${
+                      isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
+                    }`}
+                  >
                     <div className="w-11 h-11 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center shrink-0 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
                       <Phone className="w-5 h-5" />
                     </div>
@@ -270,9 +392,13 @@ export default function Contact() {
                   </a>
 
                   {/* Email */}
-                  <a href="mailto:info@enarahmodern.com" className={`flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200 transition-all duration-200 group cursor-pointer ${
-                    isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
-                  }`}>
+                  <a 
+                    href="mailto:info@enarahmodern.com" 
+                    onClick={() => trackConversionEvent('email_click', { source: 'contact_page' })}
+                    className={`flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200 transition-all duration-200 group cursor-pointer ${
+                      isAr ? 'flex-row text-right' : 'flex-row-reverse text-left'
+                    }`}
+                  >
                     <div className="w-11 h-11 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center shrink-0 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
                       <Mail className="w-5 h-5" />
                     </div>
@@ -333,17 +459,21 @@ export default function Contact() {
 
                 <a
                   href="tel:+218916580068"
-                  className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-bold text-sm shadow-md shadow-blue-500/25 active:scale-95 cursor-pointer"
+                  onClick={() => trackConversionEvent('phone_click', { source: 'quick_help_card' })}
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-sm transition-all shadow-sm"
                 >
-                  <Phone className="w-4 h-4" />
-                  {isAr ? 'اتصل بنا الآن' : 'Call Us Now'}
+                  <Phone className="w-4 h-4 text-blue-400" />
+                  <span>{isAr ? 'اتصل بالدعم الفني' : 'Call Support'}</span>
                 </a>
               </div>
 
             </div>
           </FadeIn>
+
         </div>
+
       </div>
+
     </div>
   )
 }

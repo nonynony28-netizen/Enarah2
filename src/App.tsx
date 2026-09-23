@@ -7,6 +7,7 @@ import OfflineNotice from './components/OfflineNotice'
 import Layout from './Layout'
 
 import Home from './pages/Home'
+import { initErrorMonitoring } from './utils/errorTracker'
 
 // ⚡ تحميل تفاعلي كسول (React Lazy Loading & Code-Splitting) لتقليل حجم الحزمة الابتدائية وتخصيص السرعة للهواتف
 const Products = lazy(() => import('./pages/Products'))
@@ -36,8 +37,9 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 0. تهيئة الجلسة وضبط الخلفية البيضاء الفاخرة فوراً
+  // 0. تهيئة الجلسة ومراقبة الأعطال وضبط الخلفية فوراً
   useEffect(() => {
+    initErrorMonitoring();
     sessionStorage.setItem('enarah_session_active', 'true');
     if (typeof window !== 'undefined') {
       document.body.style.backgroundColor = '#f8fafc';

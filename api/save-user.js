@@ -116,17 +116,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Run Multer to handle multipart form data file uploads
-    try {
-      await runMiddleware(req, res, uploadSingleImage);
-    } catch (err) {
-      console.warn("Multer notice:", err.message);
+    // 1. Run Multer for multipart form data if present
+    const contentType = req.headers["content-type"] || "";
+    if (contentType.includes("multipart/form-data")) {
+      try {
+        await runMiddleware(req, res, uploadSingleImage);
+      } catch (err) {
+        console.warn("Multer notice:", err.message);
+      }
+    } else if (contentType.includes("application/json")) {
+      // Collect raw JSON stream when bodyParser is disabled
+      if (!req.body || typeof req.body !== "object" || Object.keys(req.body).length === 0) {
+        const rawBody = await new Promise((resolve) => {
+          let chunks = [];
+          req.on("data", (chunk) => chunks.push(chunk));
+          req.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
+          req.on("error", () => resolve("{}"));
+        });
+        try {
+          req.body = JSON.parse(rawBody || "{}");
+        } catch (_) {
+          req.body = {};
+        }
+      }
     }
 
     const body = req.body || {};
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const type = typeof body.type === "string" ? body.type.trim().toLowerCase() : "user";
+    const rawPhone = typeof body.phone === "string" ? body.phone.trim() : (body.phone ? String(body.phone) : "");
     const description = typeof body.description === "string" ? body.description.trim() : "";
     const category = typeof body.category === "string" ? body.category.trim() : "";
     const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl.trim() : "";
@@ -174,32 +193,42 @@ export default async function handler(req, res) {
       }
     }
 
-    const phoneData = {
-      imageUrl,
-      videoUrl: finalVideoUrl,
-      description,
-      type,
-      category,
-      price,
-      discountPrice,
-      stockStatus,
-      stockQty,
-    };
-
     const { db } = await connectToDatabase();
 
-    // في حال رفع فيديو للواجهة أو الفيديو الثاني: نقوم بحذف السجلات القديمة لضمان الاعتماد المباشر للتحديث الجديد
+    // في حال رفع فيديو للواجهة أو الفيديو الثاني: نقوم بحذف السجلات القديمة
     if (email === "admin_hero_video@app.local" || email === "admin_secondary_video@app.local" || type === "hero_video" || type === "secondary_video") {
       await db.collection("users").deleteMany({
         $or: [{ email }, { type }]
       });
     }
 
+    let phoneField = rawPhone;
+    if (type !== "contact" && type !== "quote_request") {
+      const phoneData = {
+        imageUrl,
+        videoUrl: finalVideoUrl,
+        description,
+        type,
+        category,
+        price,
+        discountPrice,
+        stockStatus,
+        stockQty,
+      };
+      phoneField = JSON.stringify(phoneData);
+    }
+
     const newUser = {
       type,
       name,
       email,
-      phone: JSON.stringify(phoneData),
+      phone: phoneField,
+      rawPhone,
+      projectType: body.projectType || "",
+      buildingStage: body.buildingStage || "",
+      city: body.city || "",
+      notes: body.notes || "",
+      status: "new",
       createdAt: new Date(),
     };
 

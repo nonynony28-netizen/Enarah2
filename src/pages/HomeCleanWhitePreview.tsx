@@ -20,6 +20,7 @@ import {
   getOptimizedProjectImageUrl
 } from '../data/projectsData'
 import { initHeroVideoCache, getOptimalHeroVideoPath } from '../utils/videoCache'
+import { trackConversionEvent } from '../utils/analytics'
 
 type TrendType = 'up' | 'down' | 'same'
 
@@ -508,6 +509,7 @@ export default function Home() {
                 }`}>
                   <Link
                     to="/products"
+                    onClick={() => trackConversionEvent('hero_cta_clicked', { target: 'products' })}
                     className="inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm shadow-lg shadow-blue-600/35 transition-all hover:scale-105 active:scale-95"
                   >
                     <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -516,6 +518,7 @@ export default function Home() {
 
                   <Link
                     to="/contractors"
+                    onClick={() => trackConversionEvent('hero_cta_clicked', { target: 'contractors' })}
                     className="inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-white/95 hover:bg-white text-slate-900 font-medium text-xs sm:text-sm shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95"
                   >
                     <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />

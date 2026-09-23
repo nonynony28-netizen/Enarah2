@@ -8,6 +8,7 @@ import {
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
 import CartPanel from './CartPanel'
+import { trackConversionEvent } from '../utils/analytics'
 
 // نمط الوهج للعناوين والشعارات المضيئة
 const glowingTitleStyle = { textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)' }
@@ -532,6 +533,7 @@ export default function Navbar() {
 
                   <a
                     href="tel:0916580068"
+                    onClick={() => trackConversionEvent('phone_click', { source: 'navbar_mobile', phone: '0916580068' })}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-all active:scale-95"
                   >
                     <Phone className="w-3.5 h-3.5 text-blue-600" />

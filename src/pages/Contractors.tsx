@@ -1,45 +1,107 @@
-import { useState } from 'react'
-import { Building2, FileText, Phone, MessageSquare, AlertCircle, Sliders } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Building2, FileText, Phone, MessageSquare, AlertCircle, Loader2, CheckCircle } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
+import { trackConversionEvent } from '../utils/analytics'
+
+const DRAFT_KEY = 'enarah_contractor_draft'
 
 export default function Contractors() {
   const { isAr } = useLanguage()
 
-  // State variables for form
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [projectType, setProjectType] = useState(isAr ? 'شركة تشطيب' : 'Finishing Company')
-  const [materials, setMaterials] = useState('')
-  const [error, setError] = useState('')
+  // استرجاع المسودة المحفوظة تلقائياً في حال انقطاع النت أو إعادة التحميل
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(DRAFT_KEY)
+        if (saved) return JSON.parse(saved)
+      } catch {}
+    }
+    return {
+      name: '',
+      phone: '',
+      projectType: isAr ? 'شركة تشطيب' : 'Finishing Company',
+      materials: ''
+    }
+  })
 
-  const handleWhatsAppSubmit = (e: React.FormEvent) => {
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const hasTrackedStartRef = useRef(false)
+
+  // حفظ مسودة الاستمارة تلقائياً عند الكتابة
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const timer = setTimeout(() => {
+      if (formData.name || formData.phone || formData.materials) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(formData))
+        if (!hasTrackedStartRef.current) {
+          hasTrackedStartRef.current = true
+          trackConversionEvent('quote_request_started')
+        }
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [formData])
+
+  const handleWhatsAppSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!name.trim() || !phone.trim() || !materials.trim()) {
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.materials.trim()) {
       setError(isAr ? 'يرجى تعبئة جميع الحقول المطلوبة' : 'Please fill in all required fields')
       return
     }
 
     setError('')
+    setLoading(true)
 
-    // WhatsApp formatting
+    // 1. تسجيل طلب التسعير في قاعدة البيانات أولاً لحفظ الفرصة البيعية
+    try {
+      const idempotencyKey = `quote_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+      await fetch('https://enarah2.vercel.app/api/save-user', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': idempotencyKey
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: `[نوع المشروع: ${formData.projectType}] - ${formData.materials}`,
+          type: 'quote_request',
+        })
+      })
+      // مسح المسودة بعد نجاح التسجيل
+      localStorage.removeItem(DRAFT_KEY)
+    } catch (err) {
+      console.warn('Failed to record lead in background, proceeding to WhatsApp:', err)
+    } finally {
+      setLoading(false)
+    }
+
+    // 2. تسجيل حدث التحويل في نظام التحليلات
+    trackConversionEvent('quote_request_submitted', {
+      projectType: formData.projectType,
+      leadType: 'contractor_quote'
+    })
+
+    // 3. توجيه الزبون إلى رقم الواتساب المخصص للمبيعات والكميات
     const salesPhone = '218916580068' // Modern Enarah WhatsApp sales number
     
     const whatsappMessage = isAr 
       ? `*طلب تسعير كميات وتوريدات (بوابة المقاولين)*\n` +
         `==============================\n` +
-        `👤 *الجهة / الاسم:* ${name}\n` +
-        `📞 *رقم الهاتف:* ${phone}\n` +
-        `🏢 *نوع النشاط:* ${projectType}\n\n` +
-        `📝 *المواد والكميات المطلوبة:*\n${materials}\n` +
+        `👤 *الجهة / الاسم:* ${formData.name}\n` +
+        `📞 *رقم الهاتف:* ${formData.phone}\n` +
+        `🏢 *نوع النشاط:* ${formData.projectType}\n\n` +
+        `📝 *المواد والكميات المطلوبة:*\n${formData.materials}\n` +
         `==============================\n` +
         `المصدر: بوابة المقاولين - موقع الإنارة الحديثة`
       : `*Bulk Supplies & Quantities Quote Request (Contractor Portal)*\n` +
         `==============================\n` +
-        `👤 *Company / Name:* ${name}\n` +
-        `📞 *Phone Number:* ${phone}\n` +
-        `🏢 *Activity Type:* ${projectType}\n\n` +
-        `📝 *Required Materials & Quantities:*\n${materials}\n` +
+        `👤 *Company / Name:* ${formData.name}\n` +
+        `📞 *Phone Number:* ${formData.phone}\n` +
+        `🏢 *Activity Type:* ${formData.projectType}\n\n` +
+        `📝 *Required Materials & Quantities:*\n${formData.materials}\n` +
         `==============================\n` +
         `Source: Contractors Portal - Modern Enarah Website`
 
@@ -98,39 +160,37 @@ export default function Contractors() {
             </div>
           </div>
 
-          {/* Right panel: Form Card */}
+          {/* Right panel: Quote Request Form */}
           <div className="md:col-span-8">
-            <div 
-              className="p-6 md:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-6 text-right"
-            >
-              <div className="border-b border-slate-200 pb-4 mb-2">
-                <h2 className="text-xl font-bold text-slate-900">
-                  {isAr ? 'نموذج طلب عروض الأسعار والكميات' : 'Bulk Quote Request Form'}
+            <div className="p-6 md:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-6">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 mb-1">
+                  {isAr ? 'طلب تسعير مواد ومشاريع' : 'Request a Project Quote'}
                 </h2>
-                <p className="text-xs text-slate-500 mt-1 font-normal">
+                <p className="text-xs text-slate-500 font-normal">
                   {isAr 
-                    ? 'سيتم إرسال الطلب مشفراً للمبيعات لتسجيل حسابك كمقاول معتمد لدينا.'
-                    : 'Your request details will verify you as an authorized partner for scaling discounts.'}
+                    ? 'سيتم حفظ طلبك وإرسال نسخة منسقة ومفصلة مباشرة إلى قسم التوريد والمبيعات عبر الواتساب.' 
+                    : 'Your inquiry will be logged and dispatched directly to our bulk supply division on WhatsApp.'}
                 </p>
               </div>
 
               {error && (
-                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
 
               <div className="space-y-4">
-                {/* الاسم */}
+                {/* الاسم / اسم الشركة */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700 block">
-                    {isAr ? 'الاسم الكامل أو اسم شركة المقاولات/التشطيب *' : 'Full Name or Contracting Co. Name *'}
+                    {isAr ? 'الاسم أو اسم الشركة / المؤسسة *' : 'Your Name or Company Name *'}
                   </label>
                   <input
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder={isAr ? 'مثال: شركة الرواد للتشطيبات المعمارية' : 'e.g. Al-Rowad Architectural Finishing'}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-900 transition-all placeholder:text-slate-400"
                     required
@@ -144,8 +204,8 @@ export default function Contractors() {
                   </label>
                   <input
                     type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder={isAr ? 'مثال: 091XXXXXXX' : 'e.g. 091XXXXXXX'}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-900 transition-all placeholder:text-slate-400 text-left dir-ltr"
                     required
@@ -158,8 +218,8 @@ export default function Contractors() {
                     {isAr ? 'نوع المشروع / تصنيف النشاط *' : 'Activity / Project Classification *'}
                   </label>
                   <select
-                    value={projectType}
-                    onChange={(e) => setProjectType(e.target.value)}
+                    value={formData.projectType}
+                    onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-900 transition-all cursor-pointer"
                   >
                     {isAr ? (
@@ -186,8 +246,8 @@ export default function Contractors() {
                     {isAr ? 'تفاصيل المواد، المقاسات، والكميات المطلوبة بالتفصيل *' : 'List of Wires, Lights, and Quantities *'}
                   </label>
                   <textarea
-                    value={materials}
-                    onChange={(e) => setMaterials(e.target.value)}
+                    value={formData.materials}
+                    onChange={(e) => setFormData({ ...formData, materials: e.target.value })}
                     placeholder={isAr 
                       ? "اكتب هنا قائمة المواد والكميات المطلوبة بالتفصيل:\nمثال:\n- 20 لفة سلك 2.5 مم إيطالي\n- 150 سبوت لايت مقاس 7 سم لون أصفر 7 وات\n- كابلات نحاس مقاس..."
                       : "Type your detailed list here:\ne.g.:\n- 20 rolls of Italian wire 2.5 mm\n- 150 spotlights size 7cm, warm white, 7W\n- Copper cables size..."
@@ -199,15 +259,25 @@ export default function Contractors() {
                 </div>
               </div>
 
-              {/* زر الإرسال عبر الواتساب */}
+              {/* زر الإرسال عبر الواتساب مع مؤشر الحفظ في الخلفية */}
               <button
                 onClick={handleWhatsAppSubmit}
-                className="w-full py-3.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-md shadow-blue-500/25"
+                disabled={loading}
+                className="w-full py-3.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-md shadow-blue-500/25 disabled:opacity-75 disabled:cursor-not-allowed"
               >
-                <MessageSquare className="w-5 h-5 fill-current" />
-                <span>
-                  {isAr ? 'إرسال طلب التسعير للواتساب' : 'Send Quote Request via WhatsApp'}
-                </span>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>{isAr ? 'جاري حفظ الطلب والتحويل...' : 'Saving inquiry...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <MessageSquare className="w-5 h-5 fill-current" />
+                    <span>
+                      {isAr ? 'إرسال طلب التسعير للواتساب' : 'Send Quote Request via WhatsApp'}
+                    </span>
+                  </>
+                )}
               </button>
 
               {/* ملاحظة بخصوص التتبع */}
