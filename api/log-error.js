@@ -45,8 +45,23 @@ export default async function handler(req, res) {
     }
 
     try {
-      const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
-      if (!payload || !payload.message) {
+      let payload = req.body;
+      if (typeof payload === 'string') {
+        try { payload = JSON.parse(payload); } catch (_) {}
+      }
+      if (!payload || typeof payload !== 'object' || (!payload.message && !payload.action)) {
+        const rawBody = await new Promise((resolve) => {
+          let chunks = [];
+          req.on('data', (chunk) => chunks.push(chunk));
+          req.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+          req.on('error', () => resolve(''));
+        });
+        if (rawBody) {
+          try { payload = JSON.parse(rawBody); } catch (_) {}
+        }
+      }
+
+      if (!payload || (!payload.message && !payload.action)) {
         return res.status(400).json({ success: false, message: 'Invalid payload' })
       }
 
