@@ -19,7 +19,7 @@ import {
   getOptimizedProjectImages,
   getOptimizedProjectImageUrl
 } from '../data/projectsData'
-import { initHeroVideoCache } from '../utils/videoCache'
+import { initHeroVideoCache, getOptimalHeroVideoPath } from '../utils/videoCache'
 
 type TrendType = 'up' | 'down' | 'same'
 
@@ -125,10 +125,13 @@ export default function Home() {
   const [showHeroContent, setShowHeroContent] = useState(false)
   const heroCompletedRef = useRef(false)
 
-  // حالة مصدر فيديو الهيرو المحفوظ محلياً لمنع أي تقطيع نهائياً
+  // حالة مصدر فيديو الهيرو التكيفي والمحفوظ محلياً لمنع أي تقطيع نهائياً
   const [heroVideoSrc, setHeroVideoSrc] = useState<string>(() => {
-    if (typeof window !== 'undefined' && (window as any).__ENARAH_HERO_BLOB_URL__) {
-      return (window as any).__ENARAH_HERO_BLOB_URL__
+    if (typeof window !== 'undefined') {
+      if ((window as any).__ENARAH_HERO_BLOB_URL__) {
+        return (window as any).__ENARAH_HERO_BLOB_URL__
+      }
+      return getOptimalHeroVideoPath()
     }
     return '/hero-video.mp4'
   })
