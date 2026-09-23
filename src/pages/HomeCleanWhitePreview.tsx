@@ -19,6 +19,7 @@ import {
   getOptimizedProjectImages,
   getOptimizedProjectImageUrl
 } from '../data/projectsData'
+import { initHeroVideoCache } from '../utils/videoCache'
 
 type TrendType = 'up' | 'down' | 'same'
 
@@ -123,6 +124,38 @@ export default function Home() {
   const [activeWhyUsIndex, setActiveWhyUsIndex] = useState(0)
   const [showHeroContent, setShowHeroContent] = useState(false)
   const heroCompletedRef = useRef(false)
+
+  // حالة مصدر فيديو الهيرو المحفوظ محلياً لمنع أي تقطيع نهائياً
+  const [heroVideoSrc, setHeroVideoSrc] = useState<string>(() => {
+    if (typeof window !== 'undefined' && (window as any).__ENARAH_HERO_BLOB_URL__) {
+      return (window as any).__ENARAH_HERO_BLOB_URL__
+    }
+    return '/hero-video.mp4'
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).__ENARAH_HERO_BLOB_URL__) {
+      setHeroVideoSrc((window as any).__ENARAH_HERO_BLOB_URL__)
+    }
+
+    const handleBlobReady = (e: any) => {
+      const url = e.detail || (window as any).__ENARAH_HERO_BLOB_URL__
+      if (url) {
+        setHeroVideoSrc(url)
+      }
+    }
+
+    window.addEventListener('enarah_video_blob_ready', handleBlobReady)
+    initHeroVideoCache().then((blobUrl) => {
+      if (blobUrl) {
+        setHeroVideoSrc(blobUrl)
+      }
+    })
+
+    return () => {
+      window.removeEventListener('enarah_video_blob_ready', handleBlobReady)
+    }
+  }, [])
 
   const handleHeroVideoComplete = () => {
     if (showHeroContent) return
@@ -387,10 +420,10 @@ export default function Home() {
           willChange: 'transform'
         }}
       >
-        {/* الفيديو السينمائي الجديد بدقة عالية وبتسريع عتادي مباشر */}
+        {/* الفيديو السينمائي الجديد بدقة عالية وبتسريع عتادي مباشر والتخزين الدائم */}
         <video
           ref={heroVideoRef}
-          src="/hero-video.mp4"
+          src={heroVideoSrc}
           poster="/hero-poster.jpg"
           autoPlay
           loop

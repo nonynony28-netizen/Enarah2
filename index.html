@@ -17,6 +17,41 @@
     <link rel="preload" as="video" href="/hero-video.mp4" type="video/mp4" fetchpriority="high" />
     <link rel="preload" as="image" href="/poster.jpg" fetchpriority="high" />
 
+    <!-- محرك التخزين الفوري للفيديو لمنع التقطيع نهائياً وتخزينه كملف محلي في ذاكرة المتصفح -->
+    <script>
+      (function() {
+        try {
+          if ('caches' in window) {
+            caches.open('enarah-video-cache-v2').then(function(cache) {
+              cache.match('/hero-video.mp4').then(function(res) {
+                if (res) {
+                  res.blob().then(function(blob) {
+                    if (blob && blob.size > 20000) {
+                      window.__ENARAH_HERO_BLOB_URL__ = URL.createObjectURL(blob);
+                      window.dispatchEvent(new CustomEvent('enarah_video_blob_ready', { detail: window.__ENARAH_HERO_BLOB_URL__ }));
+                    }
+                  });
+                } else {
+                  fetch('/hero-video.mp4').then(function(netRes) {
+                    if (netRes.ok) {
+                      var clone = netRes.clone();
+                      cache.put('/hero-video.mp4', clone);
+                      netRes.blob().then(function(blob) {
+                        if (blob && blob.size > 20000) {
+                          window.__ENARAH_HERO_BLOB_URL__ = URL.createObjectURL(blob);
+                          window.dispatchEvent(new CustomEvent('enarah_video_blob_ready', { detail: window.__ENARAH_HERO_BLOB_URL__ }));
+                        }
+                      });
+                    }
+                  }).catch(function(){});
+                }
+              });
+            });
+          }
+        } catch(e) {}
+      })();
+    </script>
+
     <!-- Open Graph / WhatsApp / Facebook / Messenger / Telegram -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://enarahmodern.com/" />
