@@ -314,6 +314,34 @@
 </head>
 <body>
 
+  <!-- شاشة التحقق وتسجيل الدخول الأنيقة -->
+  <div id="authOverlay" style="display:none; position:fixed; inset:0; background:rgba(6,21,43,0.96); z-index:99999; justify-content:center; align-items:center; padding:20px; backdrop-filter: blur(8px);">
+    <div style="background:#0d2342; border:1px solid #1e3a8a; border-radius:24px; padding:36px 30px; width:100%; max-width:420px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.7);">
+      <div style="width:64px; height:64px; border-radius:20px; background:rgba(37,99,235,0.15); border:1px solid rgba(37,99,235,0.3); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:30px;">
+        🔒
+      </div>
+      <h2 style="margin:0 0 8px; font-size:22px; font-weight:800; color:#ffffff;">لوحة الإدارة والتحكم</h2>
+      <p style="margin:0 0 24px; font-size:13px; color:#94a3b8;">يرجى إدخال كلمة مرور مدير النظام للوصول إلى كافة البيانات والخدمات</p>
+      
+      <input 
+        type="password" 
+        id="loginPasswordInput" 
+        placeholder="أدخل كلمة المرور..." 
+        style="width:100%; padding:14px 18px; border-radius:12px; border:1px solid #3b82f6; background:#06152b; color:white; font-size:16px; text-align:center; margin-bottom:12px; box-sizing:border-box; outline:none; letter-spacing: 2px;"
+        onkeydown="if(event.key==='Enter') submitLogin()" 
+      />
+      <div id="loginErrorMsg" style="display:none; color:#fca5a5; font-size:13px; margin-bottom:14px; font-weight:bold; background:rgba(239,68,68,0.15); padding:8px; border-radius:8px;"></div>
+      
+      <button 
+        id="loginSubmitBtn" 
+        onclick="submitLogin()" 
+        style="width:100%; padding:14px; border-radius:12px; border:none; background:#2563eb; color:white; font-weight:800; font-size:15px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.4); transition:0.2s;"
+      >
+        دخول للوحة التحكم 🚀
+      </button>
+    </div>
+  </div>
+
   <!-- Top Header -->
   <div class="top-header">
     <div class="header-title-box">
@@ -382,6 +410,7 @@
       <button class="filter-discount" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; box-shadow: 0 4px 12px rgba(239,68,68,0.3);" onclick="filterType('discount')">التخفيضات والعروض 🔥</button>
       <button class="filter-product" onclick="filterType('product')">المنتجات 🔵</button>
       <button class="filter-project" onclick="filterType('project')">المشاريع 🟡</button>
+      <button class="filter-contact" onclick="filterType('contact')">الرسائل/الطلبات 🔴</button>
     </div>
 
     <div id="items" class="grid">جاري تحميل البيانات...</div>
@@ -702,10 +731,8 @@
   </div>
 
   <script>
-    // Config & Routing
-    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      ? 'https://enarah2.vercel.app/api'
-      : '/api';
+    // الإشارة دائماً لنقطة النهاية الحية في Vercel المتصلة بقاعدة بيانات MongoDB Atlas
+    const API_BASE = "https://enarah2.vercel.app/api";
 
     let allItems = [];
     let currentFilter = "all";
@@ -714,19 +741,74 @@
     let currentErrorStatus = "unresolved";
 
     function getAdminPassword() {
-      let pwd = sessionStorage.getItem('admin_password');
+      return sessionStorage.getItem('admin_password') || "";
+    }
+
+    // التحقق من الدخول عند بدء التشغيل
+    function checkAuthAndInit() {
+      const pwd = getAdminPassword();
       if (!pwd) {
-        pwd = prompt('الرجاء إدخال كلمة مرور مدير النظام:');
-        if (pwd) {
-          sessionStorage.setItem('admin_password', pwd);
-        }
+        document.getElementById('authOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('loginPasswordInput')?.focus(), 100);
+      } else {
+        document.getElementById('authOverlay').style.display = 'none';
+        loadItems();
+        checkHealthDetails();
       }
-      return pwd || "";
+    }
+
+    async function submitLogin() {
+      const input = document.getElementById('loginPasswordInput');
+      const errorMsg = document.getElementById('loginErrorMsg');
+      const btn = document.getElementById('loginSubmitBtn');
+      const pwd = input.value.trim();
+
+      if (!pwd) {
+        errorMsg.innerText = "يرجى كتابة كلمة المرور";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      btn.innerText = "جاري التحقق من الصلاحيات...";
+      btn.disabled = true;
+      errorMsg.style.display = "none";
+
+      try {
+        const res = await fetch(`${API_BASE}/get-users`, {
+          headers: { "x-admin-password": pwd }
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success && data.isAdmin) {
+          sessionStorage.setItem('admin_password', pwd);
+          document.getElementById('authOverlay').style.display = 'none';
+          btn.innerText = "دخول للوحة التحكم 🚀";
+          btn.disabled = false;
+          loadItems();
+          checkHealthDetails();
+        } else {
+          errorMsg.innerText = "كلمة المرور غير صحيحة، يرجى المحاولة مجدداً";
+          errorMsg.style.display = "block";
+          btn.innerText = "دخول للوحة التحكم 🚀";
+          btn.disabled = false;
+        }
+      } catch (err) {
+        errorMsg.innerText = "تعذر الاتصال بالسيرفر، تأكد من اتصال الإنترنت وحاول مجدداً";
+        errorMsg.style.display = "block";
+        btn.innerText = "دخول للوحة التحكم 🚀";
+        btn.disabled = false;
+      }
     }
 
     function logoutAdmin() {
       sessionStorage.removeItem('admin_password');
-      location.reload();
+      document.getElementById('authOverlay').style.display = 'flex';
+      const input = document.getElementById('loginPasswordInput');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      document.getElementById('loginErrorMsg').style.display = 'none';
     }
 
     async function apiFetch(endpoint, options = {}) {
@@ -735,21 +817,7 @@
         ...(options.headers || {}),
         'x-admin-password': pwd
       };
-      let url = `${API_BASE}${endpoint}`;
-      try {
-        let res = await fetch(url, { ...options, headers });
-        if (res.status === 404 && API_BASE !== 'https://enarah2.vercel.app/api') {
-          url = `https://enarah2.vercel.app/api${endpoint}`;
-          res = await fetch(url, { ...options, headers });
-        }
-        return res;
-      } catch (err) {
-        if (API_BASE !== 'https://enarah2.vercel.app/api') {
-          url = `https://enarah2.vercel.app/api${endpoint}`;
-          return await fetch(url, { ...options, headers });
-        }
-        throw err;
-      }
+      return await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
     }
 
     // ==========================================
@@ -779,14 +847,22 @@
       try {
         const res = await apiFetch("/get-users");
         if (res.status === 401) {
-          alert("كلمة المرور غير صحيحة أو منتهية الصلاحية!");
           sessionStorage.removeItem("admin_password");
-          location.reload();
+          checkAuthAndInit();
           return;
         }
 
         const data = await res.json();
-        if (!data.success) { container.innerHTML = "فشل في جلب البيانات"; return; }
+        if (!data.success) { 
+          container.innerHTML = "<div style='text-align:center; padding:30px;'>فشل في جلب البيانات من السيرفر</div>"; 
+          return; 
+        }
+
+        if (!data.isAdmin) {
+          sessionStorage.removeItem("admin_password");
+          checkAuthAndInit();
+          return;
+        }
 
         allItems = data.data.reverse();
 
@@ -798,16 +874,18 @@
 
         const discounts = validItems.filter(item => {
           let m = {}; try { m = item.phone ? JSON.parse(item.phone) : {}; } catch {}
-          return m.category === "التخفيضات والعروض الخاصة" || (m.discountPrice && m.price && parseFloat(m.discountPrice) < parseFloat(m.price));
+          return m.category === "التخفيضات والعروض الخاصة" || (m.category && m.category.includes("تخفيض")) || (m.discountPrice && m.price && parseFloat(m.discountPrice) < parseFloat(m.price));
         });
         document.getElementById("discountCount").innerText = discounts.length;
 
-        // تحديث إحصائيات وبادج الطلبات
         updateLeadsCounts();
-
         renderItems();
       } catch (err) {
-        container.innerHTML = "حدث خطأ أثناء الاتصال بالسيرفر";
+        container.innerHTML = `<div style="text-align:center; grid-column: 1/-1; padding: 25px; color: #f43f5e; background: rgba(239,68,68,0.1); border-radius: 12px;">
+          <h3>حدث خطأ أثناء الاتصال بالسيرفر</h3>
+          <p style="font-size: 13px; color: var(--text-muted);">${err.message}</p>
+          <button onclick="loadItems()" style="margin-top: 10px; padding: 8px 16px; border-radius: 8px; background: #3b82f6; border: none; color: white; font-weight: bold; cursor: pointer;">إعادة المحاولة 🔄</button>
+        </div>`;
         console.error(err);
       }
     }
@@ -818,14 +896,14 @@
       try {
         const filteredItems = allItems.filter((item) => {
           if (item.email && (item.email.includes("@analytics.local") || item.email === "admin_wire_prices@app.local" || item.email === "admin_game_rewards@app.local")) return false;
-          if (item.type === "contact" || item.type === "quote_request") return false;
 
           let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
 
           if (currentFilter === "all") return true;
-          if (currentFilter === "discount") return (media.category === "التخفيضات والعروض الخاصة" || (media.category && media.category.includes("تخفيض")) || (media.discountPrice && media.price && parseFloat(media.discountPrice) < parseFloat(media.price)));
-          if (currentFilter === "project") return media.type === "project";
-          if (currentFilter === "product") return media.type !== "project";
+          if (currentFilter === "contact") return item.type === "contact" || item.type === "quote_request";
+          if (currentFilter === "discount") return item.type !== "contact" && item.type !== "quote_request" && (media.category === "التخفيضات والعروض الخاصة" || (media.category && media.category.includes("تخفيض")) || (media.discountPrice && media.price && parseFloat(media.discountPrice) < parseFloat(media.price)));
+          if (currentFilter === "project") return item.type !== "contact" && item.type !== "quote_request" && media.type === "project";
+          if (currentFilter === "product") return item.type !== "contact" && item.type !== "quote_request" && media.type !== "project";
           return true;
         });
 
@@ -833,7 +911,14 @@
           let media = {}; try { media = item.phone ? JSON.parse(item.phone) : {}; } catch {}
           const card = document.createElement("div"); card.className = "card";
 
-          if (media.type === "project") {
+          if (item.type === "contact" || item.type === "quote_request") {
+            const isQuote = item.type === "quote_request";
+            card.innerHTML = `<span class="badge ${isQuote ? 'project-badge' : 'contact-badge'}">${isQuote ? 'طلب مقايسة 📑' : 'طلب/رسالة 🔴'}</span>
+              <h3 style="margin-top: 30px;">${item.name || "بدون اسم"}</h3>
+              <p><span class="label">رقم الهاتف:</span> <span dir="ltr">${item.phone || item.rawPhone || "لا يوجد"}</span></p>
+              <p><span class="label">التفاصيل:</span> ${item.email || item.notes || "لا يوجد"}</p>
+              <button class="delete-btn" onclick="deleteItem('${item._id}')">مسح الطلب 🗑️</button>`;
+          } else if (media.type === "project") {
             const rawImage = media.imageUrl || '';
             const coverImage = rawImage.split(',')[0]?.trim() || '/images/default-product.jpg';
             card.innerHTML = `<span class="badge project-badge">مشروع 🟡</span>
@@ -895,7 +980,14 @@
       }
     }
 
-    function filterType(type) { currentFilter = type; renderItems(); }
+    function filterType(type) { 
+      if (type === 'contact') {
+        switchTab('leads');
+        return;
+      }
+      currentFilter = type; 
+      renderItems(); 
+    }
 
     async function deleteItem(id) {
       if (!confirm("هل أنت متأكد من الحذف نهائياً؟")) return;
@@ -907,7 +999,7 @@
       if (res.status === 401) {
         alert("انتهت صلاحية الجلسة أو كلمة المرور غير صحيحة!");
         sessionStorage.removeItem("admin_password");
-        location.reload();
+        checkAuthAndInit();
         return;
       }
       loadItems();
@@ -1045,7 +1137,6 @@
         document.getElementById("an_quotes").innerText = s.quoteRequests || 0;
         document.getElementById("an_cr").innerText = s.conversionRate || "0.0%";
 
-        // جدول مصادر الزيارات
         const refBody = document.getElementById("referrersTableBody");
         if (data.topReferrers && data.topReferrers.length) {
           refBody.innerHTML = data.topReferrers.map(r => `
@@ -1058,7 +1149,6 @@
           refBody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-muted);">لا توجد بيانات حركة كافية خلال هذه الفترة</td></tr>`;
         }
 
-        // جدول الأجهزة
         const devBody = document.getElementById("devicesTableBody");
         if (data.devices && data.devices.length) {
           devBody.innerHTML = data.devices.map(d => `
@@ -1192,10 +1282,12 @@
       const badge = document.getElementById("systemHealthBadge");
       const swEl = document.getElementById("healthSwStatus");
 
-      if ('serviceWorker' in navigator) {
-        swEl.innerHTML = `<span style="color: #34d399;">مدعوم ومفعل ✅</span>`;
-      } else {
-        swEl.innerHTML = `<span style="color: #fcd34d;">غير مدعوم في هذا المتصفح</span>`;
+      if (swEl) {
+        if ('serviceWorker' in navigator) {
+          swEl.innerHTML = `<span style="color: #34d399;">مدعوم ومفعل ✅</span>`;
+        } else {
+          swEl.innerHTML = `<span style="color: #fcd34d;">غير مدعوم في هذا المتصفح</span>`;
+        }
       }
 
       try {
@@ -1205,19 +1297,23 @@
         const data = await res.json();
 
         if (res.ok && data.status === 'healthy') {
-          dbEl.innerHTML = `<span style="color: #34d399;">متصل وجاهز ✅</span>`;
-          latEl.innerText = `زمن استجابة قاعدة البيانات: ${data.services?.database?.latencyMs || clientPing} ms`;
-          apiEl.innerHTML = `<span style="color: #34d399;">يعمل بكفاءة 🟢</span>`;
-          badge.className = "health-pill";
-          badge.innerHTML = `<span style="width: 8px; height: 8px; border-radius: 50%; background: currentColor;"></span><span>السيرفر متصل ومستقر (${data.services?.database?.latencyMs || clientPing}ms)</span>`;
+          if (dbEl) dbEl.innerHTML = `<span style="color: #34d399;">متصل وجاهز ✅</span>`;
+          if (latEl) latEl.innerText = `زمن استجابة قاعدة البيانات: ${data.services?.database?.latencyMs || clientPing} ms`;
+          if (apiEl) apiEl.innerHTML = `<span style="color: #34d399;">يعمل بكفاءة 🟢</span>`;
+          if (badge) {
+            badge.className = "health-pill";
+            badge.innerHTML = `<span style="width: 8px; height: 8px; border-radius: 50%; background: currentColor;"></span><span>السيرفر متصل ومستقر (${data.services?.database?.latencyMs || clientPing}ms)</span>`;
+          }
         } else {
           throw new Error(data.message || "Unhealthy");
         }
       } catch (err) {
-        dbEl.innerHTML = `<span style="color: #ef4444;">تعذر الاتصال ❌</span>`;
-        apiEl.innerHTML = `<span style="color: #ef4444;">يواجه مشكلة ❌</span>`;
-        badge.className = "health-pill error";
-        badge.innerHTML = `<span style="width: 8px; height: 8px; border-radius: 50%; background: currentColor;"></span><span>تنبيه: تعذر الاتصال بالسيرفر</span>`;
+        if (dbEl) dbEl.innerHTML = `<span style="color: #ef4444;">تعذر الاتصال ❌</span>`;
+        if (apiEl) apiEl.innerHTML = `<span style="color: #ef4444;">يواجه مشكلة ❌</span>`;
+        if (badge) {
+          badge.className = "health-pill error";
+          badge.innerHTML = `<span style="width: 8px; height: 8px; border-radius: 50%; background: currentColor;"></span><span>تنبيه: تعذر الاتصال بالسيرفر</span>`;
+        }
       }
     }
 
@@ -1273,7 +1369,7 @@
       if (res.status === 401) {
         alert("غير مصرح لك بالعملية أو كلمة المرور غير صحيحة!");
         sessionStorage.removeItem("admin_password");
-        location.reload();
+        checkAuthAndInit();
         return;
       }
 
@@ -1401,7 +1497,7 @@
         if (res.status === 401) {
           alert("غير مصرح لك بالعملية أو كلمة المرور غير صحيحة!");
           sessionStorage.removeItem("admin_password");
-          location.reload();
+          checkAuthAndInit();
           return;
         }
 
@@ -1508,7 +1604,7 @@
         if (res.status === 401) {
           alert("غير مصرح لك بالعملية أو كلمة المرور غير صحيحة!");
           sessionStorage.removeItem("admin_password");
-          location.reload();
+          checkAuthAndInit();
           return;
         }
 
@@ -1528,9 +1624,8 @@
       }
     }
 
-    // بدء التشغيل
-    loadItems();
-    checkHealthDetails();
+    // بدء التشغيل والفحص
+    checkAuthAndInit();
   </script>
 </body>
 </html>
