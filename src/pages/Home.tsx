@@ -494,11 +494,11 @@ export default function Home() {
                 }}
               >
                 <h1 className="mobile-hero-h1 text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold mb-2.5 sm:mb-3 leading-tight tracking-tight py-0.5 text-white">
-                  <span className="text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
-                  <span className="text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.85)]">{t('hero.title.part2')}</span>
+                  <span className="text-white drop-shadow-sm">{t('hero.title.part1')}</span>{' '}
+                  <span className="text-blue-400 drop-shadow-sm">{t('hero.title.part2')}</span>
                 </h1>
                 
-                <p className="mobile-body text-xs sm:text-sm md:text-base text-slate-100/90 mb-4 sm:mb-5 leading-relaxed font-normal max-w-md drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+                <p className="mobile-body text-xs sm:text-sm md:text-base text-slate-100/90 mb-4 sm:mb-5 leading-relaxed font-normal max-w-md drop-shadow-sm">
                   {t('hero.subtitle')}
                 </p>
 

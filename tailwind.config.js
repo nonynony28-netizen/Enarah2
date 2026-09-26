@@ -5,10 +5,21 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
-        arabic: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
-        cairo: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
-        tajawal: ['"IBM Plex Sans Arabic"', 'Arial', 'sans-serif'],
+        sans: ['"IBM Plex Sans Arabic"', 'Tahoma', 'Arial', 'sans-serif'],
+        arabic: ['"IBM Plex Sans Arabic"', 'Tahoma', 'Arial', 'sans-serif'],
+        latin: ['Inter', 'Arial', 'sans-serif'],
+        inter: ['Inter', 'Arial', 'sans-serif'],
+        cairo: ['"IBM Plex Sans Arabic"', 'Tahoma', 'Arial', 'sans-serif'],
+        tajawal: ['"IBM Plex Sans Arabic"', 'Tahoma', 'Arial', 'sans-serif'],
+      },
+      fontWeight: {
+        regular: '400',
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+        extrabold: '700',
+        black: '700',
       },
       colors: {
         border: "hsl(var(--border))",
@@ -81,6 +92,9 @@ module.exports = {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        subtle: "0 6px 24px rgba(15, 23, 42, 0.06)",
+        card: "0 4px 20px -2px rgba(15, 23, 42, 0.05)",
+        deeper: "0 12px 32px rgba(15, 23, 42, 0.08)",
         glow: "0 0 20px rgba(212, 160, 23, 0.3)",
         "glow-lg": "0 0 40px rgba(212, 160, 23, 0.4)",
         glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
