@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useShake } from '../hooks/use-shake'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
-import WiresAutoCanvas from '../components/WiresAutoCanvas'
 import {
   Award, Shield, Sparkles, Zap, ArrowLeft, Loader2, Globe,
   TrendingUp, TrendingDown, Minus, ShieldCheck, Calendar, ShoppingCart, X, CheckCircle, Lightbulb, MessageCircle,
@@ -1605,108 +1604,113 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. قسم مسرح الأسلاك الـ 3D التفاعلي - مواصفات تقنية معمارية منضبطة */}
-      <section id="wires-import-showcase" className="order-7 mobile-order-7 md:order-none mobile-section-py py-12 md:py-24 relative overflow-hidden bg-[#F8FAFD] mobile-bg-soft border-t border-slate-200">
+      {/* 7. قسم الأسلاك والكوابل الإيطالية والتركية - تركيبة تحريرية معمارية بصورة الكوابل الثابتة المعتمدة */}
+      <section id="wires-import-showcase" className="order-7 mobile-order-7 md:order-none py-14 sm:py-16 md:py-24 lg:py-28 relative overflow-hidden bg-[#F5F8FC] border-t border-slate-200">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-16 items-center" dir={isAr ? 'rtl' : 'ltr'}>
             
-            {/* 1. مسرح الأسلاك 3D الأصلي الـ 240 إطار بإطار معماري نقي */}
-            <motion.div 
-              initial={{ opacity: 0, x: isAr ? 30 : -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              viewport={{ once: true }}
-              className="lg:col-span-6 w-full"
-            >
-              <div className="relative w-full aspect-square sm:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-xl group">
-                <WiresAutoCanvas totalFrames={240} fps={30} fitMode="cover" className="w-full h-full" />
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none z-10" />
-
-                {/* شارة إرشادية علوية هادئة */}
-                <div className="absolute top-4 right-4 z-20">
-                  <span className="px-3 py-1 rounded-lg bg-slate-900/80 text-white text-[11px] font-medium border border-white/10 backdrop-blur-md flex items-center gap-1.5 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                    <span>{isAr ? 'استيراد مباشر من المصنع' : 'Direct Factory Import'}</span>
-                  </span>
-                </div>
-
-                {/* شارة مواصفات المعدن */}
-                <div className="absolute bottom-4 left-4 z-20">
-                  <span className="px-3 py-1 rounded-lg bg-slate-900/80 text-white text-[11px] font-medium border border-white/10 backdrop-blur-md flex items-center gap-1.5 shadow-sm">
-                    <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{isAr ? 'نحاس إلكتروليتي نقي 100%' : '100% Electrolytic Copper'}</span>
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* 2. المواصفات الهندسية وجدول المعايير التقنية */}
-            <motion.div 
-              initial={{ opacity: 0, x: isAr ? -30 : 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              viewport={{ once: true }}
-              className="lg:col-span-6 flex flex-col justify-center text-right"
-            >
-              <span className="text-xs font-semibold text-blue-600 tracking-wider block mb-2">
+            {/* الجزء التحريري الأول (على الموبايل: العنوان والوصف بالأعلى، على الديسكتوب: أعلى العمود الأيمن) */}
+            <div className="order-1 lg:col-span-5 text-right space-y-3">
+              <span className="text-xs font-semibold text-blue-600 tracking-wider block">
                 {isAr ? 'معايير التأسيس والتوريد الصناعي' : 'Industrial Standards & Cable Supply'}
               </span>
 
-              <h3 className="mobile-section-h2 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-3 leading-tight">
+              <h2 className="mobile-section-h2 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
                 {isAr ? (
-                  <>أسلاك وكوابل إيطالية وتركية <br /><span className="text-blue-600">من المصنع مباشرة</span></>
+                  <>أسلاك وكوابل إيطالية وتركية <br className="hidden sm:inline" /><span className="text-blue-600">من المصنع مباشرة</span></>
                 ) : (
-                  <>Italian & Turkish Wires <br /><span className="text-blue-600">Direct from Source</span></>
+                  <>Italian & Turkish Wires <br className="hidden sm:inline" /><span className="text-blue-600">Direct from Source</span></>
                 )}
-              </h3>
+              </h2>
 
-              <p className="mobile-body text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed mb-6 font-normal">
+              <p className="mobile-body text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-normal">
                 {isAr
                   ? 'نوفر أفضل وأجود أنواع الأسلاك والكوابل الإيطالية والتركية المعتمدة لجميع مشاريع التأسيس السكني والتجاري بنحاس نقي 100% وعزل حراري فائق الأمان.'
                   : 'We supply certified Italian and Turkish wires and cables engineered with 100% pure electrolytic copper and flame-retardant PVC insulation.'}
               </p>
+            </div>
 
-              {/* جدول المواصفات المعماري الموحد: كتلة واحدة مقسمة بخطوط رقيقة بدلاً من بطاقات طافية منفصلة */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x sm:divide-slate-200 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.03)] mb-8" dir={isAr ? 'rtl' : 'ltr'}>
-                <div className="p-4 sm:p-5 flex flex-col gap-1.5 text-right">
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-blue-600 mb-1">
+            {/* عمود الصورة المعمارية الكبرى (على الموبايل: بالوسط بعد الوصف، على الديسكتوب: العمود الأيسر البارز بعرض 58%) */}
+            <div className="order-2 lg:order-none lg:col-span-7 lg:row-span-2 w-full">
+              <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] bg-slate-100">
+                <img
+                  src="/images/wires-italian-turkish-cables.jpg"
+                  alt={isAr ? "أسلاك وكوابل كهربائية إيطالية وتركية معتمدة من المصنع مباشرة مع علمي تركيا وإيطاليا" : "Certified Italian and Turkish electrical wires and cables direct from factory with flags"}
+                  width={1024}
+                  height={576}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* الجزء التحريري الثاني (على الموبايل: تحت الصورة، على الديسكتوب: أسفل العمود الأيمن تحت العنوان والوصف) */}
+            <div className="order-3 lg:col-span-5 text-right space-y-6">
+              
+              {/* قائمة المواصفات الفنية المضغوطة والأنيقة */}
+              <div className="border-y border-slate-200/80 py-4 divide-y divide-slate-100 space-y-3">
+                
+                {/* 1. استيراد مباشر */}
+                <div className="flex items-start gap-3.5 text-right pt-2 first:pt-0">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
                     <Globe className="w-4 h-4" />
                   </div>
-                  <span className="text-xs font-bold text-slate-900">{isAr ? 'استيراد مباشر' : 'Direct Import'}</span>
-                  <span className="text-[11px] text-slate-500 font-medium">{isAr ? 'من كبرى المصانع الأوروبية' : 'From Top Factories'}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs sm:text-sm font-semibold text-slate-900 block leading-snug">
+                      {isAr ? 'استيراد مباشر' : 'Direct Import'}
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-slate-500 font-normal block mt-0.5 leading-normal">
+                      {isAr ? 'من كبرى المصانع الأوروبية' : 'From Top Factories'}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="p-4 sm:p-5 flex flex-col gap-1.5 text-right">
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-blue-600 mb-1">
+                {/* 2. نحاس إلكتروليتي */}
+                <div className="flex items-start gap-3.5 text-right pt-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
                     <Zap className="w-4 h-4" />
                   </div>
-                  <span className="text-xs font-bold text-slate-900">{isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}</span>
-                  <span className="text-[11px] text-slate-500 font-medium">{isAr ? 'نقاء وتوصيل 100%' : '100% Conductivity'}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs sm:text-sm font-semibold text-slate-900 block leading-snug">
+                      {isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-slate-500 font-normal block mt-0.5 leading-normal">
+                      {isAr ? 'نقاء وتوصيل 100%' : '100% Conductivity'}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="p-4 sm:p-5 flex flex-col gap-1.5 text-right">
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-blue-600 mb-1">
+                {/* 3. عزل معتمد */}
+                <div className="flex items-start gap-3.5 text-right pt-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
                     <ShieldCheck className="w-4 h-4" />
                   </div>
-                  <span className="text-xs font-bold text-slate-900">{isAr ? 'عزل معتمد' : 'Certified PVC'}</span>
-                  <span className="text-[11px] text-slate-500 font-medium">{isAr ? 'مقاوم للحرارة والأكسدة' : 'Flame Retardant'}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs sm:text-sm font-semibold text-slate-900 block leading-snug">
+                      {isAr ? 'عزل معتمد' : 'Certified PVC'}
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-slate-500 font-normal block mt-0.5 leading-normal">
+                      {isAr ? 'مقاوم للحرارة والأكسدة' : 'Flame Retardant'}
+                    </span>
+                  </div>
                 </div>
+
               </div>
 
-              {/* زر الإجراء بتصميم منضبط */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3">
+              {/* زر الإجراء السريع للمتجر */}
+              <div className="pt-1">
                 <Link 
                   to="/products"
-                  className="mobile-btn inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm cursor-pointer text-center"
+                  className="mobile-btn inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
                 </Link>
               </div>
 
-            </motion.div>
+            </div>
 
           </div>
 
