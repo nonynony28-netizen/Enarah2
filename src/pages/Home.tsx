@@ -1610,12 +1610,8 @@ export default function Home() {
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-16 items-center" dir={isAr ? 'rtl' : 'ltr'}>
             
-            {/* الجزء التحريري الأول (على الموبايل: العنوان والوصف بالأعلى، على الديسكتوب: أعلى العمود الأيمن) */}
-            <div className="order-1 lg:col-span-5 text-right space-y-3">
-              <span className="text-xs font-semibold text-blue-600 tracking-wider block">
-                {isAr ? 'معايير التأسيس والتوريد الصناعي' : 'Industrial Standards & Cable Supply'}
-              </span>
-
+            {/* العمود التحريري (العنوان، الوصف، وزر الإجراء على الديسكتوب) */}
+            <div className="order-1 lg:col-span-5 text-right space-y-4">
               <h2 className="mobile-section-h2 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
                 {isAr ? (
                   <>أسلاك وكوابل إيطالية وتركية <br className="hidden sm:inline" /><span className="text-blue-600">من المصنع مباشرة</span></>
@@ -1629,10 +1625,21 @@ export default function Home() {
                   ? 'نوفر أفضل وأجود أنواع الأسلاك والكوابل الإيطالية والتركية المعتمدة لجميع مشاريع التأسيس السكني والتجاري بنحاس نقي 100% وعزل حراري فائق الأمان.'
                   : 'We supply certified Italian and Turkish wires and cables engineered with 100% pure electrolytic copper and flame-retardant PVC insulation.'}
               </p>
+
+              {/* زر الإجراء السريع لسطح المكتب */}
+              <div className="pt-2 hidden lg:block">
+                <Link 
+                  to="/products"
+                  className="mobile-btn inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
+                </Link>
+              </div>
             </div>
 
-            {/* عمود الصورة المعمارية الكبرى (على الموبايل: بالوسط بعد الوصف، على الديسكتوب: العمود الأيسر البارز بعرض 58%) */}
-            <div className="order-2 lg:order-none lg:col-span-7 lg:row-span-2 w-full">
+            {/* عمود الصورة المعمارية الكبرى */}
+            <div className="order-2 lg:col-span-7 w-full">
               <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] bg-slate-100">
                 <img
                   src="/images/wires-italian-turkish-cables.jpg"
@@ -1646,70 +1653,15 @@ export default function Home() {
               </div>
             </div>
 
-            {/* الجزء التحريري الثاني (على الموبايل: تحت الصورة، على الديسكتوب: أسفل العمود الأيمن تحت العنوان والوصف) */}
-            <div className="order-3 lg:col-span-5 text-right space-y-6">
-              
-              {/* قائمة المواصفات الفنية المضغوطة والأنيقة */}
-              <div className="border-y border-slate-200/80 py-4 divide-y divide-slate-100 space-y-3">
-                
-                {/* 1. استيراد مباشر */}
-                <div className="flex items-start gap-3.5 text-right pt-2 first:pt-0">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
-                    <Globe className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs sm:text-sm font-semibold text-slate-900 block leading-snug">
-                      {isAr ? 'استيراد مباشر' : 'Direct Import'}
-                    </span>
-                    <span className="text-[11px] sm:text-xs text-slate-500 font-normal block mt-0.5 leading-normal">
-                      {isAr ? 'من كبرى المصانع الأوروبية' : 'From Top Factories'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* 2. نحاس إلكتروليتي */}
-                <div className="flex items-start gap-3.5 text-right pt-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
-                    <Zap className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs sm:text-sm font-semibold text-slate-900 block leading-snug">
-                      {isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}
-                    </span>
-                    <span className="text-[11px] sm:text-xs text-slate-500 font-normal block mt-0.5 leading-normal">
-                      {isAr ? 'نقاء وتوصيل 100%' : '100% Conductivity'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* 3. عزل معتمد */}
-                <div className="flex items-start gap-3.5 text-right pt-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs sm:text-sm font-semibold text-slate-900 block leading-snug">
-                      {isAr ? 'عزل معتمد' : 'Certified PVC'}
-                    </span>
-                    <span className="text-[11px] sm:text-xs text-slate-500 font-normal block mt-0.5 leading-normal">
-                      {isAr ? 'مقاوم للحرارة والأكسدة' : 'Flame Retardant'}
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* زر الإجراء السريع للمتجر */}
-              <div className="pt-1">
-                <Link 
-                  to="/products"
-                  className="mobile-btn inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
-                </Link>
-              </div>
-
+            {/* زر الإجراء السريع على الموبايل (يظهر تحت الصورة مباشرة لراحة التصفح) */}
+            <div className="order-3 lg:hidden w-full pt-1">
+              <Link 
+                to="/products"
+                className="mobile-btn inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
+              </Link>
             </div>
 
           </div>
