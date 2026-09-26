@@ -30,26 +30,26 @@ html {
 
     /* Responsive Typography Scale */
     --h1-size-desktop: clamp(3rem, 4.5vw, 3.5rem);   /* 48px - 56px */
-    --h1-size-mobile: clamp(2.125rem, 6vw, 2.5rem);   /* 34px - 40px */
-    --h1-line-height: 1.25;
+    --h1-size-mobile: clamp(2.125rem, 5.5vw, 2.375rem);   /* 34px - 38px */
+    --h1-line-height: 1.3;
 
     --h2-size-desktop: clamp(2.25rem, 3.2vw, 2.625rem); /* 36px - 42px */
-    --h2-size-mobile: clamp(1.75rem, 4.8vw, 2rem);      /* 28px - 32px */
-    --h2-line-height: 1.3;
+    --h2-size-mobile: clamp(1.6875rem, 4.5vw, 1.9375rem); /* 27px - 31px */
+    --h2-line-height: 1.35;
 
     --h3-size-desktop: clamp(1.625rem, 2.2vw, 1.875rem); /* 26px - 30px */
-    --h3-size-mobile: clamp(1.375rem, 3.8vw, 1.625rem);  /* 22px - 26px */
-    --h3-line-height: 1.35;
+    --h3-size-mobile: clamp(1.25rem, 3.2vw, 1.4375rem);  /* 20px - 23px */
+    --h3-line-height: 1.4;
 
     --h4-size-desktop: 1.375rem; /* 22px */
     --h4-size-mobile: 1.1875rem; /* 19px */
     --h4-line-height: 1.4;
 
     --body-size-desktop: 1.0625rem; /* 17px */
-    --body-size-mobile: 1rem;       /* 16px */
-    --body-line-height: 1.8;
+    --body-size-mobile: 1.03125rem; /* 16.5px */
+    --body-line-height: 1.82;
 
-    --small-text-size: 0.875rem;    /* 14px */
+    --small-text-size: 0.84375rem;  /* 13.5px */
     --small-text-line-height: 1.6;
 
     /* Controlled Brand Blue Tokens */
@@ -689,6 +689,93 @@ p {
 .light .bg-radial-spotlight {
   background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.02) 55%, transparent 75%) !important;
 }
+
+/* =========================================================
+   نظام التصميم المخصص للهواتف المحمولة فقط (< 768px)
+   ENARAH Mobile System: Ordering, Typography & Backgrounds
+   مع الحفاظ المطلق على الديسكتوب والتابلت بنسبة 100% دون أي تغيير
+   ========================================================= */
+@media (max-width: 767px) {
+  /* 1. ترتيب الأقسام على الهاتف (11 قسماً بالترتيب المطلوب بدقة) */
+  .mobile-order-1 { order: 1 !important; }
+  .mobile-order-2 { order: 2 !important; }
+  .mobile-order-3 { order: 3 !important; }
+  .mobile-order-4 { order: 4 !important; }
+  .mobile-order-5 { order: 5 !important; }
+  .mobile-order-6 { order: 6 !important; }
+  .mobile-order-7 { order: 7 !important; }
+  .mobile-order-8 { order: 8 !important; }
+  .mobile-order-9 { order: 9 !important; }
+  .mobile-order-10 { order: 10 !important; }
+  .mobile-order-11 { order: 11 !important; }
+
+  /* 2. نظام الخلفيات الخفيفة والمنضبطة للهواتف فقط */
+  .mobile-bg-white {
+    background-color: #ffffff !important;
+  }
+  .mobile-bg-secondary {
+    background-color: #f5f8fc !important;
+  }
+  .mobile-bg-soft {
+    background-color: #f8fafd !important;
+  }
+
+  /* 3. سلم التيبوغرافي العربي العصري والمريح للهواتف */
+  .mobile-hero-h1 {
+    font-size: clamp(2.125rem, 5.5vw, 2.375rem) !important; /* 34px - 38px */
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.015em !important;
+  }
+
+  .mobile-section-h2 {
+    font-size: clamp(1.6875rem, 4.5vw, 1.9375rem) !important; /* 27px - 31px */
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .mobile-card-h3 {
+    font-size: clamp(1.25rem, 3.2vw, 1.4375rem) !important; /* 20px - 23px */
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    letter-spacing: normal !important;
+  }
+
+  .mobile-body {
+    font-size: 1.03125rem !important; /* 16.5px */
+    font-weight: 400 !important;
+    line-height: 1.82 !important;
+    letter-spacing: normal !important;
+  }
+
+  .mobile-small {
+    font-size: 0.84375rem !important; /* 13.5px */
+    font-weight: 400 !important;
+    line-height: 1.6 !important;
+    letter-spacing: normal !important;
+  }
+
+  .mobile-btn {
+    font-size: 0.96875rem !important; /* 15.5px */
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+  }
+
+  /* 4. انضباط المسافات والإيقاع الرأسي على الهواتف */
+  .mobile-section-py {
+    padding-top: 2.75rem !important;
+    padding-bottom: 2.75rem !important;
+  }
+
+  /* منع أي تسريب أفقي وضمان التناسق */
+  .mobile-container-safe {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
 
 
 

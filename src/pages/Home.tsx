@@ -411,13 +411,13 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-600 selection:text-white flex flex-col">
       
       {/* 1. الواجهة الترحيبية السينمائية بكامل ارتفاع الشاشة (Full-Screen Cinematic Hero) */}
       <section 
         id="hero" 
         onClick={handleHeroVideoComplete}
-        className="relative h-screen min-h-[600px] sm:min-h-[680px] w-full flex items-center justify-center overflow-hidden bg-black select-none cursor-pointer"
+        className="order-1 mobile-order-1 md:order-none relative h-screen min-h-[600px] sm:min-h-[680px] w-full flex items-center justify-center overflow-hidden bg-black select-none cursor-pointer"
         style={{
           contain: 'paint layout',
           transform: 'translateZ(0)',
@@ -494,12 +494,12 @@ export default function Home() {
                   WebkitBackfaceVisibility: 'hidden',
                 }}
               >
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold mb-2.5 sm:mb-3 leading-tight tracking-tight py-0.5 text-white">
+                <h1 className="mobile-hero-h1 text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold mb-2.5 sm:mb-3 leading-tight tracking-tight py-0.5 text-white">
                   <span className="text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">{t('hero.title.part1')}</span>{' '}
                   <span className="text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.85)]">{t('hero.title.part2')}</span>
                 </h1>
                 
-                <p className="text-xs sm:text-sm md:text-base text-slate-100/90 mb-4 sm:mb-5 leading-relaxed font-normal max-w-md drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+                <p className="mobile-body text-xs sm:text-sm md:text-base text-slate-100/90 mb-4 sm:mb-5 leading-relaxed font-normal max-w-md drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
                   {t('hero.subtitle')}
                 </p>
 
@@ -510,7 +510,7 @@ export default function Home() {
                   <Link
                     to="/products"
                     onClick={() => trackConversionEvent('hero_cta_clicked', { target: 'products' })}
-                    className="inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm shadow-lg shadow-blue-600/35 transition-all hover:scale-105 active:scale-95"
+                    className="mobile-btn inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm shadow-lg shadow-blue-600/35 transition-all hover:scale-105 active:scale-95"
                   >
                     <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span>{isAr ? 'تصفح المتجر' : 'Shop Products'}</span>
@@ -519,7 +519,7 @@ export default function Home() {
                   <Link
                     to="/contractors"
                     onClick={() => trackConversionEvent('hero_cta_clicked', { target: 'contractors' })}
-                    className="inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-white/95 hover:bg-white text-slate-900 font-medium text-xs sm:text-sm shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                    className="mobile-btn inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-white/95 hover:bg-white text-slate-900 font-medium text-xs sm:text-sm shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95"
                   >
                     <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                     <span>{isAr ? 'اطلب فاتورتك' : 'Request Your Invoice'}</span>
@@ -547,7 +547,7 @@ export default function Home() {
       </section>
 
       {/* 2. لماذا نحن - ميزات موحدة بالعرض على الهواتف بتصميم خفيف ومنضبط واحترافي */}
-      <section id="about" className="py-10 md:py-16 relative overflow-hidden border-t border-slate-200 bg-white">
+      <section id="about" className="order-2 mobile-order-2 md:order-none mobile-section-py py-10 md:py-16 relative overflow-hidden border-t border-slate-200 bg-white mobile-bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           {/* عنوان قسم لماذا نحن بتنظيم منضبط واحترافي بدون أي إيموجي */}
@@ -563,14 +563,14 @@ export default function Home() {
               <span>{isAr ? 'الثقة والجودة في مكان واحد' : 'Trust & Quality in One Place'}</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 tracking-tight text-slate-900">
+            <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold mb-2 tracking-tight text-slate-900">
               {isAr ? 'لماذا' : 'Why'}{' '}
               <span className="text-blue-600">
                 {isAr ? 'نحن؟' : 'Choose Us?'}
               </span>
             </h2>
 
-            <p className="text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal leading-relaxed">
+            <p className="mobile-body text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal leading-relaxed">
               {isAr 
                 ? 'أصالة معتمدة 100%، جاهزية للتوريد الفوري للمشاريع، وخدمة دعم فني سريع.' 
                 : '100% certified authenticity, project-ready immediate supply, and fast technical support.'}
@@ -606,11 +606,11 @@ export default function Home() {
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="mobile-card-h3 text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'وكالات عالمية حصرية' : 'Exclusive Global Agencies'}
                 </h3>
 
-                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
+                <p className="mobile-small text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
                   {isAr 
                     ? 'استيراد وتوريد مباشر من كبرى المصانع العالمية مع ضمان أصالة 100%.' 
                     : 'Direct import from leading global manufacturers with 100% authenticity guarantee.'}
@@ -659,11 +659,11 @@ export default function Home() {
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="mobile-card-h3 text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'توريد كبرى المشاريع والجملة' : 'Bulk & Project Supply'}
                 </h3>
 
-                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
+                <p className="mobile-small text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
                   {isAr 
                     ? 'تجهيز فوري وشامل لطلبيات المقاولين والشركات ومحلات الكهرباء.' 
                     : 'Immediate fulfillment for contractors, companies, and retail shops.'}
@@ -712,11 +712,11 @@ export default function Home() {
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="mobile-card-h3 text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'خدمة دعم فني سريع' : 'Fast Technical Support'}
                 </h3>
 
-                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
+                <p className="mobile-small text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
                   {isAr 
                     ? 'فريق فني متخصص جاهز لمساعدتكم والإجابة على الاستفسارات وحل أي مسألة فنية.' 
                     : 'Specialized technical team ready to assist, answer questions, and resolve technical inquiries.'}
@@ -765,8 +765,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2.5 قسم شركة الإنارة - لتجارة وتصنيع مواد التأسيس الكهربائي والاضاءات (منذ 1988) */}
-      <section id="company-enarah" className="py-16 md:py-24 relative overflow-hidden bg-white border-t border-slate-200">
+      {/* 3. قسم شركة الإنارة - لتجارة وتصنيع مواد التأسيس الكهربائي والاضاءات (منذ 1988) */}
+      <section id="company-enarah" className="order-3 mobile-order-3 md:order-none mobile-section-py py-12 md:py-24 relative overflow-hidden bg-[#F5F8FC] md:bg-white mobile-bg-secondary border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           {/* الحاوية المعمارية الفاخرة للشركة */}
@@ -777,7 +777,7 @@ export default function Home() {
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
             {/* الجزء الرئيسي: تصميم ثنائي متناسق جنباً إلى جنب على الهواتف والشاشات الكبيرة */}
-            <div className="flex flex-row items-start gap-3 sm:gap-6 lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center mb-8 sm:mb-12 relative z-10" dir={isAr ? 'rtl' : 'ltr'}>
+            <div className="flex flex-row items-start gap-3 sm:gap-6 lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center mb-4 sm:mb-8 relative z-10" dir={isAr ? 'rtl' : 'ltr'}>
               
               {/* عمود الشعار الدائري للشركة (جزء اليمين) */}
               <div className="w-[95px] sm:w-[130px] lg:w-auto lg:col-span-4 shrink-0 flex flex-col items-center text-center">
@@ -803,18 +803,18 @@ export default function Home() {
                   <span>{isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}</span>
                 </div>
 
-                <h2 className="text-lg sm:text-2xl lg:text-4xl font-bold text-slate-900 tracking-tight">
+                <h2 className="mobile-section-h2 text-lg sm:text-2xl lg:text-4xl font-bold text-slate-900 tracking-tight">
                   {isAr ? 'شركة الإنارة' : 'ENARAH Company'}
                 </h2>
 
                 {/* بطاقة الشرح المتكامل عن الشركة بدون مظهر طولي أو تكرار */}
                 <div className="p-3 sm:p-5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-xs text-slate-700 leading-relaxed text-[11px] sm:text-sm lg:text-base font-normal space-y-2">
-                  <p className="font-semibold text-slate-900">
+                  <p className="mobile-body font-semibold text-slate-900">
                     {isAr 
                       ? 'شركة الإنارة لتجارة وتصنيع مواد التأسيس الكهربائي والاضاءات المختلفة، إحدى الشركات الرائدة في السوق الليبي منذ تأسيسها عام 1988.'
                       : 'Enarah Company for trading and manufacturing electrical foundation materials and various lightings, one of the leading companies in the Libyan market since its establishment in 1988.'}
                   </p>
-                  <p className="text-slate-600 text-[10.5px] sm:text-sm leading-normal">
+                  <p className="mobile-small text-slate-600 text-[10.5px] sm:text-sm leading-normal">
                     {isAr 
                       ? 'نمتلك خبرة طويلة في استيراد وتصنيع وتوزيع المنتجات الكهربائية، ونحرص دائماً على توفير أحدث المنتجات ذات الجودة العالية. بنينا شبكة واسعة من الفروع ونقاط التوزيع في مختلف المدن الليبية لخدمة عملائنا بكفاءة وموثوقية، ونفخر بكوننا موزعين ووكلاء معتمدين لنخبة من كبرى العلامات التجارية العالمية.'
                       : 'We possess extensive experience in importing, manufacturing, and distributing top-tier electrical products across a nationwide branch network serving clients with speed and reliability, and we are proud authorized distributors for world-renowned brands.'}
@@ -825,28 +825,23 @@ export default function Home() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
                     <span className="block text-sm sm:text-base lg:text-lg font-bold text-slate-900">+36</span>
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'عاماً خبرة' : 'Years Experience'}</span>
+                    <span className="mobile-small text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'عاماً خبرة' : 'Years Experience'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
                     <span className="block text-sm sm:text-base lg:text-lg font-bold text-emerald-600">1988</span>
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'سنة التأسيس' : 'Established'}</span>
+                    <span className="mobile-small text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'سنة التأسيس' : 'Established'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
                     <span className="block text-sm sm:text-base lg:text-lg font-bold text-blue-600">{isAr ? 'فروع ليبيا' : 'Libya Branches'}</span>
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'تغطية شاملة' : 'Nationwide'}</span>
+                    <span className="mobile-small text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'تغطية شاملة' : 'Nationwide'}</span>
                   </div>
                   <div className="p-2 sm:p-3 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
                     <span className="block text-sm sm:text-base lg:text-lg font-bold text-orange-500">100%</span>
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'وكلاء وموزعون' : 'Certified Agency'}</span>
+                    <span className="mobile-small text-[10px] sm:text-[11px] font-semibold text-slate-600">{isAr ? 'وكلاء وموزعون' : 'Certified Agency'}</span>
                   </div>
                 </div>
 
               </div>
-            </div>
-
-            {/* معرض منتجات وخطوط تصنيع شركة الإنارة - عرض أفقي عالمي فاخر */}
-            <div className="pt-8 border-t border-slate-200 relative z-10">
-              <EnarahProductsCarousel isAr={isAr} />
             </div>
 
           </div>
@@ -854,13 +849,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. قسم شركاؤنا من العلامات العالمية (18 علامة عالمية) */}
-      <section id="brands-partners" className="py-20 md:py-28 relative overflow-hidden border-t border-slate-200 bg-slate-50">
+      {/* 4. منتجات وتصنيع شركة الإنارة - عرض أفقي عالمي فاخر */}
+      <section id="company-products" className="order-4 mobile-order-4 md:order-none mobile-section-py py-10 md:py-16 relative overflow-hidden bg-white mobile-bg-white border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <EnarahProductsCarousel isAr={isAr} />
+        </div>
+      </section>
+
+      {/* 6. قسم شركاؤنا من العلامات العالمية (18 علامة عالمية) */}
+      <section id="brands-partners" className="order-6 mobile-order-6 md:order-none mobile-section-py py-12 md:py-28 relative overflow-hidden border-t border-slate-200 bg-white md:bg-slate-50 mobile-bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           {/* عنوان القسم */}
           <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
+            <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
               {isAr ? (
                 <>شركاؤنا من <span className="text-blue-600">العلامات العالمية</span></>
               ) : (
@@ -868,7 +870,7 @@ export default function Home() {
               )}
             </h2>
 
-            <p className="text-slate-600 max-w-3xl mx-auto leading-relaxed text-sm md:text-base mb-6 font-normal">
+            <p className="mobile-body text-slate-600 max-w-3xl mx-auto leading-relaxed text-sm md:text-base mb-6 font-normal">
               {isAr 
                 ? 'نتعاون مع نخبة من أبرز العلامات والشركات العالمية المتخصصة في الإضاءة والتجهيزات والمواد الكهربائية'
                 : 'We collaborate with a group of the most prominent international brands and companies specialized in lighting and electrical equipment'
@@ -910,10 +912,10 @@ export default function Home() {
 
                 {/* Brand Name & Origin */}
                 <div className="w-full">
-                  <h3 className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 truncate">
+                  <h3 className="mobile-card-h3 text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 truncate">
                     {brand.name}
                   </h3>
-                  <span className="inline-block text-[10px] px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 font-bold">
+                  <span className="mobile-small inline-block text-[10px] px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 font-bold">
                     {brand.origin}
                   </span>
                 </div>
@@ -925,7 +927,7 @@ export default function Home() {
           <div className="mt-10 md:mt-12 text-center">
             <Link
               to="/brands"
-              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-md shadow-blue-500/25 hover:scale-105 active:scale-95 cursor-pointer"
+              className="mobile-btn inline-flex items-center gap-2.5 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-md shadow-blue-500/25 hover:scale-105 active:scale-95 cursor-pointer"
             >
               <span>{isAr ? 'استعرض تفاصيل كافة الوكالات والشركات (18 علامة عالمية)' : 'Explore All 18 Global Agencies'}</span>
               <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
@@ -935,8 +937,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. قسم عرض الفيديو الثاني (بعرض الشاشة الكاملة 100% كما في الموقع الأصلي) */}
-      <section id="showcase-video" className="w-full py-6 md:py-10 relative overflow-hidden bg-white border-y border-slate-200">
+      {/* قسم عرض الفيديو الثاني (بعرض الشاشة الكاملة 100% كما في الموقع الأصلي) */}
+      <section id="showcase-video" className="order-6 mobile-order-6 md:order-none w-full py-6 md:py-10 relative overflow-hidden bg-white border-y border-slate-200">
         <div className="w-full relative z-10">
           <div className="relative w-full overflow-hidden bg-black shadow-2xl">
             <div className="relative w-full aspect-video md:aspect-[21/9] max-h-[85vh] overflow-hidden flex items-center justify-center">
@@ -962,15 +964,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. مُحاكي الإضاءة التفاعلي المبتكر (Interactive Simulator) */}
-      <section id="simulator" className="py-20 md:py-28 relative overflow-hidden border-t border-slate-200 bg-white">
+      {/* 8. مُحاكي الإضاءة التفاعلي المبتكر (Interactive Simulator) */}
+      <section id="simulator" className="order-8 mobile-order-8 md:order-none mobile-section-py py-12 md:py-28 relative overflow-hidden border-t border-slate-200 bg-white mobile-bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
+            <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
               {t('sim.title.part1')} <span className="text-blue-600">{t('sim.title.part2')}</span>
             </h2>
-            <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal">
+            <p className="mobile-body text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal">
               {t('sim.desc')}
             </p>
             <div className="flex items-center justify-center gap-1.5 mt-5">
@@ -1150,18 +1152,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. دليل تطابق طلاء الجدران والإضاءة (Paint & Lighting Matching) */}
-      <section id="paint-matching" className="py-20 md:py-28 relative overflow-hidden border-t border-slate-200 bg-slate-50">
+      {/* 9. دليل تطابق طلاء الجدران والإضاءة (Paint & Lighting Matching) */}
+      <section id="paint-matching" className="order-9 mobile-order-9 md:order-none mobile-section-py py-12 md:py-28 relative overflow-hidden border-t border-slate-200 bg-[#F5F8FC] md:bg-slate-50 mobile-bg-secondary">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
+            <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
               {isAr ? (
                 <>دليل تطابق <span className="text-blue-600">الطلاء والإضاءة</span></>
               ) : (
                 <>Paint & Lighting <span className="text-blue-600">Matching Guide</span></>
               )}
             </h2>
-            <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal">
+            <p className="mobile-body text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal">
               {isAr 
                 ? 'اكتشف كيف يتأثر لون طلاء جدران بيتك بحرارة لون الإضاءة المختلفة لتتجنب الأخطاء الشائعة في التصميم الداخلي'
                 : 'Discover how your home wall paint color is affected by different lighting color temperatures to avoid common interior design mistakes'
@@ -1388,12 +1390,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. جزء من مشاريعنا (Featured Projects - Responsive Grid/Slider) */}
-      <section id="featured-projects" className="py-20 md:py-28 relative overflow-hidden border-t border-slate-200 bg-white">
+      {/* 5. جزء من مشاريعنا (Featured Projects - Responsive Grid/Slider) */}
+      <section id="featured-projects" className="order-5 mobile-order-5 md:order-none mobile-section-py py-12 md:py-28 relative overflow-hidden border-t border-slate-200 bg-[#F5F8FC] md:bg-white mobile-bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 md:mb-18 gap-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
+              <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-900">
                 {isAr ? (
                   <>جزء من <span className="text-blue-600">مشاريعنا</span></>
                 ) : (
@@ -1402,7 +1404,7 @@ export default function Home() {
               </h2>
               <div className="w-16 h-[3px] bg-blue-600 rounded-full mt-3" />
             </div>
-            <Link to="/projects" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-600 border border-blue-200 hover:border-blue-600 rounded-xl text-blue-700 hover:text-white font-bold transition-all shadow-sm">
+            <Link to="/projects" className="mobile-btn inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-600 border border-blue-200 hover:border-blue-600 rounded-xl text-blue-700 hover:text-white font-bold transition-all shadow-sm">
               {isAr ? 'شاهد كل المشاريع' : 'View All Projects'} <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
             </Link>
           </div>
@@ -1442,8 +1444,8 @@ export default function Home() {
                       
                       <div className="p-5 relative z-20 flex-grow flex flex-col justify-between">
                         <div>
-                          <h3 className="text-base font-bold text-slate-900 mb-2 line-clamp-1">{project.name}</h3>
-                          <p className="text-slate-600 text-xs leading-relaxed line-clamp-2 mb-4 font-normal">{project.description}</p>
+                          <h3 className="mobile-card-h3 text-base font-bold text-slate-900 mb-2 line-clamp-1">{project.name}</h3>
+                          <p className="mobile-small text-slate-600 text-xs leading-relaxed line-clamp-2 mb-4 font-normal">{project.description}</p>
                         </div>
                         
                         <div className="flex items-center justify-between text-[11px] text-blue-600 font-bold border-t border-slate-100 pt-3">
@@ -1510,8 +1512,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 8. قسم مسرح الأسلاك الـ 3D التفاعلي (Wires 3D Canvas Showcase) */}
-      <section id="wires-import-showcase" className="py-16 md:py-24 relative overflow-hidden bg-slate-50 border-t border-slate-200">
+      {/* 7. قسم مسرح الأسلاك الـ 3D التفاعلي (Wires 3D Canvas Showcase) */}
+      <section id="wires-import-showcase" className="order-7 mobile-order-7 md:order-none mobile-section-py py-12 md:py-24 relative overflow-hidden bg-[#F8FAFD] md:bg-slate-50 mobile-bg-soft border-t border-slate-200">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -1560,7 +1562,7 @@ export default function Home() {
                 <span>{isAr ? 'معايير الجودة والتأسيس الكهربائي' : 'Electrical Standards & Cables'}</span>
               </div>
 
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 mb-4 leading-tight">
+              <h3 className="mobile-section-h2 text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 mb-4 leading-tight">
                 {isAr ? (
                   <>أسلاك وكوابل إيطالية وتركية <br /><span className="text-blue-600">من المصنع مباشرة</span></>
                 ) : (
@@ -1568,7 +1570,7 @@ export default function Home() {
                 )}
               </h3>
 
-              <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed mb-6 font-normal">
+              <p className="mobile-body text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed mb-6 font-normal">
                 {isAr
                   ? 'نوفر أفضل وأجود أنواع الأسلاك والكوابل الإيطالية والتركية المعتمدة لجميع مشاريع التأسيس السكني والتجاري بنحاس نقي 100% وعزل حراري فائق الأمان.'
                   : 'We supply certified Italian and Turkish wires and cables engineered with 100% pure electrolytic copper and flame-retardant PVC insulation.'}
@@ -1605,7 +1607,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3">
                 <Link 
                   to="/products"
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-blue-600/30 hover:scale-[1.02] active:scale-95 text-center"
+                  className="mobile-btn inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-blue-600/30 hover:scale-[1.02] active:scale-95 text-center"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
@@ -1620,7 +1622,7 @@ export default function Home() {
       </section>
 
       {/* 9. قسم اللعبة التفاعلية الحصرية: رحلة النور */}
-      <section id="game-teaser" className="py-12 md:py-16 relative overflow-hidden border-t border-slate-200 bg-white">
+      <section id="game-teaser" className="order-9 mobile-order-9 md:order-none mobile-section-py py-10 md:py-16 relative overflow-hidden border-t border-slate-200 bg-[#F5F8FC] md:bg-white mobile-bg-secondary">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="relative bg-gradient-to-r from-blue-50 via-white to-blue-50 border border-blue-200 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm overflow-hidden text-right">
             
@@ -1647,7 +1649,7 @@ export default function Home() {
 
             <Link
               to="/game"
-              className="w-full md:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 shadow-md shadow-blue-500/25 cursor-pointer"
+              className="mobile-btn w-full md:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 shadow-md shadow-blue-500/25 cursor-pointer"
             >
               <span>{isAr ? 'العب واكسب الخصم الآن' : 'Play & Win Discount'}</span>
               <ArrowLeft className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
@@ -1658,7 +1660,7 @@ export default function Home() {
       </section>
 
       {/* 10. ابدأ مشروعك معنا اليوم (CTA + Social Links) */}
-      <section id="start" className="py-20 md:py-28 relative overflow-hidden border-t border-slate-200 bg-slate-50">
+      <section id="start" className="order-10 mobile-order-10 md:order-none mobile-section-py py-12 md:py-28 relative overflow-hidden border-t border-slate-200 bg-slate-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1669,20 +1671,20 @@ export default function Home() {
           >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.06),transparent_70%)] pointer-events-none" />
 
-            <h2 className="relative z-10 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+            <h2 className="mobile-section-h2 relative z-10 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
               {isAr ? (
                 <>ابدأ مشروعك معنا <span className="text-blue-600">اليوم</span></>
               ) : (
                 <>Start Your Project With Us <span className="text-blue-600">Today</span></>
               )}
             </h2>
-            <p className="relative z-10 text-slate-600 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
+            <p className="mobile-body relative z-10 text-slate-600 text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
               {isAr 
                 ? 'نحن هنا لنساعدك في تحويل رؤيتك إلى واقع مبهر. تواصل مع خبرائنا للحصول على استشارة هندسية وفنية لمشروعك، أو لطلب فواتير المواد وعروض الأسعار المتكاملة لمشروعك الكهربائي.'
                 : 'We are here to help you transform your vision into a stunning reality. Contact our experts for engineering and technical consultations, or to request material invoices and comprehensive quotes for your electrical project.'
               }
             </p>
-            <Link to="/contact" className="relative z-10 inline-flex items-center gap-2.5 px-8 py-4 bg-blue-600 text-white font-bold text-base md:text-lg rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 active:scale-95">
+            <Link to="/contact" className="mobile-btn relative z-10 inline-flex items-center gap-2.5 px-8 py-4 bg-blue-600 text-white font-bold text-base md:text-lg rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 active:scale-95">
               <Zap className="w-5 h-5 text-amber-300" />
               {isAr ? 'تواصل معنا الآن' : 'Contact Us Now'}
             </Link>
