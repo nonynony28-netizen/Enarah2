@@ -8,6 +8,7 @@ import Layout from './Layout'
 
 import Home from './pages/Home'
 import { initErrorMonitoring } from './utils/errorTracker'
+import { initWebVitals } from './utils/webVitals'
 
 // ⚡ تحميل تفاعلي كسول (React Lazy Loading & Code-Splitting) لتقليل حجم الحزمة الابتدائية وتخصيص السرعة للهواتف
 const Products = lazy(() => import('./pages/Products'))
@@ -37,9 +38,10 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 0. تهيئة الجلسة ومراقبة الأعطال وضبط الخلفية فوراً
+  // 0. تهيئة الجلسة ومراقبة الأعطال ومؤشرات السرعة وضبط الخلفية فوراً
   useEffect(() => {
     initErrorMonitoring();
+    initWebVitals();
     sessionStorage.setItem('enarah_session_active', 'true');
     if (typeof window !== 'undefined') {
       document.body.style.backgroundColor = '#f8fafc';

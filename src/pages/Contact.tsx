@@ -56,6 +56,7 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [offlineError, setOfflineError] = useState(false)
+  const [serverError, setServerError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({})
   const hasTrackedStartRef = useRef(false)
 
@@ -110,12 +111,14 @@ export default function Contact() {
     // فحص الاتصال بالإنترنت قبل الإرسال لمنع فقدان البيانات
     if (!navigator.onLine) {
       setOfflineError(true)
+      setServerError(null)
       return
     }
 
     try {
       setLoading(true)
       setOfflineError(false)
+      setServerError(null)
 
       const idempotencyKey = `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
 
@@ -146,14 +149,15 @@ export default function Contact() {
           setSubmitted(false)
         }, 5000)
       } else {
-        alert(data.error || data.message || (isAr ? 'فشل إرسال الرسالة' : 'Failed to send message'))
+        setServerError(data.error || data.message || (isAr ? 'تعذر إرسال الطلب حالياً. يرجى المحاولة مرة أخرى.' : 'Unable to send request currently. Please try again.'))
       }
     } catch (error) {
       console.error('Submit Error:', error)
       if (!navigator.onLine) {
         setOfflineError(true)
+        setServerError(null)
       } else {
-        alert(isAr ? 'حدث خطأ أثناء الإرسال، تم حفظ مسودتك. حاول مرة أخرى.' : 'Error occurred, draft is preserved. Please try again.')
+        setServerError(isAr ? 'تعذر إرسال الطلب حالياً. يرجى المحاولة مرة أخرى.' : 'Unable to send request currently. Please try again.')
       }
     } finally {
       setLoading(false)
@@ -222,8 +226,12 @@ export default function Contact() {
                   <div className="flex items-center gap-2.5">
                     <WifiOff className="w-4 h-4 text-amber-600 shrink-0" />
                     <div>
-                      <div className="font-bold">{isAr ? 'تعذر الإرسال لعدم وجود اتصال بالإنترنت' : 'Unable to send: No internet'}</div>
-                      <div className="text-slate-600 text-[11px]">{isAr ? 'تم حفظ بياناتك المدخلة بأمان. انقر لإعادة الإرسال.' : 'Your draft is saved. Click to retry.'}</div>
+                      <div className="font-bold">
+                        {isAr ? 'تعذر الإرسال لعدم وجود اتصال بالإنترنت. تم الاحتفاظ بالبيانات المدخلة.' : 'Unable to send: No internet connection. Entered data is preserved.'}
+                      </div>
+                      <div className="text-slate-600 text-[11px] mt-0.5">
+                        {isAr ? 'يمكنك النقر على زر إعادة المحاولة فور عودة الاتصال.' : 'You can click retry as soon as connectivity is restored.'}
+                      </div>
                     </div>
                   </div>
                   <button
@@ -232,7 +240,30 @@ export default function Contact() {
                     className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>{isAr ? 'إعادة' : 'Retry'}</span>
+                    <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+                  </button>
+                </div>
+              )}
+
+              {/* تنبيه تعذر الاتصال بالسيرفر أو فشل الإرسال */}
+              {!offlineError && serverError && (
+                <div className="mb-5 p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <RefreshCw className="w-4 h-4 text-red-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">{serverError}</div>
+                      <div className="text-slate-600 text-[11px] mt-0.5">
+                        {isAr ? 'تم حفظ كافة بياناتك المدخلة بأمان في جهازك.' : 'All your entered fields remain safely saved.'}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleSubmit()}
+                    className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
                   </button>
                 </div>
               )}

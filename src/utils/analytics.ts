@@ -1,15 +1,18 @@
-// محرك تتبع التحويلات والزيارات لشركة الإنارة الحديثة - متوافق مع أعلى معايير الخصوصية والأداء
+// محرك تتبع التحويلات والزيارات والـ UTM لشركة الإنارة الحديثة - متوافق مع أعلى معايير الخصوصية والأداء
 // Privacy-First Conversion & Attribution Analytics Engine
 
-interface AnalyticsEvent {
+export interface AnalyticsEvent {
   eventName: string
   properties?: Record<string, any>
   timestamp: number
   url: string
+  landingPage: string
   referrer: string
   sessionId: string
   visitorId: string
   deviceType: 'mobile' | 'tablet' | 'desktop'
+  browser: string
+  os: string
   utm: {
     source?: string
     medium?: string
@@ -20,7 +23,7 @@ interface AnalyticsEvent {
 }
 
 // إنشاء أو استرجاع معرف زائر مجهول (Anonymous UUID)
-function getOrCreateVisitorId(): string {
+export function getOrCreateVisitorId(): string {
   if (typeof window === 'undefined') return 'anon'
   let id = localStorage.getItem('enarah_visitor_uuid')
   if (!id) {
@@ -31,7 +34,7 @@ function getOrCreateVisitorId(): string {
 }
 
 // إدارة الجلسة الحالية
-function getOrCreateSessionId(): string {
+export function getOrCreateSessionId(): string {
   if (typeof window === 'undefined') return 'session'
   let id = sessionStorage.getItem('enarah_session_uuid')
   if (!id) {
@@ -41,8 +44,19 @@ function getOrCreateSessionId(): string {
   return id
 }
 
-// استخراج وحفظ معاملات الحملات التسويقية (UTM Parameters)
-function captureUtmParameters(): Record<string, string> {
+// حفظ واسترجاع أول صفحة هبوط وصل إليها الزائر
+export function getLandingPage(): string {
+  if (typeof window === 'undefined') return '/'
+  let lp = sessionStorage.getItem('enarah_landing_page')
+  if (!lp) {
+    lp = window.location.pathname + window.location.search
+    sessionStorage.setItem('enarah_landing_page', lp)
+  }
+  return lp
+}
+
+// استخراج وحفظ معاملات الحملات التسويقية (UTM Parameters) مع حفظ اللمسة الأولى والأخيرة
+export function captureUtmParameters(): Record<string, string> {
   if (typeof window === 'undefined') return {}
   const params = new URLSearchParams(window.location.search)
   const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
@@ -57,7 +71,7 @@ function captureUtmParameters(): Record<string, string> {
     }
   }
 
-  // حفظ اللمسة الأولى (First-Touch) واللمسة الأخيرة (Last-Touch)
+  // حفظ اللمسة الأولى (First-Touch) بشكل دائم واللمسة الأخيرة (Last-Touch) للجلسة
   if (foundNew) {
     if (!localStorage.getItem('enarah_utm_first_touch')) {
       localStorage.setItem('enarah_utm_first_touch', JSON.stringify(currentUtm))
@@ -76,12 +90,35 @@ function captureUtmParameters(): Record<string, string> {
   return {}
 }
 
-function getDeviceCategory(): 'mobile' | 'tablet' | 'desktop' {
+export function getDeviceCategory(): 'mobile' | 'tablet' | 'desktop' {
   if (typeof window === 'undefined') return 'desktop'
   const width = window.innerWidth
   if (width < 640) return 'mobile'
   if (width < 1024) return 'tablet'
   return 'desktop'
+}
+
+export function detectBrowser(): string {
+  if (typeof window === 'undefined') return 'unknown'
+  const ua = navigator.userAgent
+  if (/Edg\//i.test(ua)) return 'Edge'
+  if (/OPR\//i.test(ua) || /Opera/i.test(ua)) return 'Opera'
+  if (/SamsungBrowser/i.test(ua)) return 'Samsung Internet'
+  if (/Chrome/i.test(ua) && !/Chromium/i.test(ua)) return 'Chrome'
+  if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) return 'Safari'
+  if (/Firefox/i.test(ua)) return 'Firefox'
+  return 'Other'
+}
+
+export function detectOS(): string {
+  if (typeof window === 'undefined') return 'unknown'
+  const ua = navigator.userAgent
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'iOS'
+  if (/Android/i.test(ua)) return 'Android'
+  if (/Windows/i.test(ua)) return 'Windows'
+  if (/Macintosh|Mac OS X/i.test(ua)) return 'macOS'
+  if (/Linux/i.test(ua)) return 'Linux'
+  return 'Other'
 }
 
 /**
@@ -95,10 +132,13 @@ export function trackConversionEvent(eventName: string, properties: Record<strin
     properties,
     timestamp: Date.now(),
     url: window.location.pathname + window.location.search,
+    landingPage: getLandingPage(),
     referrer: document.referrer || '',
     sessionId: getOrCreateSessionId(),
     visitorId: getOrCreateVisitorId(),
     deviceType: getDeviceCategory(),
+    browser: detectBrowser(),
+    os: detectOS(),
     utm: captureUtmParameters()
   }
 
@@ -118,4 +158,41 @@ export function trackConversionEvent(eventName: string, properties: Record<strin
     body: JSON.stringify(payload),
     keepalive: true
   }).catch(() => {})
+}
+
+// وظائف مساعدة متخصصة لتوحيد قياسات التحويل عبر الموقع
+export const analytics = {
+  trackWhatsAppClick: (label = 'general', props = {}) => {
+    trackConversionEvent('whatsapp_click', { label, ...props })
+  },
+  trackPhoneClick: (label = 'general', props = {}) => {
+    trackConversionEvent('phone_click', { label, ...props })
+  },
+  trackEmailClick: (label = 'general', props = {}) => {
+    trackConversionEvent('email_click', { label, ...props })
+  },
+  trackPrimaryCta: (label: string, props = {}) => {
+    trackConversionEvent('primary_cta_click', { label, ...props })
+  },
+  trackProductView: (productName: string, category?: string) => {
+    trackConversionEvent('product_viewed', { productName, category })
+  },
+  trackProjectView: (projectName: string, category?: string) => {
+    trackConversionEvent('project_viewed', { projectName, category })
+  },
+  trackBrandView: (brandName: string) => {
+    trackConversionEvent('brand_viewed', { brandName })
+  },
+  trackSearch: (query: string, resultsCount = 0) => {
+    trackConversionEvent('search_performed', { query, resultsCount })
+  },
+  trackSearchResultClick: (query: string, itemTitle: string) => {
+    trackConversionEvent('search_result_clicked', { query, itemTitle })
+  },
+  trackMapClick: (locationName = 'Main Branch') => {
+    trackConversionEvent('map_location_click', { locationName })
+  },
+  trackSocialClick: (platform: string) => {
+    trackConversionEvent('social_link_click', { platform })
+  }
 }

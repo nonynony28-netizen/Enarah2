@@ -14,8 +14,15 @@ export default function OfflineNotice() {
   // وظيفة التحقق الفعلي من الاتصال بالإنترنت والخدمة
   const testConnectivity = async () => {
     setIsChecking(true)
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 4500)
     try {
-      const response = await fetch('/robots.txt?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
+      const response = await fetch('/robots.txt?t=' + Date.now(), {
+        method: 'HEAD',
+        cache: 'no-store',
+        signal: controller.signal
+      })
+      clearTimeout(timeoutId)
       if (response.ok) {
         setIsOffline(false)
         setIsServerDown(false)
@@ -24,6 +31,7 @@ export default function OfflineNotice() {
         return true
       }
     } catch {
+      clearTimeout(timeoutId)
       // إذا فشل الطلب رغم أن المتصفح يرى أنه online، فهذا خلل اتصال
       if (!navigator.onLine) {
         setIsOffline(true)
@@ -90,7 +98,7 @@ export default function OfflineNotice() {
                   {isAr ? 'لا يوجد اتصال بالإنترنت' : 'No Internet Connection'}
                 </div>
                 <div className="text-[11px] text-slate-300 font-normal">
-                  {isAr ? 'تحقق من اتصالك وحاول مرة أخرى (الموقع محفوظ ويعمل أوفلاين)' : 'Check connection. Cached pages are ready offline.'}
+                  {isAr ? 'تحقق من اتصالك بالإنترنت وحاول مرة أخرى.' : 'Check connection. Cached pages are ready offline.'}
                 </div>
               </div>
             </div>

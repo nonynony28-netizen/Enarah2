@@ -72,10 +72,13 @@ export default async function handler(req, res) {
         eventName: sanitizeString(String(payload.eventName)),
         properties: typeof payload.properties === 'object' ? payload.properties : {},
         url: sanitizeString(String(payload.url || '')),
+        landingPage: sanitizeString(String(payload.landingPage || '')),
         referrer: sanitizeString(String(payload.referrer || '')),
         sessionId: sanitizeString(String(payload.sessionId || '')),
         visitorId: sanitizeString(String(payload.visitorId || '')),
         deviceType: payload.deviceType || 'unknown',
+        browser: sanitizeString(String(payload.browser || 'unknown')),
+        os: sanitizeString(String(payload.os || 'unknown')),
         utm: typeof payload.utm === 'object' ? payload.utm : {},
         createdAt: new Date(),
         timestamp: payload.timestamp || Date.now()
@@ -130,6 +133,31 @@ export default async function handler(req, res) {
         { $group: { _id: '$deviceType', count: { $sum: 1 } } }
       ]).toArray()
 
+      // مؤشرات الأداء الحيوية الحقيقية للمتصفحات (Core Web Vitals Aggregation)
+      const vitals = await analyticsCollection.aggregate([
+        { $match: { ...filter, eventName: 'web_vital' } },
+        { $group: {
+            _id: '$properties.name',
+            avgValue: { $avg: '$properties.value' },
+            samplesCount: { $sum: 1 },
+            goodSamples: {
+              $sum: { $cond: [{ $eq: ['$properties.rating', 'good'] }, 1, 0] }
+            }
+        }},
+        { $sort: { _id: 1 } }
+      ]).toArray()
+
+      // أداء حملات التسويق (Campaigns & UTMs)
+      const topCampaigns = await analyticsCollection.aggregate([
+        { $match: { ...filter, 'utm.source': { $exists: true, $ne: '' } } },
+        { $group: {
+            _id: { source: '$utm.source', campaign: '$utm.campaign' },
+            count: { $sum: 1 }
+        }},
+        { $sort: { count: -1 } },
+        { $limit: 6 }
+      ]).toArray()
+
       return res.status(200).json({
         success: true,
         data: {
@@ -148,7 +176,9 @@ export default async function handler(req, res) {
             heroCtaClicks
           },
           topReferrers,
-          devices
+          devices,
+          vitals,
+          topCampaigns
         }
       })
     } catch (err) {

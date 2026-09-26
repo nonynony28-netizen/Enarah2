@@ -13,6 +13,20 @@
   RewriteRule . /index.html [L]
 </IfModule>
 
+# 0. Prevent Directory Browsing & Information Disclosure
+Options -Indexes
+
+# Block Access to Sensitive Files, Dotfiles, and Backups
+<FilesMatch "(^\.env|^\.git|\.bak$|\.sql$|\.log$|\.config$|\.sh$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
 # 3. Production Security Headers
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
@@ -20,6 +34,13 @@
   Header set X-XSS-Protection "1; mode=block"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
   Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header set Content-Security-Policy "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self';"
+
+  # HTTP Range Request Support for Video Streaming (Fast scrubbing & zero buffering)
+  <FilesMatch "\.(mp4|webm|ogv)$">
+    Header set Accept-Ranges bytes
+  </FilesMatch>
 </IfModule>
 
 # 4. Gzip & Deflate Compression

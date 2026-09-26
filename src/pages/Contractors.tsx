@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Building2, FileText, Phone, MessageSquare, AlertCircle, Loader2, CheckCircle } from 'lucide-react'
+import { Building2, FileText, Phone, MessageSquare, AlertCircle, Loader2, CheckCircle, WifiOff, RefreshCw } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 import { trackConversionEvent } from '../utils/analytics'
 
@@ -25,6 +25,8 @@ export default function Contractors() {
   })
 
   const [error, setError] = useState('')
+  const [offlineError, setOfflineError] = useState(false)
+  const [serverError, setServerError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const hasTrackedStartRef = useRef(false)
 
@@ -43,21 +45,39 @@ export default function Contractors() {
     return () => clearTimeout(timer)
   }, [formData])
 
-  const handleWhatsAppSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // الاستماع لعودة الاتصال
+  useEffect(() => {
+    const handleOnline = () => {
+      if (offlineError) setOfflineError(false)
+    }
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [offlineError])
+
+  const handleWhatsAppSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
 
     if (!formData.name.trim() || !formData.phone.trim() || !formData.materials.trim()) {
       setError(isAr ? 'يرجى تعبئة جميع الحقول المطلوبة' : 'Please fill in all required fields')
       return
     }
 
+    if (!navigator.onLine) {
+      setOfflineError(true)
+      setServerError(null)
+      setError('')
+      return
+    }
+
     setError('')
+    setOfflineError(false)
+    setServerError(null)
     setLoading(true)
 
     // 1. تسجيل طلب التسعير في قاعدة البيانات أولاً لحفظ الفرصة البيعية
     try {
       const idempotencyKey = `quote_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
-      await fetch('https://enarah2.vercel.app/api/save-user', {
+      const res = await fetch('https://enarah2.vercel.app/api/save-user', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -70,10 +90,24 @@ export default function Contractors() {
           type: 'quote_request',
         })
       })
+
+      if (!res.ok) {
+        throw new Error('Server request failed')
+      }
+
       // مسح المسودة بعد نجاح التسجيل
       localStorage.removeItem(DRAFT_KEY)
     } catch (err) {
-      console.warn('Failed to record lead in background, proceeding to WhatsApp:', err)
+      if (!navigator.onLine) {
+        setOfflineError(true)
+        setServerError(null)
+        setLoading(false)
+        return
+      } else {
+        setServerError(isAr ? 'تعذر إرسال الطلب حالياً. يرجى المحاولة مرة أخرى.' : 'Unable to send request currently. Please try again.')
+        setLoading(false)
+        return
+      }
     } finally {
       setLoading(false)
     }
@@ -173,6 +207,54 @@ export default function Contractors() {
                     : 'Your inquiry will be logged and dispatched directly to our bulk supply division on WhatsApp.'}
                 </p>
               </div>
+
+              {/* تنبيه انقطاع الإنترنت وحفظ المسودة */}
+              {offlineError && (
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <WifiOff className="w-4 h-4 text-amber-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">
+                        {isAr ? 'تعذر الإرسال لعدم وجود اتصال بالإنترنت. تم الاحتفاظ بالبيانات المدخلة.' : 'Unable to send: No internet connection. Entered data is preserved.'}
+                      </div>
+                      <div className="text-slate-600 text-[11px] mt-0.5">
+                        {isAr ? 'يمكنك النقر على زر إعادة المحاولة فور عودة الاتصال.' : 'You can click retry as soon as connectivity is restored.'}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleWhatsAppSubmit()}
+                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+                  </button>
+                </div>
+              )}
+
+              {/* تنبيه تعذر الاتصال بالسيرفر أو فشل الإرسال */}
+              {!offlineError && serverError && (
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <RefreshCw className="w-4 h-4 text-red-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">{serverError}</div>
+                      <div className="text-slate-600 text-[11px] mt-0.5">
+                        {isAr ? 'تم حفظ كافة بياناتك المدخلة بأمان في جهازك.' : 'All your entered fields remain safely saved.'}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleWhatsAppSubmit()}
+                    className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+                  </button>
+                </div>
+              )}
 
               {error && (
                 <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
