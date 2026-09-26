@@ -551,24 +551,17 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           {/* عنوان القسم بتصميم تحريري معماري غير متكرر */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4 pb-6 border-b border-slate-100">
-            <div className="max-w-xl text-right">
-              <span className="text-xs font-semibold text-blue-600 tracking-wider block mb-2">
-                {isAr ? 'معايير الجودة والاعتماد' : 'Quality & Standards'}
-              </span>
-              <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 leading-tight">
-                {isAr ? (
-                  <>لماذا يختار المقاولون والمهندسون <span className="text-blue-600">الإنارة الحديثة؟</span></>
-                ) : (
-                  <>Why Contractors & Engineers Choose <span className="text-blue-600">ENARAH Modern?</span></>
-                )}
-              </h2>
-            </div>
-            <p className="mobile-body text-slate-600 text-xs sm:text-sm md:text-base max-w-md font-normal leading-relaxed text-right md:text-left">
-              {isAr 
-                ? 'أصالة معتمدة 100%، جاهزية للتوريد الفوري للمشاريع، وخدمة دعم فني سريع.' 
-                : '100% certified authenticity, project-ready immediate supply, and fast technical support.'}
-            </p>
+          <div className="mb-8 md:mb-12 pb-5 border-b border-slate-100 text-right">
+            <span className="text-xs font-semibold text-blue-600 tracking-wider block mb-2">
+              {isAr ? 'معايير الجودة والاعتماد' : 'Quality & Standards'}
+            </span>
+            <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 leading-tight">
+              {isAr ? (
+                <>لماذا يختار المقاولون والمهندسون <span className="text-blue-600">الإنارة الحديثة؟</span></>
+              ) : (
+                <>Why Contractors & Engineers Choose <span className="text-blue-600">ENARAH Modern?</span></>
+              )}
+            </h2>
           </div>
 
           {/* شبكة البطاقات المعمارية: بدون زوايا مفرطة وبدون ظلال طافية */}

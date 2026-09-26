@@ -569,14 +569,6 @@ export default function Home() {
                 {isAr ? 'نحن؟' : 'Choose Us?'}
               </span>
             </h2>
-
-            <p className="text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal leading-relaxed">
-              {isAr 
-                ? 'أصالة معتمدة 100%، جاهزية للتوريد الفوري للمشاريع، وخدمة دعم فني سريع.' 
-                : '100% certified authenticity, project-ready immediate supply, and fast technical support.'}
-            </p>
-
-            <div className="w-10 h-0.5 bg-blue-600/30 mx-auto mt-3 rounded-full" />
           </motion.div>
 
           {/* شبكة البطاقات: بالعرض كشريط أفقي انسيابي وخفيف على الهواتف، وشبكة متناسقة على الشاشات الكبيرة */}
