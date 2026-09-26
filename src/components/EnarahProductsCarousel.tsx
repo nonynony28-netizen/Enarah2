@@ -273,37 +273,37 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
   }
 
   return (
-    <section className={`relative bg-gradient-to-b from-slate-50/80 via-white to-slate-50/60 border border-slate-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs ${className}`}>
-      {/* شريط العنوان المنسق وأزرار التصفح */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+    <div className={`relative ${className}`}>
+      {/* شريط العنوان التحريري المعماري وأزرار التصفح */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100/80">
-              <SlidersHorizontal className="w-4 h-4" />
-            </span>
-            <h3 className="text-base sm:text-lg font-semibold text-slate-900 tracking-tight">
+          <span className="text-xs font-semibold text-blue-600 tracking-wider block mb-1.5">
+            {isAr ? 'خطوط التصنيع والتوريد المعتمدة' : 'Manufacturing & Supply Lines'}
+          </span>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
               {isAr ? 'منتجات وتصنيع شركة الإنارة' : 'ENARAH Manufacturing Lines'}
-            </h3>
-            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100/80 shadow-2xs">
-              {isAr ? `أكثر من ${ENARAH_PRODUCTS.length} صنف` : `${ENARAH_PRODUCTS.length}+ Categories`}
+            </h2>
+            <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+              {isAr ? `${ENARAH_PRODUCTS.length} صنف` : `${ENARAH_PRODUCTS.length} Categories`}
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed max-w-2xl font-normal">
             {isAr 
-              ? 'صناعة وطنية وتوريد متكامل بأعلى معايير الجودة والمواصفات المعتمدة.'
-              : 'National manufacturing and integrated supply complying with the highest quality standards.'}
+              ? 'صناعة وتوريد متكامل لحلول الإنارة المعمارية ومواد التأسيس بأعلى معايير الجودة والمواصفات القياسية.'
+              : 'National manufacturing and integrated supply complying with the highest architectural standards.'}
           </p>
         </div>
 
-        {/* أزرار الأسهم المصغرة والأنيقة */}
-        <div className="flex items-center gap-1.5 self-end sm:self-auto">
+        {/* أزرار الأسهم المنضبطة */}
+        <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
           <button
             onClick={() => handleScroll('prev')}
             aria-label={isAr ? 'السابق' : 'Previous'}
             disabled={!canScrollLeft}
-            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
+            className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${
               canScrollLeft
-                ? 'bg-white border-slate-200 text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 shadow-xs active:scale-95'
+                ? 'bg-white border-slate-200 text-slate-700 hover:border-slate-400 hover:text-slate-900 active:scale-95'
                 : 'bg-slate-50 border-slate-200/50 text-slate-300 cursor-not-allowed'
             }`}
           >
@@ -314,9 +314,9 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
             onClick={() => handleScroll('next')}
             aria-label={isAr ? 'التالي' : 'Next'}
             disabled={!canScrollRight}
-            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
+            className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${
               canScrollRight
-                ? 'bg-white border-slate-200 text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 shadow-xs active:scale-95'
+                ? 'bg-white border-slate-200 text-slate-700 hover:border-slate-400 hover:text-slate-900 active:scale-95'
                 : 'bg-slate-50 border-slate-200/50 text-slate-300 cursor-not-allowed'
             }`}
           >
@@ -325,55 +325,55 @@ export default function EnarahProductsCarousel({ isAr, className = '' }: Props) 
         </div>
       </div>
 
-      {/* شريط البطاقات الأفقي المصغر والمريح للعين (حجم مثالي ومدروس) */}
+      {/* شريط المنتجات المفتوح بتصميم منضبط ومعماري */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-3 sm:gap-3.5 overflow-x-auto pb-2 pt-1 px-0.5 snap-x snap-mandatory scroll-smooth select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="flex gap-4 overflow-x-auto pb-3 pt-1 px-0.5 snap-x snap-mandatory scroll-smooth select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {displayedProducts.map((product) => (
           <div
             key={product.id}
             id={`enarah-product-${product.id}`}
-            className={`w-[220px] sm:w-[245px] shrink-0 snap-start bg-white border rounded-xl overflow-hidden transition-all duration-300 flex flex-col group ${
+            className={`w-[230px] sm:w-[255px] shrink-0 snap-start bg-white border rounded-xl overflow-hidden transition-all duration-200 flex flex-col group ${
               product.isPending 
-                ? 'border-slate-200/80 hover:border-blue-300' 
-                : 'border-slate-200 hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5'
+                ? 'border-slate-200/80 hover:border-slate-300' 
+                : 'border-slate-200 hover:border-slate-400 hover:shadow-xs'
             }`}
           >
-            {/* إطار الصورة المدمج والمتناسق وغير المقصوص بنسبة مربعة متناغمة */}
-            <div className="w-full aspect-square bg-white relative overflow-hidden flex items-center justify-center p-2.5 border-b border-slate-100">
+            {/* إطار الصورة المدمج والمتناسق */}
+            <div className="w-full aspect-square bg-slate-50/50 relative overflow-hidden flex items-center justify-center p-3.5 border-b border-slate-100">
               <img
                 src={product.image}
                 alt={isAr ? product.titleAr : product.titleEn}
-                className={`w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105 ${
+                className={`w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-102 ${
                   product.isPending ? 'opacity-85 filter contrast-90' : ''
                 }`}
                 loading="lazy"
               />
 
               {product.isPending && (
-                <div className="absolute bottom-2 left-2 bg-amber-500/95 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-xs">
+                <div className="absolute bottom-2.5 left-2.5 bg-slate-900 text-white text-[10px] font-medium px-2 py-0.5 rounded">
                   {isAr ? 'قريباً' : 'Coming Soon'}
                 </div>
               )}
             </div>
 
-            {/* محتوى البطاقة المنسق بحجم خطوط مريح وغير عشوائي */}
-            <div className="p-3 sm:p-3.5 flex flex-col flex-grow justify-start">
-              <span className="text-[10px] font-bold text-blue-600 tracking-wide block mb-1">
+            {/* محتوى البطاقة المنسق */}
+            <div className="p-3.5 sm:p-4 flex flex-col flex-grow justify-start">
+              <span className="text-[11px] font-semibold text-blue-600 block mb-1">
                 {isAr ? product.categoryAr : product.categoryEn}
               </span>
-              <h4 className="font-bold text-slate-900 text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-blue-600 transition-colors">
+              <h4 className="font-semibold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-1 group-hover:text-blue-600 transition-colors">
                 {isAr ? product.titleAr : product.titleEn}
               </h4>
-              <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mt-1">
+              <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mt-1.5 font-normal">
                 {isAr ? product.descAr : product.descEn}
               </p>
             </div>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   )
 }
