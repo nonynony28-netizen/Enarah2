@@ -549,18 +549,26 @@ export default function Home() {
       <section id="about" className="order-2 mobile-order-2 md:order-none mobile-section-py py-12 md:py-20 relative overflow-hidden border-t border-slate-200 bg-white mobile-bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          {/* عنوان القسم بتصميم تحريري معماري غير متكرر */}
-          <div className="mb-8 md:mb-12 pb-5 border-b border-slate-100 text-right">
-            <span className="text-xs font-semibold text-blue-600 tracking-wider block mb-2">
-              {isAr ? 'معايير الجودة والاعتماد' : 'Quality & Standards'}
-            </span>
-            <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 leading-tight">
-              {isAr ? (
-                <>لماذا يختار المقاولون والمهندسون <span className="text-blue-600">الإنارة الحديثة؟</span></>
-              ) : (
-                <>Why Contractors & Engineers Choose <span className="text-blue-600">ENARAH Modern?</span></>
-              )}
-            </h2>
+          {/* عنوان القسم بتصميم تحريري معماري منضبط وسلس */}
+          <div className="mb-8 md:mb-10 pb-5 border-b border-slate-100 flex flex-col md:flex-row md:items-end md:justify-between gap-3 text-right">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50/80 border border-blue-100/80 text-blue-700 text-xs font-semibold mb-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                <span>{isAr ? 'معايير الجودة والاعتماد' : 'Quality & Standards'}</span>
+              </div>
+              <h2 className="mobile-section-h2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 leading-tight">
+                {isAr ? (
+                  <>لماذا يختار المقاولون والمهندسون <span className="text-blue-600">الإنارة الحديثة؟</span></>
+                ) : (
+                  <>Why Contractors & Engineers Choose <span className="text-blue-600">ENARAH Modern?</span></>
+                )}
+              </h2>
+            </div>
+            <p className="text-slate-500 text-xs sm:text-sm max-w-sm font-normal leading-relaxed">
+              {isAr 
+                ? 'ثلاث ركائز معتمدة تجعلنا الشريك الأول لمشاريع الكهرباء والإنارة المتكاملة.' 
+                : 'Three trusted pillars making us the premier partner for integrated electrical projects.'}
+            </p>
           </div>
 
           {/* شبكة البطاقات المعمارية: بدون زوايا مفرطة وبدون ظلال طافية */}
@@ -577,50 +585,40 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.4, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -2, transition: { duration: 0.2 } }}
-              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-5 sm:p-6 rounded-xl bg-white border border-slate-200 hover:border-slate-300 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-sm flex flex-col justify-between group transition-all duration-300 h-full"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[320px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400/80 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_-10px_rgba(37,99,235,0.08)] flex flex-col justify-between group transition-all duration-300 h-full overflow-hidden"
             >
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
               <div>
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                    {isAr ? 'وكالة معتمدة' : 'Official Agency'}
-                  </span>
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                    <Globe className="w-4 h-4" />
+                <div className="flex items-center justify-between gap-3 mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50/80 border border-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 shadow-xs">
+                    <Globe className="w-5 h-5" />
                   </div>
+                  <span className="font-mono text-xs font-bold text-slate-300 group-hover:text-blue-600 transition-colors tracking-widest">
+                    01
+                  </span>
                 </div>
 
-                <h3 className="mobile-card-h3 text-base sm:text-lg font-semibold text-slate-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="mobile-card-h3 text-lg sm:text-xl font-bold text-slate-900 mb-2.5 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'وكالات عالمية حصرية' : 'Exclusive Global Agencies'}
                 </h3>
 
-                <p className="mobile-small text-slate-600 text-xs leading-relaxed mb-4 font-normal">
+                <p className="mobile-small text-slate-600 text-sm leading-relaxed font-normal">
                   {isAr 
-                    ? 'استيراد وتوريد مباشر من كبرى المصانع العالمية مع ضمان أصالة 100%.' 
-                    : 'Direct import from leading global manufacturers with 100% authenticity guarantee.'}
+                    ? 'استيراد وتوزيع معتمد لأعرق المصانع العالمية مع ضمان أصالة ومطابقة 100%.' 
+                    : 'Direct import & certified distribution from premier global factories with 100% authenticity guarantee.'}
                 </p>
-
-                <div className="space-y-2 mb-4">
-                  {(isAr ? [
-                    'منتجات أصلية معتمدة ومطابقة للمواصفات',
-                    'استيراد مباشر من المصانع الأوروبية والعالمية'
-                  ] : [
-                    '100% certified authentic products in Libya',
-                    'Direct import from certified international factories'
-                  ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
-                        <Check className="w-2 h-2 text-blue-600 stroke-[3]" />
-                      </div>
-                      <span className="text-xs text-slate-700 font-medium leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'الأصالة والاعتماد' : 'Authenticity'}</span>
-                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? '100% مضمون' : '100% Guaranteed'}</span>
+              <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  {isAr ? 'اعتماد دولي رسمي' : 'Official Agency'}
+                </span>
+                <span className="font-semibold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-md border border-blue-100/60">
+                  {isAr ? '100% أصلي' : '100% Authentic'}
+                </span>
               </div>
             </motion.div>
 
@@ -630,50 +628,40 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -2, transition: { duration: 0.2 } }}
-              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-5 sm:p-6 rounded-xl bg-gradient-to-b from-blue-50/40 via-white to-white border border-blue-600/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-sm flex flex-col justify-between group transition-all duration-300 h-full"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[320px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400/80 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_-10px_rgba(37,99,235,0.08)] flex flex-col justify-between group transition-all duration-300 h-full overflow-hidden"
             >
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
               <div>
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">
-                    {isAr ? 'توريد تجاري ومشاريع' : 'Commercial Supply'}
-                  </span>
-                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center transition-colors duration-300 shadow-xs">
-                    <ShieldCheck className="w-4 h-4" />
+                <div className="flex items-center justify-between gap-3 mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50/80 border border-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 shadow-xs">
+                    <ShieldCheck className="w-5 h-5" />
                   </div>
+                  <span className="font-mono text-xs font-bold text-slate-300 group-hover:text-blue-600 transition-colors tracking-widest">
+                    02
+                  </span>
                 </div>
 
-                <h3 className="mobile-card-h3 text-base sm:text-lg font-semibold text-slate-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'توريد كبرى المشاريع والجملة' : 'Bulk & Project Supply'}
+                <h3 className="mobile-card-h3 text-lg sm:text-xl font-bold text-slate-900 mb-2.5 leading-snug group-hover:text-blue-600 transition-colors">
+                  {isAr ? 'توريد المشاريع والجملة' : 'Bulk & Project Supply'}
                 </h3>
 
-                <p className="mobile-small text-slate-600 text-xs leading-relaxed mb-4 font-normal">
+                <p className="mobile-small text-slate-600 text-sm leading-relaxed font-normal">
                   {isAr 
-                    ? 'تجهيز فوري وشامل لطلبيات المقاولين والشركات ومحلات الكهرباء.' 
-                    : 'Immediate fulfillment for contractors, companies, and retail shops.'}
+                    ? 'جاهزية مخازن متكاملة وأسعار منافسة لتلبية احتياجات المقاولين والمخططات الكبرى.' 
+                    : 'Full warehouse readiness and competitive wholesale pricing for contractors and major projects.'}
                 </p>
-
-                <div className="space-y-2 mb-4">
-                  {(isAr ? [
-                    'أسعار جملة تنافسية وأسلاك إيطالية معتمدة',
-                    'جاهزية مخازن لتغطية كافة المخططات الكبرى'
-                  ] : [
-                    'Competitive wholesale pricing & certified Italian wires',
-                    'Full warehouse readiness for large-scale plans'
-                  ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0">
-                        <Check className="w-2 h-2 text-white stroke-[3]" />
-                      </div>
-                      <span className="text-xs text-slate-800 font-semibold leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'جاهزية المستودعات' : 'Warehouse Readiness'}</span>
-                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? 'كميات متوفرة دائماً' : 'Always in Stock'}</span>
+              <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  {isAr ? 'جاهزية فورية' : 'Immediate Supply'}
+                </span>
+                <span className="font-semibold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-md border border-blue-100/60">
+                  {isAr ? 'أسعار جملة' : 'Wholesale'}
+                </span>
               </div>
             </motion.div>
 
@@ -683,50 +671,40 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -2, transition: { duration: 0.2 } }}
-              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-5 sm:p-6 rounded-xl bg-white border border-slate-200 hover:border-slate-300 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-sm flex flex-col justify-between group transition-all duration-300 h-full"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[320px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400/80 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_-10px_rgba(37,99,235,0.08)] flex flex-col justify-between group transition-all duration-300 h-full overflow-hidden"
             >
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
               <div>
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                    {isAr ? 'استجابة سريعة' : 'Fast Response'}
-                  </span>
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                    <Headphones className="w-4 h-4" />
+                <div className="flex items-center justify-between gap-3 mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50/80 border border-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 shadow-xs">
+                    <Headphones className="w-5 h-5" />
                   </div>
+                  <span className="font-mono text-xs font-bold text-slate-300 group-hover:text-blue-600 transition-colors tracking-widest">
+                    03
+                  </span>
                 </div>
 
-                <h3 className="mobile-card-h3 text-base sm:text-lg font-semibold text-slate-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'خدمة دعم فني سريع' : 'Fast Technical Support'}
+                <h3 className="mobile-card-h3 text-lg sm:text-xl font-bold text-slate-900 mb-2.5 leading-snug group-hover:text-blue-600 transition-colors">
+                  {isAr ? 'دعم فني واستشارات' : 'Technical Support'}
                 </h3>
 
-                <p className="mobile-small text-slate-600 text-xs leading-relaxed mb-4 font-normal">
+                <p className="mobile-small text-slate-600 text-sm leading-relaxed font-normal">
                   {isAr 
-                    ? 'فريق فني متخصص جاهز لمساعدتكم والإجابة على الاستفسارات وحل أي مسألة فنية.' 
-                    : 'Specialized technical team ready to assist, answer questions, and resolve technical inquiries.'}
+                    ? 'فريق هندسي متخصص يرافقكم بالحلول الفنية والاستجابة السريعة قبل وبعد الشراء.' 
+                    : 'Specialized engineering team providing expert technical guidance and fast response.'}
                 </p>
-
-                <div className="space-y-2 mb-4">
-                  {(isAr ? [
-                    'استجابة فورية ومتابعة مباشرة لكافة احتياجاتكم',
-                    'إرشادات هندسية وفنية دقيقة قبل وبعد الشراء'
-                  ] : [
-                    'Rapid response and direct follow-up for all inquiries',
-                    'Expert technical guidance before and after purchase'
-                  ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
-                        <Check className="w-2 h-2 text-blue-600 stroke-[3]" />
-                      </div>
-                      <span className="text-xs text-slate-700 font-medium leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'سرعة الاستجابة' : 'Response Time'}</span>
-                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? 'فوري ومباشر' : 'Instant & Direct'}</span>
+              <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  {isAr ? 'متابعة مباشرة' : 'Direct Advisory'}
+                </span>
+                <span className="font-semibold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-md border border-blue-100/60">
+                  {isAr ? 'فوري ومباشر' : 'Fast Response'}
+                </span>
               </div>
             </motion.div>
 

@@ -584,103 +584,83 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.4, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -3, transition: { duration: 0.2 } }}
-              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-2xs hover:shadow-md flex flex-col justify-between group transition-all duration-300 h-full"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[320px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400/80 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_-10px_rgba(37,99,235,0.08)] flex flex-col justify-between group transition-all duration-300 h-full overflow-hidden"
             >
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3.5">
-                  <span className="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold">
-                    {isAr ? 'وكالة معتمدة' : 'Official Agency'}
-                  </span>
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                    <Globe className="w-4 h-4" />
+                <div className="flex items-center justify-between gap-3 mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50/80 border border-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 shadow-xs">
+                    <Globe className="w-5 h-5" />
                   </div>
+                  <span className="font-mono text-xs font-bold text-slate-300 group-hover:text-blue-600 transition-colors tracking-widest">
+                    01
+                  </span>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
+                <h3 className="mobile-card-h3 text-lg sm:text-xl font-bold text-slate-900 mb-2.5 leading-snug group-hover:text-blue-600 transition-colors">
                   {isAr ? 'وكالات عالمية حصرية' : 'Exclusive Global Agencies'}
                 </h3>
 
-                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
+                <p className="mobile-small text-slate-600 text-sm leading-relaxed font-normal">
                   {isAr 
-                    ? 'استيراد وتوريد مباشر من كبرى المصانع العالمية مع ضمان أصالة 100%.' 
-                    : 'Direct import from leading global manufacturers with 100% authenticity guarantee.'}
+                    ? 'استيراد وتوزيع معتمد لأعرق المصانع العالمية مع ضمان أصالة ومطابقة 100%.' 
+                    : 'Direct import & certified distribution from premier global factories with 100% authenticity guarantee.'}
                 </p>
-
-                <div className="space-y-1.5 mb-4">
-                  {(isAr ? [
-                    'منتجات أصلية معتمدة ومطابقة للمواصفات',
-                    'استيراد مباشر من المصانع الأوروبية والعالمية'
-                  ] : [
-                    '100% certified authentic products in Libya',
-                    'Direct import from certified international factories'
-                  ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
-                        <Check className="w-2 h-2 text-blue-600 stroke-[3]" />
-                      </div>
-                      <span className="text-xs text-slate-700 font-medium leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'الأصالة والاعتماد' : 'Authenticity'}</span>
-                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? '100% مضمون' : '100% Guaranteed'}</span>
+              <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  {isAr ? 'اعتماد دولي رسمي' : 'Official Agency'}
+                </span>
+                <span className="font-semibold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-md border border-blue-100/60">
+                  {isAr ? '100% أصلي' : '100% Authentic'}
+                </span>
               </div>
             </motion.div>
 
-            {/* البطاقة الثانية: توريد كبرى المشاريع والجملة (البطاقة البارزة) */}
+            {/* البطاقة الثانية: توريد كبرى المشاريع والجملة */}
             <motion.div 
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -3, transition: { duration: 0.2 } }}
-              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-4 sm:p-5 rounded-2xl bg-white border-2 border-blue-600 shadow-sm hover:shadow-md flex flex-col justify-between group transition-all duration-300 h-full ring-2 ring-blue-50"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[320px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400/80 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_-10px_rgba(37,99,235,0.08)] flex flex-col justify-between group transition-all duration-300 h-full overflow-hidden"
             >
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3.5">
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[11px] font-bold tracking-wide">
-                    {isAr ? 'توريد تجاري ومشاريع' : 'Commercial Supply'}
-                  </span>
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                    <ShieldCheck className="w-4 h-4" />
+                <div className="flex items-center justify-between gap-3 mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50/80 border border-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 shadow-xs">
+                    <ShieldCheck className="w-5 h-5" />
                   </div>
+                  <span className="font-mono text-xs font-bold text-slate-300 group-hover:text-blue-600 transition-colors tracking-widest">
+                    02
+                  </span>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'توريد كبرى المشاريع والجملة' : 'Bulk & Project Supply'}
+                <h3 className="mobile-card-h3 text-lg sm:text-xl font-bold text-slate-900 mb-2.5 leading-snug group-hover:text-blue-600 transition-colors">
+                  {isAr ? 'توريد المشاريع والجملة' : 'Bulk & Project Supply'}
                 </h3>
 
-                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
+                <p className="mobile-small text-slate-600 text-sm leading-relaxed font-normal">
                   {isAr 
-                    ? 'تجهيز فوري وشامل لطلبيات المقاولين والشركات ومحلات الكهرباء.' 
-                    : 'Immediate fulfillment for contractors, companies, and retail shops.'}
+                    ? 'جاهزية مخازن متكاملة وأسعار منافسة لتلبية احتياجات المقاولين والمخططات الكبرى.' 
+                    : 'Full warehouse readiness and competitive wholesale pricing for contractors and major projects.'}
                 </p>
-
-                <div className="space-y-1.5 mb-4">
-                  {(isAr ? [
-                    'أسعار جملة تنافسية وأسلاك إيطالية معتمدة',
-                    'جاهزية مخازن لتغطية كافة المخططات الكبرى'
-                  ] : [
-                    'Competitive wholesale pricing & certified Italian wires',
-                    'Full warehouse readiness for large-scale plans'
-                  ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0">
-                        <Check className="w-2 h-2 text-white stroke-[3]" />
-                      </div>
-                      <span className="text-xs text-slate-800 font-bold leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'جاهزية المستودعات' : 'Warehouse Readiness'}</span>
-                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? 'كميات متوفرة دائماً' : 'Always in Stock'}</span>
+              <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  {isAr ? 'جاهزية فورية' : 'Immediate Supply'}
+                </span>
+                <span className="font-semibold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-md border border-blue-100/60">
+                  {isAr ? 'أسعار جملة' : 'Wholesale'}
+                </span>
               </div>
             </motion.div>
 
@@ -690,50 +670,40 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -3, transition: { duration: 0.2 } }}
-              className="w-[84vw] max-w-[310px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-2xs hover:shadow-md flex flex-col justify-between group transition-all duration-300 h-full"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="w-[84vw] max-w-[320px] shrink-0 snap-center md:w-auto md:shrink md:snap-align-none relative p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400/80 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_-10px_rgba(37,99,235,0.08)] flex flex-col justify-between group transition-all duration-300 h-full overflow-hidden"
             >
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3.5">
-                  <span className="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold">
-                    {isAr ? 'استجابة سريعة' : 'Fast Response'}
-                  </span>
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                    <Headphones className="w-4 h-4" />
+                <div className="flex items-center justify-between gap-3 mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50/80 border border-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300 shadow-xs">
+                    <Headphones className="w-5 h-5" />
                   </div>
+                  <span className="font-mono text-xs font-bold text-slate-300 group-hover:text-blue-600 transition-colors tracking-widest">
+                    03
+                  </span>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors">
-                  {isAr ? 'خدمة دعم فني سريع' : 'Fast Technical Support'}
+                <h3 className="mobile-card-h3 text-lg sm:text-xl font-bold text-slate-900 mb-2.5 leading-snug group-hover:text-blue-600 transition-colors">
+                  {isAr ? 'دعم فني واستشارات' : 'Technical Support'}
                 </h3>
 
-                <p className="text-slate-600 text-xs leading-relaxed mb-3.5 font-normal">
+                <p className="mobile-small text-slate-600 text-sm leading-relaxed font-normal">
                   {isAr 
-                    ? 'فريق فني متخصص جاهز لمساعدتكم والإجابة على الاستفسارات وحل أي مسألة فنية.' 
-                    : 'Specialized technical team ready to assist, answer questions, and resolve technical inquiries.'}
+                    ? 'فريق هندسي متخصص يرافقكم بالحلول الفنية والاستجابة السريعة قبل وبعد الشراء.' 
+                    : 'Specialized engineering team providing expert technical guidance and fast response.'}
                 </p>
-
-                <div className="space-y-1.5 mb-4">
-                  {(isAr ? [
-                    'استجابة فورية ومتابعة مباشرة لكافة احتياجاتكم',
-                    'إرشادات هندسية وفنية دقيقة قبل وبعد الشراء'
-                  ] : [
-                    'Rapid response and direct follow-up for all inquiries',
-                    'Expert technical guidance before and after purchase'
-                  ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
-                        <Check className="w-2 h-2 text-blue-600 stroke-[3]" />
-                      </div>
-                      <span className="text-xs text-slate-700 font-medium leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-auto">
-                <span>{isAr ? 'سرعة الاستجابة' : 'Response Time'}</span>
-                <span className="text-blue-600 font-bold text-xs sm:text-sm">{isAr ? 'فوري ومباشر' : 'Instant & Direct'}</span>
+              <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  {isAr ? 'متابعة مباشرة' : 'Direct Advisory'}
+                </span>
+                <span className="font-semibold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-md border border-blue-100/60">
+                  {isAr ? 'فوري ومباشر' : 'Fast Response'}
+                </span>
               </div>
             </motion.div>
 
