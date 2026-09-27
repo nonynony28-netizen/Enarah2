@@ -120,6 +120,77 @@ const defaultFallbackProducts: ProductItem[] = [
   }
 ]
 
+
+// 🏷️ المنتجات المعروضة بسعر مخفض (التخفيضات والعروض الخاصة)
+const defaultFallbackDiscounts: ProductItem[] = [
+  {
+    id: 'discount-chandelier-ring',
+    name: 'ثريا مودرن ليد فاخرة (تصميم حلقي ذهبي معلق)',
+    description: 'ثريا معمارية عصرية بإضاءة ثلاثية الألوان (دافئ / شمسي / أبيض) مع تحكم ذكي بالريموت وتوفير فائق للطاقة.',
+    image: '/images/product-chandeliers.jpg',
+    price: 720,
+    discountPrice: 540,
+    stockStatus: 'available',
+    stockQty: 15,
+    category: 'التخفيضات والعروض الخاصة'
+  },
+  {
+    id: 'discount-spotlight-pack',
+    name: 'طقم سبوت لايت ليد غاطس مانع للوهج Anti-Glare (10 حبات)',
+    description: 'سبوتات ألمنيوم عالية الجودة بتقنية منع الوهج، إضاءة نقية 3000K CRI>90 موفرة للكهرباء ومريحة للعين.',
+    image: '/images/product-spotlights.png',
+    price: 350,
+    discountPrice: 280,
+    stockStatus: 'available',
+    stockQty: 40,
+    category: 'التخفيضات والعروض الخاصة'
+  },
+  {
+    id: 'discount-magnetic-track',
+    name: 'مسار ماجنتيك مغناطيسي متكامل Magnetic Track (3 متر مع المحول)',
+    description: 'نظام المسار المغناطيسي الحديث كامل مع كشافات خطية ومحول عالي الكفاءة، جاهز للتركيب السكني والتجاري.',
+    image: '/images/product-led-profile.jpg',
+    price: 890,
+    discountPrice: 695,
+    stockStatus: 'available',
+    stockQty: 12,
+    category: 'التخفيضات والعروض الخاصة'
+  },
+  {
+    id: 'discount-switches-pack',
+    name: 'باك مفاتيح وبرايز إيطالية فاخرة من Geros / Legrand (15 قطعة)',
+    description: 'تشكيلة مفاتيح وبرايز عصرية مقاومة للحرارة والخدش، بتصميم مسطح Slim أنيق ولمسة نهائية فاخرة.',
+    image: '/images/product-sockets-switches.jpg',
+    price: 420,
+    discountPrice: 315,
+    stockStatus: 'available',
+    stockQty: 25,
+    category: 'التخفيضات والعروض الخاصة'
+  },
+  {
+    id: 'discount-wall-light',
+    name: 'كشاف جداري ديكوري خارجي Up & Down مقاوم للعوامل الجوية IP65',
+    description: 'إنارة جدارية عصرية للواجهات والممرات مصنعة من الألمنيوم المصبوب المقاوم للصدأ بتوزيع إضاءة مزدوج راقي.',
+    image: '/images/product-wall-lights.png',
+    price: 185,
+    discountPrice: 135,
+    stockStatus: 'available',
+    stockQty: 30,
+    category: 'التخفيضات والعروض الخاصة'
+  },
+  {
+    id: 'discount-led-strip-bundle',
+    name: 'باقة شريط ليد COB فائق النعومة (بكرة 10 متر مع محول ذكي)',
+    description: 'شريط ليد بدون نقاط نقطية Dotless بإضاءة دافئة ناعمة 3000K مع محول فائق النحافة مناسب للجبس بورد والمطابخ.',
+    image: '/images/product-electrical-foundation.jpg',
+    price: 260,
+    discountPrice: 195,
+    stockStatus: 'available',
+    stockQty: 20,
+    category: 'التخفيضات والعروض الخاصة'
+  }
+]
+
 export default function Products() {
   const { isAr } = useLanguage()
   const { addToCart, triggerFlyAnimation } = useCart()
@@ -258,12 +329,13 @@ export default function Products() {
     e.stopPropagation()
     triggerFlyAnimation(e.clientX, e.clientY)
     setAddingId(product.id)
+    const finalPrice = (product.discountPrice && product.discountPrice > 0) ? product.discountPrice : (product.price || 0)
     addToCart({
       id: product.id,
       name: product.name,
       description: product.description,
       image: product.image,
-      price: product.price || 0,
+      price: finalPrice,
       stockStatus: product.stockStatus,
       stockQty: product.stockQty
     })
@@ -287,10 +359,12 @@ export default function Products() {
     return CATEGORIES_LIST.map(cat => {
       let items: ProductItem[] = []
       if (cat.id === 'cat-discounts') {
-        // خانة التخفيضات فارغة حالياً ليتحكم بها العميل ويضيف الأصناف لاحقاً
         items = products.filter(p => p.category === 'التخفيضات والعروض الخاصة' || p.category === 'التخفيضات والعروض الحصرية' || (Boolean(p.discountPrice) && (p.discountPrice ?? 0) > 0))
+        if (items.length === 0) {
+          items = defaultFallbackDiscounts
+        }
       } else {
-        items = products.filter(p => p.category !== 'التخفيضات والعروض الخاصة' && p.category !== 'التخفيضات والعروض الحصرية')
+        items = products.filter(p => p.category !== 'التخفيضات والعروض الخاصة' && p.category !== 'التخفيضات والعروض الحصرية' && (!p.discountPrice || p.discountPrice <= 0))
         if (items.length === 0) {
           items = defaultFallbackProducts
         }
@@ -468,9 +542,7 @@ export default function Products() {
                 <section key={catGroup.id} id={catGroup.id} className="scroll-mt-32">
                   
                   {/* رأس قسم المتجر */}
-                  <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b ${
-                    'border-slate-200'
-                  }`}>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200">
                     <div className="flex items-center gap-3.5">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         isDiscountCat 
@@ -487,10 +559,10 @@ export default function Products() {
                               ? 'bg-rose-50 border-rose-200/80 text-rose-700'
                               : 'bg-blue-50 border-blue-200 text-blue-700'
                           }`}>
-                            {isDiscountCat && catGroup.items.length === 0 ? (
+                            {isDiscountCat ? (
                               <>
                                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                                <span>{isAr ? 'عروض وتخفيضات موسمية' : 'Seasonal Discounts'}</span>
+                                <span>{isAr ? `${catGroup.items.length} أصناف مخفضة` : `${catGroup.items.length} Discounted Items`}</span>
                               </>
                             ) : (
                               <span>{isAr ? `${catGroup.items.length} صنف` : `${catGroup.items.length} items`}</span>
@@ -522,100 +594,48 @@ export default function Products() {
                     )}
                   </div>
 
-                  {/* شبكة البطاقات أو حالة واجهة العروض العالمية */}
-                  {catGroup.items.length === 0 ? (
-                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-8 sm:p-10 md:p-14 border border-slate-800 shadow-2xl my-6 text-right">
-                      {/* إضاءات جمالية ناعمة تحاكي سبوتات المعارض المعمارية */}
-                      <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-                      <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
-
-                      <div className="relative z-10">
-                        {/* وسام ترحيبي */}
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/25 text-rose-300 text-xs font-semibold mb-5 backdrop-blur-sm">
-                          <Sparkles className="w-3.5 h-3.5 text-rose-400" />
-                          <span>{isAr ? 'موسم التخفيضات والعروض الحصرية' : 'Exclusive Promotional Campaigns'}</span>
+                  {/* بنر عروض ترويجي مميز في أعلى قسم التخفيضات */}
+                  {isDiscountCat && (
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white p-6 sm:p-7 border border-slate-800 shadow-xl mb-8 text-right">
+                      <div className="absolute top-0 right-0 w-80 h-80 bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                      
+                      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                        <div>
+                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/25 text-rose-300 text-xs font-semibold mb-2.5 backdrop-blur-sm">
+                            <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+                            <span>{isAr ? 'عروض حصرية بأسعار مخفضة لفترة محدودة' : 'Limited-Time Curated Promotional Deals'}</span>
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-1.5">
+                            {isAr ? 'قائمة المنتجات المعروضة بسعر مخفض' : 'Featured Discounted Products & Fixtures'}
+                          </h3>
+                          <p className="text-slate-300 text-xs sm:text-sm font-normal max-w-2xl leading-relaxed">
+                            {isAr 
+                              ? 'استفد من التخفيضات الفورية على تشكيلات مختارة من الثريات، الإنارة المعمارية، والمفاتيح الأوروبية بضمان كامل.' 
+                              : 'Take advantage of instant discounts on selected chandeliers, architectural fixtures, and certified accessories.'}
+                          </p>
                         </div>
 
-                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4 leading-snug">
-                          {isAr 
-                            ? 'ترقبوا إطلاق باقة التخفيضات والعروض الموسمية القادمة' 
-                            : 'Upcoming Curated Discounts & Seasonal Offers'}
-                        </h3>
-
-                        <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-normal mb-10">
-                          {isAr 
-                            ? 'نُطلق دورياً حملات تخفيض كبرى تشمل تشكيلات مختارة من الثريات الفاخرة، الإضاءات المعمارية، والأنظمة والمفاتيح الكهربائية المعتمدة. تابعونا باستمرار أو تفضلوا بزيارة صالة العرض للاستفادة من أحدث العروض المباشرة.' 
-                            : 'We regularly launch curated promotional campaigns featuring exclusive discounts on designer chandeliers, architectural lighting, and certified electrical fixtures. Follow our updates or visit our showroom to enjoy instant in-store offers.'}
-                        </p>
-
-                        {/* ركائز المزايا الثلاث الراقية */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 pt-8 border-t border-white/10">
-                          <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3.5 hover:bg-white/[0.07] transition-all">
-                            <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
-                              <BadgePercent className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <h4 className="text-sm sm:text-base font-bold text-white mb-1">
-                                {isAr ? 'خصومات دورية حصرية' : 'Seasonal Discounts'}
-                              </h4>
-                              <p className="text-xs text-slate-400 leading-relaxed font-normal">
-                                {isAr ? 'تخفيضات استثنائية على موديلات مختارة من الإنارة الحديثة والثريات.' : 'Exceptional discounts on selected modern lighting and chandeliers.'}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3.5 hover:bg-white/[0.07] transition-all">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                              <ShieldCheck className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <h4 className="text-sm sm:text-base font-bold text-white mb-1">
-                                {isAr ? 'ضمان الأصالة 100%' : '100% Guaranteed Authenticity'}
-                              </h4>
-                              <p className="text-xs text-slate-400 leading-relaxed font-normal">
-                                {isAr ? 'كافة القطع المخفضة مشمولة بالضمان الرسمي المعتمد لشركتنا.' : 'All discounted items retain our full certified warranty and support.'}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3.5 hover:bg-white/[0.07] transition-all">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                              <Tag className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <h4 className="text-sm sm:text-base font-bold text-white mb-1">
-                                {isAr ? 'عروض المعرض المباشرة' : 'Showroom Privileges'}
-                              </h4>
-                              <p className="text-xs text-slate-400 leading-relaxed font-normal">
-                                {isAr ? 'أسعار تفضيلية إضافية لزبائن صالة العرض في بنغازي والمهندسين.' : 'Preferential in-store pricing for showroom visitors and designers.'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* أزرار الإجراء الفخمة */}
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+                        <div className="shrink-0 flex items-center gap-3">
                           <a 
-                            href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AA%D8%AE%D9%81%D9%8A%D8%B6%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%B9%D8%B1%D9%88%D8%B6%20%D8%A7%D9%84%D8%AD%D8%A7%D9%84%D9%8A%D8%A9%20%D9%81%D9%8A%20%D8%B5%D8%A7%D9%84%D8%A9%20%D8%A7%D9%84%D8%B9%D8%B1%D8%B6"
+                            href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D9%85%D9%86%D8%AA%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D8%AE%D9%81%D8%B6%D8%A9"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-emerald-950/40 active:scale-95 cursor-pointer group"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold text-xs transition-all shadow-md shadow-emerald-950/30 active:scale-95 cursor-pointer"
                           >
-                            <MessageCircle className="w-4 h-4" />
-                            <span>{isAr ? 'الاستفسار عن عروض التخفيض الحالية عبر واتساب' : 'Inquire Active Offers via WhatsApp'}</span>
-                            <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180 group-hover:-translate-x-1 transition-transform" />
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>{isAr ? 'طلب التخفيض عبر واتساب' : 'Inquire via WhatsApp'}</span>
                           </a>
-
-                          <Link 
-                            to="/branches"
-                            className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 font-medium text-xs sm:text-sm transition-all cursor-pointer"
-                          >
-                            <Sparkles className="w-4 h-4 text-amber-400" />
-                            <span>{isAr ? 'زيارة صالة العرض في بنغازي' : 'Visit Benghazi Showroom'}</span>
-                          </Link>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {/* شبكة البطاقات */}
+                  {catGroup.items.length === 0 ? (
+                    <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
+                      <Tag className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                      <p className="text-sm font-semibold text-slate-600">{isAr ? 'لا توجد منتجات مخفضة حالياً' : 'No discounted items currently'}</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -698,7 +718,7 @@ export default function Products() {
                     src={selectedProduct.image} 
                     alt={selectedProduct.name} 
                     className="w-full h-full object-cover"
-                    onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }}
+                    onError={(e) => { e.currentTarget.src = '/images/product-chandeliers.jpg' }}
                   />
                 </div>
 
@@ -714,9 +734,27 @@ export default function Products() {
                   <div className="border-t border-slate-200 pt-4 mt-4 flex items-center justify-between">
                     <div>
                       <span className="text-slate-400 text-xs block">{isAr ? 'السعر الرسمي' : 'Official Price'}</span>
-                      <span className="text-2xl font-bold text-slate-900">
-                        {selectedProduct.price ? `${selectedProduct.price} د.ل` : (isAr ? 'اتصل للسعر' : 'Call for Price')}
-                      </span>
+                      {selectedProduct.discountPrice && selectedProduct.price && selectedProduct.discountPrice < selectedProduct.price ? (
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl font-extrabold text-rose-600">
+                              {selectedProduct.discountPrice} د.ل
+                            </span>
+                            <span className="text-sm text-slate-400 line-through">
+                              {selectedProduct.price} د.ل
+                            </span>
+                          </div>
+                          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md self-start mt-1">
+                            {isAr 
+                              ? `توفير ${Math.round(selectedProduct.price - selectedProduct.discountPrice)} د.ل (${Math.round(((selectedProduct.price - selectedProduct.discountPrice) / selectedProduct.price) * 100)}% خصم)` 
+                              : `Save ${Math.round(selectedProduct.price - selectedProduct.discountPrice)} LYD`}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-2xl font-bold text-slate-900">
+                          {selectedProduct.price ? `${selectedProduct.price} د.ل` : (isAr ? 'اتصل للسعر' : 'Call for Price')}
+                        </span>
+                      )}
                     </div>
 
                     <button
@@ -754,11 +792,15 @@ function ProductCard({
   isAdding: boolean
   onOpenModal: () => void
 }) {
+  const hasDiscount = Boolean(product.discountPrice && product.price && product.discountPrice < product.price)
+  const discountPercent = hasDiscount ? Math.round((((product.price || 0) - (product.discountPrice || 0)) / (product.price || 1)) * 100) : 0
+  const savingsAmount = hasDiscount ? Math.round((product.price || 0) - (product.discountPrice || 0)) : 0
+
   return (
     <motion.div 
       onClick={onOpenModal}
       whileHover={{ y: -4 }}
-      className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-xl transition-all duration-200 shadow-sm flex flex-col h-full cursor-pointer"
+      className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-xl transition-all duration-200 shadow-sm flex flex-col h-full cursor-pointer text-right"
     >
       {/* صورة المنتج مع زوم انسيابي */}
       <div className="relative aspect-[4/3] bg-slate-50 overflow-hidden flex items-center justify-center border-b border-slate-100">
@@ -768,8 +810,16 @@ function ProductCard({
           loading="lazy" 
           decoding="async" 
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0" 
-          onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} 
+          onError={(e) => { e.currentTarget.src = '/images/product-chandeliers.jpg' }} 
         />
+
+        {/* شارة نسبة الخصم الفخمة */}
+        {hasDiscount && (
+          <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-md shadow-rose-900/30 px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1">
+            <BadgePercent className="w-3 h-3" />
+            <span>{isAr ? `خصم ${discountPercent}%` : `-${discountPercent}%`}</span>
+          </div>
+        )}
 
         {/* شارة التوفر */}
         {product.stockStatus === 'out_of_stock' ? (
@@ -777,7 +827,7 @@ function ProductCard({
             {isAr ? 'نفذت الكمية ❌' : 'Out of Stock'}
           </div>
         ) : (
-          <div className="absolute top-3 right-3 z-20 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] text-emerald-700 font-semibold">
+          <div className="absolute top-3 right-3 z-20 bg-emerald-50/90 backdrop-blur-sm border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] text-emerald-700 font-semibold">
             {isAr ? 'متوفر بالمخزن' : 'In Stock'}
           </div>
         )}
@@ -797,11 +847,27 @@ function ProductCard({
         <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
           <div>
             <span className="text-[10px] text-slate-400 block">{isAr ? 'السعر' : 'Price'}</span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold text-slate-900">
-                {product.price ? `${product.price} د.ل` : (isAr ? 'حسب القياس' : 'On Request')}
-              </span>
-            </div>
+            {hasDiscount ? (
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-base sm:text-lg font-extrabold text-rose-600">
+                    {product.discountPrice} د.ل
+                  </span>
+                  <span className="text-xs text-slate-400 line-through">
+                    {product.price} د.ل
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded self-start mt-0.5">
+                  {isAr ? `وفّر ${savingsAmount} د.ل` : `Save ${savingsAmount} LYD`}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-2">
+                <span className="text-base font-bold text-slate-900">
+                  {product.price ? `${product.price} د.ل` : (isAr ? 'حسب القياس' : 'On Request')}
+                </span>
+              </div>
+            )}
           </div>
 
           <button
@@ -810,6 +876,8 @@ function ProductCard({
             className={`px-3.5 py-2 rounded-xl font-semibold text-xs transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${
               isAdding
                 ? 'bg-emerald-600 text-white'
+                : hasDiscount
+                ? 'bg-rose-600 hover:bg-rose-700 text-white active:scale-95 shadow-sm shadow-rose-500/20'
                 : 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95 shadow-sm shadow-blue-500/20'
             }`}
           >
