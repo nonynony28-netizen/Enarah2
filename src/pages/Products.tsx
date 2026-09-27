@@ -205,8 +205,28 @@ export default function Products() {
   const isAllowedStoreProduct = (item: ProductItem) => {
     const name = String(item.name || '').toLowerCase().trim()
     const cat = String(item.category || '').toLowerCase().trim()
-    
-    // إذا كان المنتج ضمن التخفيضات والعروض
+    const desc = String(item.description || '').toLowerCase().trim()
+    const id = String(item.id || '').toLowerCase().trim()
+
+    // استبعاد قطعي لأي سجلات إدارية، نظام ألعاب، بريد إلكتروني، أو تحديثات نظام
+    if (
+      name.includes('game') || name.includes('reward') || name.includes('update') ||
+      desc.includes('admin_') || desc.includes('@app.local') || desc.includes('upload.local') ||
+      desc.includes('@') || name.includes('visitor') || desc.includes('visitor') ||
+      id.includes('game') || id.includes('admin') || name.includes('wire prices')
+    ) {
+      return false
+    }
+
+    // استبعاد المشاريع والمباني التجارية التي قد تأتي من قاعدة البيانات
+    if (
+      name.includes('cafe') || name.includes('مول') || name.includes('قاعة') ||
+      name.includes('مصحة') || name.includes('معرض كواترو') || name.includes('panyoti')
+    ) {
+      return false
+    }
+
+    // إذا كان المنتج ضمن التخفيضات والعروض المعتمدة
     if (cat.includes('تخفيض') || cat.includes('discount') || cat.includes('عرض') || (Boolean(item.discountPrice) && (item.discountPrice ?? 0) > 0)) {
       return true
     }
@@ -242,20 +262,26 @@ export default function Products() {
 
         if (res.ok && data.success && Array.isArray(data.data)) {
           const formattedProducts: ProductItem[] = data.data
-            .filter((item: any) => item.type !== 'contact')
+            .filter((item: any) => item.type !== 'contact' && item.type !== 'hero_video' && item.type !== 'secondary_video')
             .filter((item: any) => {
               const itemName = String(item.name || '').toLowerCase().trim()
               const itemEmail = String(item.email || '').toLowerCase().trim()
 
-              if (itemName.includes('visitor') || itemEmail.includes('visitor') || itemEmail.includes('visit_') || itemEmail.includes('analytics.local')) {
+              // استبعاد سجلات الألعاب والجوائز والتحديثات الإدارية والمشاريع
+              if (
+                itemEmail.includes('admin_') || itemEmail.includes('game') || itemEmail.includes('@app.local') ||
+                itemName.includes('game') || itemName.includes('reward') || itemName.includes('update') ||
+                itemEmail.includes('admin_wire_prices') || itemName.includes('wire prices') ||
+                itemEmail.includes('visitor') || itemEmail.includes('visit_') || itemEmail.includes('analytics.local') ||
+                itemEmail.includes('hero_video') || itemEmail.includes('video') || itemName.includes('فيديو') ||
+                itemName.includes('panyoti') || itemName.includes('مول') || itemName.includes('قاعة') || itemName.includes('مصحة')
+              ) {
                 return false
               }
-              if (itemEmail.includes('admin_wire_prices')) return false
-              if (itemEmail.includes('hero_video') || itemEmail.includes('video') || itemName.includes('فيديو') || itemName.includes('تحديث فيديو') || itemName.includes('خلفية')) return false
 
               try {
                 const phoneData = item.phone ? JSON.parse(item.phone) : {}
-                if (phoneData.type === 'project' || phoneData.type === 'hero_video' || phoneData.type === 'video') return false
+                if (phoneData.type === 'project' || phoneData.type === 'hero_video' || phoneData.type === 'video' || phoneData.type === 'game') return false
               } catch {}
 
               return true
@@ -264,7 +290,7 @@ export default function Products() {
               let mediaData: any = {}
               try { mediaData = item.phone ? JSON.parse(item.phone) : {} } catch {}
 
-              let descText = mediaData.description || (item.email && !item.email.includes('@upload.local') ? item.email : '')
+              let descText = mediaData.description || ''
               try {
                 const descObj = JSON.parse(descText)
                 descText = isAr ? (descObj.ar || descObj.en || descText) : (descObj.en || descObj.ar || descText)
@@ -287,11 +313,9 @@ export default function Products() {
                 .replace(/كابل\s*\/\s*سلك/gi, 'سلك')
                 .replace(/كوابل/gi, 'أسلاك')
 
-              const itemCategory = mediaData.category === 'التخفيضات والعروض الخاصة' || 
+              const isDiscount = mediaData.category === 'التخفيضات والعروض الخاصة' || 
                 (mediaData.category && mediaData.category.includes('تخفيض')) ||
-                (mediaData.discountPrice && mediaData.price && mediaData.discountPrice < mediaData.price && (nameText.includes('باقة') || nameText.includes('عرض') || nameText.includes('تخفيض') || nameText.includes('خصم')))
-                ? 'التخفيضات والعروض الخاصة'
-                : 'الأسلاك والكوابل الإيطالية والتركية'
+                (Boolean(mediaData.discountPrice) && Number(mediaData.discountPrice) > 0 && Number(mediaData.discountPrice) < Number(mediaData.price))
 
               return {
                 id: item._id || String(index),
@@ -300,10 +324,10 @@ export default function Products() {
                 image: mediaData.imageUrl || 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
                 video: mediaData.videoUrl || '',
                 price: mediaData.price,
-                discountPrice: undefined, // إزالة التخفيضات من الأصناف حالياً ليتحكم بها المستخدم
+                discountPrice: mediaData.discountPrice,
                 stockStatus: mediaData.stockStatus || 'available',
                 stockQty: mediaData.stockQty,
-                category: 'الأسلاك والكوابل الإيطالية والتركية'
+                category: isDiscount ? 'التخفيضات والعروض الخاصة' : 'الأسلاك والكوابل الإيطالية والتركية'
               }
             })
             .filter(isAllowedStoreProduct)
