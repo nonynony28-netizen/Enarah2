@@ -1492,10 +1492,11 @@ export default function Home() {
               <div className="pt-2 hidden lg:block">
                 <Link 
                   to="/products"
-                  className="mobile-btn inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center"
+                  className="mobile-btn inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center group"
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
+                  <span>{isAr ? 'استكشف كتالوج الأسلاك واطلب أونلاين' : 'Explore Wire Catalog & Order Online'}</span>
+                  <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180 group-hover:-translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
@@ -1519,10 +1520,11 @@ export default function Home() {
             <div className="order-3 lg:hidden w-full pt-1">
               <Link 
                 to="/products"
-                className="mobile-btn inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center"
+                className="mobile-btn inline-flex items-center justify-center gap-2.5 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center group"
               >
                 <ShoppingCart className="w-4 h-4" />
-                <span>{isAr ? 'تسوق الأسلاك بالمتجر الإلكتروني ←' : 'Shop Store Wires ←'}</span>
+                <span>{isAr ? 'استكشف كتالوج الأسلاك واطلب أونلاين' : 'Explore Wire Catalog & Order Online'}</span>
+                <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180 group-hover:-translate-x-1 transition-transform" />
               </Link>
             </div>
 
