@@ -752,12 +752,8 @@ export default function Home() {
 
             {/* عمود السرد التحريري وسجل الخبرة العريق */}
             <div className="lg:col-span-8 text-right space-y-4">
-              <span className="text-xs font-semibold text-blue-600 tracking-wider block">
-                {isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}
-              </span>
-
               <h2 className="mobile-section-h2 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-                {isAr ? 'شركة الإنارة الحديثة' : 'ENARAH Modern Company'}
+                {isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}
               </h2>
 
               <p className="mobile-body text-slate-800 text-sm sm:text-base font-medium leading-relaxed">

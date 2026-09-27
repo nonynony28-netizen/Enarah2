@@ -759,13 +759,8 @@ export default function Home() {
 
               {/* عمود البيانات والشرح الرسمي المتكامل (جزء اليسار جنباً إلى جنب) */}
               <div className="flex-1 min-w-0 space-y-2 sm:space-y-4 lg:col-span-8 text-right">
-                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-[10px] sm:text-xs font-bold">
-                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  <span>{isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}</span>
-                </div>
-
                 <h2 className="text-lg sm:text-2xl lg:text-4xl font-bold text-slate-900 tracking-tight">
-                  {isAr ? 'شركة الإنارة' : 'ENARAH Company'}
+                  {isAr ? 'عراقة وخبرة لأكثر من ثلاثة عقود' : 'Over 3 Decades of Heritage'}
                 </h2>
 
                 {/* بطاقة الشرح المتكامل عن الشركة بدون مظهر طولي أو تكرار */}
