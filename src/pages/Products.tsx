@@ -398,21 +398,25 @@ export default function Products() {
           </Link>
         </motion.div>
 
-        {/* عنوان المعرض الرئيسي */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-10 md:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
-            {isAr ? (
-              <>متجر <span className="text-blue-600">الإنارة والكهرباء</span></>
-            ) : (
-              <>Lighting & Electrical <span className="text-blue-600">Store</span></>
-            )}
-          </h1>
-          <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
-            {isAr 
-              ? 'تصفح قائمة الأسلاك والكوابل الإيطالية والتركية المعتمدة بأعلى معايير الجودة وأفضل الأسعار'
-              : 'Browse certified Italian and Turkish wires and cables with the highest quality standards and best prices'
-            }
-          </p>
+        {/* عنوان المعرض الرئيسي بتصميم عالمي فخم */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-10 md:mb-12 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-36 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight tracking-tight text-slate-900">
+              {isAr ? (
+                <>متجر <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">الإنارة والكهرباء</span></>
+              ) : (
+                <>Lighting & Electrical <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Store</span></>
+              )}
+            </h1>
+            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
+              {isAr 
+                ? 'تصفح قائمة الأسلاك والكوابل الإيطالية والتركية المعتمدة بأعلى معايير الجودة وأفضل الأسعار'
+                : 'Browse certified Italian and Turkish wires and cables with the highest quality standards and best prices'
+              }
+            </p>
+          </div>
         </motion.div>
 
         {/* 🔍 1. خانة البحث الفوري الاحترافية */}
@@ -424,7 +428,7 @@ export default function Products() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isAr ? "ابحث عن مقاس السلك (مثال: 1.5 مم، 2.5 مم، 4 مم...)" : "Search wire size (e.g. 1.5mm, 2.5mm, 4mm...)"}
-              className={`w-full ${isAr ? 'pr-12 pl-12' : 'pl-12 pr-12'} py-3.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all text-sm shadow-sm`}
+              className={`w-full ${isAr ? 'pr-12 pl-12' : 'pl-12 pr-12'} py-4 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] focus:shadow-[0_12px_36px_rgba(37,99,235,0.1)] transition-all text-sm font-medium`}
             />
             {searchQuery && (
               <button 
@@ -449,7 +453,7 @@ export default function Products() {
         {/* 🗂️ 2. شريط التنقل السريع بين الأقسام الفعالة */}
         {searchQuery.trim() === '' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12 flex justify-center">
-            <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-white border border-slate-200 shadow-md overflow-x-auto max-w-full">
+            <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-x-auto max-w-full">
               <button
                 onClick={() => setSelectedCategory('all')}
                 className={`px-4 py-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 cursor-pointer ${
@@ -541,23 +545,23 @@ export default function Products() {
               return (
                 <section key={catGroup.id} id={catGroup.id} className="scroll-mt-32">
                   
-                  {/* رأس قسم المتجر */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200">
+                  {/* رأس قسم المتجر بتصميم راقٍ */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-5 border-b border-slate-200/80">
                     <div className="flex items-center gap-3.5">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all ${
                         isDiscountCat 
                           ? 'bg-rose-50 border border-rose-200/80 text-rose-600'
-                          : 'bg-blue-50 border border-blue-200 text-blue-600'
+                          : 'bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-lg shadow-blue-600/20 ring-4 ring-blue-50/80'
                       }`}>
-                        <IconComponent className="w-5 h-5" />
+                        <IconComponent className={`w-5 h-5 ${isDiscountCat ? 'text-rose-600' : 'text-amber-300 fill-amber-300'}`} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2.5">
-                          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{catName}</h2>
-                          <span className={`px-3 py-0.5 text-xs font-semibold rounded-full border flex items-center gap-1.5 ${
+                          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">{catName}</h2>
+                          <span className={`px-3 py-1 text-xs font-bold rounded-full border flex items-center gap-1.5 shadow-sm ${
                             isDiscountCat
                               ? 'bg-rose-50 border-rose-200/80 text-rose-700'
-                              : 'bg-blue-50 border-blue-200 text-blue-700'
+                              : 'bg-blue-50/90 border-blue-200/90 text-blue-700'
                           }`}>
                             {isDiscountCat ? (
                               <>
@@ -565,11 +569,14 @@ export default function Products() {
                                 <span>{isAr ? `${catGroup.items.length} أصناف مخفضة` : `${catGroup.items.length} Discounted Items`}</span>
                               </>
                             ) : (
-                              <span>{isAr ? `${catGroup.items.length} صنف` : `${catGroup.items.length} items`}</span>
+                              <>
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                                <span>{isAr ? `${catGroup.items.length} صنف` : `${catGroup.items.length} items`}</span>
+                              </>
                             )}
                           </span>
                         </div>
-                        <p className="text-slate-500 text-xs mt-1 font-normal">{catDesc}</p>
+                        <p className="text-slate-500 text-xs sm:text-sm mt-1.5 font-normal leading-relaxed max-w-2xl">{catDesc}</p>
                       </div>
                     </div>
 
@@ -578,7 +585,7 @@ export default function Products() {
                         href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AA%D8%AE%D9%81%D9%8A%D8%B6%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%B9%D8%B1%D9%88%D8%B6%20%D8%A7%D9%84%D8%AD%D8%A7%D9%84%D9%8A%D8%A9"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-all self-start md:self-auto cursor-pointer shadow-sm group"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-all self-start md:self-auto cursor-pointer shadow-sm group"
                       >
                         <BadgePercent className="w-3.5 h-3.5 text-rose-400" />
                         <span>{isAr ? 'الاستفسار عن عروض المعرض ←' : 'Inquire Showroom Offers ←'}</span>
@@ -586,9 +593,9 @@ export default function Products() {
                     ) : (
                       <Link 
                         to="/wire-prices"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-blue-600 text-xs font-semibold transition-all self-start md:self-auto shadow-sm"
+                        className="inline-flex items-center gap-2.5 px-4.5 py-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-xs sm:text-sm font-semibold transition-all duration-300 self-start md:self-auto shadow-md shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group cursor-pointer"
                       >
-                        <Zap className="w-3.5 h-3.5 text-blue-600" />
+                        <Zap className="w-4 h-4 text-amber-400 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" />
                         <span>{isAr ? 'عرض جدول أسعار الأسلاك المحدث ←' : 'Live Wire Prices Table ←'}</span>
                       </Link>
                     )}
@@ -821,14 +828,23 @@ function ProductCard({
           </div>
         )}
 
+        {/* شارة الأصالة والاعتماد لمنتجات التأسيس والأسلاك */}
+        {!hasDiscount && (
+          <div className="absolute top-3 left-3 z-20 bg-slate-900/80 backdrop-blur-md border border-white/10 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-sm flex items-center gap-1">
+            <ShieldCheck className="w-3 h-3 text-blue-400" />
+            <span>{isAr ? 'معتمد 100%' : '100% Certified'}</span>
+          </div>
+        )}
+
         {/* شارة التوفر */}
         {product.stockStatus === 'out_of_stock' ? (
-          <div className="absolute top-3 right-3 z-20 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full text-[10px] text-rose-600 font-semibold">
+          <div className="absolute top-3 right-3 z-20 bg-rose-50/95 backdrop-blur-md border border-rose-200 px-2.5 py-0.5 rounded-full text-[10px] text-rose-600 font-semibold shadow-sm">
             {isAr ? 'نفذت الكمية ❌' : 'Out of Stock'}
           </div>
         ) : (
-          <div className="absolute top-3 right-3 z-20 bg-emerald-50/90 backdrop-blur-sm border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] text-emerald-700 font-semibold">
-            {isAr ? 'متوفر بالمخزن' : 'In Stock'}
+          <div className="absolute top-3 right-3 z-20 bg-white/95 backdrop-blur-md border border-emerald-200/80 px-2.5 py-0.5 rounded-full text-[10px] text-emerald-700 font-bold shadow-sm flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{isAr ? 'متوفر بالمخزن' : 'In Stock'}</span>
           </div>
         )}
       </div>
@@ -863,7 +879,7 @@ function ProductCard({
               </div>
             ) : (
               <div className="flex items-baseline gap-2">
-                <span className="text-base font-bold text-slate-900">
+                <span className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
                   {product.price ? `${product.price} د.ل` : (isAr ? 'حسب القياس' : 'On Request')}
                 </span>
               </div>
