@@ -4,7 +4,7 @@ import {
   Search, X, ShoppingCart, Check, Image as ImageIcon, 
   ArrowRight, Layers, Zap, Eye, Video, 
   ChevronLeft, SlidersHorizontal, Package, Star,
-  Flame, Tag, BadgePercent, Sparkles, ArrowLeft, MessageCircle, CheckCircle2
+  Flame, Tag, BadgePercent, Sparkles, ArrowLeft, MessageCircle, CheckCircle2, ShieldCheck
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
@@ -36,11 +36,11 @@ const CATEGORIES_LIST = [
   },
   {
     id: 'cat-discounts',
-    nameAr: 'العروض وباقات المشاريع',
-    nameEn: 'Offers & Project Packages',
-    descriptionAr: 'أسعار تفضيلية وباقات تسعير مخصصة لطلبيات المقاولين وكبرى مشاريع التأسيس الكهربائي.',
-    descriptionEn: 'Preferential pricing and bespoke commercial packages tailored for contractors and major projects.',
-    icon: Sparkles,
+    nameAr: 'التخفيضات والعروض الخاصة',
+    nameEn: 'Special Offers & Discounts',
+    descriptionAr: 'عروض حصرية وخصومات دورية على تشكيلات مختارة من الثريات، الإنارة المعمارية، والمفاتيح الكهربائية.',
+    descriptionEn: 'Curated seasonal promotions and exclusive discounts on chandeliers, architectural lighting, and smart fixtures.',
+    icon: BadgePercent,
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp'
   }
 ]
@@ -135,7 +135,12 @@ export default function Products() {
     const name = String(item.name || '').toLowerCase().trim()
     const cat = String(item.category || '').toLowerCase().trim()
     
-    // استبعاد صريح لأي سبوت لايت، ثريات، مفاتيح، برايز، انترفون، سكك ليد
+    // إذا كان المنتج ضمن التخفيضات والعروض
+    if (cat.includes('تخفيض') || cat.includes('discount') || cat.includes('عرض') || (Boolean(item.discountPrice) && (item.discountPrice ?? 0) > 0)) {
+      return true
+    }
+
+    // استبعاد صريح لأي سبوت لايت، ثريات، مفاتيح، برايز، انترفون، سكك ليد غير مخفضة من متجر الأسلاك
     if (
       name.includes('سبوت') || name.includes('spot') || 
       name.includes('ثريا') || name.includes('chandelier') ||
@@ -148,9 +153,7 @@ export default function Products() {
     }
 
     return cat.includes('سلك') || cat.includes('أسلاك') || cat.includes('كابل') || cat.includes('wire') ||
-           cat.includes('تخفيض') || cat.includes('عرض') || cat.includes('discount') ||
-           name.includes('سلك') || name.includes('أسلاك') || name.includes('كابل') || name.includes('wire') ||
-           name.includes('باقة') || name.includes('عرض')
+           name.includes('سلك') || name.includes('أسلاك') || name.includes('كابل') || name.includes('wire')
   }
 
   const [products, setProducts] = useState<ProductItem[]>(defaultFallbackProducts)
@@ -285,9 +288,9 @@ export default function Products() {
       let items: ProductItem[] = []
       if (cat.id === 'cat-discounts') {
         // خانة التخفيضات فارغة حالياً ليتحكم بها العميل ويضيف الأصناف لاحقاً
-        items = products.filter(p => p.category === 'التخفيضات والعروض الخاصة' || p.category === 'العروض وباقات المشاريع' || (Boolean(p.discountPrice) && (p.discountPrice ?? 0) > 0))
+        items = products.filter(p => p.category === 'التخفيضات والعروض الخاصة' || p.category === 'التخفيضات والعروض الحصرية' || (Boolean(p.discountPrice) && (p.discountPrice ?? 0) > 0))
       } else {
-        items = products.filter(p => p.category !== 'التخفيضات والعروض الخاصة' && p.category !== 'العروض وباقات المشاريع')
+        items = products.filter(p => p.category !== 'التخفيضات والعروض الخاصة' && p.category !== 'التخفيضات والعروض الحصرية')
         if (items.length === 0) {
           items = defaultFallbackProducts
         }
@@ -404,7 +407,7 @@ export default function Products() {
                         : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
                     }`}
                   >
-                    <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-blue-600'}`} />
+                    <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : isDiscountCat ? 'text-rose-500' : 'text-blue-600'}`} />
                     <span>{catName}</span>
                     {catItemsCount > 0 && (
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
@@ -471,7 +474,7 @@ export default function Products() {
                     <div className="flex items-center gap-3.5">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         isDiscountCat 
-                          ? 'bg-blue-50 border border-blue-200 text-blue-600'
+                          ? 'bg-rose-50 border border-rose-200/80 text-rose-600'
                           : 'bg-blue-50 border border-blue-200 text-blue-600'
                       }`}>
                         <IconComponent className="w-5 h-5" />
@@ -479,12 +482,19 @@ export default function Products() {
                       <div>
                         <div className="flex items-center gap-2.5">
                           <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{catName}</h2>
-                          <span className={`px-3 py-0.5 text-xs font-bold rounded-full border ${
+                          <span className={`px-3 py-0.5 text-xs font-semibold rounded-full border flex items-center gap-1.5 ${
                             isDiscountCat
-                              ? 'bg-blue-50 border-blue-200/80 text-blue-700'
+                              ? 'bg-rose-50 border-rose-200/80 text-rose-700'
                               : 'bg-blue-50 border-blue-200 text-blue-700'
                           }`}>
-                            {isDiscountCat && catGroup.items.length === 0 ? (isAr ? 'عروض وباقات توريد' : 'Commercial Packages') : (isAr ? `${catGroup.items.length} صنف` : `${catGroup.items.length} items`)}
+                            {isDiscountCat && catGroup.items.length === 0 ? (
+                              <>
+                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                <span>{isAr ? 'عروض وتخفيضات موسمية' : 'Seasonal Discounts'}</span>
+                              </>
+                            ) : (
+                              <span>{isAr ? `${catGroup.items.length} صنف` : `${catGroup.items.length} items`}</span>
+                            )}
                           </span>
                         </div>
                         <p className="text-slate-500 text-xs mt-1 font-normal">{catDesc}</p>
@@ -493,13 +503,13 @@ export default function Products() {
 
                     {isDiscountCat ? (
                       <a 
-                        href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D9%88%D8%A7%D9%84%D8%B9%D8%B1%D9%88%D8%B6"
+                        href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AA%D8%AE%D9%81%D9%8A%D8%B6%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%B9%D8%B1%D9%88%D8%B6%20%D8%A7%D9%84%D8%AD%D8%A7%D9%84%D9%8A%D8%A9"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-xs font-semibold transition-all self-start md:self-auto cursor-pointer shadow-sm group"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-all self-start md:self-auto cursor-pointer shadow-sm group"
                       >
-                        <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{isAr ? 'طلب عرض سعر للمشاريع ←' : 'Request Project Quote ←'}</span>
+                        <BadgePercent className="w-3.5 h-3.5 text-rose-400" />
+                        <span>{isAr ? 'الاستفسار عن عروض المعرض ←' : 'Inquire Showroom Offers ←'}</span>
                       </a>
                     ) : (
                       <Link 
@@ -512,96 +522,97 @@ export default function Products() {
                     )}
                   </div>
 
-                  {/* شبكة البطاقات أو حالة الخانة الفارغة */}
+                  {/* شبكة البطاقات أو حالة واجهة العروض العالمية */}
                   {catGroup.items.length === 0 ? (
-                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-7 sm:p-9 md:p-12 border border-slate-800 shadow-xl my-4 text-right">
-                      {/* خلفية جمالية خافتة */}
-                      <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
+                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-8 sm:p-10 md:p-14 border border-slate-800 shadow-2xl my-6 text-right">
+                      {/* إضاءات جمالية ناعمة تحاكي سبوتات المعارض المعمارية */}
+                      <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                      <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
 
                       <div className="relative z-10">
                         {/* وسام ترحيبي */}
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/15 border border-blue-400/25 text-blue-300 text-xs font-semibold mb-4">
-                          <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                          <span>{isAr ? 'عروض أسعار خاصة بالمشاريع والكميات' : 'Commercial Volume Pricing'}</span>
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/25 text-rose-300 text-xs font-semibold mb-5 backdrop-blur-sm">
+                          <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+                          <span>{isAr ? 'موسم التخفيضات والعروض الحصرية' : 'Exclusive Promotional Campaigns'}</span>
                         </div>
 
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white mb-3 leading-snug">
+                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4 leading-snug">
                           {isAr 
-                            ? 'تجهيز عروض أسعار تفضيلية لكبرى المخططات والمشاريع' 
-                            : 'Bespoke Quotations for Major Projects & Contractors'}
+                            ? 'ترقبوا إطلاق باقة التخفيضات والعروض الموسمية القادمة' 
+                            : 'Upcoming Curated Discounts & Seasonal Offers'}
                         </h3>
 
-                        <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-normal mb-8">
+                        <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-normal mb-10">
                           {isAr 
-                            ? 'نقدم لشركات المقاولات والمهندسين وأصحاب المشاريع باقات تسعير تفضيلية وخصومات تصاعدية فورية على طلبيات التأسيس وكافة مقاسات الأسلاك والكوابل الإيطالية والتركية، مع تسليم مباشر من مستودعاتنا.' 
-                            : 'We provide contractors, engineers, and project owners preferential volume pricing and custom quotation schedules for all certified wires, cables, and installation supplies with fast warehouse fulfillment.'}
+                            ? 'نُطلق دورياً حملات تخفيض كبرى تشمل تشكيلات مختارة من الثريات الفاخرة، الإضاءات المعمارية، والأنظمة والمفاتيح الكهربائية المعتمدة. تابعونا باستمرار أو تفضلوا بزيارة صالة العرض للاستفادة من أحدث العروض المباشرة.' 
+                            : 'We regularly launch curated promotional campaigns featuring exclusive discounts on designer chandeliers, architectural lighting, and certified electrical fixtures. Follow our updates or visit our showroom to enjoy instant in-store offers.'}
                         </p>
 
-                        {/* ركائز المزايا الثلاث */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8 pt-6 border-t border-white/10">
-                          <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
-                              <BadgePercent className="w-4 h-4" />
+                        {/* ركائز المزايا الثلاث الراقية */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 pt-8 border-t border-white/10">
+                          <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3.5 hover:bg-white/[0.07] transition-all">
+                            <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                              <BadgePercent className="w-5 h-5" />
                             </div>
                             <div>
-                              <h4 className="text-xs sm:text-sm font-bold text-white mb-0.5">
-                                {isAr ? 'خصومات كميات تصاعدية' : 'Tiered Volume Discounts'}
+                              <h4 className="text-sm sm:text-base font-bold text-white mb-1">
+                                {isAr ? 'خصومات دورية حصرية' : 'Seasonal Discounts'}
                               </h4>
-                              <p className="text-[11px] text-slate-400 leading-snug font-normal">
-                                {isAr ? 'أسعار جملة تنافسية لكافة المخططات' : 'Competitive wholesale rates for large plans'}
+                              <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                                {isAr ? 'تخفيضات استثنائية على موديلات مختارة من الإنارة الحديثة والثريات.' : 'Exceptional discounts on selected modern lighting and chandeliers.'}
                               </p>
                             </div>
                           </div>
 
-                          <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                              <CheckCircle2 className="w-4 h-4" />
+                          <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3.5 hover:bg-white/[0.07] transition-all">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                              <ShieldCheck className="w-5 h-5" />
                             </div>
                             <div>
-                              <h4 className="text-xs sm:text-sm font-bold text-white mb-0.5">
-                                {isAr ? 'تسعير رسمي معتمد' : 'Official Quotes'}
+                              <h4 className="text-sm sm:text-base font-bold text-white mb-1">
+                                {isAr ? 'ضمان الأصالة 100%' : '100% Guaranteed Authenticity'}
                               </h4>
-                              <p className="text-[11px] text-slate-400 leading-snug font-normal">
-                                {isAr ? 'عروض أسعار تفصيلية للمهندسين' : 'Detailed quotation schedules for engineers'}
+                              <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                                {isAr ? 'كافة القطع المخفضة مشمولة بالضمان الرسمي المعتمد لشركتنا.' : 'All discounted items retain our full certified warranty and support.'}
                               </p>
                             </div>
                           </div>
 
-                          <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
-                              <Package className="w-4 h-4" />
+                          <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3.5 hover:bg-white/[0.07] transition-all">
+                            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                              <Tag className="w-5 h-5" />
                             </div>
                             <div>
-                              <h4 className="text-xs sm:text-sm font-bold text-white mb-0.5">
-                                {isAr ? 'جاهزية مخازن فورية' : 'Immediate Readiness'}
+                              <h4 className="text-sm sm:text-base font-bold text-white mb-1">
+                                {isAr ? 'عروض المعرض المباشرة' : 'Showroom Privileges'}
                               </h4>
-                              <p className="text-[11px] text-slate-400 leading-snug font-normal">
-                                {isAr ? 'تغطية فورية للطلبيات بدون تأخير' : 'Immediate fulfillment of bulk orders'}
+                              <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                                {isAr ? 'أسعار تفضيلية إضافية لزبائن صالة العرض في بنغازي والمهندسين.' : 'Preferential in-store pricing for showroom visitors and designers.'}
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        {/* أزرار الإجراء */}
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        {/* أزرار الإجراء الفخمة */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
                           <a 
-                            href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%B7%D9%84%D8%A8%20%D8%B9%D8%B1%D8%B6%20%D8%B3%D8%B9%D8%B1%20%D8%AE%D8%A7%D8%B3%20%D9%84%D9%85%D8%B4%D8%B1%D9%88%D8%B9%20%D9%85%D9%86%20%D9%85%D8%AA%D8%AC%D8%B1%20%D8%A7%D9%84%D8%A5%D9%86%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%D8%A9"
+                            href="https://wa.me/218915079140?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AA%D8%AE%D9%81%D9%8A%D8%B6%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%B9%D8%B1%D9%88%D8%B6%20%D8%A7%D9%84%D8%AD%D8%A7%D9%84%D9%8A%D8%A9%20%D9%81%D9%8A%20%D8%B5%D8%A7%D9%84%D8%A9%20%D8%A7%D9%84%D8%B9%D8%B1%D8%B6"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-emerald-900/30 active:scale-95 cursor-pointer group"
+                            className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-emerald-950/40 active:scale-95 cursor-pointer group"
                           >
                             <MessageCircle className="w-4 h-4" />
-                            <span>{isAr ? 'طلب تسعير فوري للمشروع عبر واتساب' : 'Request Instant Project Quote'}</span>
+                            <span>{isAr ? 'الاستفسار عن عروض التخفيض الحالية عبر واتساب' : 'Inquire Active Offers via WhatsApp'}</span>
                             <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180 group-hover:-translate-x-1 transition-transform" />
                           </a>
 
                           <Link 
-                            to="/wire-prices"
+                            to="/branches"
                             className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 font-medium text-xs sm:text-sm transition-all cursor-pointer"
                           >
-                            <Zap className="w-4 h-4 text-blue-400" />
-                            <span>{isAr ? 'مراجعة جدول أسعار الأسلاك المحدث' : 'Review Wire Price Index'}</span>
+                            <Sparkles className="w-4 h-4 text-amber-400" />
+                            <span>{isAr ? 'زيارة صالة العرض في بنغازي' : 'Visit Benghazi Showroom'}</span>
                           </Link>
                         </div>
                       </div>
