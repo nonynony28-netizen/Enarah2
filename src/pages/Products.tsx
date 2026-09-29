@@ -29,7 +29,7 @@ const CATEGORIES_LIST = [
     id: 'cat-wires',
     nameAr: 'الأسلاك والكوابل الإيطالية والتركية',
     nameEn: 'Italian & Turkish Wires & Cables',
-    descriptionAr: 'الأسلاك الإيطالية والأوروبية الأصلية المعتمدة 100% بنحاس نقي لجميع مشاريع التأسيس.',
+    descriptionAr: 'الأسلاك الإيطالية والأوروبية الأصلية 100% بنحاس نقي لجميع مشاريع التأسيس.',
     descriptionEn: 'Certified 100% pure copper Italian and Turkish wires and cables.',
     icon: Zap,
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp'
@@ -45,12 +45,12 @@ const CATEGORIES_LIST = [
   }
 ]
 
-// 🛒 المنتجات المعتمدة (الأسلاك والكوابل الإيطالية المعتمدة)
+// 🛒 منتجات الأسلاك (الأسلاك والكوابل الإيطالية)
 const defaultFallbackProducts: ProductItem[] = [
   // 🔌 مقاسات الأسلاك والكوابل الإيطالية
   {
     id: 'wire-size-15',
-    name: 'سلك كهربائي إيطالي معتمد 1.5 مم (لفة 100 متر)',
+    name: 'سلك كهربائي إيطالي 1.5 مم (لفة 100 متر)',
     description: 'نحاس صافي 100% عالي النقاء مستورد مباشرة من إيطاليا، مناسب للإنارة والإضاءة العامة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 245,
@@ -60,7 +60,7 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-25',
-    name: 'سلك كهربائي إيطالي معتمد 2.5 مم (لفة 100 متر)',
+    name: 'سلك كهربائي إيطالي 2.5 مم (لفة 100 متر)',
     description: 'نحاس صافي 100% عازل للحرارة والكهرباء، مخصص للتأسيس المنزلي والأحمال المتوسطة والبرايز.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 375,
@@ -70,7 +70,7 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-40',
-    name: 'سلك كهربائي إيطالي معتمد 4.0 مم (لفة 100 متر)',
+    name: 'سلك كهربائي إيطالي 4.0 مم (لفة 100 متر)',
     description: 'نحاس إيطالي صافي 100%، مخصص للمكيفات والأجهزة الكبيرة والأحمال الثقيلة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 585,
@@ -80,7 +80,7 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-60',
-    name: 'سلك كهربائي إيطالي معتمد 6.0 مم (لفة 100 متر)',
+    name: 'سلك كهربائي إيطالي 6.0 مم (لفة 100 متر)',
     description: 'سلك نحاسي إيطالي فائق القوة للخطوط المغذية الرئيسية والفرعية والأحمال العالية.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 845,
@@ -90,8 +90,8 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-100',
-    name: 'سلك كهربائي إيطالي معتمد 10.0 مم (لفة 100 متر)',
-    description: 'موصلات نحاسية إيطالية صافية 100% معتمدة للوحات التوزيع والعدادات الرئيسية.',
+    name: 'سلك كهربائي إيطالي 10.0 مم (لفة 100 متر)',
+    description: 'موصلات نحاسية إيطالية صافية 100% للوحات التوزيع والعدادات الرئيسية.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 1350,
     stockStatus: 'available',
@@ -100,7 +100,7 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-160',
-    name: 'سلك كهربائي إيطالي معتمد 16.0 مم (لفة 100 متر)',
+    name: 'سلك كهربائي إيطالي 16.0 مم (لفة 100 متر)',
     description: 'أسلاك إيطالية ثقيلة فائقة النقاء عازلة للضغط العالي مخصصة للتأسيس الصناعي والمباني الضخمة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 1980,
@@ -110,7 +110,7 @@ const defaultFallbackProducts: ProductItem[] = [
   },
   {
     id: 'wire-size-250',
-    name: 'سلك كهربائي إيطالي معتمد 25.0 مم (لفة 100 متر)',
+    name: 'سلك كهربائي إيطالي 25.0 مم (لفة 100 متر)',
     description: 'أسلاك نحاسية إيطالية فائقة النقاء للأحمال والمصانع والعدادات الرئيسية الضخمة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 2950,
@@ -226,7 +226,7 @@ export default function Products() {
       return false
     }
 
-    // إذا كان المنتج ضمن التخفيضات والعروض المعتمدة
+    // إذا كان المنتج ضمن التخفيضات والعروض
     if (cat.includes('تخفيض') || cat.includes('discount') || cat.includes('عرض') || (Boolean(item.discountPrice) && (item.discountPrice ?? 0) > 0)) {
       return true
     }
@@ -296,20 +296,20 @@ export default function Products() {
                 descText = isAr ? (descObj.ar || descObj.en || descText) : (descObj.en || descObj.ar || descText)
               } catch {}
 
-              let nameText = item.name || 'سلك كهربائي إيطالي معتمد'
+              let nameText = item.name || 'سلك كهربائي إيطالي'
               try {
                 const nameObj = JSON.parse(nameText)
                 nameText = isAr ? (nameObj.ar || nameObj.en || nameText) : (nameObj.en || nameObj.ar || nameText)
               } catch {}
 
               nameText = nameText
-                .replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
-                .replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+                .replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي')
+                .replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي')
                 .replace(/كابل\s*\/\s*سلك/gi, 'سلك')
                 .replace(/كوابل/gi, 'أسلاك')
               descText = descText
-                .replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
-                .replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي معتمد')
+                .replace(/إيطالي\s*\/\s*تركي/gi, 'إيطالي')
+                .replace(/ايطالي\s*\/\s*تركي/gi, 'إيطالي')
                 .replace(/كابل\s*\/\s*سلك/gi, 'سلك')
                 .replace(/كوابل/gi, 'أسلاك')
 
@@ -436,7 +436,7 @@ export default function Products() {
             </h1>
             <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
               {isAr 
-                ? 'تصفح قائمة الأسلاك والكوابل الإيطالية والتركية المعتمدة بأعلى معايير الجودة وأفضل الأسعار'
+                ? 'تصفح قائمة الأسلاك والكوابل الإيطالية والتركية بأعلى معايير الجودة وأفضل الأسعار'
                 : 'Browse certified Italian and Turkish wires and cables with the highest quality standards and best prices'
               }
             </p>
@@ -756,7 +756,7 @@ export default function Products() {
                 <div className="flex flex-col justify-between h-full">
                   <div>
                     <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold inline-block mb-3">
-                      {selectedProduct.category || (isAr ? 'منتج معتمد' : 'Certified Product')}
+                      {selectedProduct.category || (isAr ? 'منتج أصلي' : 'Genuine Product')}
                     </span>
                     <h3 className="text-xl font-bold text-slate-900 mb-2">{selectedProduct.name}</h3>
                     <p className="text-slate-600 text-sm leading-relaxed mb-6 font-normal">{selectedProduct.description}</p>
