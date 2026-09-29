@@ -852,14 +852,6 @@ function ProductCard({
           </div>
         )}
 
-        {/* شارة الأصالة والاعتماد لمنتجات التأسيس والأسلاك */}
-        {!hasDiscount && (
-          <div className="absolute top-3 left-3 z-20 bg-slate-900/80 backdrop-blur-md border border-white/10 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-sm flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3 text-blue-400" />
-            <span>{isAr ? 'معتمد 100%' : '100% Certified'}</span>
-          </div>
-        )}
-
         {/* شارة التوفر */}
         {product.stockStatus === 'out_of_stock' ? (
           <div className="absolute top-3 right-3 z-20 bg-rose-50/95 backdrop-blur-md border border-rose-200 px-2.5 py-0.5 rounded-full text-[10px] text-rose-600 font-semibold shadow-sm">
