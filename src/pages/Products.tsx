@@ -29,8 +29,8 @@ const CATEGORIES_LIST = [
     id: 'cat-wires',
     nameAr: 'الأسلاك والكوابل الإيطالية والتركية',
     nameEn: 'Italian & Turkish Wires & Cables',
-    descriptionAr: 'الأسلاك الإيطالية والأوروبية الأصلية المعتمدة 100% بنحاس إلكتروليتي نقي لجميع مشاريع التأسيس.',
-    descriptionEn: 'Certified 100% pure electrolytic copper Italian and Turkish wires and cables.',
+    descriptionAr: 'الأسلاك الإيطالية والأوروبية الأصلية المعتمدة 100% بنحاس نقي لجميع مشاريع التأسيس.',
+    descriptionEn: 'Certified 100% pure copper Italian and Turkish wires and cables.',
     icon: Zap,
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp'
   },
@@ -71,7 +71,7 @@ const defaultFallbackProducts: ProductItem[] = [
   {
     id: 'wire-size-40',
     name: 'سلك كهربائي إيطالي معتمد 4.0 مم (لفة 100 متر)',
-    description: 'نحاس إلكتروليتي إيطالي صافي 100%، مخصص للمكيفات والأجهزة الكبيرة والأحمال الثقيلة.',
+    description: 'نحاس إيطالي صافي 100%، مخصص للمكيفات والأجهزة الكبيرة والأحمال الثقيلة.',
     image: 'https://i.postimg.cc/jjWyzRBs/IMG-3393.webp',
     price: 585,
     stockStatus: 'available',

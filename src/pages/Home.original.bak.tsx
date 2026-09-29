@@ -1558,7 +1558,7 @@ export default function Home() {
 
                   <div className="p-3.5 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-sm flex flex-col gap-1">
                     <span className="text-lg">⚡</span>
-                    <span className="text-xs font-bold text-white">{isAr ? 'نحاس إلكتروليتي' : 'Pure Copper'}</span>
+                    <span className="text-xs font-bold text-white">{isAr ? 'نحاس نقي' : 'Pure Copper'}</span>
                     <span className="text-[10px] text-zinc-400">{isAr ? 'نقاء وتوصيل 100%' : '100% Conductivity'}</span>
                   </div>
 
