@@ -334,10 +334,10 @@ export default function HomeCleanWhitePreview() {
   // Preload all 4 photorealistic variations (all-off, 3000K, 4000K, 6000K)
   useEffect(() => {
     const simPhotos = [
-      '/images/simulator/room-all-off.jpg',
-      '/images/simulator/room-3000k.jpg',
-      '/images/simulator/room-4000k.jpg',
-      '/images/simulator/room-6000k.jpg'
+      '/images/simulator/room-all-off.jpg?v=2',
+      '/images/simulator/room-3000k.jpg?v=2',
+      '/images/simulator/room-4000k.jpg?v=2',
+      '/images/simulator/room-6000k.jpg?v=2'
     ]
     simPhotos.forEach((src) => {
       const img = new Image()
@@ -955,7 +955,7 @@ export default function HomeCleanWhitePreview() {
             
             {/* Layer 0 (Base): Natural Dusk Architectural Scene - All Artificial Lights OFF */}
             <img
-              src="/images/simulator/room-all-off.jpg"
+              src="/images/simulator/room-all-off.jpg?v=2"
               alt="Natural Dusk Architectural Scene - Artificial Lights OFF"
               className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
               style={{ zIndex: 1 }}
@@ -974,7 +974,7 @@ export default function HomeCleanWhitePreview() {
             >
               {/* 3000K Warm White Base Render */}
               <img
-                src="/images/simulator/room-3000k.jpg"
+                src="/images/simulator/room-3000k.jpg?v=2"
                 alt="Architectural Room Lighting 3000K Warm White"
                 className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
                 style={{ zIndex: 1, willChange: 'opacity' }}
@@ -983,7 +983,7 @@ export default function HomeCleanWhitePreview() {
 
               {/* 4000K Neutral White Middle Render */}
               <img
-                src="/images/simulator/room-4000k.jpg"
+                src="/images/simulator/room-4000k.jpg?v=2"
                 alt="Architectural Room Lighting 4000K Neutral White"
                 className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
                 style={{
@@ -997,7 +997,7 @@ export default function HomeCleanWhitePreview() {
 
               {/* 6000K Cool White Top Render */}
               <img
-                src="/images/simulator/room-6000k.jpg"
+                src="/images/simulator/room-6000k.jpg?v=2"
                 alt="Architectural Room Lighting 6000K Cool White"
                 className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
                 style={{
