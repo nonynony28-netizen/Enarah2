@@ -1041,51 +1041,50 @@ export default function HomeCleanWhitePreview() {
               </div>
             </div>
 
-            {/* FLOATING ARCHITECTURAL CONTROL DOCK (Bottom Inside Canvas) */}
-            <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 w-[96%] sm:w-[92%] max-w-2xl">
-              <div className="bg-black/80 backdrop-blur-xl border border-white/20 p-3 sm:p-4 rounded-2xl shadow-2xl space-y-3">
+            {/* FLOATING ARCHITECTURAL CONTROL DOCK (Sleek, Compact Minimal Floating Bar) */}
+            <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 w-[94%] sm:w-[90%] max-w-xl">
+              <div className="bg-black/80 backdrop-blur-xl border border-white/20 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-2xl space-y-2">
                 
-                {/* 1. Header Row: Instruction or Active Status + Return to OFF Button */}
+                {/* 1. Header Row: Compact Status & Off Button */}
                 <div className="flex items-center justify-between text-white text-xs">
                   {simLightsOn ? (
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white/90">حرارة لون الإضاءة</span>
-                      <span className="text-white/40">•</span>
-                      <span className="text-[#93C5FD] font-mono font-bold">{simKelvin}K</span>
-                      <span className="text-white/70">({activeSimMeta.arabicLabel})</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-white/70 text-[11px] sm:text-xs">حرارة الإضاءة:</span>
+                      <span className="text-[#93C5FD] font-mono font-bold text-xs">{simKelvin}K</span>
+                      <span className="text-white/80 text-[11px]">({activeSimMeta.arabicLabel})</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white/95 text-xs sm:text-sm">
+                      <span className="font-semibold text-white/95 text-xs">
                         اختر درجة الإضاءة لتشاهد تأثيرها على المساحة
                       </span>
                     </div>
                   )}
 
-                  {/* Return to Off Button when lights are ON / Status indicator when OFF */}
+                  {/* Return to Off Button when lights are ON */}
                   {simLightsOn ? (
                     <button
                       type="button"
                       onClick={handleTurnLightsOff}
-                      className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/15 transition-all cursor-pointer shadow-sm"
+                      className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/15 transition-all cursor-pointer shadow-sm"
                       title="العودة للإضاءة المسائية الطبيعية"
                     >
-                      <Power className="w-3.5 h-3.5 text-amber-400" />
+                      <Power className="w-3 h-3 text-amber-400" />
                       <span>إطفاء الإضاءة</span>
                     </button>
                   ) : (
-                    <span className="text-[11px] text-white/60 hidden sm:block">
-                      الإنارة الصناعية مطفأة حالياً
+                    <span className="text-[10px] text-white/50 hidden sm:block">
+                      الإنارة مطفأة حالياً
                     </span>
                   )}
                 </div>
 
-                {/* 2. Continuous Kelvin Slider (Visible when ON) */}
+                {/* 2. Continuous Kelvin Slider (Slim, Sleek Minimal Track) */}
                 {simLightsOn && (
-                  <div className="relative pt-1 pb-1">
+                  <div className="relative py-1">
                     {/* Visual Temperature Progression Track */}
                     <div
-                      className="w-full h-3 rounded-full relative overflow-hidden pointer-events-none"
+                      className="w-full h-2 rounded-full relative overflow-hidden pointer-events-none"
                       style={{
                         background: 'linear-gradient(to right, #FFE8CD 0%, #FFF8EE 33.3%, #FFFFFF 40%, #EEF5FF 70%, #DBEAFF 100%)',
                         boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.4)'
@@ -1132,13 +1131,13 @@ export default function HomeCleanWhitePreview() {
                       }}
                     >
                       <div
-                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white border-2 border-[#0062D2] shadow-lg flex items-center justify-center"
+                        className="w-5 h-5 rounded-full bg-white border-2 border-[#0062D2] shadow-md flex items-center justify-center"
                         style={{
-                          boxShadow: '0 2px 8px rgba(0, 98, 210, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.8)'
+                          boxShadow: '0 1px 6px rgba(0, 98, 210, 0.45), 0 0 0 1.5px rgba(255, 255, 255, 0.9)'
                         }}
                       >
                         <div
-                          className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full"
+                          className="w-1.5 h-1.5 rounded-full"
                           style={{ backgroundColor: activeSimMeta.dotColor }}
                         />
                       </div>
@@ -1146,29 +1145,8 @@ export default function HomeCleanWhitePreview() {
                   </div>
                 )}
 
-                {/* Track Scale Labels when ON */}
-                {simLightsOn && (
-                  <div className="flex justify-between items-center text-[11px] text-white/70 font-mono px-0.5" dir="ltr">
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#FFB85A]" />
-                      <span>3000K</span>
-                      <span className="text-[10px] text-white/50">(دافئ)</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                      <span>4000K</span>
-                      <span className="text-[10px] text-white/50">(محايد)</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#93C5FD]" />
-                      <span>6000K</span>
-                      <span className="text-[10px] text-white/50">(بارد)</span>
-                    </span>
-                  </div>
-                )}
-
-                {/* 3. Three Temperature Option Buttons (Equal Width, Min 44px Height) */}
-                <div className={`grid grid-cols-3 gap-2 ${simLightsOn ? 'pt-1 border-t border-white/10' : 'pt-0.5'}`}>
+                {/* 3. Three Compact Temperature Option Buttons */}
+                <div className={`grid grid-cols-3 gap-1.5 ${simLightsOn ? 'pt-0.5' : ''}`}>
                   {[
                     {
                       k: 3000,
@@ -1195,26 +1173,26 @@ export default function HomeCleanWhitePreview() {
                         key={preset.k}
                         type="button"
                         onClick={() => handleSimPreset(preset.k)}
-                        className={`min-h-[46px] px-2 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer border ${
+                        className={`h-8 sm:h-9 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
                           isActive
-                            ? 'bg-[#0062D2] text-white border-[#0062D2] shadow-lg shadow-blue-500/25 ring-1 ring-white/30'
+                            ? 'bg-[#0062D2] text-white border-[#0062D2] shadow-md shadow-blue-500/25 ring-1 ring-white/30'
                             : 'bg-white/10 hover:bg-white/15 text-white/90 border-white/15 hover:border-white/30'
                         }`}
                         aria-pressed={isActive}
                       >
                         <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
+                          className="w-2 h-2 rounded-full shrink-0 shadow-sm"
                           style={{ backgroundColor: preset.dot }}
                         />
-                        <span className="font-mono font-bold">{preset.k}K</span>
-                        <span className="text-[11px] opacity-90">{preset.ar}</span>
+                        <span className="font-mono font-bold text-xs">{preset.k}K</span>
+                        <span className="text-[11px] opacity-85">{preset.ar}</span>
                       </button>
                     )
                   })}
                 </div>
 
                 {/* Supporting Architectural Advice Note */}
-                <p className="text-[11px] sm:text-xs text-white/70 text-center leading-relaxed pt-0.5">
+                <p className="text-[10px] sm:text-[11px] text-white/60 text-center leading-normal pt-0.5">
                   {activeSimMeta.desc}
                 </p>
 
