@@ -32,6 +32,7 @@ import {
   INITIAL_PROJECTS,
   getOptimizedProjectImageUrl
 } from '../data/projectsData'
+import { initHeroVideoCache, getOptimalHeroVideoPath } from '../utils/videoCache'
 
 /* =========================================================================
    1. Data Definitions (Colors, Brands, Featured Categories, Trust Items)
@@ -203,6 +204,42 @@ export default function HomeCleanWhitePreview() {
   // Navigation scroll state
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Hero Video State & Adaptive Local Blob Caching
+  const heroVideoRef = useRef<HTMLVideoElement>(null)
+  const [heroVideoSrc, setHeroVideoSrc] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      if ((window as any).__ENARAH_HERO_BLOB_URL__) {
+        return (window as any).__ENARAH_HERO_BLOB_URL__
+      }
+      return getOptimalHeroVideoPath()
+    }
+    return '/hero-video.mp4'
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).__ENARAH_HERO_BLOB_URL__) {
+      setHeroVideoSrc((window as any).__ENARAH_HERO_BLOB_URL__)
+    }
+
+    const handleBlobReady = (e: any) => {
+      const url = e.detail || (window as any).__ENARAH_HERO_BLOB_URL__
+      if (url) {
+        setHeroVideoSrc(url)
+      }
+    }
+
+    window.addEventListener('enarah_video_blob_ready', handleBlobReady)
+    initHeroVideoCache().then((blobUrl) => {
+      if (blobUrl) {
+        setHeroVideoSrc(blobUrl)
+      }
+    })
+
+    return () => {
+      window.removeEventListener('enarah_video_blob_ready', handleBlobReady)
+    }
+  }, [])
 
   // Interactive Simulator States (Section 06 & 07)
   const [simKelvin, setSimKelvin] = useState<3000 | 4000 | 6000>(3000)
@@ -484,17 +521,32 @@ export default function HomeCleanWhitePreview() {
           Headline: الضوء الذي يغيّر المساحة
           ===================================================================== */}
       <section className="relative w-full h-[88vh] min-h-[620px] max-h-[960px] flex items-end sm:items-center overflow-hidden bg-[#101820]">
-        {/* Background Architectural Photography */}
+        {/* Background Architectural Video */}
         <div className="absolute inset-0 z-0">
-          <img
-            src="/images/architectural-hero.jpg"
-            alt="European Architectural Lighting Interior by Enarah Modern"
-            className="w-full h-full object-cover object-center scale-[1.01]"
-            loading="eager"
+          <video
+            ref={heroVideoRef}
+            src={heroVideoSrc}
+            poster="/hero-poster.jpg"
+            autoPlay
+            loop
+            muted
+            defaultMuted
+            playsInline
+            webkit-playsinline="true"
+            disablePictureInPicture
+            disableRemotePlayback
+            preload="auto"
+            className="w-full h-full object-cover object-center scale-[1.01] pointer-events-none"
+            style={{
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              willChange: 'transform'
+            }}
           />
           {/* Subtle architectural dark vignette only for typography legibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#101820]/90 via-[#101820]/30 to-black/35" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#101820]/75 via-transparent to-transparent hidden lg:block" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#101820]/90 via-[#101820]/35 to-black/40 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#101820]/80 via-transparent to-transparent hidden lg:block pointer-events-none" />
         </div>
 
         {/* Content Container */}
