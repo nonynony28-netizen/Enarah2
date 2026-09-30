@@ -370,6 +370,64 @@ export default function HomeCleanWhitePreview() {
   }
 
   const currentKelvinInfo = getSimSceneInfo()
+
+  // Select exact photorealistic room photograph based on active lighting states
+  const getSimActiveImage = () => {
+    // If master is OFF or both fixtures are toggled off:
+    if (!simMasterOn || (!simSpotlightsOn && !simLedOn)) {
+      return '/images/simulator/room-all-off.jpg'
+    }
+
+    // Both Spotlights and LED are ON:
+    if (simSpotlightsOn && simLedOn) {
+      if (simSpotlightsKelvin === 6000 || simLedKelvin === 6000 || simLedKelvin === 'ice') {
+        return '/images/simulator/room-6000k.jpg'
+      }
+      if (simSpotlightsKelvin === 4000 || simLedKelvin === 4000) {
+        return '/images/simulator/room-4000k.jpg'
+      }
+      return '/images/simulator/room-3000k.jpg'
+    }
+
+    // Only Spotlights are ON (LED Strip is OFF):
+    if (simSpotlightsOn && !simLedOn) {
+      if (simSpotlightsKelvin === 6000) {
+        return '/images/simulator/room-spots-only-6000k.jpg'
+      }
+      return '/images/simulator/room-spots-only-3000k.jpg'
+    }
+
+    // Only LED Strip is ON (Spotlights are OFF):
+    if (!simSpotlightsOn && simLedOn) {
+      if (simLedKelvin === 6000 || simLedKelvin === 'ice') {
+        return '/images/simulator/room-led-only-6000k.jpg'
+      }
+      return '/images/simulator/room-led-only-3000k.jpg'
+    }
+
+    return '/images/simulator/room-3000k.jpg'
+  }
+
+  const activeSimImage = getSimActiveImage()
+
+  // Preload all 8 photorealistic variations so cross-fade is instantaneous
+  useEffect(() => {
+    const simPhotos = [
+      '/images/simulator/room-3000k.jpg',
+      '/images/simulator/room-4000k.jpg',
+      '/images/simulator/room-6000k.jpg',
+      '/images/simulator/room-spots-only-3000k.jpg',
+      '/images/simulator/room-spots-only-6000k.jpg',
+      '/images/simulator/room-led-only-3000k.jpg',
+      '/images/simulator/room-led-only-6000k.jpg',
+      '/images/simulator/room-all-off.jpg'
+    ]
+    simPhotos.forEach((src) => {
+      const img = new Image()
+      img.src = src
+    })
+  }, [])
+
   const [selectedPaintId, setSelectedPaintId] = useState('white')
   const [paintTemp, setPaintTemp] = useState<'warm' | 'natural' | 'cool'>('warm')
   const [paintTransitioning, setPaintTransitioning] = useState(false)
@@ -974,217 +1032,30 @@ export default function HomeCleanWhitePreview() {
 
           {/* Immersive Viewport Simulator Canvas with Floating Controls */}
           <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10] max-h-[580px] min-h-[420px] rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-xl bg-[#101820] max-w-5xl mx-auto">
-            {/* Architectural Room Base Photo */}
-            <img
-              src="/images/architectural-hero.jpg"
-              alt="Room Lighting Simulator"
-              className="w-full h-full object-cover transition-all duration-500 ease-out"
-              style={{ filter: currentKelvinInfo.roomFilter }}
-            />
-
-            {/* SVG Optical Fixture Overlays (Precise Beam Scallops & LED Coves) */}
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none select-none transition-all duration-500 ease-out"
-              viewBox="0 0 1000 562.5"
-              preserveAspectRatio="none"
-            >
-              <defs>
-                {/* 1. Blur filters */}
-                <filter id="spotScallopBlur" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="8" />
-                </filter>
-                <filter id="spotMultiplyBlur" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="11" />
-                </filter>
-                <filter id="ledCoreBlur" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="4" />
-                </filter>
-                <filter id="ledWashBlur" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="14" />
-                </filter>
-
-                {/* 2. Radial Gradients for 3 Spotlights Cones */}
-                <radialGradient id="spotGrad1" cx="368" cy="66" r="148" fx="368" fy="70" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-                  <stop offset="30%" stopColor="#FFFFFF" stopOpacity="0.85" />
-                  <stop offset="65%" stopColor="#FFFFFF" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-                </radialGradient>
-
-                <radialGradient id="spotGrad2" cx="463" cy="66" r="148" fx="463" fy="70" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-                  <stop offset="30%" stopColor="#FFFFFF" stopOpacity="0.85" />
-                  <stop offset="65%" stopColor="#FFFFFF" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-                </radialGradient>
-
-                <radialGradient id="spotGrad3" cx="558" cy="66" r="148" fx="558" fy="70" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-                  <stop offset="30%" stopColor="#FFFFFF" stopOpacity="0.85" />
-                  <stop offset="65%" stopColor="#FFFFFF" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-                </radialGradient>
-
-                {/* Spotlights Paths Reusable Def */}
-                <path
-                  id="spotPath1"
-                  d="M 368,66 C 344,95 314,145 310,215 C 344,230 392,230 426,215 C 422,145 392,95 368,66 Z"
+            {/* Photorealistic Architectural Room Light Variations (Silky Smooth Hardware-Accelerated Cross-fade) */}
+            {[
+              { id: 'all-off', src: '/images/simulator/room-all-off.jpg' },
+              { id: '3000k', src: '/images/simulator/room-3000k.jpg' },
+              { id: '4000k', src: '/images/simulator/room-4000k.jpg' },
+              { id: '6000k', src: '/images/simulator/room-6000k.jpg' },
+              { id: 'spots-3000k', src: '/images/simulator/room-spots-only-3000k.jpg' },
+              { id: 'spots-6000k', src: '/images/simulator/room-spots-only-6000k.jpg' },
+              { id: 'led-3000k', src: '/images/simulator/room-led-only-3000k.jpg' },
+              { id: 'led-6000k', src: '/images/simulator/room-led-only-6000k.jpg' }
+            ].map((variant) => {
+              const isActive = activeSimImage === variant.src
+              return (
+                <img
+                  key={variant.id}
+                  src={variant.src}
+                  alt="Architectural Room Lighting"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out pointer-events-none select-none ${
+                    isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
+                  loading="eager"
                 />
-                <path
-                  id="spotPath2"
-                  d="M 463,66 C 439,95 409,145 405,215 C 439,230 487,230 521,215 C 517,145 487,95 463,66 Z"
-                />
-                <path
-                  id="spotPath3"
-                  d="M 558,66 C 534,95 504,145 500,215 C 534,230 582,230 616,215 C 612,145 582,95 558,66 Z"
-                />
-              </defs>
-
-              {/* =====================================================================
-                  LAYER A: SPOTLIGHTS ON STONE WALL
-                  ===================================================================== */}
-              {(!simSpotlightsOn || !simMasterOn) ? (
-                /* When Spotlights are OFF: Soft Uniform Shadow Dims the Cones to Match Unlit Stone */
-                <g style={{ mixBlendMode: 'multiply' }} className="transition-opacity duration-500">
-                  <rect x="280" y="62" width="360" height="200" fill="rgba(65, 58, 50, 0.42)" filter="url(#spotMultiplyBlur)" />
-                  <use href="#spotPath1" fill="rgba(55, 48, 40, 0.52)" filter="url(#spotMultiplyBlur)" />
-                  <use href="#spotPath2" fill="rgba(55, 48, 40, 0.52)" filter="url(#spotMultiplyBlur)" />
-                  <use href="#spotPath3" fill="rgba(55, 48, 40, 0.52)" filter="url(#spotMultiplyBlur)" />
-                  <rect x="295" y="62" width="335" height="26" fill="rgba(35, 30, 24, 0.6)" filter="url(#spotMultiplyBlur)" />
-                </g>
-              ) : (
-                /* When Spotlights are ON: Recolor & Luminance injection */
-                <g className="transition-opacity duration-500">
-                  {/* 4000K: Strip amber, inject neutral architectural daylight */}
-                  {simSpotlightsKelvin === 4000 && (
-                    <>
-                      <g style={{ mixBlendMode: 'color' }}>
-                        <use href="#spotPath1" fill="rgba(245, 245, 248, 0.94)" filter="url(#spotScallopBlur)" />
-                        <use href="#spotPath2" fill="rgba(245, 245, 248, 0.94)" filter="url(#spotScallopBlur)" />
-                        <use href="#spotPath3" fill="rgba(245, 245, 248, 0.94)" filter="url(#spotScallopBlur)" />
-                      </g>
-                      <g style={{ mixBlendMode: 'screen' }}>
-                        <use href="#spotPath1" fill="url(#spotGrad1)" opacity="0.45" />
-                        <use href="#spotPath2" fill="url(#spotGrad2)" opacity="0.45" />
-                        <use href="#spotPath3" fill="url(#spotGrad3)" opacity="0.45" />
-                      </g>
-                    </>
-                  )}
-
-                  {/* 6000K: Strip amber, inject cool daylight blue-white */}
-                  {simSpotlightsKelvin === 6000 && (
-                    <>
-                      <g style={{ mixBlendMode: 'color' }}>
-                        <use href="#spotPath1" fill="rgba(145, 205, 255, 0.96)" filter="url(#spotScallopBlur)" />
-                        <use href="#spotPath2" fill="rgba(145, 205, 255, 0.96)" filter="url(#spotScallopBlur)" />
-                        <use href="#spotPath3" fill="rgba(145, 205, 255, 0.96)" filter="url(#spotScallopBlur)" />
-                      </g>
-                      <g style={{ mixBlendMode: 'screen' }}>
-                        <use href="#spotPath1" fill="rgba(215, 238, 255, 0.55)" filter="url(#spotScallopBlur)" />
-                        <use href="#spotPath2" fill="rgba(215, 238, 255, 0.55)" filter="url(#spotScallopBlur)" />
-                        <use href="#spotPath3" fill="rgba(215, 238, 255, 0.55)" filter="url(#spotScallopBlur)" />
-                        <use href="#spotPath1" fill="url(#spotGrad1)" opacity="0.4" />
-                        <use href="#spotPath2" fill="url(#spotGrad2)" opacity="0.4" />
-                        <use href="#spotPath3" fill="url(#spotGrad3)" opacity="0.4" />
-                      </g>
-                    </>
-                  )}
-
-                  {/* 3000K: Enhance natural warm gold */}
-                  {simSpotlightsKelvin === 3000 && (
-                    <g style={{ mixBlendMode: 'screen' }}>
-                      <use href="#spotPath1" fill="rgba(255, 175, 45, 0.28)" filter="url(#spotScallopBlur)" />
-                      <use href="#spotPath2" fill="rgba(255, 175, 45, 0.28)" filter="url(#spotScallopBlur)" />
-                      <use href="#spotPath3" fill="rgba(255, 175, 45, 0.28)" filter="url(#spotScallopBlur)" />
-                    </g>
-                  )}
-                </g>
-              )}
-
-              {/* =====================================================================
-                  LAYER B: LED STRIP (VERTICAL PROFILE + STEPPED COVE)
-                  ===================================================================== */}
-              {(!simLedOn || !simMasterOn) ? (
-                /* When LED Strip is OFF: Multiply Shadow Extinguishes the Core and Wood Reflection */
-                <g style={{ mixBlendMode: 'multiply' }} className="transition-opacity duration-500">
-                  <rect x="52" y="0" width="85" height="520" fill="rgba(30, 22, 16, 0.72)" filter="url(#ledWashBlur)" />
-                  <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(15, 10, 8, 0.9)" strokeWidth="12" filter="url(#ledCoreBlur)" />
-                  <polygon points="76,112 258,194 252,228 70,146" fill="rgba(30, 22, 16, 0.72)" filter="url(#ledWashBlur)" />
-                  <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(15, 10, 8, 0.9)" strokeWidth="10" filter="url(#ledCoreBlur)" />
-                </g>
-              ) : (
-                /* When LED Strip is ON: Recolor & Glow Injection */
-                <g className="transition-opacity duration-500">
-                  {/* 4000K: Neutral Architectural Daylight */}
-                  {simLedKelvin === 4000 && (
-                    <>
-                      <g style={{ mixBlendMode: 'color' }}>
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(255, 248, 235, 0.95)" strokeWidth="24" filter="url(#ledCoreBlur)" />
-                        <rect x="50" y="0" width="90" height="510" fill="rgba(255, 248, 235, 0.88)" filter="url(#ledWashBlur)" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(255, 248, 235, 0.95)" strokeWidth="22" filter="url(#ledCoreBlur)" />
-                        <polygon points="80,110 256,190 250,225 74,145" fill="rgba(255, 248, 235, 0.88)" filter="url(#ledWashBlur)" />
-                      </g>
-                      <g style={{ mixBlendMode: 'screen' }}>
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="#FFFFFF" strokeWidth="6" />
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="#FFF7EB" strokeWidth="18" opacity="0.45" filter="url(#ledCoreBlur)" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="#FFFFFF" strokeWidth="5" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="#FFF7EB" strokeWidth="16" opacity="0.4" filter="url(#ledCoreBlur)" />
-                      </g>
-                    </>
-                  )}
-
-                  {/* 6000K: Crisp Modern Cool White */}
-                  {simLedKelvin === 6000 && (
-                    <>
-                      <g style={{ mixBlendMode: 'color' }}>
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(140, 205, 255, 0.96)" strokeWidth="26" filter="url(#ledCoreBlur)" />
-                        <rect x="50" y="0" width="92" height="510" fill="rgba(140, 205, 255, 0.9)" filter="url(#ledWashBlur)" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(140, 205, 255, 0.96)" strokeWidth="22" filter="url(#ledCoreBlur)" />
-                        <polygon points="80,110 256,190 250,225 74,145" fill="rgba(140, 205, 255, 0.9)" filter="url(#ledWashBlur)" />
-                      </g>
-                      <g style={{ mixBlendMode: 'screen' }}>
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="#F0F8FF" strokeWidth="6" />
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="#B8DEFF" strokeWidth="20" opacity="0.65" filter="url(#ledCoreBlur)" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="#F0F8FF" strokeWidth="5" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="#B8DEFF" strokeWidth="18" opacity="0.55" filter="url(#ledCoreBlur)" />
-                      </g>
-                    </>
-                  )}
-
-                  {/* 'ice': Contemporary Architectural Cyan / Ice Blue */}
-                  {simLedKelvin === 'ice' && (
-                    <>
-                      <g style={{ mixBlendMode: 'color' }}>
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(0, 220, 255, 0.98)" strokeWidth="28" filter="url(#ledCoreBlur)" />
-                        <rect x="48" y="0" width="95" height="510" fill="rgba(0, 220, 255, 0.92)" filter="url(#ledWashBlur)" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(0, 220, 255, 0.98)" strokeWidth="24" filter="url(#ledCoreBlur)" />
-                        <polygon points="80,110 256,190 250,225 74,145" fill="rgba(0, 220, 255, 0.92)" filter="url(#ledWashBlur)" />
-                      </g>
-                      <g style={{ mixBlendMode: 'screen' }}>
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="#E0F7FF" strokeWidth="6" />
-                        <line x1="76" y1="0" x2="76" y2="510" stroke="#00D0FF" strokeWidth="22" opacity="0.75" filter="url(#ledCoreBlur)" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="#E0F7FF" strokeWidth="5" />
-                        <line x1="84" y1="124" x2="250" y2="205" stroke="#00D0FF" strokeWidth="18" opacity="0.65" filter="url(#ledCoreBlur)" />
-                      </g>
-                    </>
-                  )}
-
-                  {/* 3000K: Warm Golden Amber Enrichment */}
-                  {simLedKelvin === 3000 && (
-                    <g style={{ mixBlendMode: 'screen' }}>
-                      <line x1="76" y1="0" x2="76" y2="510" stroke="#FFA834" strokeWidth="16" opacity="0.38" filter="url(#ledCoreBlur)" />
-                      <line x1="84" y1="124" x2="250" y2="205" stroke="#FFA834" strokeWidth="14" opacity="0.32" filter="url(#ledCoreBlur)" />
-                    </g>
-                  )}
-                </g>
-              )}
-            </svg>
-
-            {/* Subtle Room Ambient Overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none transition-colors duration-500 ease-in-out"
-              style={{ backgroundColor: currentKelvinInfo.ambientBg }}
-            />
+              )
+            })}
 
             {/* Top Bar Indicators (Inside Canvas) */}
             <div className="absolute top-3.5 sm:top-4 right-3.5 sm:right-4 left-3.5 sm:left-4 z-20 flex items-center justify-between pointer-events-none">
