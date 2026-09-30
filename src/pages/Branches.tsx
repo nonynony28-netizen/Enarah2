@@ -1,155 +1,157 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { MapPin, Phone, Clock, ArrowRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { MapPin, Phone, Clock, ArrowRight, ExternalLink, Navigation } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
-
-// نمط الوهج الأزرق للعناوين الفخمة
-const glowingTitleStyle = {
-  textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
-}
-
-// مكون الأنيميشن السريع
-function FadeIn({
-  children,
-  delay = 0,
-}: {
-  children: React.ReactNode
-  delay?: number
-}) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '50px' })
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      style={{ willChange: "opacity, transform" }} // لتسريع العرض
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 export default function Branches() {
   const { isAr } = useLanguage()
 
   const branches = [
     {
-      name: isAr ? 'فرع بنغازي - الليثي' : 'Benghazi Branch - Al-Laythi',
-      address: isAr ? 'مقابل مدرسة العيد الفضي' : 'Opposite Silver Feast School',
-      phones: ['0916580068', '0926580068'],
-      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+      id: 'tripoli',
+      name: isAr ? 'المقر الرئيسي والمعرض المركزي — طرابلس' : 'Tripoli Main Showroom & HQ',
+      tag: isAr ? 'المعرض الرئيسي' : 'Flagship Showroom',
+      address: isAr
+        ? 'طريق 20 رمضان (11 يونيو سابقاً) بالقرب من معهد النفط، طرابلس'
+        : '20 Ramadan Road (formerly June 11), near Oil Institute, Tripoli',
+      phones: ['+218912121303', '+218916580068'],
+      hours: isAr ? 'السبت — الخميس: 9:00 ص – 8:30 م' : 'Sat — Thu: 9:00 AM – 8:30 PM',
+      mapsUrl: 'https://maps.google.com/?q=32.8687,13.1672'
     },
     {
-      name: isAr ? 'فرع البيضاء الأول' : 'First Al-Bayda Branch',
-      address: isAr ? 'مفترق رويفع الأنصاري' : 'Ruwaifa Al-Ansari Intersection',
-      phones: ['0911910600', '0921910600'],
-      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+      id: 'benghazi',
+      name: isAr ? 'معرض بنغازي — الليثي' : 'Benghazi Branch — Al-Laythi',
+      tag: isAr ? 'فرع بنغازي' : 'Benghazi Branch',
+      address: isAr ? 'الليثي، مقابل مدرسة العيد الفضي' : 'Al-Laythi, Opposite Silver Feast School',
+      phones: ['+218916580068', '+218926580068'],
+      hours: isAr ? 'السبت — الخميس: 8:30 ص – 9:00 م' : 'Sat — Thu: 8:30 AM – 9:00 PM',
+      mapsUrl: 'https://maps.google.com/?q=Benghazi,Libya'
     },
     {
-      name: isAr ? 'فرع البيضاء الثاني' : 'Second Al-Bayda Branch',
-      address: isAr ? 'مقابل مول البكوش' : 'Opposite Al-Bakoosh Mall',
-      phones: ['0919219100', '0929219100'],
-      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+      id: 'bayda-1',
+      name: isAr ? 'معرض البيضاء — مفترق رويفع الأنصاري' : 'Al-Bayda Branch 1 — Ruwaifa',
+      tag: isAr ? 'فرع البيضاء' : 'Al-Bayda Branch',
+      address: isAr ? 'مفترق رويفع الأنصاري، البيضاء' : 'Ruwaifa Al-Ansari Intersection, Al-Bayda',
+      phones: ['+218911910600', '+218921910600'],
+      hours: isAr ? 'السبت — الخميس: 8:30 ص – 9:00 م' : 'Sat — Thu: 8:30 AM – 9:00 PM',
+      mapsUrl: 'https://maps.google.com/?q=Bayda,Libya'
     },
+    {
+      id: 'bayda-2',
+      name: isAr ? 'معرض البيضاء — مقابل مول البكوش' : 'Al-Bayda Branch 2 — Al-Bakoosh',
+      tag: isAr ? 'فرع البيضاء' : 'Al-Bayda Branch',
+      address: isAr ? 'مقابل مول البكوش، البيضاء' : 'Opposite Al-Bakoosh Mall, Al-Bayda',
+      phones: ['+218919219100', '+218929219100'],
+      hours: isAr ? 'السبت — الخميس: 8:30 ص – 9:00 م' : 'Sat — Thu: 8:30 AM – 9:00 PM',
+      mapsUrl: 'https://maps.google.com/?q=Bayda,Libya'
+    }
   ]
 
   return (
-    <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
-      
-      {/* شبكة هندسية خفيفة جداً في الخلفية للفخامة */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+    <div
+      dir="rtl"
+      className="min-h-screen bg-[#F7F8FA] text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white pt-24 pb-28"
+    >
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+        {/* Back Link */}
+        <div className="mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors"
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
+          </Link>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Editorial Hero Header */}
+        <div className="mb-14 sm:mb-18 max-w-3xl">
+          <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
+            SHOWROOMS & LOCATIONS
+          </span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
+            شبكة معارضنا وفروعنا
+          </h1>
+          <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
+            نسعد باستقبالكم في معارضنا للتعرف على تشكيلات الإنارة المعمارية وتجربة محاكاة درجات حرارة الضوء واستشارة مهندسينا المختصين.
+          </p>
+        </div>
 
-        {/* زر الرجوع للرئيسية */}
-        <FadeIn>
-          <div className="mb-6 flex justify-start">
-            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm">
-              <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
-            </Link>
-          </div>
-        </FadeIn>
-
-        {/* عنوان الصفحة */}
-        <FadeIn delay={0.1}>
-          <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
-              {isAr ? (
-                <>فرو<span className="text-blue-600">عنا</span></>
-              ) : (
-                <>Our <span className="text-blue-600">Branches</span></>
-              )}
-            </h1>
-
-            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg mb-6 font-normal">
-              {isAr 
-                ? 'نخدمكم عبر فروعنا داخل ليبيا لتوفير أفضل حلول الإضاءة والمواد الكهربائية'
-                : 'We serve you through our branches in Libya to provide the best lighting and electrical solutions'
-              }
-            </p>
-
-            <div className="flex items-center justify-center gap-1.5 mt-5">
-              <div className="w-16 h-[2px] bg-slate-300" />
-              <div className="w-2 h-2 rounded-full bg-blue-600 ring-4 ring-blue-100" />
-              <div className="w-16 h-[2px] bg-slate-300" />
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* شبكة الفروع */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {branches.map((branch, i) => (
-            <FadeIn key={branch.name} delay={0.2 + (i * 0.1)}>
-              <div className="bg-white border border-slate-200 hover:border-blue-500 rounded-2xl p-7 transition-all duration-200 shadow-sm hover:shadow-xl h-full flex flex-col">
-
-                {/* عنوان الفرع */}
-                <div className="flex items-center gap-3.5 mb-6">
-                  <div className="w-12 h-12 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center text-blue-600">
-                    <MapPin className="w-6 h-6" />
-                  </div>
-
-                  <h3 className="text-xl font-bold text-slate-900">
-                    {branch.name}
-                  </h3>
+        {/* Showrooms Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+          {branches.map((b) => (
+            <div
+              key={b.id}
+              className="bg-white rounded-3xl p-8 border border-[#E7EAF0] shadow-xs hover:border-[#0062D2]/40 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <span className="text-xs font-semibold text-[#0062D2] bg-[#EBF3FC] px-3.5 py-1 rounded-full border border-[#0062D2]/15">
+                    {b.tag}
+                  </span>
+                  <a
+                    href={b.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-semibold text-[#68717D] hover:text-[#0062D2] inline-flex items-center gap-1.5 transition-colors"
+                  >
+                    <span>الاتجاهات</span>
+                    <Navigation className="w-3.5 h-3.5" />
+                  </a>
                 </div>
 
-                {/* تفاصيل الفرع */}
-                <div className="space-y-3.5 flex-grow">
+                <h3 className="text-xl font-semibold text-[#15191E] mb-6 tracking-tight">
+                  {b.name}
+                </h3>
 
-                  {/* العنوان */}
-                  <div className="flex items-start gap-3 text-slate-700 text-sm leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <MapPin className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
-                    <span>{branch.address}</span>
+                <div className="space-y-4 text-xs sm:text-sm text-[#68717D]">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
+                    <span className="leading-relaxed">{b.address}</span>
                   </div>
 
-                  {/* الهواتف */}
-                  <div className="flex items-start gap-3 text-slate-700 text-sm leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <Phone className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
+                    <span>{b.hours}</span>
+                  </div>
 
-                    <div className="flex flex-col gap-1 font-mono font-bold text-base text-slate-900">
-                      {branch.phones.map((phone) => (
-                        <span key={phone} className="hover:text-blue-600 cursor-pointer transition-colors" dir="ltr">{phone}</span>
+                  <div className="flex items-start gap-3">
+                    <Phone className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
+                    <div className="flex flex-wrap gap-x-4 gap-y-1" dir="ltr">
+                      {b.phones.map((p, i) => (
+                        <a
+                          key={i}
+                          href={`tel:${p}`}
+                          className="font-semibold text-[#15191E] hover:text-[#0062D2] transition-colors"
+                        >
+                          {p}
+                        </a>
                       ))}
                     </div>
                   </div>
-
-                  {/* أوقات العمل */}
-                  <div className="flex items-start gap-3 text-slate-700 text-sm leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <Clock className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
-                    <span>{branch.hours}</span>
-                  </div>
-
                 </div>
               </div>
-            </FadeIn>
+
+              <div className="mt-8 pt-6 border-t border-[#E7EAF0] flex items-center justify-between">
+                <a
+                  href={`tel:${b.phones[0]}`}
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-[#0062D2] hover:text-[#0047A5]"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>اتصال مباشر بالمعرض</span>
+                </a>
+                <a
+                  href={b.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-[#68717D] hover:text-[#15191E] inline-flex items-center gap-1"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
           ))}
         </div>
-
       </div>
     </div>
   )

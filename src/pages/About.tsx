@@ -1,187 +1,232 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { Target, Eye, Heart, Lightbulb, ArrowRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import {
+  Award,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle2,
+  Calendar,
+  Building2,
+  Cpu
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
-
-// نمط الوهج الأزرق للعناوين الفخمة
-const glowingTitleStyle = {
-  textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
-}
-
-// مكون الأنيميشن السريع
-function FadeIn({
-  children,
-  delay = 0,
-}: {
-  children: React.ReactNode
-  delay?: number
-}) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '50px' })
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      style={{ willChange: "opacity, transform" }} // تسريع الأداء
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 export default function About() {
   const { isAr } = useLanguage()
 
+  const milestones = [
+    {
+      year: '1988',
+      title: isAr ? 'التأسيس والانطلاقة الأولى' : 'Establishment & Inception',
+      desc: isAr
+        ? 'انطلقت شركة الإنارة الحديثة في طرابلس برؤية معمارية تضع الجودة والموثوقية في قلب التأسيس الكهربائي.'
+        : 'Founded in Tripoli with an architectural vision placing quality at the core of electrical systems.'
+    },
+    {
+      year: '2005',
+      title: isAr ? 'الشراكات الأوروبية والدولية' : 'European & Global Alliances',
+      desc: isAr
+        ? 'توسيع نطاق الأعمال واعتماد شراكات توزيع رئيسية مع نخبة مصانع الإضاءة والمفاتيح في فرنسا وإيطاليا وألمانيا.'
+        : 'Expanded operations, securing key distribution alliances with top French, Italian, and European manufacturers.'
+    },
+    {
+      year: '2016',
+      title: isAr ? 'دخول عصر الإنارة المعمارية المتطورة' : 'Architectural LED Revolution',
+      desc: isAr
+        ? 'إدخال أنظمة الإنارة الخطية (LED Profiles)، والسبوت المعماري المانع للتوهج، وحلول الطاقة الذكية.'
+        : 'Pioneered linear architectural LED profiles, anti-glare optics, and energy-efficient systems.'
+    },
+    {
+      year: '2024+',
+      title: isAr ? 'ريادة كبرى المشاريع والصروح' : 'Landmark Projects Leadership',
+      desc: isAr
+        ? 'توريد وتنفيذ منظومات الإنارة والكهرباء لأبرز المجمعات التجارية، المصحات الطبية، والمباني الفاخرة.'
+        : 'Successfully executing illumination for prominent commercial malls, medical clinics, and luxury villas.'
+    }
+  ]
+
+  const pillars = [
+    {
+      icon: Cpu,
+      title: isAr ? 'الدقة الهندسية وتوزيع الضوء' : 'Engineering Photometrics',
+      desc: isAr
+        ? 'نتعامل مع الضوء كعلم هندسي دقيق؛ نحسب درجات الانتشار وزوايا الانعكاس لتوفير بيئة بصرية مريحة بلا توهج.'
+        : 'Light treated as an exact science; precision beam angles and photometrics for supreme visual comfort.'
+    },
+    {
+      icon: ShieldCheck,
+      title: isAr ? 'الجودة والسلامة غير القابلة للمساومة' : 'Uncompromising Safety',
+      desc: isAr
+        ? 'منتجاتنا مطابقة للمواصفات القياسية الأوروبية والعالمية، من النحاس النقي 100% إلى مواد التأسيس المقاومة للحريق.'
+        : 'Certified to European and international standards, from 100% pure copper to fire-retardant enclosures.'
+    },
+    {
+      icon: Building2,
+      title: isAr ? 'شراكات مع كبرى المصانع العالمية' : 'World-Class Partnerships',
+      desc: isAr
+        ? 'وكلاء وموزعون موثوقون لعلامات مثل Legrand و Philips و Gewiss و CHINT لضمان أصالة المنتج وكفاءته.'
+        : 'Authorized partners for Legrand, Philips, Gewiss, CHINT and more, guaranteeing authentic performance.'
+    }
+  ]
+
   return (
-    <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
-      
-      {/* شبكة هندسية خفيفة جداً في الخلفية للفخامة */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
-        {/* زر الرجوع للرئيسية */}
-        <FadeIn>
-          <div className={`mb-6 flex ${isAr ? 'justify-start' : 'justify-start'}`}>
-            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm">
-              <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
-            </Link>
-          </div>
-        </FadeIn>
-
-        {/* عنوان الصفحة */}
-        <FadeIn delay={0.1}>
-          <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
-              {isAr ? (
-                <>من <span className="text-blue-600">نحن</span></>
-              ) : (
-                <>About <span className="text-blue-600">Us</span></>
-              )}
-            </h1>
-
-            <div className="flex items-center justify-center gap-1.5 mt-5">
-              <div className="w-16 h-[2px] bg-slate-300" />
-              <div className="w-2 h-2 rounded-full bg-blue-600 ring-4 ring-blue-100" />
-              <div className="w-16 h-[2px] bg-slate-300" />
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* بطاقة من نحن الأساسية */}
-        <FadeIn delay={0.2}>
-          <div className="bg-white border border-slate-200 rounded-2xl p-8 md:p-12 mb-12 shadow-sm">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center text-blue-600">
-                <Lightbulb className="w-6 h-6" />
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                {isAr ? 'الإنارة الحديثة' : 'ENARAHMODERN'}
-              </h2>
-            </div>
-
-            <p className="text-slate-700 text-base md:text-lg leading-relaxed mb-6 font-normal">
-              {isAr 
-                ? 'نحن وجهتك الأولى والموثوقة لجميع احتياجات الإضاءة والمواد الكهربائية في ليبيا. منذ تأسيسنا، نسعى دائماً لتقديم أجود المنتجات العالمية بأسعار تنافسية، مع التركيز على تقديم تجربة عملاء استثنائية وحلول احترافية متكاملة.'
-                : 'We are your primary and trusted destination for all lighting and electrical needs in Libya. Since our establishment, we have always strived to offer the highest quality global products at competitive prices, with a focus on providing an exceptional customer experience and integrated professional solutions.'
-              }
-            </p>
-
-            <p className="text-slate-700 text-base md:text-lg leading-relaxed font-normal">
-              {isAr
-                ? 'نختار منتجاتنا بعناية فائقة من أفضل المصادر والماركات العالمية، ونحرص على توفير حلول متكاملة تناسب كافة المشاريع السكنية والتجارية داخل ليبيا بأعلى معايير الجودة والموثوقية.'
-                : 'We select our products with extreme care from the best global sources and brands, ensuring the provision of integrated solutions suitable for all residential and commercial projects in Libya with the highest quality and reliability standards.'
-              }
-            </p>
-          </div>
-        </FadeIn>
-
-        {/* القيم والرؤية والرسالة */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {[
-            {
-              icon: Target,
-              title: isAr ? 'رسالتنا' : 'Our Mission',
-              desc: isAr 
-                ? 'توفير حلول إضاءة وكهرباء عالية الجودة تلبي احتياجات عملائنا وتتجاوز توقعاتهم.'
-                : 'Providing high-quality lighting and electrical solutions that meet our clients\' needs and exceed their expectations.',
-            },
-            {
-              icon: Eye,
-              title: isAr ? 'رؤيتنا' : 'Our Vision',
-              desc: isAr
-                ? 'أن نكون الشريك الأول في ليبيا لتقديم حلول الإضاءة والكهرباء المتكاملة.'
-                : 'To be the premier partner in Libya for providing integrated lighting and electrical solutions.',
-            },
-            {
-              icon: Heart,
-              title: isAr ? 'قيمنا' : 'Our Values',
-              desc: isAr
-                ? 'الجودة، الأمانة، الابتكار، والالتزام بأعلى معايير الخدمة والاحترافية.'
-                : 'Quality, honesty, innovation, and commitment to the highest standards of service and professionalism.',
-            },
-          ].map((item, i) => (
-            <FadeIn key={item.title} delay={0.3 + (i * 0.1)}>
-              <div className="bg-white border border-slate-200 hover:border-blue-500 rounded-2xl p-7 transition-all duration-200 h-full shadow-sm hover:shadow-lg">
-                <div className="w-12 h-12 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center mb-6 text-blue-600">
-                  <item.icon className="w-6 h-6" />
-                </div>
-
-                <h3 className="text-xl font-bold text-slate-900 mb-3">
-                  {item.title}
-                </h3>
-
-                <p className="text-slate-600 text-sm leading-relaxed font-normal">
-                  {item.desc}
-                </p>
-              </div>
-            </FadeIn>
-          ))}
+    <div
+      dir="rtl"
+      className="min-h-screen bg-[#F7F8FA] text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white pt-24 pb-28"
+    >
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+        {/* Back Link */}
+        <div className="mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors"
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
+          </Link>
         </div>
 
-        {/* لماذا نحن الخيار الأمثل */}
-        <FadeIn delay={0.5}>
-          <div className="bg-white border border-slate-200 rounded-2xl p-8 md:p-12 shadow-sm relative overflow-hidden">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8 relative z-10 flex items-center gap-3">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full" />
-              {isAr ? 'لماذا نحن الخيار الأمثل؟' : 'Why Choose Us?'}
-            </h3>
+        {/* Editorial Hero Header */}
+        <div className="mb-16 sm:mb-20 max-w-3xl">
+          <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
+            SINCE 1988
+          </span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
+            خبرة تمتد لأكثر من ثلاثة عقود
+          </h1>
+          <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
+            منذ أكثر من 35 عاماً، نكرّس خبرتنا الهندسية في توفير أرقى حلول الإنارة المعمارية والأنظمة الكهربائية المعتمدة في ليبيا.
+          </p>
+        </div>
 
-            <ul className="space-y-4 relative z-10">
-              {(isAr 
-                ? [
-                    'منتجات أصلية 100% من ماركات عالمية موثوقة',
-                    'فريق فني متخصص في التركيب والاستشارات',
-                    'ضمان شامل على منتجات شركة "wellmax"',
-                    'توفير حلول متكاملة للمشاريع السكنية والتجارية',
-                    'أسعار تنافسية مع جودة استثنائية',
-                  ]
-                : [
-                    '100% original products from trusted global brands',
-                    'Specialized technical team for installation and consultation',
-                    'Comprehensive warranty on "wellmax" products',
-                    'Integrated solutions for residential and commercial projects',
-                    'Competitive prices with exceptional quality',
-                  ]
-              ).map((point) => (
-                <li
-                  key={point}
-                  className="flex items-center gap-3 text-slate-700 text-sm md:text-base font-normal"
-                >
-                  <div className="w-2 h-2 bg-blue-600 rounded-full shrink-0" />
-                  {point}
-                </li>
-              ))}
-            </ul>
+        {/* Brand Story Asymmetric Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center bg-white rounded-3xl p-8 sm:p-12 border border-[#E7EAF0] shadow-sm mb-20">
+          <div className="lg:col-span-6 space-y-6 text-[#15191E]">
+            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block">
+              OUR ARCHITECTURAL PHILOSOPHY
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-semibold tracking-tight text-[#15191E] leading-snug">
+              الضوء يشكّل المكان ويصنع الفارق
+            </h2>
+            <div className="space-y-4 text-sm sm:text-base text-[#68717D] leading-relaxed font-normal">
+              <p>
+                تأسست شركة الإنارة الحديثة في طرابلس عام 1988، بهدف الارتقاء بمفهوم الإضاءة من مجرد عنصر وظيفي تقليدي إلى قيمة معمارية محورية تُبرز جمال الفراغ وتمنحه شخصيته المستقلة.
+              </p>
+              <p>
+                نواكب باستمرار التطور التقني المتسارع في عالم الإضاءة والتحكم الذكي، ونوفر للمهندسين الاستشاريين والمقاولين وأصحاب الذوق الرفيع باقة متكاملة من المنتجات الأصلية المطابقة للمواصفات العالمية.
+              </p>
+            </div>
+
+            {/* Metrics */}
+            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-[#E7EAF0]">
+              <div>
+                <span className="text-3xl font-bold text-[#15191E] block">+35</span>
+                <span className="text-xs text-[#68717D] mt-1 block">عاماً من الريادة</span>
+              </div>
+              <div>
+                <span className="text-3xl font-bold text-[#15191E] block">+500</span>
+                <span className="text-xs text-[#68717D] mt-1 block">مشروعاً ناجحاً</span>
+              </div>
+              <div>
+                <span className="text-3xl font-bold text-[#15191E] block">+15</span>
+                <span className="text-xs text-[#68717D] mt-1 block">علامة دولية</span>
+              </div>
+            </div>
           </div>
-        </FadeIn>
 
+          <div className="lg:col-span-6 relative">
+            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-[#E7EAF0] shadow-md">
+              <img
+                src="/images/architectural-hero.jpg"
+                alt="Enarah Modern Architectural Interior"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Core Pillars */}
+        <div className="mb-24">
+          <div className="text-center max-w-xl mx-auto mb-14">
+            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
+              CORE PRINCIPLES
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight">
+              ركائز عملنا الهندسي
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {pillars.map((item, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-8 border border-[#E7EAF0] shadow-xs hover:border-[#0062D2]/30 transition-all duration-200"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#EBF3FC] text-[#0062D2] flex items-center justify-center mb-6">
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-[#15191E] mb-3">{item.title}</h3>
+                <p className="text-sm text-[#68717D] leading-relaxed font-normal">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Chronological Timeline */}
+        <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#E7EAF0] shadow-sm mb-20">
+          <div className="max-w-xl mb-12">
+            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
+              OUR JOURNEY
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight">
+              محطات مضيئة في مسيرتنا
+            </h2>
+          </div>
+
+          <div className="space-y-8 relative before:absolute before:inset-0 before:right-4 md:before:right-32 before:w-0.5 before:bg-[#E7EAF0]">
+            {milestones.map((m, idx) => (
+              <div key={idx} className="relative flex flex-col md:flex-row items-start gap-6 md:gap-10">
+                <div className="md:w-28 shrink-0 flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-[#0062D2] text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">
+                    {idx + 1}
+                  </span>
+                  <span className="text-xl font-bold text-[#15191E]">{m.year}</span>
+                </div>
+                <div className="flex-grow bg-[#F7F8FA] p-6 rounded-2xl border border-[#E7EAF0]">
+                  <h4 className="text-base font-semibold text-[#15191E] mb-2">{m.title}</h4>
+                  <p className="text-sm text-[#68717D] leading-relaxed font-normal">{m.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Strip */}
+        <div className="bg-[#101820] text-white rounded-3xl p-10 sm:p-14 text-center">
+          <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
+            هل تخطط لمشروعك القادم؟
+          </h3>
+          <p className="text-sm sm:text-base text-white/80 max-w-lg mx-auto mb-8 font-normal">
+            تواصل مع مهندسينا للحصول على استشارة متخصصة ودراسة ضوئية شاملة لمساحتك.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs sm:text-sm font-semibold rounded-full transition-colors"
+            >
+              <span>تواصل مع خبرائنا</span>
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/branches"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold rounded-full transition-colors border border-white/15"
+            >
+              <span>فروعنا ومعارضنا</span>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )

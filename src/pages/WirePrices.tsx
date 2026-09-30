@@ -184,51 +184,37 @@ export default function WirePrices() {
     : ''
 
   return (
-    <div className="pt-24 md:pt-32 pb-36 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
-      
-      {/* شبكة هندسية خفيفة جداً في الخلفية */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div className="pt-24 md:pt-32 pb-36 bg-[#F7F8FA] min-h-screen relative overflow-hidden text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
         
         {/* زر الرجوع للرئيسية */}
         <FadeIn>
           <div className="mb-6 flex justify-start">
-            <Link to="/" className={`inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm ${
-              isAr ? 'flex-row' : 'flex-row-reverse'
-            }`}>
-              <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
+            <Link to="/" className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors">
+              <ArrowRight className={`w-3.5 h-3.5 ${isAr ? '' : 'rotate-180'}`} />
+              <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
             </Link>
           </div>
         </FadeIn>
 
-        {/* رأس الصفحة */}
+        {/* رأس الصفحة التحريري المعماري */}
         <FadeIn delay={0.1}>
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center justify-center p-3.5 bg-blue-50 border border-blue-200 rounded-2xl mb-6 shadow-sm">
-              <Zap className="w-7 h-7 text-blue-600" />
-            </div>
-            
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
-              {isAr ? 'أسعار الأسلاك' : 'Wire Prices'}{' '}
-              <span className="text-blue-600">
-                {isAr ? 'الإيطالية' : 'Italian'}
-              </span>
+          <div className="mb-12 max-w-3xl">
+            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
+              CERTIFIED COPPER CABLES
+            </span>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
+              {isAr ? 'مؤشر أسعار الأسلاك والكوابل' : 'Live Certified Wire Index'}
             </h1>
-            
-            <p className="text-slate-600 max-w-2xl mx-auto text-base md:text-lg mb-8 font-normal">
+            <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed mb-6">
               {isAr 
-                ? 'نقدم لكم التحديث اليومي لأسعار الأسلاك الكهربائية الإيطالية المعتمدة، لضمان أعلى معايير الجودة لمشاريعكم.'
-                : 'Providing you with the daily certified Italian electrical wire price updates, ensuring the highest standards of safety and quality for your projects.'
-              }
+                ? 'نقدم لكم التحديث اليومي الشفاف لأسعار الأسلاك والكوابل الإيطالية الأصلية، لضمان أعلى معايير الأمان والتوصيل لمشاريعكم.'
+                : 'Providing live daily certified Italian wire price updates, ensuring the highest standards of safety and quality for your projects.'}
             </p>
 
-            <div className={`inline-flex items-center gap-2.5 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-semibold text-sm shadow-sm ${
-              isAr ? 'flex-row' : 'flex-row-reverse'
-            }`}>
-              <Calendar className="w-4 h-4 text-blue-600" />
-              <span>{isAr ? 'تحديث اليوم:' : 'Today\'s Update:'} {currentDate}</span>
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-white border border-[#E7EAF0] rounded-full text-[#68717D] font-medium text-xs shadow-xs">
+              <Calendar className="w-3.5 h-3.5 text-[#0062D2]" />
+              <span>{isAr ? 'تحديث اليوم:' : "Today's Update:"} {currentDate}</span>
             </div>
           </div>
         </FadeIn>

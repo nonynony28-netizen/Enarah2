@@ -408,40 +408,31 @@ export default function Products() {
   }, [categoryGroups, selectedCategory, isAr])
 
   return (
-    <div className="pt-24 md:pt-32 pb-36 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
-      {/* شبكة هندسية خلفية دافئة */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div className="pt-24 md:pt-32 pb-36 bg-[#F7F8FA] min-h-screen relative overflow-hidden text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
         
         {/* زر العودة */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-6 flex justify-start">
-          <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm">
-            <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-            {isAr ? 'العودة للرئيسية' : 'Back to Home'}
+          <Link to="/" className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors">
+            <ArrowRight className={`w-3.5 h-3.5 ${isAr ? '' : 'rotate-180'}`} />
+            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
           </Link>
         </motion.div>
 
-        {/* عنوان المعرض الرئيسي بتصميم عالمي فخم */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-10 md:mb-12 relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-36 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="relative z-10">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight tracking-tight text-slate-900">
-              {isAr ? (
-                <>متجر <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">الإنارة والكهرباء</span></>
-              ) : (
-                <>Lighting & Electrical <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Store</span></>
-              )}
-            </h1>
-            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
-              {isAr 
-                ? 'تصفح قائمة الأسلاك والكوابل الإيطالية والتركية بأعلى معايير الجودة وأفضل الأسعار'
-                : 'Browse certified Italian and Turkish wires and cables with the highest quality standards and best prices'
-              }
-            </p>
-          </div>
-        </motion.div>
+        {/* عنوان المعرض التحريري المعماري */}
+        <div className="mb-12 max-w-3xl">
+          <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
+            LIGHTING & ELECTRICAL SOLUTIONS
+          </span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
+            {isAr ? 'حلول الإضاءة والأنظمة المعتمدة' : 'Certified Lighting & Electrical Systems'}
+          </h1>
+          <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
+            {isAr 
+              ? 'تصفح قائمة الأسلاك النحاسية، الكوابل، والتخفيضات الحصرية المطابقة لأعلى المواصفات القياسية الأوروبية.'
+              : 'Explore certified pure copper wires, cables, and curated promotional architectural lighting.'}
+          </p>
+        </div>
 
         {/* 🔍 1. خانة البحث الفوري الاحترافية */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="relative max-w-2xl mx-auto mb-8">
