@@ -26,7 +26,9 @@ import {
   Flame,
   Power,
   Lightbulb,
-  CheckCircle2
+  CheckCircle2,
+  Sliders,
+  Zap
 } from 'lucide-react'
 import type { ProjectItem } from '../data/projectsData'
 import {
@@ -243,9 +245,131 @@ export default function HomeCleanWhitePreview() {
     }
   }, [])
 
-  // Interactive Simulator States (Section 06 & 07)
-  const [simIsOn, setSimIsOn] = useState(true)
-  const [simKelvin, setSimKelvin] = useState<3000 | 4000 | 6000>(3000)
+  // Interactive Simulator States (Section 06: Fixture-Level Controls)
+  const [simMasterOn, setSimMasterOn] = useState(true)
+  const [simSpotlightsOn, setSimSpotlightsOn] = useState(true)
+  const [simSpotlightsKelvin, setSimSpotlightsKelvin] = useState<3000 | 4000 | 6000>(3000)
+  const [simLedOn, setSimLedOn] = useState(true)
+  const [simLedKelvin, setSimLedKelvin] = useState<3000 | 4000 | 6000 | 'ice'>(3000)
+  const [simDockMode, setSimDockMode] = useState<'fixtures' | 'presets'>('fixtures')
+
+  // Master Power Toggle
+  const toggleSimMaster = () => {
+    if (simMasterOn && (simSpotlightsOn || simLedOn)) {
+      setSimMasterOn(false)
+    } else {
+      setSimMasterOn(true)
+      setSimSpotlightsOn(true)
+      setSimLedOn(true)
+    }
+  }
+
+  // Quick Presets Handler
+  const applySimPreset = (presetId: string) => {
+    setSimMasterOn(true)
+    if (presetId === 'all-3000') {
+      setSimSpotlightsOn(true)
+      setSimSpotlightsKelvin(3000)
+      setSimLedOn(true)
+      setSimLedKelvin(3000)
+    } else if (presetId === 'all-4000') {
+      setSimSpotlightsOn(true)
+      setSimSpotlightsKelvin(4000)
+      setSimLedOn(true)
+      setSimLedKelvin(4000)
+    } else if (presetId === 'all-6000') {
+      setSimSpotlightsOn(true)
+      setSimSpotlightsKelvin(6000)
+      setSimLedOn(true)
+      setSimLedKelvin(6000)
+    } else if (presetId === 'led-only') {
+      setSimSpotlightsOn(false)
+      setSimLedOn(true)
+    } else if (presetId === 'spots-only') {
+      setSimSpotlightsOn(true)
+      setSimLedOn(false)
+    }
+  }
+
+  // Dynamic Scene Info for Top Indicators & Room Ambience
+  const getSimSceneInfo = () => {
+    const isAnyOn = simMasterOn && (simSpotlightsOn || simLedOn)
+    if (!isAnyOn) {
+      return {
+        badgeText: isAr ? 'الإنارة مطفأة' : 'Lights OFF',
+        badgeColor: '#64748B',
+        desc: isAr
+          ? 'المساحة في الإضاءة المسائية الهادئة؛ انقر على السبوتات أو شريط الليد لتشغيلهما ومشاهدة التأثير الفوري.'
+          : 'Space in natural ambient dusk; click on fixture controls below to illuminate.',
+        ambientBg: 'rgba(0, 0, 0, 0.42)',
+        roomFilter: 'brightness(0.72) saturate(0.85)'
+      }
+    }
+
+    if (simSpotlightsOn && simLedOn) {
+      if (simSpotlightsKelvin === simLedKelvin && simLedKelvin !== 'ice') {
+        const k = simSpotlightsKelvin
+        return {
+          badgeText: isAr
+            ? `${k}K — ${k === 3000 ? 'أصفر دافئ' : k === 4000 ? 'شمسي طبيعي' : 'أبيض نهاري'}`
+            : `${k}K Synchronized`,
+          badgeColor: k === 3000 ? '#FFB85A' : k === 4000 ? '#FFF2D6' : '#D8ECFF',
+          desc: isAr
+            ? k === 3000
+              ? 'إنارة متناسقة 3000K: السبوتات وشريط الليد يبرزان دفء خشب الجوز وحجر الترافرتين الفاخر.'
+              : k === 4000
+              ? 'إنارة معمارية 4000K: توازن طبيعي قياسي يظهر خامات الحجر والخشب بحيادية واقعية تامة.'
+              : 'إنارة نهارية 6000K: وضوح بصري فائق وإشراقة عصرية تمنح المساحة اتساعاً وحيوية.'
+            : 'Synchronized architectural lighting across stone wall spotlights and wood wall LED cove.',
+          ambientBg:
+            k === 3000
+              ? 'rgba(255, 175, 75, 0.12)'
+              : k === 4000
+              ? 'rgba(255, 245, 220, 0.06)'
+              : 'rgba(215, 235, 255, 0.10)',
+          roomFilter: 'brightness(1.02) saturate(1.04)'
+        }
+      } else {
+        return {
+          badgeText: isAr
+            ? `سبوتات ${simSpotlightsKelvin}K • ليد ${simLedKelvin === 'ice' ? 'ثلجي معاصر' : simLedKelvin + 'K'}`
+            : 'Custom Architectural Scene',
+          badgeColor: '#0062D2',
+          desc: isAr
+            ? 'تكوين معماري مخصص: دمج درجات حرارة مختلفة للسبوتات وشريط الليد لإبراز تفاصيل الديكور.'
+            : 'Custom architectural composition blending multiple color temperatures.',
+          ambientBg: 'rgba(255, 240, 220, 0.08)',
+          roomFilter: 'brightness(1.02) saturate(1.03)'
+        }
+      }
+    }
+
+    if (simSpotlightsOn && !simLedOn) {
+      return {
+        badgeText: isAr ? `سبوتات حجر الترافرتين (${simSpotlightsKelvin}K)` : `Spotlights Only (${simSpotlightsKelvin}K)`,
+        badgeColor: simSpotlightsKelvin === 3000 ? '#FFB85A' : simSpotlightsKelvin === 4000 ? '#FFF2D6' : '#D8ECFF',
+        desc: isAr
+          ? 'تركيز بصري معماري على الجدار الحجري يبرز التدرجات الظلية وملمس الحجر الطبيعي.'
+          : 'Focused architectural illumination on stone wall texture, highlighting natural scallops.',
+        ambientBg: 'rgba(255, 210, 160, 0.06)',
+        roomFilter: 'brightness(0.94) saturate(0.98)'
+      }
+    }
+
+    return {
+      badgeText: isAr
+        ? `شريط ليد الجدار الخشبي (${simLedKelvin === 'ice' ? 'ثلجي معاصر' : simLedKelvin + 'K'})`
+        : `LED Cove Only (${simLedKelvin})`,
+      badgeColor: simLedKelvin === 'ice' ? '#38BDF8' : simLedKelvin === 3000 ? '#FFB85A' : simLedKelvin === 4000 ? '#FFF2D6' : '#D8ECFF',
+      desc: isAr
+        ? 'إضاءة مخفية (Cove Light) ناعمة غير مباشرة تعطي الدفء والأناقة للبانوهات الخشبية.'
+        : 'Soft indirect architectural cove lighting creating subtle wood wall depth.',
+      ambientBg: 'rgba(255, 190, 120, 0.06)',
+      roomFilter: 'brightness(0.94) saturate(0.98)'
+    }
+  }
+
+  const currentKelvinInfo = getSimSceneInfo()
   const [selectedPaintId, setSelectedPaintId] = useState('white')
   const [paintTemp, setPaintTemp] = useState<'warm' | 'natural' | 'cool'>('warm')
   const [paintTransitioning, setPaintTransitioning] = useState(false)
@@ -278,68 +402,6 @@ export default function HomeCleanWhitePreview() {
     const timer = setTimeout(() => setPaintTransitioning(false), 150)
     return () => clearTimeout(timer)
   }, [selectedPaintId, paintTemp])
-
-  // Real-world physical Kelvin styles for Section 06
-  const getKelvinStyle = (k: number, isOn: boolean) => {
-    if (!isOn) {
-      return {
-        overlay: 'rgba(0, 0, 0, 0.45)',
-        ambient: 'transparent',
-        glowColor: '#64748B',
-        filter: 'brightness(0.65) saturate(0.85)',
-        tempLabel: isAr ? 'الإنارة مطفأة' : 'Lights OFF',
-        desc: isAr
-          ? 'المساحة في وضع الإطفاء؛ انقر على زر التشغيل أو درجات الحرارة أدناه لإضاءة الغرفة فوراً.'
-          : 'Space in natural ambient darkness; click turn on or any Kelvin button to illuminate the room.'
-      }
-    }
-    switch (k) {
-      case 3000:
-        return {
-          overlay: 'rgba(255, 175, 75, 0.16)',
-          ambient: 'rgba(255, 185, 90, 0.28)',
-          glowColor: '#FFB85A',
-          filter: 'brightness(1.02) saturate(1.08)',
-          tempLabel: isAr ? '3000K — أصفر دافئ' : '3000K Warm White',
-          desc: isAr
-            ? 'إضاءة دافئة حميمية تعزز الراحة والاسترخاء، وتبرز دفء الخشب والأحجار الطبيعية.'
-            : 'Warm, cozy illumination that promotes relaxation and brings out natural wood textures.'
-        }
-      case 4000:
-        return {
-          overlay: 'rgba(255, 245, 220, 0.08)',
-          ambient: 'rgba(255, 250, 235, 0.18)',
-          glowColor: '#FFF2D6',
-          filter: 'brightness(1.03) saturate(1.02)',
-          tempLabel: isAr ? '4000K — شمسي طبيعي' : '4000K Neutral Natural',
-          desc: isAr
-            ? 'الإضاءة المعمارية القياسية المتوازنة، تعكس ألوان الأثاث والخامات بحيادية واقعية تامة.'
-            : 'Balanced architectural lighting displaying accurate material colors with zero tint.'
-        }
-      case 6000:
-        return {
-          overlay: 'rgba(215, 235, 255, 0.14)',
-          ambient: 'rgba(225, 242, 255, 0.25)',
-          glowColor: '#D8ECFF',
-          filter: 'brightness(1.04) saturate(0.98)',
-          tempLabel: isAr ? '6000K — أبيض نهاري' : '6000K Cool Daylight',
-          desc: isAr
-            ? 'إضاءة نشطة عالية الوضوح والتركيز، ممتازة للمطابخ والمكاتب وغرف القراءة والعمل.'
-            : 'Crisp, high-energy daylight ideal for modern workspaces, task areas, and reading zones.'
-        }
-      default:
-        return {
-          overlay: 'transparent',
-          ambient: 'transparent',
-          glowColor: '#FFF',
-          filter: 'none',
-          tempLabel: '',
-          desc: ''
-        }
-    }
-  }
-
-  const currentKelvinInfo = getKelvinStyle(simKelvin, simIsOn)
   const currentPaint = paintColors.find((p) => p.id === selectedPaintId) || paintColors[0]
 
   return (
@@ -892,13 +954,13 @@ export default function HomeCleanWhitePreview() {
       </section>
 
       {/* =====================================================================
-          SECTION 06: Light Experience (Lighting Simulator with Zero-Scroll Floating Controls)
+          SECTION 06: Light Experience (Lighting Simulator with Fixture-Level Controls)
           Eyebrow: LIGHT EXPERIENCE
           Headline: شاهد كيف يغيّر الضوء مساحتك
           ===================================================================== */}
-      <section className="py-14 sm:py-20 bg-[#F3F6FA] border-y border-[#E7EAF0]">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+      <section className="py-12 sm:py-16 bg-[#F3F6FA] border-y border-[#E7EAF0]">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
             <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
               LIGHT EXPERIENCE
             </span>
@@ -906,110 +968,408 @@ export default function HomeCleanWhitePreview() {
               شاهد كيف يغيّر الضوء مساحتك
             </h2>
             <p className="text-xs sm:text-sm text-[#68717D] leading-relaxed">
-              تحكّم في تشغيل الإنارة وتغيير درجات حرارة اللون لتشاهد التحول المعماري الفوري للغرفة أمامك مباشرة دون الحاجة للتمرير.
+              تحكّم فعلياً في السبوتات الجدارية وشريط الليد المعماري ولاحظ التحول البصري المباشر لمصادر الإضاءة دون الحاجة للتمرير.
             </p>
           </div>
 
           {/* Immersive Viewport Simulator Canvas with Floating Controls */}
-          <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10] max-h-[540px] min-h-[380px] rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-md bg-[#101820] max-w-5xl mx-auto">
+          <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10] max-h-[580px] min-h-[420px] rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-xl bg-[#101820] max-w-5xl mx-auto">
             {/* Architectural Room Base Photo */}
             <img
               src="/images/architectural-hero.jpg"
               alt="Room Lighting Simulator"
               className="w-full h-full object-cover transition-all duration-500 ease-out"
-              style={{ filter: currentKelvinInfo.filter }}
+              style={{ filter: currentKelvinInfo.roomFilter }}
             />
 
-            {/* Dynamic Physical Kelvin Overlay */}
+            {/* SVG Optical Fixture Overlays (Precise Beam Scallops & LED Coves) */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none select-none transition-all duration-500 ease-out"
+              viewBox="0 0 1000 562.5"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                {/* 1. Blur filters */}
+                <filter id="spotScallopBlur" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="8" />
+                </filter>
+                <filter id="spotMultiplyBlur" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="11" />
+                </filter>
+                <filter id="ledCoreBlur" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="4" />
+                </filter>
+                <filter id="ledWashBlur" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="14" />
+                </filter>
+
+                {/* 2. Radial Gradients for 3 Spotlights Cones */}
+                <radialGradient id="spotGrad1" cx="368" cy="66" r="148" fx="368" fy="70" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                  <stop offset="30%" stopColor="#FFFFFF" stopOpacity="0.85" />
+                  <stop offset="65%" stopColor="#FFFFFF" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+                </radialGradient>
+
+                <radialGradient id="spotGrad2" cx="463" cy="66" r="148" fx="463" fy="70" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                  <stop offset="30%" stopColor="#FFFFFF" stopOpacity="0.85" />
+                  <stop offset="65%" stopColor="#FFFFFF" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+                </radialGradient>
+
+                <radialGradient id="spotGrad3" cx="558" cy="66" r="148" fx="558" fy="70" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                  <stop offset="30%" stopColor="#FFFFFF" stopOpacity="0.85" />
+                  <stop offset="65%" stopColor="#FFFFFF" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+                </radialGradient>
+
+                {/* Spotlights Paths Reusable Def */}
+                <path
+                  id="spotPath1"
+                  d="M 368,66 C 344,95 314,145 310,215 C 344,230 392,230 426,215 C 422,145 392,95 368,66 Z"
+                />
+                <path
+                  id="spotPath2"
+                  d="M 463,66 C 439,95 409,145 405,215 C 439,230 487,230 521,215 C 517,145 487,95 463,66 Z"
+                />
+                <path
+                  id="spotPath3"
+                  d="M 558,66 C 534,95 504,145 500,215 C 534,230 582,230 616,215 C 612,145 582,95 558,66 Z"
+                />
+              </defs>
+
+              {/* =====================================================================
+                  LAYER A: SPOTLIGHTS ON STONE WALL
+                  ===================================================================== */}
+              {(!simSpotlightsOn || !simMasterOn) ? (
+                /* When Spotlights are OFF: Soft Uniform Shadow Dims the Cones to Match Unlit Stone */
+                <g style={{ mixBlendMode: 'multiply' }} className="transition-opacity duration-500">
+                  <rect x="280" y="62" width="360" height="200" fill="rgba(65, 58, 50, 0.42)" filter="url(#spotMultiplyBlur)" />
+                  <use href="#spotPath1" fill="rgba(55, 48, 40, 0.52)" filter="url(#spotMultiplyBlur)" />
+                  <use href="#spotPath2" fill="rgba(55, 48, 40, 0.52)" filter="url(#spotMultiplyBlur)" />
+                  <use href="#spotPath3" fill="rgba(55, 48, 40, 0.52)" filter="url(#spotMultiplyBlur)" />
+                  <rect x="295" y="62" width="335" height="26" fill="rgba(35, 30, 24, 0.6)" filter="url(#spotMultiplyBlur)" />
+                </g>
+              ) : (
+                /* When Spotlights are ON: Recolor & Luminance injection */
+                <g className="transition-opacity duration-500">
+                  {/* 4000K: Strip amber, inject neutral architectural daylight */}
+                  {simSpotlightsKelvin === 4000 && (
+                    <>
+                      <g style={{ mixBlendMode: 'color' }}>
+                        <use href="#spotPath1" fill="rgba(245, 245, 248, 0.94)" filter="url(#spotScallopBlur)" />
+                        <use href="#spotPath2" fill="rgba(245, 245, 248, 0.94)" filter="url(#spotScallopBlur)" />
+                        <use href="#spotPath3" fill="rgba(245, 245, 248, 0.94)" filter="url(#spotScallopBlur)" />
+                      </g>
+                      <g style={{ mixBlendMode: 'screen' }}>
+                        <use href="#spotPath1" fill="url(#spotGrad1)" opacity="0.45" />
+                        <use href="#spotPath2" fill="url(#spotGrad2)" opacity="0.45" />
+                        <use href="#spotPath3" fill="url(#spotGrad3)" opacity="0.45" />
+                      </g>
+                    </>
+                  )}
+
+                  {/* 6000K: Strip amber, inject cool daylight blue-white */}
+                  {simSpotlightsKelvin === 6000 && (
+                    <>
+                      <g style={{ mixBlendMode: 'color' }}>
+                        <use href="#spotPath1" fill="rgba(145, 205, 255, 0.96)" filter="url(#spotScallopBlur)" />
+                        <use href="#spotPath2" fill="rgba(145, 205, 255, 0.96)" filter="url(#spotScallopBlur)" />
+                        <use href="#spotPath3" fill="rgba(145, 205, 255, 0.96)" filter="url(#spotScallopBlur)" />
+                      </g>
+                      <g style={{ mixBlendMode: 'screen' }}>
+                        <use href="#spotPath1" fill="rgba(215, 238, 255, 0.55)" filter="url(#spotScallopBlur)" />
+                        <use href="#spotPath2" fill="rgba(215, 238, 255, 0.55)" filter="url(#spotScallopBlur)" />
+                        <use href="#spotPath3" fill="rgba(215, 238, 255, 0.55)" filter="url(#spotScallopBlur)" />
+                        <use href="#spotPath1" fill="url(#spotGrad1)" opacity="0.4" />
+                        <use href="#spotPath2" fill="url(#spotGrad2)" opacity="0.4" />
+                        <use href="#spotPath3" fill="url(#spotGrad3)" opacity="0.4" />
+                      </g>
+                    </>
+                  )}
+
+                  {/* 3000K: Enhance natural warm gold */}
+                  {simSpotlightsKelvin === 3000 && (
+                    <g style={{ mixBlendMode: 'screen' }}>
+                      <use href="#spotPath1" fill="rgba(255, 175, 45, 0.28)" filter="url(#spotScallopBlur)" />
+                      <use href="#spotPath2" fill="rgba(255, 175, 45, 0.28)" filter="url(#spotScallopBlur)" />
+                      <use href="#spotPath3" fill="rgba(255, 175, 45, 0.28)" filter="url(#spotScallopBlur)" />
+                    </g>
+                  )}
+                </g>
+              )}
+
+              {/* =====================================================================
+                  LAYER B: LED STRIP (VERTICAL PROFILE + STEPPED COVE)
+                  ===================================================================== */}
+              {(!simLedOn || !simMasterOn) ? (
+                /* When LED Strip is OFF: Multiply Shadow Extinguishes the Core and Wood Reflection */
+                <g style={{ mixBlendMode: 'multiply' }} className="transition-opacity duration-500">
+                  <rect x="52" y="0" width="85" height="520" fill="rgba(30, 22, 16, 0.72)" filter="url(#ledWashBlur)" />
+                  <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(15, 10, 8, 0.9)" strokeWidth="12" filter="url(#ledCoreBlur)" />
+                  <polygon points="76,112 258,194 252,228 70,146" fill="rgba(30, 22, 16, 0.72)" filter="url(#ledWashBlur)" />
+                  <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(15, 10, 8, 0.9)" strokeWidth="10" filter="url(#ledCoreBlur)" />
+                </g>
+              ) : (
+                /* When LED Strip is ON: Recolor & Glow Injection */
+                <g className="transition-opacity duration-500">
+                  {/* 4000K: Neutral Architectural Daylight */}
+                  {simLedKelvin === 4000 && (
+                    <>
+                      <g style={{ mixBlendMode: 'color' }}>
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(255, 248, 235, 0.95)" strokeWidth="24" filter="url(#ledCoreBlur)" />
+                        <rect x="50" y="0" width="90" height="510" fill="rgba(255, 248, 235, 0.88)" filter="url(#ledWashBlur)" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(255, 248, 235, 0.95)" strokeWidth="22" filter="url(#ledCoreBlur)" />
+                        <polygon points="80,110 256,190 250,225 74,145" fill="rgba(255, 248, 235, 0.88)" filter="url(#ledWashBlur)" />
+                      </g>
+                      <g style={{ mixBlendMode: 'screen' }}>
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="#FFFFFF" strokeWidth="6" />
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="#FFF7EB" strokeWidth="18" opacity="0.45" filter="url(#ledCoreBlur)" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="#FFFFFF" strokeWidth="5" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="#FFF7EB" strokeWidth="16" opacity="0.4" filter="url(#ledCoreBlur)" />
+                      </g>
+                    </>
+                  )}
+
+                  {/* 6000K: Crisp Modern Cool White */}
+                  {simLedKelvin === 6000 && (
+                    <>
+                      <g style={{ mixBlendMode: 'color' }}>
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(140, 205, 255, 0.96)" strokeWidth="26" filter="url(#ledCoreBlur)" />
+                        <rect x="50" y="0" width="92" height="510" fill="rgba(140, 205, 255, 0.9)" filter="url(#ledWashBlur)" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(140, 205, 255, 0.96)" strokeWidth="22" filter="url(#ledCoreBlur)" />
+                        <polygon points="80,110 256,190 250,225 74,145" fill="rgba(140, 205, 255, 0.9)" filter="url(#ledWashBlur)" />
+                      </g>
+                      <g style={{ mixBlendMode: 'screen' }}>
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="#F0F8FF" strokeWidth="6" />
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="#B8DEFF" strokeWidth="20" opacity="0.65" filter="url(#ledCoreBlur)" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="#F0F8FF" strokeWidth="5" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="#B8DEFF" strokeWidth="18" opacity="0.55" filter="url(#ledCoreBlur)" />
+                      </g>
+                    </>
+                  )}
+
+                  {/* 'ice': Contemporary Architectural Cyan / Ice Blue */}
+                  {simLedKelvin === 'ice' && (
+                    <>
+                      <g style={{ mixBlendMode: 'color' }}>
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="rgba(0, 220, 255, 0.98)" strokeWidth="28" filter="url(#ledCoreBlur)" />
+                        <rect x="48" y="0" width="95" height="510" fill="rgba(0, 220, 255, 0.92)" filter="url(#ledWashBlur)" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="rgba(0, 220, 255, 0.98)" strokeWidth="24" filter="url(#ledCoreBlur)" />
+                        <polygon points="80,110 256,190 250,225 74,145" fill="rgba(0, 220, 255, 0.92)" filter="url(#ledWashBlur)" />
+                      </g>
+                      <g style={{ mixBlendMode: 'screen' }}>
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="#E0F7FF" strokeWidth="6" />
+                        <line x1="76" y1="0" x2="76" y2="510" stroke="#00D0FF" strokeWidth="22" opacity="0.75" filter="url(#ledCoreBlur)" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="#E0F7FF" strokeWidth="5" />
+                        <line x1="84" y1="124" x2="250" y2="205" stroke="#00D0FF" strokeWidth="18" opacity="0.65" filter="url(#ledCoreBlur)" />
+                      </g>
+                    </>
+                  )}
+
+                  {/* 3000K: Warm Golden Amber Enrichment */}
+                  {simLedKelvin === 3000 && (
+                    <g style={{ mixBlendMode: 'screen' }}>
+                      <line x1="76" y1="0" x2="76" y2="510" stroke="#FFA834" strokeWidth="16" opacity="0.38" filter="url(#ledCoreBlur)" />
+                      <line x1="84" y1="124" x2="250" y2="205" stroke="#FFA834" strokeWidth="14" opacity="0.32" filter="url(#ledCoreBlur)" />
+                    </g>
+                  )}
+                </g>
+              )}
+            </svg>
+
+            {/* Subtle Room Ambient Overlay */}
             <div
               className="absolute inset-0 pointer-events-none transition-colors duration-500 ease-in-out"
-              style={{ backgroundColor: currentKelvinInfo.overlay }}
-            />
-
-            {/* Realistic Ambient Light Wash */}
-            <div
-              className="absolute inset-0 pointer-events-none transition-opacity duration-500 ease-in-out"
-              style={{
-                background: simIsOn
-                  ? `radial-gradient(ellipse at 50% 30%, ${currentKelvinInfo.ambient} 0%, transparent 70%)`
-                  : 'none'
-              }}
+              style={{ backgroundColor: currentKelvinInfo.ambientBg }}
             />
 
             {/* Top Bar Indicators (Inside Canvas) */}
-            <div className="absolute top-4 right-4 left-4 z-20 flex items-center justify-between pointer-events-none">
-              {/* Right: Active Kelvin Badge */}
-              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-white text-xs font-semibold shadow-md">
+            <div className="absolute top-3.5 sm:top-4 right-3.5 sm:right-4 left-3.5 sm:left-4 z-20 flex items-center justify-between pointer-events-none">
+              {/* Right: Active Fixtures Badge */}
+              <div className="flex items-center gap-2 bg-black/65 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-white text-xs font-semibold shadow-md">
                 <span
                   className="w-2.5 h-2.5 rounded-full transition-colors duration-300"
-                  style={{ backgroundColor: currentKelvinInfo.glowColor }}
+                  style={{ backgroundColor: currentKelvinInfo.badgeColor }}
                 />
-                <span>{currentKelvinInfo.tempLabel}</span>
+                <span>{currentKelvinInfo.badgeText}</span>
               </div>
 
-              {/* Left: Quick Advice Snippet */}
-              <div className="hidden sm:flex items-center gap-2 bg-black/50 backdrop-blur-md border border-white/15 px-3.5 py-1.5 rounded-full text-white/90 text-xs">
+              {/* Left: Quick Architectural Snippet */}
+              <div className="hidden sm:flex items-center gap-2 bg-black/55 backdrop-blur-md border border-white/15 px-3.5 py-1.5 rounded-full text-white/90 text-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
-                <span className="truncate max-w-xs">{currentKelvinInfo.desc}</span>
+                <span className="truncate max-w-sm">{currentKelvinInfo.desc}</span>
               </div>
             </div>
 
             {/* FLOATING ARCHITECTURAL CONTROL DOCK (Bottom Inside Canvas) */}
-            <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 w-[94%] sm:w-auto max-w-2xl">
-              <div className="bg-black/65 backdrop-blur-xl border border-white/25 p-2 sm:p-2.5 rounded-2xl shadow-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-                {/* 1. On / Off Power Button */}
-                <button
-                  onClick={() => setSimIsOn(!simIsOn)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer shadow-sm ${
-                    simIsOn
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/25'
-                      : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
-                  }`}
-                  title={simIsOn ? 'إطفاء الإنارة' : 'إشعال الإنارة'}
-                >
-                  <Power className="w-4 h-4" />
-                  <span>{simIsOn ? 'الإنارة تعمل' : 'إشعال الإنارة'}</span>
-                </button>
+            <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 w-[96%] sm:w-[94%] max-w-3xl">
+              <div className="bg-black/75 backdrop-blur-xl border border-white/20 p-2 sm:p-2.5 rounded-2xl shadow-2xl">
+                {/* Dock Header: Mode Switcher & Master Toggle */}
+                <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-white/10">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setSimDockMode('fixtures')}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                        simDockMode === 'fixtures'
+                          ? 'bg-[#0062D2] text-white shadow-sm'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Sliders className="w-3.5 h-3.5" />
+                      <span>التحكم بالعناصر (السبوتات والليد)</span>
+                    </button>
+                    <button
+                      onClick={() => setSimDockMode('presets')}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                        simDockMode === 'presets'
+                          ? 'bg-[#0062D2] text-white shadow-sm'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>مشاهد سريعة</span>
+                    </button>
+                  </div>
 
-                <div className="w-px h-6 bg-white/20 hidden sm:block" />
+                  {/* Master Power Button */}
+                  <button
+                    onClick={toggleSimMaster}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-sm ${
+                      simMasterOn && (simSpotlightsOn || simLedOn)
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                        : 'bg-white/15 hover:bg-white/25 text-white/90 border border-white/20'
+                    }`}
+                    title={simMasterOn ? 'إطفاء كل الإنارة' : 'تشغيل كل الإنارة'}
+                  >
+                    <Power className="w-3.5 h-3.5" />
+                    <span>{simMasterOn && (simSpotlightsOn || simLedOn) ? 'الإنارة تعمل' : 'إشعال الكل'}</span>
+                  </button>
+                </div>
 
-                {/* 2. Temperature Kelvin Buttons */}
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  {[
-                    { k: 3000, label: '3000K أصفر دافئ', icon: Flame, color: '#FFB85A' },
-                    { k: 4000, label: '4000K شمسي طبيعي', icon: Sun, color: '#FFF2D6' },
-                    { k: 6000, label: '6000K أبيض نهاري', icon: Sparkles, color: '#D8ECFF' }
-                  ].map((btn) => {
-                    const active = simIsOn && simKelvin === btn.k
-                    return (
+                {/* Dock Body: Mode-Based Controls */}
+                {simDockMode === 'fixtures' ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {/* Fixture 1: Spotlights */}
+                    <div className="flex items-center justify-between gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5">
                       <button
-                        key={btn.k}
                         onClick={() => {
-                          setSimIsOn(true)
-                          setSimKelvin(btn.k as 3000 | 4000 | 6000)
+                          setSimSpotlightsOn(!simSpotlightsOn)
+                          if (!simMasterOn) setSimMasterOn(true)
                         }}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                          active
-                            ? 'bg-[#0062D2] text-white shadow-lg shadow-[#0062D2]/40 scale-105 ring-2 ring-white/30'
-                            : 'bg-white/10 hover:bg-white/20 text-white/90 border border-white/10'
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                          simSpotlightsOn && simMasterOn
+                            ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40'
+                            : 'bg-white/10 text-white/60 border border-white/10 hover:bg-white/15'
                         }`}
                       >
-                        <span
-                          className="w-2.5 h-2.5 rounded-full"
-                          style={{ backgroundColor: btn.color }}
-                        />
-                        <span>{btn.label}</span>
+                        <Lightbulb className="w-3.5 h-3.5" />
+                        <span>{simSpotlightsOn && simMasterOn ? 'السبوتات: تعمل' : 'السبوتات: مطفأة'}</span>
                       </button>
-                    )
-                  })}
-                </div>
-              </div>
 
-              {/* Mobile Sub-note */}
-              <div className="sm:hidden text-center mt-2">
-                <span className="text-[10px] text-white/80 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md">
-                  {currentKelvinInfo.desc}
-                </span>
+                      {/* Kelvin buttons for Spotlights */}
+                      <div className="flex items-center gap-1">
+                        {[
+                          { k: 3000, label: '3000K', color: '#FFB85A', title: 'أصفر دافئ' },
+                          { k: 4000, label: '4000K', color: '#FFF2D6', title: 'شمسي طبيعي' },
+                          { k: 6000, label: '6000K', color: '#D8ECFF', title: 'أبيض نهاري' }
+                        ].map((btn) => {
+                          const active = simSpotlightsOn && simMasterOn && simSpotlightsKelvin === btn.k
+                          return (
+                            <button
+                              key={btn.k}
+                              onClick={() => {
+                                setSimSpotlightsOn(true)
+                                setSimMasterOn(true)
+                                setSimSpotlightsKelvin(btn.k as 3000 | 4000 | 6000)
+                              }}
+                              className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                                active
+                                  ? 'bg-[#0062D2] text-white shadow-sm ring-1 ring-white/30'
+                                  : 'bg-white/10 hover:bg-white/20 text-white/80'
+                              }`}
+                              title={btn.title}
+                            >
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: btn.color }} />
+                              <span>{btn.label}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Fixture 2: LED Strip */}
+                    <div className="flex items-center justify-between gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5">
+                      <button
+                        onClick={() => {
+                          setSimLedOn(!simLedOn)
+                          if (!simMasterOn) setSimMasterOn(true)
+                        }}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                          simLedOn && simMasterOn
+                            ? 'bg-blue-500/25 text-blue-300 border border-blue-500/40'
+                            : 'bg-white/10 text-white/60 border border-white/10 hover:bg-white/15'
+                        }`}
+                      >
+                        <Zap className="w-3.5 h-3.5" />
+                        <span>{simLedOn && simMasterOn ? 'شريط الليد: يعمل' : 'شريط الليد: مطفأ'}</span>
+                      </button>
+
+                      {/* Kelvin & Color buttons for LED Strip */}
+                      <div className="flex items-center gap-1">
+                        {[
+                          { k: 3000, label: '3000K', color: '#FFB85A', title: 'أصفر دافئ' },
+                          { k: 4000, label: '4000K', color: '#FFF2D6', title: 'شمسي طبيعي' },
+                          { k: 6000, label: '6000K', color: '#D8ECFF', title: 'أبيض نهاري' },
+                          { k: 'ice', label: 'ثلجي', color: '#38BDF8', title: 'أزرق جليدي معاصر' }
+                        ].map((btn) => {
+                          const active = simLedOn && simMasterOn && simLedKelvin === btn.k
+                          return (
+                            <button
+                              key={btn.k}
+                              onClick={() => {
+                                setSimLedOn(true)
+                                setSimMasterOn(true)
+                                setSimLedKelvin(btn.k as any)
+                              }}
+                              className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                                active
+                                  ? 'bg-[#0062D2] text-white shadow-sm ring-1 ring-white/30'
+                                  : 'bg-white/10 hover:bg-white/20 text-white/80'
+                              }`}
+                              title={btn.title}
+                            >
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: btn.color }} />
+                              <span>{btn.label}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Presets Mode */
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                    {[
+                      { id: 'all-3000', label: '3000K دافئ للكل', color: '#FFB85A' },
+                      { id: 'all-4000', label: '4000K شمسي للكل', color: '#FFF2D6' },
+                      { id: 'all-6000', label: '6000K أبيض للكل', color: '#D8ECFF' },
+                      { id: 'spots-only', label: 'السبوتات فقط', color: '#F59E0B' },
+                      { id: 'led-only', label: 'شريط الليد فقط', color: '#38BDF8' }
+                    ].map((preset) => (
+                      <button
+                        key={preset.id}
+                        onClick={() => applySimPreset(preset.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all cursor-pointer"
+                      >
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: preset.color }} />
+                        <span>{preset.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
