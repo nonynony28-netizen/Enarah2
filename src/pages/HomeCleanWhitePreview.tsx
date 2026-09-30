@@ -247,19 +247,40 @@ export default function HomeCleanWhitePreview() {
 
   // =========================================================================
   // SECTION 06: Light Experience - Architectural Temperature Simulator
+  // Default State: LIGHTS_OFF (Artificial lights initially OFF)
   // Continuous Kelvin Range (3000K to 6000K), Default 4000K
   // =========================================================================
+  const [simLightsOn, setSimLightsOn] = useState<boolean>(false)
   const [simKelvin, setSimKelvin] = useState<number>(4000)
   const [isSimDragging, setIsSimDragging] = useState<boolean>(false)
 
-  // Quick preset selection with smooth transition
+  // Quick preset selection: turns artificial lights ON and smoothly transitions to Kelvin value
   const handleSimPreset = (k: number) => {
     setIsSimDragging(false)
     setSimKelvin(k)
+    setSimLightsOn(true)
   }
 
-  // Live metadata for active Kelvin value
-  const getSimKelvinMeta = (k: number) => {
+  // Master turn off action: returns to natural dark architectural scene
+  const handleTurnLightsOff = () => {
+    setIsSimDragging(false)
+    setSimLightsOn(false)
+  }
+
+  // Live metadata for active Kelvin value or OFF state
+  const getSimKelvinMeta = (k: number, isLightsOn: boolean) => {
+    if (!isLightsOn) {
+      return {
+        arabicLabel: 'الإنارة مطفأة',
+        englishLabel: 'Lights OFF',
+        dotColor: '#64748B',
+        badgeBg: 'rgba(100, 116, 139, 0.15)',
+        badgeBorder: 'rgba(100, 116, 139, 0.35)',
+        desc: isAr
+          ? 'المساحة في الإضاءة المسائية الطبيعية بدون أي إنارة صناعية؛ اختر درجة لتشغيلها.'
+          : 'Space in natural ambient dusk with all artificial lights off. Select a temperature to illuminate.'
+      }
+    }
     if (k < 3500) {
       return {
         arabicLabel: 'دافئ',
@@ -268,8 +289,8 @@ export default function HomeCleanWhitePreview() {
         badgeBg: 'rgba(255, 184, 90, 0.15)',
         badgeBorder: 'rgba(255, 184, 90, 0.35)',
         desc: isAr
-          ? 'إضاءة دافئة معمارية تبرز دفء خشب الجوز وتجاويف حجر الترافرتين دون اصفرار زائد.'
-          : 'Warm architectural white with controlled golden warmth, enhancing walnut wood and travertine.'
+          ? 'إضاءة دافئة معمارية (3000K) تبرز دفء خشب الجوز وتجاويف حجر الترافرتين دون اصفرار زائد.'
+          : 'Warm architectural white (3000K) with controlled golden warmth, enhancing walnut wood and travertine.'
       }
     }
     if (k <= 4500) {
@@ -280,8 +301,8 @@ export default function HomeCleanWhitePreview() {
         badgeBg: 'rgba(255, 255, 255, 0.15)',
         badgeBorder: 'rgba(255, 255, 255, 0.35)',
         desc: isAr
-          ? 'إضاءة محايدة نقية تحافظ على توازن ألوان الخشب والحجر والزجاج والنباتات بواقعية تامة.'
-          : 'Clean neutral white preserving authentic stone, wood, glass and vegetation tones.'
+          ? 'إضاءة محايدة نقية (4000K) تحافظ على توازن ألوان الخشب والحجر والزجاج والنباتات بواقعية تامة.'
+          : 'Clean neutral white (4000K) preserving authentic stone, wood, glass and vegetation tones.'
       }
     }
     return {
@@ -291,12 +312,12 @@ export default function HomeCleanWhitePreview() {
       badgeBg: 'rgba(147, 197, 253, 0.15)',
       badgeBorder: 'rgba(147, 197, 253, 0.35)',
       desc: isAr
-        ? 'إضاءة باردة نقية مع مسحة انتعاش خفيفة متميزة عن 4000K دون أي زرقة مصطنعة.'
-        : 'Clean cool white with subtle cool bounce, clearly distinguishable without unnatural blue.'
+        ? 'إضاءة باردة نقية (6000K) مع مسحة انتعاش خفيفة متميزة عن 4000K دون أي زرقة مصطنعة.'
+        : 'Clean cool white (6000K) with subtle cool bounce, clearly distinguishable without unnatural blue.'
     }
   }
 
-  const activeSimMeta = getSimKelvinMeta(simKelvin)
+  const activeSimMeta = getSimKelvinMeta(simKelvin, simLightsOn)
 
   // Compute precise opacities for the 3 stacked photorealistic room renders:
   // Base (z: 1): room-3000k.jpg (always 1 underneath)
@@ -310,9 +331,10 @@ export default function HomeCleanWhitePreview() {
 
   const { neutralOpacity: simNeutralOpacity, coolOpacity: simCoolOpacity } = getSimOpacities(simKelvin)
 
-  // Preload all 3 photorealistic lighting variations
+  // Preload all 4 photorealistic variations (all-off, 3000K, 4000K, 6000K)
   useEffect(() => {
     const simPhotos = [
+      '/images/simulator/room-all-off.jpg',
       '/images/simulator/room-3000k.jpg',
       '/images/simulator/room-4000k.jpg',
       '/images/simulator/room-6000k.jpg'
@@ -908,6 +930,7 @@ export default function HomeCleanWhitePreview() {
 
       {/* =====================================================================
           SECTION 06: Light Experience (Architectural Temperature Simulator)
+          Default State: LIGHTS_OFF (Starts in natural dark architectural scene)
           Eyebrow: LIGHT EXPERIENCE
           Headline: شاهد كيف يغيّر الضوء مساحتك
           Description: تحكّم في حرارة لون الإضاءة وشاهد تأثيرها على المساحة والخامات مباشرة.
@@ -929,46 +952,67 @@ export default function HomeCleanWhitePreview() {
 
           {/* Large Dominant Architectural Visualization Canvas */}
           <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10] max-h-[620px] min-h-[440px] rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-2xl bg-[#101820] max-w-5xl mx-auto select-none">
-            {/* Layer 1 (Base): 3000K Warm White Authentic Room Render */}
+            
+            {/* Layer 0 (Base): Natural Dusk Architectural Scene - All Artificial Lights OFF */}
             <img
-              src="/images/simulator/room-3000k.jpg"
-              alt="Architectural Room Lighting 3000K Warm White"
+              src="/images/simulator/room-all-off.jpg"
+              alt="Natural Dusk Architectural Scene - Artificial Lights OFF"
               className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
-              style={{ zIndex: 1, willChange: 'opacity' }}
+              style={{ zIndex: 1 }}
               loading="eager"
             />
 
-            {/* Layer 2 (Middle): 4000K Neutral White Authentic Room Render */}
-            <img
-              src="/images/simulator/room-4000k.jpg"
-              alt="Architectural Room Lighting 4000K Neutral White"
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+            {/* Layer 1 (Group): Artificial Architectural Lighting (Smooth 600ms Natural Light Fade-in) */}
+            <div
+              className="absolute inset-0 w-full h-full pointer-events-none select-none"
               style={{
                 zIndex: 2,
-                opacity: simNeutralOpacity,
-                transition: isSimDragging ? 'none' : 'opacity 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+                opacity: simLightsOn ? 1 : 0,
+                transition: isSimDragging ? 'none' : 'opacity 600ms cubic-bezier(0.2, 0.8, 0.2, 1)',
                 willChange: 'opacity'
               }}
-              loading="eager"
-            />
+            >
+              {/* 3000K Warm White Base Render */}
+              <img
+                src="/images/simulator/room-3000k.jpg"
+                alt="Architectural Room Lighting 3000K Warm White"
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+                style={{ zIndex: 1, willChange: 'opacity' }}
+                loading="eager"
+              />
 
-            {/* Layer 3 (Top): 6000K Cool White Authentic Room Render */}
-            <img
-              src="/images/simulator/room-6000k.jpg"
-              alt="Architectural Room Lighting 6000K Cool White"
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
-              style={{
-                zIndex: 3,
-                opacity: simCoolOpacity,
-                transition: isSimDragging ? 'none' : 'opacity 400ms cubic-bezier(0.16, 1, 0.3, 1)',
-                willChange: 'opacity'
-              }}
-              loading="eager"
-            />
+              {/* 4000K Neutral White Middle Render */}
+              <img
+                src="/images/simulator/room-4000k.jpg"
+                alt="Architectural Room Lighting 4000K Neutral White"
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+                style={{
+                  zIndex: 2,
+                  opacity: simNeutralOpacity,
+                  transition: isSimDragging ? 'none' : 'opacity 550ms cubic-bezier(0.16, 1, 0.3, 1)',
+                  willChange: 'opacity'
+                }}
+                loading="eager"
+              />
+
+              {/* 6000K Cool White Top Render */}
+              <img
+                src="/images/simulator/room-6000k.jpg"
+                alt="Architectural Room Lighting 6000K Cool White"
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+                style={{
+                  zIndex: 3,
+                  opacity: simCoolOpacity,
+                  transition: isSimDragging ? 'none' : 'opacity 550ms cubic-bezier(0.16, 1, 0.3, 1)',
+                  willChange: 'opacity'
+                }}
+                loading="eager"
+              />
+            </div>
 
             {/* Top Bar Minimal Technical Badge (Inside Canvas) */}
             <div className="absolute top-3.5 sm:top-4 right-3.5 sm:right-4 left-3.5 sm:left-4 z-20 flex items-center justify-between pointer-events-none">
-              {/* Right: Live Kelvin & Label Badge */}
+              {/* Right: Live Status Badge */}
               <div
                 className="flex items-center gap-2.5 backdrop-blur-md px-3.5 py-1.5 rounded-full text-white text-xs font-semibold shadow-lg border"
                 style={{
@@ -981,14 +1025,16 @@ export default function HomeCleanWhitePreview() {
                   style={{ backgroundColor: activeSimMeta.dotColor }}
                 />
                 <span className="tracking-wide">
-                  {simKelvin}K • {activeSimMeta.arabicLabel}
+                  {simLightsOn ? `${simKelvin}K • ${activeSimMeta.arabicLabel}` : 'الإنارة مطفأة'}
                 </span>
-                <span className="text-[10px] text-white/60 hidden sm:inline">
-                  ({activeSimMeta.englishLabel})
-                </span>
+                {simLightsOn && (
+                  <span className="text-[10px] text-white/60 hidden sm:inline">
+                    ({activeSimMeta.englishLabel})
+                  </span>
+                )}
               </div>
 
-              {/* Left: Architectural Lighting Description Snippet */}
+              {/* Left: Architectural Snippet */}
               <div className="hidden md:flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/15 px-3.5 py-1.5 rounded-full text-white/90 text-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
                 <span className="truncate max-w-sm font-normal">{activeSimMeta.desc}</span>
@@ -999,102 +1045,130 @@ export default function HomeCleanWhitePreview() {
             <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 w-[96%] sm:w-[92%] max-w-2xl">
               <div className="bg-black/80 backdrop-blur-xl border border-white/20 p-3 sm:p-4 rounded-2xl shadow-2xl space-y-3">
                 
-                {/* 1. Continuous Kelvin Slider Header & Display */}
+                {/* 1. Header Row: Instruction or Active Status + Return to OFF Button */}
                 <div className="flex items-center justify-between text-white text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-white/90">حرارة لون الإضاءة</span>
-                    <span className="text-white/40">•</span>
-                    <span className="text-[#93C5FD] font-mono font-bold">{simKelvin}K</span>
-                    <span className="text-white/70">({activeSimMeta.arabicLabel})</span>
-                  </div>
-                  <div className="text-[11px] text-white/60 hidden sm:block">
-                    اسحب لتعديل مستمر من 3000K إلى 6000K
-                  </div>
+                  {simLightsOn ? (
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-white/90">حرارة لون الإضاءة</span>
+                      <span className="text-white/40">•</span>
+                      <span className="text-[#93C5FD] font-mono font-bold">{simKelvin}K</span>
+                      <span className="text-white/70">({activeSimMeta.arabicLabel})</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-white/95 text-xs sm:text-sm">
+                        اختر درجة الإضاءة لتشاهد تأثيرها على المساحة
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Return to Off Button when lights are ON / Status indicator when OFF */}
+                  {simLightsOn ? (
+                    <button
+                      type="button"
+                      onClick={handleTurnLightsOff}
+                      className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/15 transition-all cursor-pointer shadow-sm"
+                      title="العودة للإضاءة المسائية الطبيعية"
+                    >
+                      <Power className="w-3.5 h-3.5 text-amber-400" />
+                      <span>إطفاء الإضاءة</span>
+                    </button>
+                  ) : (
+                    <span className="text-[11px] text-white/60 hidden sm:block">
+                      الإنارة الصناعية مطفأة حالياً
+                    </span>
+                  )}
                 </div>
 
-                {/* 2. Visual Slider Track & Native Range Input */}
-                <div className="relative pt-1 pb-1">
-                  {/* Visual Temperature Progression Track */}
-                  <div
-                    className="w-full h-3 rounded-full relative overflow-hidden pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(to right, #FFE8CD 0%, #FFF8EE 33.3%, #FFFFFF 40%, #EEF5FF 70%, #DBEAFF 100%)',
-                      boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.4)'
-                    }}
-                  >
-                    {/* Subtle marker notches for 3000K, 4000K, 6000K */}
-                    <div className="absolute inset-0 flex justify-between px-1 pointer-events-none">
-                      <span className="w-0.5 h-full bg-black/20" title="3000K" />
-                      <span className="w-0.5 h-full bg-black/20 ml-[33%]" title="4000K" />
-                      <span className="w-0.5 h-full bg-black/20" title="6000K" />
-                    </div>
-                  </div>
-
-                  {/* Range Input Overlay */}
-                  <input
-                    type="range"
-                    min={3000}
-                    max={6000}
-                    step={100}
-                    value={simKelvin}
-                    dir="ltr"
-                    onChange={(e) => setSimKelvin(Number(e.target.value))}
-                    onPointerDown={() => setIsSimDragging(true)}
-                    onPointerUp={() => setIsSimDragging(false)}
-                    onTouchStart={() => setIsSimDragging(true)}
-                    onTouchEnd={() => setIsSimDragging(false)}
-                    aria-label="محدد درجة حرارة الإضاءة كلفن"
-                    aria-valuemin={3000}
-                    aria-valuemax={6000}
-                    aria-valuenow={simKelvin}
-                    aria-valuetext={`${simKelvin}K ${activeSimMeta.arabicLabel}`}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-10"
-                    style={{ touchAction: 'none' }}
-                  />
-
-                  {/* Visual Circular Thumb Following Value */}
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-transform duration-75"
-                    style={{
-                      left: `${((simKelvin - 3000) / 3000) * 100}%`,
-                      zIndex: 5
-                    }}
-                  >
+                {/* 2. Continuous Kelvin Slider (Visible when ON) */}
+                {simLightsOn && (
+                  <div className="relative pt-1 pb-1">
+                    {/* Visual Temperature Progression Track */}
                     <div
-                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white border-2 border-[#0062D2] shadow-lg flex items-center justify-center"
+                      className="w-full h-3 rounded-full relative overflow-hidden pointer-events-none"
                       style={{
-                        boxShadow: '0 2px 8px rgba(0, 98, 210, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.8)'
+                        background: 'linear-gradient(to right, #FFE8CD 0%, #FFF8EE 33.3%, #FFFFFF 40%, #EEF5FF 70%, #DBEAFF 100%)',
+                        boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.4)'
+                      }}
+                    >
+                      <div className="absolute inset-0 flex justify-between px-1 pointer-events-none">
+                        <span className="w-0.5 h-full bg-black/20" title="3000K" />
+                        <span className="w-0.5 h-full bg-black/20 ml-[33%]" title="4000K" />
+                        <span className="w-0.5 h-full bg-black/20" title="6000K" />
+                      </div>
+                    </div>
+
+                    {/* Range Input Overlay */}
+                    <input
+                      type="range"
+                      min={3000}
+                      max={6000}
+                      step={100}
+                      value={simKelvin}
+                      dir="ltr"
+                      onChange={(e) => {
+                        setSimLightsOn(true)
+                        setSimKelvin(Number(e.target.value))
+                      }}
+                      onPointerDown={() => setIsSimDragging(true)}
+                      onPointerUp={() => setIsSimDragging(false)}
+                      onTouchStart={() => setIsSimDragging(true)}
+                      onTouchEnd={() => setIsSimDragging(false)}
+                      aria-label="محدد درجة حرارة الإضاءة كلفن"
+                      aria-valuemin={3000}
+                      aria-valuemax={6000}
+                      aria-valuenow={simKelvin}
+                      aria-valuetext={`${simKelvin}K ${activeSimMeta.arabicLabel}`}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-10"
+                      style={{ touchAction: 'none' }}
+                    />
+
+                    {/* Visual Circular Thumb Following Value */}
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-transform duration-75"
+                      style={{
+                        left: `${((simKelvin - 3000) / 3000) * 100}%`,
+                        zIndex: 5
                       }}
                     >
                       <div
-                        className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full"
-                        style={{ backgroundColor: activeSimMeta.dotColor }}
-                      />
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white border-2 border-[#0062D2] shadow-lg flex items-center justify-center"
+                        style={{
+                          boxShadow: '0 2px 8px rgba(0, 98, 210, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.8)'
+                        }}
+                      >
+                        <div
+                          className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full"
+                          style={{ backgroundColor: activeSimMeta.dotColor }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Track Scale Labels */}
-                <div className="flex justify-between items-center text-[11px] text-white/70 font-mono px-0.5" dir="ltr">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#FFB85A]" />
-                    <span>3000K</span>
-                    <span className="text-[10px] text-white/50">(دافئ)</span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                    <span>4000K</span>
-                    <span className="text-[10px] text-white/50">(محايد)</span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#93C5FD]" />
-                    <span>6000K</span>
-                    <span className="text-[10px] text-white/50">(بارد)</span>
-                  </span>
-                </div>
+                {/* Track Scale Labels when ON */}
+                {simLightsOn && (
+                  <div className="flex justify-between items-center text-[11px] text-white/70 font-mono px-0.5" dir="ltr">
+                    <span className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#FFB85A]" />
+                      <span>3000K</span>
+                      <span className="text-[10px] text-white/50">(دافئ)</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                      <span>4000K</span>
+                      <span className="text-[10px] text-white/50">(محايد)</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#93C5FD]" />
+                      <span>6000K</span>
+                      <span className="text-[10px] text-white/50">(بارد)</span>
+                    </span>
+                  </div>
+                )}
 
-                {/* 3. Three Quick Preset Buttons (Equal Width, Min 44px Height) */}
-                <div className="grid grid-cols-3 gap-2 pt-1 border-t border-white/10">
+                {/* 3. Three Temperature Option Buttons (Equal Width, Min 44px Height) */}
+                <div className={`grid grid-cols-3 gap-2 ${simLightsOn ? 'pt-1 border-t border-white/10' : 'pt-0.5'}`}>
                   {[
                     {
                       k: 3000,
@@ -1115,13 +1189,13 @@ export default function HomeCleanWhitePreview() {
                       dot: '#93C5FD'
                     }
                   ].map((preset) => {
-                    const isActive = simKelvin === preset.k
+                    const isActive = simLightsOn && simKelvin === preset.k
                     return (
                       <button
                         key={preset.k}
                         type="button"
                         onClick={() => handleSimPreset(preset.k)}
-                        className={`min-h-[44px] px-2 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer border ${
+                        className={`min-h-[46px] px-2 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer border ${
                           isActive
                             ? 'bg-[#0062D2] text-white border-[#0062D2] shadow-lg shadow-blue-500/25 ring-1 ring-white/30'
                             : 'bg-white/10 hover:bg-white/15 text-white/90 border-white/15 hover:border-white/30'
