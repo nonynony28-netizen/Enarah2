@@ -24,6 +24,8 @@ import {
   Menu,
   Sun,
   Flame,
+  Power,
+  Lightbulb,
   CheckCircle2
 } from 'lucide-react'
 import type { ProjectItem } from '../data/projectsData'
@@ -242,6 +244,7 @@ export default function HomeCleanWhitePreview() {
   }, [])
 
   // Interactive Simulator States (Section 06 & 07)
+  const [simIsOn, setSimIsOn] = useState(true)
   const [simKelvin, setSimKelvin] = useState<3000 | 4000 | 6000>(3000)
   const [selectedPaintId, setSelectedPaintId] = useState('white')
   const [paintTemp, setPaintTemp] = useState<'warm' | 'natural' | 'cool'>('warm')
@@ -277,14 +280,27 @@ export default function HomeCleanWhitePreview() {
   }, [selectedPaintId, paintTemp])
 
   // Real-world physical Kelvin styles for Section 06
-  const getKelvinStyle = (k: number) => {
+  const getKelvinStyle = (k: number, isOn: boolean) => {
+    if (!isOn) {
+      return {
+        overlay: 'rgba(0, 0, 0, 0.45)',
+        ambient: 'transparent',
+        glowColor: '#64748B',
+        filter: 'brightness(0.65) saturate(0.85)',
+        tempLabel: isAr ? 'الإنارة مطفأة' : 'Lights OFF',
+        desc: isAr
+          ? 'المساحة في وضع الإطفاء؛ انقر على زر التشغيل أو درجات الحرارة أدناه لإضاءة الغرفة فوراً.'
+          : 'Space in natural ambient darkness; click turn on or any Kelvin button to illuminate the room.'
+      }
+    }
     switch (k) {
       case 3000:
         return {
           overlay: 'rgba(255, 175, 75, 0.16)',
           ambient: 'rgba(255, 185, 90, 0.28)',
           glowColor: '#FFB85A',
-          tempLabel: isAr ? '3000K — أصفر دافئ (Warm White)' : '3000K — Warm White',
+          filter: 'brightness(1.02) saturate(1.08)',
+          tempLabel: isAr ? '3000K — أصفر دافئ' : '3000K Warm White',
           desc: isAr
             ? 'إضاءة دافئة حميمية تعزز الراحة والاسترخاء، وتبرز دفء الخشب والأحجار الطبيعية.'
             : 'Warm, cozy illumination that promotes relaxation and brings out natural wood textures.'
@@ -294,7 +310,8 @@ export default function HomeCleanWhitePreview() {
           overlay: 'rgba(255, 245, 220, 0.08)',
           ambient: 'rgba(255, 250, 235, 0.18)',
           glowColor: '#FFF2D6',
-          tempLabel: isAr ? '4000K — شمسي طبيعي (Neutral Natural)' : '4000K — Neutral Natural',
+          filter: 'brightness(1.03) saturate(1.02)',
+          tempLabel: isAr ? '4000K — شمسي طبيعي' : '4000K Neutral Natural',
           desc: isAr
             ? 'الإضاءة المعمارية القياسية المتوازنة، تعكس ألوان الأثاث والخامات بحيادية واقعية تامة.'
             : 'Balanced architectural lighting displaying accurate material colors with zero tint.'
@@ -304,7 +321,8 @@ export default function HomeCleanWhitePreview() {
           overlay: 'rgba(215, 235, 255, 0.14)',
           ambient: 'rgba(225, 242, 255, 0.25)',
           glowColor: '#D8ECFF',
-          tempLabel: isAr ? '6000K — أبيض نهاري (Cool Daylight)' : '6000K — Cool Daylight',
+          filter: 'brightness(1.04) saturate(0.98)',
+          tempLabel: isAr ? '6000K — أبيض نهاري' : '6000K Cool Daylight',
           desc: isAr
             ? 'إضاءة نشطة عالية الوضوح والتركيز، ممتازة للمطابخ والمكاتب وغرف القراءة والعمل.'
             : 'Crisp, high-energy daylight ideal for modern workspaces, task areas, and reading zones.'
@@ -314,13 +332,14 @@ export default function HomeCleanWhitePreview() {
           overlay: 'transparent',
           ambient: 'transparent',
           glowColor: '#FFF',
+          filter: 'none',
           tempLabel: '',
           desc: ''
         }
     }
   }
 
-  const currentKelvinInfo = getKelvinStyle(simKelvin)
+  const currentKelvinInfo = getKelvinStyle(simKelvin, simIsOn)
   const currentPaint = paintColors.find((p) => p.id === selectedPaintId) || paintColors[0]
 
   return (
@@ -873,107 +892,124 @@ export default function HomeCleanWhitePreview() {
       </section>
 
       {/* =====================================================================
-          SECTION 06: Light Experience (Lighting Simulator)
+          SECTION 06: Light Experience (Lighting Simulator with Zero-Scroll Floating Controls)
           Eyebrow: LIGHT EXPERIENCE
           Headline: شاهد كيف يغيّر الضوء مساحتك
-          Feature: Realistic 3000K / 4000K / 6000K simulator
           ===================================================================== */}
-      <section className="py-24 sm:py-32 bg-[#F3F6FA] border-y border-[#E7EAF0]">
+      <section className="py-14 sm:py-20 bg-[#F3F6FA] border-y border-[#E7EAF0]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
             <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
               LIGHT EXPERIENCE
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight mb-4">
+            <h2 className="text-2xl sm:text-4xl font-semibold text-[#15191E] tracking-tight mb-2">
               شاهد كيف يغيّر الضوء مساحتك
             </h2>
-            <p className="text-sm sm:text-base text-[#68717D] leading-relaxed">
-              اختر درجة حرارة اللون وشاهد التحول المعماري الواقعي للضوء وانعكاسه على المواد والأجواء العامة للغرفة.
+            <p className="text-xs sm:text-sm text-[#68717D] leading-relaxed">
+              تحكّم في تشغيل الإنارة وتغيير درجات حرارة اللون لتشاهد التحول المعماري الفوري للغرفة أمامك مباشرة دون الحاجة للتمرير.
             </p>
           </div>
 
-          {/* Immersive Simulator Card */}
-          <div className="bg-white rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-sm max-w-5xl mx-auto">
-            {/* Visual Canvas */}
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#101820]">
-              {/* Architectural Room Base Photo */}
-              <img
-                src="/images/architectural-hero.jpg"
-                alt="Room Lighting Simulator"
-                className="w-full h-full object-cover transition-all duration-700"
-              />
+          {/* Immersive Viewport Simulator Canvas with Floating Controls */}
+          <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10] max-h-[540px] min-h-[380px] rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-md bg-[#101820] max-w-5xl mx-auto">
+            {/* Architectural Room Base Photo */}
+            <img
+              src="/images/architectural-hero.jpg"
+              alt="Room Lighting Simulator"
+              className="w-full h-full object-cover transition-all duration-500 ease-out"
+              style={{ filter: currentKelvinInfo.filter }}
+            />
 
-              {/* Dynamic Physical Kelvin Overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none transition-colors duration-700 ease-in-out"
-                style={{ backgroundColor: currentKelvinInfo.overlay }}
-              />
+            {/* Dynamic Physical Kelvin Overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none transition-colors duration-500 ease-in-out"
+              style={{ backgroundColor: currentKelvinInfo.overlay }}
+            />
 
-              {/* Realistic Ambient Light Wash */}
-              <div
-                className="absolute inset-0 pointer-events-none transition-opacity duration-700 ease-in-out"
-                style={{
-                  background: `radial-gradient(ellipse at 50% 30%, ${currentKelvinInfo.ambient} 0%, transparent 70%)`
-                }}
-              />
+            {/* Realistic Ambient Light Wash */}
+            <div
+              className="absolute inset-0 pointer-events-none transition-opacity duration-500 ease-in-out"
+              style={{
+                background: simIsOn
+                  ? `radial-gradient(ellipse at 50% 30%, ${currentKelvinInfo.ambient} 0%, transparent 70%)`
+                  : 'none'
+              }}
+            />
 
-              {/* Top Temperature Tag Indicator */}
-              <div className="absolute top-5 right-5 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/15 px-4 py-2 rounded-full text-white text-xs font-semibold">
+            {/* Top Bar Indicators (Inside Canvas) */}
+            <div className="absolute top-4 right-4 left-4 z-20 flex items-center justify-between pointer-events-none">
+              {/* Right: Active Kelvin Badge */}
+              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-white text-xs font-semibold shadow-md">
                 <span
                   className="w-2.5 h-2.5 rounded-full transition-colors duration-300"
                   style={{ backgroundColor: currentKelvinInfo.glowColor }}
                 />
                 <span>{currentKelvinInfo.tempLabel}</span>
               </div>
+
+              {/* Left: Quick Advice Snippet */}
+              <div className="hidden sm:flex items-center gap-2 bg-black/50 backdrop-blur-md border border-white/15 px-3.5 py-1.5 rounded-full text-white/90 text-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                <span className="truncate max-w-xs">{currentKelvinInfo.desc}</span>
+              </div>
             </div>
 
-            {/* Simulator Controls & Explanation */}
-            <div className="p-8 sm:p-10 bg-white">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-[#E7EAF0]">
-                {/* 3 Temperature Buttons */}
-                <div className="flex items-center gap-3 w-full md:w-auto">
+            {/* FLOATING ARCHITECTURAL CONTROL DOCK (Bottom Inside Canvas) */}
+            <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 w-[94%] sm:w-auto max-w-2xl">
+              <div className="bg-black/65 backdrop-blur-xl border border-white/25 p-2 sm:p-2.5 rounded-2xl shadow-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                {/* 1. On / Off Power Button */}
+                <button
+                  onClick={() => setSimIsOn(!simIsOn)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer shadow-sm ${
+                    simIsOn
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/25'
+                      : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
+                  }`}
+                  title={simIsOn ? 'إطفاء الإنارة' : 'إشعال الإنارة'}
+                >
+                  <Power className="w-4 h-4" />
+                  <span>{simIsOn ? 'الإنارة تعمل' : 'إشعال الإنارة'}</span>
+                </button>
+
+                <div className="w-px h-6 bg-white/20 hidden sm:block" />
+
+                {/* 2. Temperature Kelvin Buttons */}
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   {[
-                    { k: 3000, label: '3000K أصفر دافئ', icon: Flame },
-                    { k: 4000, label: '4000K شمسي طبيعي', icon: Sun },
-                    { k: 6000, label: '6000K أبيض نهاري', icon: Sparkles }
+                    { k: 3000, label: '3000K أصفر دافئ', icon: Flame, color: '#FFB85A' },
+                    { k: 4000, label: '4000K شمسي طبيعي', icon: Sun, color: '#FFF2D6' },
+                    { k: 6000, label: '6000K أبيض نهاري', icon: Sparkles, color: '#D8ECFF' }
                   ].map((btn) => {
-                    const active = simKelvin === btn.k
+                    const active = simIsOn && simKelvin === btn.k
                     return (
                       <button
                         key={btn.k}
-                        onClick={() => setSimKelvin(btn.k as 3000 | 4000 | 6000)}
-                        className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                        onClick={() => {
+                          setSimIsOn(true)
+                          setSimKelvin(btn.k as 3000 | 4000 | 6000)
+                        }}
+                        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
                           active
-                            ? 'bg-[#0062D2] text-white shadow-md shadow-[#0062D2]/25'
-                            : 'bg-[#F7F8FA] text-[#15191E] border border-[#E7EAF0] hover:bg-slate-100'
+                            ? 'bg-[#0062D2] text-white shadow-lg shadow-[#0062D2]/40 scale-105 ring-2 ring-white/30'
+                            : 'bg-white/10 hover:bg-white/20 text-white/90 border border-white/10'
                         }`}
                       >
-                        <btn.icon className="w-4 h-4" />
+                        <span
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: btn.color }}
+                        />
                         <span>{btn.label}</span>
                       </button>
                     )
                   })}
                 </div>
-
-                <div className="text-xs text-[#68717D] flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span>محاكاة فيزيائية واقعية لدرجات حرارة الضوء</span>
-                </div>
               </div>
 
-              {/* Contextual Description */}
-              <div className="mt-6 flex items-start gap-4 p-4 rounded-xl bg-[#F3F6FA] border border-[#E7EAF0]">
-                <div className="w-8 h-8 rounded-lg bg-white border border-[#E7EAF0] flex items-center justify-center text-[#0062D2] shrink-0">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-[#15191E] block mb-1">
-                    التأثير المعماري الموصى به:
-                  </span>
-                  <p className="text-xs sm:text-sm text-[#68717D] leading-relaxed">
-                    {currentKelvinInfo.desc}
-                  </p>
-                </div>
+              {/* Mobile Sub-note */}
+              <div className="sm:hidden text-center mt-2">
+                <span className="text-[10px] text-white/80 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md">
+                  {currentKelvinInfo.desc}
+                </span>
               </div>
             </div>
           </div>
