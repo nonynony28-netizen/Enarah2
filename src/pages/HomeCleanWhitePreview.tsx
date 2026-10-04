@@ -731,9 +731,9 @@ export default function HomeCleanWhitePreview() {
           Eyebrow: SINCE 1988
           Headline: خبرة بُنيت على الضوء
           Layout: Asymmetric editorial split layout
-          Concise story: 80-120 words
+          Seamlessly merges into Section 04 (Manufactured Collections)
           ===================================================================== */}
-      <section className="py-24 sm:py-32 bg-[#FFFFFF] border-b border-[#E7EAF0]">
+      <section className="pt-20 sm:pt-28 pb-12 sm:pb-16 bg-[#FFFFFF]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Editorial Visual (5 cols) */}
@@ -830,28 +830,37 @@ export default function HomeCleanWhitePreview() {
       </section>
 
       {/* =====================================================================
-          SECTION 04: Lighting Collections (Product Categories & Manufacturing)
-          Eyebrow: LIGHTING COLLECTIONS
-          Headline: إضاءة لكل مساحة
-          Layout: Editorial image grid (6 featured tiles), subtle hover scale
+          SECTION 04: Manufactured Collections (Seamlessly merged with Brand Story)
+          Eyebrow: PROPRIETARY ARCHITECTURAL LINES
+          Headline: خطوط إنتاجنا المعمارية: إضاءة لكل مساحة
+          Layout: Editorial image grid (6 featured tiles), tactile cards on white
           ===================================================================== */}
-      <section className="py-24 sm:py-32 bg-[#F7F8FA]">
+      <section className="pt-4 pb-24 sm:pb-32 bg-[#FFFFFF]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          {/* Subtle architectural transition separator */}
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-[#E7EAF0] to-transparent mb-16" />
+
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
             <div>
-              <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
-                LIGHTING COLLECTIONS
-              </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0062D2]/[0.08] border border-[#0062D2]/15 text-[#0062D2] text-[11px] sm:text-xs font-semibold uppercase tracking-wider mb-3">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>PROPRIETARY ARCHITECTURAL LINES · خطوط إنتاجنا وتصنيعنا</span>
+              </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
-                إضاءة لكل مساحة
+                {isAr ? 'خطوط إنتاجنا: إضاءة لكل مساحة' : 'Proprietary Lines: Lighting for Every Space'}
               </h2>
+              <p className="text-sm sm:text-base text-[#68717D] mt-2 max-w-2xl font-normal leading-relaxed">
+                {isAr
+                  ? 'تشكيلات هندسية نقوم بتصنيعها وهندستها بأعلى معايير الجودة لتلائم أدق متطلبات المشاريع المعمارية والمنازل العصرية.'
+                  : 'Architectural collections manufactured and engineered to global standards for residential and commercial spaces.'}
+              </p>
             </div>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors group"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors group shrink-0"
             >
-              <span>استعرض جميع المنتجات</span>
+              <span>استعرض كافة خطوط الإنتاج</span>
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             </Link>
           </div>
@@ -862,7 +871,7 @@ export default function HomeCleanWhitePreview() {
               <Link
                 key={col.id}
                 to={`/products?category=${col.categoryKey}`}
-                className="group relative bg-[#FFFFFF] rounded-2xl overflow-hidden border border-[#E7EAF0] transition-all duration-300 hover:border-[#0062D2]/40 hover:shadow-lg hover:shadow-black/5 flex flex-col"
+                className="group relative bg-[#FBFBFD] rounded-2xl overflow-hidden border border-[#E7EAF0] transition-all duration-300 hover:border-[#0062D2]/40 hover:shadow-xl hover:shadow-black/5 flex flex-col"
               >
                 {/* Photo container */}
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
@@ -906,9 +915,9 @@ export default function HomeCleanWhitePreview() {
           SECTION 05: Brands (Global Brands Logo Wall)
           Eyebrow: GLOBAL BRANDS
           Headline: علامات نثق بها
-          Style: Clean logo wall on pure #FFFFFF, generous spacing
+          Style: Clean logo wall on subtle gallery background #F7F8FA
           ===================================================================== */}
-      <section className="py-20 sm:py-28 bg-[#FFFFFF]">
+      <section className="py-20 sm:py-28 bg-[#F7F8FA] border-t border-[#E7EAF0]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 text-center">
           <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
             GLOBAL BRANDS
