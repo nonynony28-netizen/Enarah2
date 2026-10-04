@@ -200,6 +200,57 @@ const GLOBAL_BRANDS = [
 ]
 
 /* =========================================================================
+   CountUp: smooth number animation triggered once when scrolled into view
+   ========================================================================= */
+
+function CountUp({ to, duration = 1800, prefix = '' }: { to: number; duration?: number; prefix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const [value, setValue] = useState(0)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let raf = 0
+    let started = false
+
+    const run = () => {
+      const start = performance.now()
+      const tick = (now: number) => {
+        const t = Math.min((now - start) / duration, 1)
+        const eased = 1 - Math.pow(1 - t, 4) // easeOutQuart
+        setValue(Math.round(eased * to))
+        if (t < 1) raf = requestAnimationFrame(tick)
+      }
+      raf = requestAnimationFrame(tick)
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !started) {
+          started = true
+          run()
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.4 }
+    )
+    observer.observe(el)
+
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(raf)
+    }
+  }, [to, duration])
+
+  return (
+    <span ref={ref} className="tabular-nums" dir="ltr">
+      {prefix}
+      {value}
+    </span>
+  )
+}
+
+/* =========================================================================
    2. Main Component: HomeCleanWhitePreview
    ========================================================================= */
 
@@ -736,30 +787,42 @@ export default function HomeCleanWhitePreview() {
       <section className="pt-20 sm:pt-28 pb-12 sm:pb-16 bg-[#FFFFFF]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Editorial Visual (5 cols) */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100 border border-[#E7EAF0] shadow-sm">
-                <img
-                  src="/images/company-enarah-logo.jpg"
-                  alt="Enarah Modern Showroom Tripoli Since 1988"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
+            {/* Editorial Visual (5 cols) — circular brand mark */}
+            <div className="lg:col-span-5 flex flex-col items-center">
+              <div className="relative w-60 h-60 sm:w-72 sm:h-72 lg:w-80 lg:h-80">
+                {/* Slow rotating dashed ring (brand blue) */}
+                <div
+                  className="absolute -inset-4 rounded-full border border-dashed border-[#0062D2]/30 animate-spin motion-reduce:animate-none"
+                  style={{ animationDuration: '40s' }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-6 right-6 left-6 text-white">
-                  <span className="text-xs uppercase tracking-widest text-white/80 block mb-1">
-                    ESTABLISHED 1988
-                  </span>
-                  <p className="text-sm font-medium text-white/90">
-                    طرابلس — ليبيا · الريادة في حلول الإنارة والتأسيس الكهربائي
-                  </p>
+                {/* Soft blue halo */}
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-[#0062D2]/15 via-transparent to-[#0062D2]/5 blur-md" />
+
+                {/* Circle */}
+                <div className="relative w-full h-full rounded-full overflow-hidden bg-white border border-[#E7EAF0] shadow-[0_20px_50px_-20px_rgba(0,98,210,0.25)]">
+                  <img
+                    src="/images/company-enarah-logo.jpg"
+                    alt="شعار الإنارة الحديثة - منذ 1988"
+                    className="w-full h-full object-contain p-[14%]"
+                    loading="lazy"
+                  />
+                </div>
+
+                {/* Established badge */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-[#0062D2] text-white text-[11px] font-semibold tracking-widest whitespace-nowrap shadow-lg shadow-[#0062D2]/25">
+                  ESTABLISHED 1988
                 </div>
               </div>
 
-              {/* Accent micro-card */}
-              <div className="absolute -bottom-6 -left-6 hidden sm:flex items-center gap-4 bg-white p-5 rounded-xl border border-[#E7EAF0] shadow-lg max-w-xs">
-                <div className="w-10 h-10 rounded-lg bg-[#EBF3FC] text-[#0062D2] flex items-center justify-center font-bold shrink-0">
-                  <Award className="w-5 h-5" />
+              {/* Location line */}
+              <p className="mt-8 text-sm text-[#68717D] text-center">
+                طرابلس — ليبيا · الريادة في حلول الإنارة والتأسيس الكهربائي
+              </p>
+
+              {/* Quality micro-card */}
+              <div className="mt-5 hidden sm:flex items-center gap-4 bg-white px-5 py-4 rounded-xl border border-[#E7EAF0] shadow-sm">
+                <div className="w-10 h-10 rounded-lg bg-[#EBF3FC] text-[#0062D2] flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
                   <span className="block text-sm font-semibold text-[#15191E]">ضمان الجودة والسلامة</span>
@@ -789,24 +852,24 @@ export default function HomeCleanWhitePreview() {
               {/* Three minimalist stats */}
               <div className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-[#E7EAF0]">
                 <div>
-                  <span className="text-2xl sm:text-3xl font-bold text-[#15191E] tracking-tight block">
-                    +35
+                  <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
+                    <CountUp to={35} prefix="+" duration={1600} />
                   </span>
                   <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">
                     عاماً من الريادة
                   </span>
                 </div>
                 <div>
-                  <span className="text-2xl sm:text-3xl font-bold text-[#15191E] tracking-tight block">
-                    +500
+                  <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
+                    <CountUp to={500} prefix="+" duration={2000} />
                   </span>
                   <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">
                     مشروع تم تنفيذه
                   </span>
                 </div>
                 <div>
-                  <span className="text-2xl sm:text-3xl font-bold text-[#15191E] tracking-tight block">
-                    +15
+                  <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
+                    <CountUp to={15} prefix="+" duration={1400} />
                   </span>
                   <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">
                     علامة عالمية معتمدة
