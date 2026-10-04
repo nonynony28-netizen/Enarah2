@@ -40,6 +40,7 @@ import {
   getOptimizedProjectImageUrl
 } from '../data/projectsData'
 import { initHeroVideoCache, getOptimalHeroVideoPath } from '../utils/videoCache'
+import { ENARAH_PRODUCTS } from '../components/EnarahProductsCarousel'
 
 /* =========================================================================
    1. Data Definitions (Colors, Brands, Featured Categories, Trust Items)
@@ -128,62 +129,14 @@ const getPaintColors = (isAr: boolean) => [
   }
 ]
 
-const FEATURED_COLLECTIONS = [
-  {
-    id: 'chandeliers',
-    nameAr: 'الثريات الفاخرة',
-    nameEn: 'Luxury Chandeliers',
-    descAr: 'تصاميم معمارية وكريستالية مودرن تمنح الفراغات فخامة استثنائية.',
-    image: '/images/product-chandeliers.jpg',
-    categoryKey: 'chandeliers',
-    count: '60+ تصميم'
-  },
-  {
-    id: 'spotlights',
-    nameAr: 'السبوت لايت المعماري',
-    nameEn: 'Architectural Spotlights',
-    descAr: 'عدسات مانعة للتوهج وتوزيع مخروطي متزن للإضاءة الموجهة.',
-    image: '/images/product-spotlights.png',
-    categoryKey: 'spotlights',
-    count: '80+ موديل'
-  },
-  {
-    id: 'outdoor',
-    nameAr: 'الإنارة الخارجية والمعمارية',
-    nameEn: 'Outdoor & Facade Lighting',
-    descAr: 'كشافات وفوانيس وأبليكات واجهات مقاومة لأقسى العوامل الجوية.',
-    image: '/images/product-outdoor-lanterns.jpg',
-    categoryKey: 'outdoor',
-    count: '45+ حل'
-  },
-  {
-    id: 'switches',
-    nameAr: 'المفاتيح والبرايز',
-    nameEn: 'Architectural Switches & Sockets',
-    descAr: 'تشطيبات راقية باللون الذهبي والأسود والأبيض مع منافذ شحن سريعة.',
-    image: '/images/product-sockets-switches.jpg',
-    categoryKey: 'switches',
-    count: '50+ خيار'
-  },
-  {
-    id: 'foundation',
-    nameAr: 'مواد التأسيس والكوابل',
-    nameEn: 'Electrical Foundation & Cables',
-    descAr: 'كوابل نحاسية نقية وعلب دفن وحمايات مطابقة لأعلى المعايير الهندسية.',
-    image: '/images/product-electrical-foundation.jpg',
-    categoryKey: 'electrical',
-    count: '120+ صنف'
-  },
-  {
-    id: 'solar',
-    nameAr: 'أنظمة الطاقة الشمسية',
-    nameEn: 'Solar Lighting Systems',
-    descAr: 'كشافات وإنارة ممرات ذكية بمستشعرات حركة وبطاريات عالية الكفاءة.',
-    image: '/images/product-solar-lighting.jpg',
-    categoryKey: 'solar',
-    count: '25+ منظومة'
-  }
-]
+// Same product list as the live homepage (single source of truth),
+// so any product added to ENARAH_PRODUCTS appears here automatically.
+const FEATURED_COLLECTIONS = ENARAH_PRODUCTS.map((p) => ({
+  id: p.id,
+  nameAr: p.categoryAr,
+  nameEn: p.categoryEn,
+  image: p.image
+}))
 
 const GLOBAL_BRANDS = [
   { name: 'Legrand', origin: 'فرنسا 🇫🇷', logo: '/images/brand-legrand.png?v=2' },
@@ -924,7 +877,7 @@ export default function HomeCleanWhitePreview() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: i >= 4 ? (i - 4) * 0.08 : 0 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: i >= 4 ? Math.min((i - 4) * 0.04, 0.4) : 0 }}
                   className="group w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-4.5rem)/4)]"
                 >
                   {/* Image — compact 4:3 */}
