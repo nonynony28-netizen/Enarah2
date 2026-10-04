@@ -28,7 +28,9 @@ import {
   Lightbulb,
   CheckCircle2,
   Sliders,
-  Zap
+  Zap,
+  Globe,
+  Building2
 } from 'lucide-react'
 import type { ProjectItem } from '../data/projectsData'
 import {
@@ -649,51 +651,77 @@ export default function HomeCleanWhitePreview() {
 
       {/* =====================================================================
           SECTION 02: Trust Bar (Credibility Strip)
-          Minimal horizontal strip, no large cards, subtle separators
+          Minimal horizontal strip, brand royal blue accents (#0062D2), refined typography
           Content: منذ 1988 · علامات عالمية · حلول للمشاريع · خبرة فنية متخصصة
           ===================================================================== */}
-      <section className="bg-[#FFFFFF] border-b border-[#E7EAF0] py-8 sm:py-10">
+      <section className="bg-[#FFFFFF] border-b border-[#E7EAF0] py-7 sm:py-9 relative shadow-[0_4px_20px_-10px_rgba(0,98,210,0.04)]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-[#E7EAF0]">
-            {/* Item 1 */}
-            <div className="pt-4 md:pt-0 flex flex-col items-center md:items-start text-center md:text-right px-2">
-              <span className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight">
-                منذ 1988
-              </span>
-              <span className="text-xs sm:text-sm text-[#68717D] mt-1 font-normal">
-                أكثر من ثلاثة عقود من الريادة المعمارية
-              </span>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 items-center divide-y lg:divide-y-0 lg:divide-x lg:divide-x-reverse divide-[#E7EAF0]">
+            
+            {/* Item 1: منذ 1988 */}
+            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
+              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
+                <Award className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
+                  {isAr ? (
+                    <>منذ <span className="text-[#0062D2] font-black">1988</span></>
+                  ) : (
+                    <>Since <span className="text-[#0062D2] font-black">1988</span></>
+                  )}
+                </h3>
+                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
+                  {isAr ? 'أكثر من ثلاثة عقود من الريادة المعمارية' : 'Over three decades of architectural leadership'}
+                </p>
+              </div>
             </div>
 
-            {/* Item 2 */}
-            <div className="pt-4 md:pt-0 flex flex-col items-center md:items-start text-center md:text-right px-2 md:pr-6">
-              <span className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight">
-                علامات عالمية
-              </span>
-              <span className="text-xs sm:text-sm text-[#68717D] mt-1 font-normal">
-                شراكات مع رواد الصناعة الأوروبية والدولية
-              </span>
+            {/* Item 2: علامات عالمية */}
+            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
+              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
+                <Globe className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
+                  {isAr ? 'علامات عالمية' : 'Global Brands'}
+                </h3>
+                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
+                  {isAr ? 'شراكات مع رواد الصناعة الأوروبية والدولية' : 'Partnerships with European & global industry leaders'}
+                </p>
+              </div>
             </div>
 
-            {/* Item 3 */}
-            <div className="pt-4 md:pt-0 flex flex-col items-center md:items-start text-center md:text-right px-2 md:pr-6">
-              <span className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight">
-                حلول للمشاريع
-              </span>
-              <span className="text-xs sm:text-sm text-[#68717D] mt-1 font-normal">
-                توريد هندسي متكامل للمباني والمجمعات والفلل
-              </span>
+            {/* Item 3: حلول للمشاريع */}
+            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
+              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
+                <Building2 className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
+                  {isAr ? 'حلول للمشاريع' : 'Project Solutions'}
+                </h3>
+                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
+                  {isAr ? 'توريد هندسي متكامل للمباني والمجمعات والفلل' : 'Integrated engineering supply for commercial & residential'}
+                </p>
+              </div>
             </div>
 
-            {/* Item 4 */}
-            <div className="pt-4 md:pt-0 flex flex-col items-center md:items-start text-center md:text-right px-2 md:pr-6">
-              <span className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight">
-                خبرة فنية متخصصة
-              </span>
-              <span className="text-xs sm:text-sm text-[#68717D] mt-1 font-normal">
-                استشارات معمارية وتوزيع ضوئي هندسي دقيق
-              </span>
+            {/* Item 4: خبرة فنية متخصصة */}
+            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
+              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
+                <Lightbulb className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
+                  {isAr ? 'خبرة فنية متخصصة' : 'Technical Expertise'}
+                </h3>
+                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
+                  {isAr ? 'استشارات معمارية وتوزيع ضوئي هندسي دقيق' : 'Architectural consulting and photometric lighting design'}
+                </p>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
