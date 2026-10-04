@@ -727,86 +727,13 @@ export default function HomeCleanWhitePreview() {
       </section>
 
       {/* =====================================================================
-          SECTION 03: Lighting Collections (Product Categories)
-          Eyebrow: LIGHTING COLLECTIONS
-          Headline: إضاءة لكل مساحة
-          Layout: Editorial image grid (6 featured tiles), subtle hover scale
-          ===================================================================== */}
-      <section className="py-24 sm:py-32 bg-[#F7F8FA]">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div>
-              <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
-                LIGHTING COLLECTIONS
-              </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
-                إضاءة لكل مساحة
-              </h2>
-            </div>
-            <Link
-              to="/products"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors group"
-            >
-              <span>استعرض جميع المنتجات</span>
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            </Link>
-          </div>
-
-          {/* Grid: 6 Large Photography Tiles */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FEATURED_COLLECTIONS.map((col) => (
-              <Link
-                key={col.id}
-                to={`/products?category=${col.categoryKey}`}
-                className="group relative bg-[#FFFFFF] rounded-2xl overflow-hidden border border-[#E7EAF0] transition-all duration-300 hover:border-[#0062D2]/40 hover:shadow-lg hover:shadow-black/5 flex flex-col"
-              >
-                {/* Photo container */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={col.image}
-                    alt={col.nameAr}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                    onError={(e) => {
-                      e.currentTarget.src = '/images/default-product.jpg'
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[#15191E] text-[11px] font-semibold px-3 py-1 rounded-full border border-black/5">
-                    {col.count}
-                  </span>
-                </div>
-
-                {/* Information */}
-                <div className="p-6 flex-grow flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#15191E] group-hover:text-[#0062D2] transition-colors mb-2">
-                      {col.nameAr}
-                    </h3>
-                    <p className="text-sm text-[#68717D] leading-relaxed font-normal">
-                      {col.descAr}
-                    </p>
-                  </div>
-                  <div className="mt-5 pt-4 border-t border-[#E7EAF0] flex items-center justify-between text-xs font-semibold text-[#0062D2]">
-                    <span>استكشف التشكيلة</span>
-                    <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================================
-          SECTION 04: Brand Story (Company Credibility)
+          SECTION 03: Brand Story (Company Introduction & Credibility)
           Eyebrow: SINCE 1988
           Headline: خبرة بُنيت على الضوء
           Layout: Asymmetric editorial split layout
           Concise story: 80-120 words
           ===================================================================== */}
-      <section className="py-24 sm:py-32 bg-[#FFFFFF] border-y border-[#E7EAF0]">
+      <section className="py-24 sm:py-32 bg-[#FFFFFF] border-b border-[#E7EAF0]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Editorial Visual (5 cols) */}
@@ -898,6 +825,79 @@ export default function HomeCleanWhitePreview() {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          SECTION 04: Lighting Collections (Product Categories & Manufacturing)
+          Eyebrow: LIGHTING COLLECTIONS
+          Headline: إضاءة لكل مساحة
+          Layout: Editorial image grid (6 featured tiles), subtle hover scale
+          ===================================================================== */}
+      <section className="py-24 sm:py-32 bg-[#F7F8FA]">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div>
+              <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
+                LIGHTING COLLECTIONS
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
+                إضاءة لكل مساحة
+              </h2>
+            </div>
+            <Link
+              to="/products"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors group"
+            >
+              <span>استعرض جميع المنتجات</span>
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            </Link>
+          </div>
+
+          {/* Grid: 6 Large Photography Tiles */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {FEATURED_COLLECTIONS.map((col) => (
+              <Link
+                key={col.id}
+                to={`/products?category=${col.categoryKey}`}
+                className="group relative bg-[#FFFFFF] rounded-2xl overflow-hidden border border-[#E7EAF0] transition-all duration-300 hover:border-[#0062D2]/40 hover:shadow-lg hover:shadow-black/5 flex flex-col"
+              >
+                {/* Photo container */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+                  <img
+                    src={col.image}
+                    alt={col.nameAr}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/default-product.jpg'
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[#15191E] text-[11px] font-semibold px-3 py-1 rounded-full border border-black/5">
+                    {col.count}
+                  </span>
+                </div>
+
+                {/* Information */}
+                <div className="p-6 flex-grow flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold text-[#15191E] group-hover:text-[#0062D2] transition-colors mb-2">
+                      {col.nameAr}
+                    </h3>
+                    <p className="text-sm text-[#68717D] leading-relaxed font-normal">
+                      {col.descAr}
+                    </p>
+                  </div>
+                  <div className="mt-5 pt-4 border-t border-[#E7EAF0] flex items-center justify-between text-xs font-semibold text-[#0062D2]">
+                    <span>استكشف التشكيلة</span>
+                    <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
