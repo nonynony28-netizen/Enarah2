@@ -200,25 +200,26 @@ const GLOBAL_BRANDS = [
 ]
 
 /* =========================================================================
-   CountUp: smooth number animation triggered once when scrolled into view
+   SyncedStats: all numbers share ONE animation clock & ONE trigger,
+   so they start together and land on their final values at the same moment.
    ========================================================================= */
 
-function CountUp({ to, duration = 1800, prefix = '' }: { to: number; duration?: number; prefix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const [value, setValue] = useState(0)
+type StatItem = { value: number; prefix?: string; label: string }
+
+function SyncedStats({ items, duration = 2200 }: { items: StatItem[]; duration?: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
     let raf = 0
-    let started = false
 
     const run = () => {
       const start = performance.now()
       const tick = (now: number) => {
         const t = Math.min((now - start) / duration, 1)
-        const eased = 1 - Math.pow(1 - t, 4) // easeOutQuart
-        setValue(Math.round(eased * to))
+        setProgress(1 - Math.pow(1 - t, 3)) // easeOutCubic — shared by all numbers
         if (t < 1) raf = requestAnimationFrame(tick)
       }
       raf = requestAnimationFrame(tick)
@@ -226,13 +227,12 @@ function CountUp({ to, duration = 1800, prefix = '' }: { to: number; duration?: 
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !started) {
-          started = true
-          run()
+        if (entries[0].isIntersecting) {
           observer.disconnect()
+          run()
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.5 }
     )
     observer.observe(el)
 
@@ -240,13 +240,22 @@ function CountUp({ to, duration = 1800, prefix = '' }: { to: number; duration?: 
       observer.disconnect()
       cancelAnimationFrame(raf)
     }
-  }, [to, duration])
+  }, [duration])
 
   return (
-    <span ref={ref} className="tabular-nums" dir="ltr">
-      {prefix}
-      {value}
-    </span>
+    <div ref={ref} className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-[#E7EAF0]">
+      {items.map((item) => (
+        <div key={item.label}>
+          <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
+            <span className="tabular-nums" dir="ltr">
+              {item.prefix}
+              {Math.round(progress * item.value)}
+            </span>
+          </span>
+          <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">{item.label}</span>
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -849,33 +858,15 @@ export default function HomeCleanWhitePreview() {
                 </p>
               </div>
 
-              {/* Three minimalist stats */}
-              <div className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-[#E7EAF0]">
-                <div>
-                  <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
-                    <CountUp to={35} prefix="+" duration={1600} />
-                  </span>
-                  <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">
-                    عاماً من الريادة
-                  </span>
-                </div>
-                <div>
-                  <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
-                    <CountUp to={500} prefix="+" duration={2000} />
-                  </span>
-                  <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">
-                    مشروع تم تنفيذه
-                  </span>
-                </div>
-                <div>
-                  <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
-                    <CountUp to={15} prefix="+" duration={1400} />
-                  </span>
-                  <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">
-                    علامة عالمية معتمدة
-                  </span>
-                </div>
-              </div>
+              {/* Three minimalist stats — synchronized count-up */}
+              <SyncedStats
+                duration={2200}
+                items={[
+                  { value: 35, prefix: '+', label: 'عاماً من الريادة' },
+                  { value: 500, prefix: '+', label: 'مشروع تم تنفيذه' },
+                  { value: 15, prefix: '+', label: 'علامة عالمية معتمدة' }
+                ]}
+              />
 
               {/* CTA */}
               <div className="mt-10">
