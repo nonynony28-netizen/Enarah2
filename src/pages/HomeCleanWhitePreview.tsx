@@ -893,18 +893,18 @@ export default function HomeCleanWhitePreview() {
           Minimal international layout: one row visible, in-place "show all"
           (does NOT navigate to the store)
           ===================================================================== */}
-      <section ref={collectionsRef} className="pt-4 pb-24 sm:pb-32 bg-[#FFFFFF] scroll-mt-28">
+      <section ref={collectionsRef} className="pt-2 pb-16 sm:pb-28 bg-[#FFFFFF] scroll-mt-28">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
           {/* Subtle transition separator */}
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-[#E7EAF0] to-transparent mb-16" />
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-[#E7EAF0] to-transparent mb-10 sm:mb-16" />
 
           {/* Header — minimal */}
-          <div className="flex items-end justify-between gap-6 mb-10">
+          <div className="flex items-end justify-between gap-6 mb-6 sm:mb-10">
             <div>
               <span className="text-[11px] sm:text-xs font-semibold text-[#0062D2] tracking-[0.25em] uppercase block mb-3">
                 Made by Enarah
               </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
                 {isAr ? 'من تصميمنا وتصنيعنا' : 'Designed & Made by Us'}
               </h2>
             </div>
@@ -913,21 +913,22 @@ export default function HomeCleanWhitePreview() {
             </span>
           </div>
 
-          {/* Products row (first 3) + in-place expansion */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
+          {/* Products row (first 4) + in-place expansion
+              Phones: 2 per row (2×2) · Desktop: 4 in one row · extras centered */}
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-8 sm:gap-x-6">
             <AnimatePresence initial={false}>
-              {(showAllCollections ? FEATURED_COLLECTIONS : FEATURED_COLLECTIONS.slice(0, 3)).map((col, i) => (
+              {(showAllCollections ? FEATURED_COLLECTIONS : FEATURED_COLLECTIONS.slice(0, 4)).map((col, i) => (
                 <motion.article
                   key={col.id}
                   layout
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 12 }}
-                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: i >= 3 ? (i - 3) * 0.08 : 0 }}
-                  className="group"
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: i >= 4 ? (i - 4) * 0.08 : 0 }}
+                  className="group w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-4.5rem)/4)]"
                 >
-                  {/* Image */}
-                  <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#F5F6F8]">
+                  {/* Image — compact 4:3 */}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl sm:rounded-2xl bg-[#F5F6F8] border border-[#EEF0F3]">
                     <img
                       src={col.image}
                       alt={col.nameAr}
@@ -938,19 +939,19 @@ export default function HomeCleanWhitePreview() {
                       }}
                     />
                     <span
-                      className="absolute top-4 left-4 text-[11px] font-semibold text-[#15191E] bg-white/90 backdrop-blur px-2.5 py-1 rounded-full tabular-nums"
+                      className="absolute top-2 left-2 sm:top-3 sm:left-3 text-[10px] sm:text-[11px] font-semibold text-[#15191E] bg-white/90 backdrop-blur px-2 py-0.5 rounded-full tabular-nums"
                       dir="ltr"
                     >
                       {String(i + 1).padStart(2, '0')}
                     </span>
                   </div>
 
-                  {/* Caption — name only */}
-                  <div className="mt-4 flex items-baseline justify-between gap-3">
-                    <h3 className="text-base sm:text-lg font-semibold text-[#15191E] group-hover:text-[#0062D2] transition-colors">
+                  {/* Caption — stacked so it fits on narrow phones */}
+                  <div className="mt-3">
+                    <h3 className="text-sm sm:text-base font-semibold text-[#15191E] leading-snug group-hover:text-[#0062D2] transition-colors">
                       {col.nameAr}
                     </h3>
-                    <span className="text-[11px] text-[#9AA1AB] uppercase tracking-wider truncate" dir="ltr">
+                    <span className="block mt-0.5 text-[10px] sm:text-[11px] text-[#9AA1AB] uppercase tracking-wider truncate" dir="ltr">
                       {col.nameEn}
                     </span>
                   </div>
