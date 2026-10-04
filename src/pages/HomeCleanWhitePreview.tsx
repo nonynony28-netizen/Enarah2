@@ -811,7 +811,7 @@ export default function HomeCleanWhitePreview() {
                 <div className="relative w-full h-full rounded-full overflow-hidden bg-white border border-[#E7EAF0] shadow-[0_20px_50px_-20px_rgba(0,98,210,0.25)]">
                   <img
                     src="/images/company-enarah-logo.jpg"
-                    alt="شعار الإنارة الحديثة - منذ 1988"
+                    alt="شعار شركة الإنارة - منذ 1988"
                     className="w-full h-full object-contain p-[14%]"
                     loading="lazy"
                   />
@@ -851,7 +851,7 @@ export default function HomeCleanWhitePreview() {
 
               <div className="space-y-4 text-base sm:text-lg text-[#68717D] leading-relaxed font-normal">
                 <p>
-                  منذ تأسيس الإنارة الحديثة عام 1988، انطلقنا برؤية معمارية تضع الضوء في قلب التصميم الداخلي والخارجي كعنصر هندسي أصيل يشكّل الفراغ ويحدد شخصيته.
+                  منذ تأسيس شركة الإنارة عام 1988، انطلقنا برؤية معمارية تضع الضوء في قلب التصميم الداخلي والخارجي كعنصر هندسي أصيل يشكّل الفراغ ويحدد شخصيته.
                 </p>
                 <p>
                   لأكثر من ثلاثة عقود، واكبنا تطور تقنيات الإنارة العالمية وشيّدنا شراكات استراتيجية متينة مع كبرى العلامات الأوروبية والدولية. نجمع بين الدقة الهندسية والذوق الجمالي لنقدم للمهندسين والمقاولين وأصحاب المنازل حلولاً كهربائية متكاملة ترتقي بالمكان وتمنحه حضوراً استثنائياً يدوم.
@@ -874,7 +874,7 @@ export default function HomeCleanWhitePreview() {
                   to="/about"
                   className="inline-flex items-center gap-2.5 px-6 py-3 bg-[#15191E] hover:bg-[#0062D2] text-white text-sm font-semibold rounded-full transition-colors duration-200"
                 >
-                  <span>تعرف على الإنارة الحديثة</span>
+                  <span>تعرف على شركة الإنارة</span>
                   <ArrowLeft className="w-4 h-4" />
                 </Link>
               </div>
