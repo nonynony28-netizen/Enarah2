@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Phone,
   MapPin,
   Mail,
@@ -266,6 +267,10 @@ function SyncedStats({ items, duration = 2200 }: { items: StatItem[]; duration?:
 export default function HomeCleanWhitePreview() {
   const { isAr } = useLanguage()
   const paintColors = getPaintColors(isAr)
+
+  // Section 04: in-place "show all products" toggle (no store navigation)
+  const [showAllCollections, setShowAllCollections] = useState(false)
+  const collectionsRef = useRef<HTMLElement>(null)
 
   // Navigation scroll state
   const [isScrolled, setIsScrolled] = useState(false)
@@ -884,83 +889,99 @@ export default function HomeCleanWhitePreview() {
       </section>
 
       {/* =====================================================================
-          SECTION 04: Manufactured Collections (Seamlessly merged with Brand Story)
-          Eyebrow: PROPRIETARY ARCHITECTURAL LINES
-          Headline: خطوط إنتاجنا المعمارية: إضاءة لكل مساحة
-          Layout: Editorial image grid (6 featured tiles), tactile cards on white
+          SECTION 04: Manufactured Collections (merged with Brand Story)
+          Minimal international layout: one row visible, in-place "show all"
+          (does NOT navigate to the store)
           ===================================================================== */}
-      <section className="pt-4 pb-24 sm:pb-32 bg-[#FFFFFF]">
+      <section ref={collectionsRef} className="pt-4 pb-24 sm:pb-32 bg-[#FFFFFF] scroll-mt-28">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          {/* Subtle architectural transition separator */}
+          {/* Subtle transition separator */}
           <div className="w-full h-px bg-gradient-to-r from-transparent via-[#E7EAF0] to-transparent mb-16" />
 
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+          {/* Header — minimal */}
+          <div className="flex items-end justify-between gap-6 mb-10">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0062D2]/[0.08] border border-[#0062D2]/15 text-[#0062D2] text-[11px] sm:text-xs font-semibold uppercase tracking-wider mb-3">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>PROPRIETARY ARCHITECTURAL LINES · خطوط إنتاجنا وتصنيعنا</span>
-              </div>
+              <span className="text-[11px] sm:text-xs font-semibold text-[#0062D2] tracking-[0.25em] uppercase block mb-3">
+                Made by Enarah
+              </span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
-                {isAr ? 'خطوط إنتاجنا: إضاءة لكل مساحة' : 'Proprietary Lines: Lighting for Every Space'}
+                {isAr ? 'من تصميمنا وتصنيعنا' : 'Designed & Made by Us'}
               </h2>
-              <p className="text-sm sm:text-base text-[#68717D] mt-2 max-w-2xl font-normal leading-relaxed">
-                {isAr
-                  ? 'تشكيلات هندسية نقوم بتصنيعها وهندستها بأعلى معايير الجودة لتلائم أدق متطلبات المشاريع المعمارية والمنازل العصرية.'
-                  : 'Architectural collections manufactured and engineered to global standards for residential and commercial spaces.'}
-              </p>
             </div>
-            <Link
-              to="/products"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors group shrink-0"
-            >
-              <span>استعرض كافة خطوط الإنتاج</span>
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            </Link>
+            <span className="hidden sm:block text-sm text-[#68717D] tabular-nums shrink-0" dir="ltr">
+              {String(FEATURED_COLLECTIONS.length).padStart(2, '0')} Collections
+            </span>
           </div>
 
-          {/* Grid: 6 Large Photography Tiles */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FEATURED_COLLECTIONS.map((col) => (
-              <Link
-                key={col.id}
-                to={`/products?category=${col.categoryKey}`}
-                className="group relative bg-[#FBFBFD] rounded-2xl overflow-hidden border border-[#E7EAF0] transition-all duration-300 hover:border-[#0062D2]/40 hover:shadow-xl hover:shadow-black/5 flex flex-col"
-              >
-                {/* Photo container */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={col.image}
-                    alt={col.nameAr}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                    onError={(e) => {
-                      e.currentTarget.src = '/images/default-product.jpg'
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[#15191E] text-[11px] font-semibold px-3 py-1 rounded-full border border-black/5">
-                    {col.count}
-                  </span>
-                </div>
+          {/* Products row (first 3) + in-place expansion */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
+            <AnimatePresence initial={false}>
+              {(showAllCollections ? FEATURED_COLLECTIONS : FEATURED_COLLECTIONS.slice(0, 3)).map((col, i) => (
+                <motion.article
+                  key={col.id}
+                  layout
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 12 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: i >= 3 ? (i - 3) * 0.08 : 0 }}
+                  className="group"
+                >
+                  {/* Image */}
+                  <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#F5F6F8]">
+                    <img
+                      src={col.image}
+                      alt={col.nameAr}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/default-product.jpg'
+                      }}
+                    />
+                    <span
+                      className="absolute top-4 left-4 text-[11px] font-semibold text-[#15191E] bg-white/90 backdrop-blur px-2.5 py-1 rounded-full tabular-nums"
+                      dir="ltr"
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                  </div>
 
-                {/* Information */}
-                <div className="p-6 flex-grow flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#15191E] group-hover:text-[#0062D2] transition-colors mb-2">
+                  {/* Caption — name only */}
+                  <div className="mt-4 flex items-baseline justify-between gap-3">
+                    <h3 className="text-base sm:text-lg font-semibold text-[#15191E] group-hover:text-[#0062D2] transition-colors">
                       {col.nameAr}
                     </h3>
-                    <p className="text-sm text-[#68717D] leading-relaxed font-normal">
-                      {col.descAr}
-                    </p>
+                    <span className="text-[11px] text-[#9AA1AB] uppercase tracking-wider truncate" dir="ltr">
+                      {col.nameEn}
+                    </span>
                   </div>
-                  <div className="mt-5 pt-4 border-t border-[#E7EAF0] flex items-center justify-between text-xs font-semibold text-[#0062D2]">
-                    <span>استكشف التشكيلة</span>
-                    <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </motion.article>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Show all / show less — stays on the page */}
+          <div className="mt-12 flex justify-center">
+            <button
+              id="toggle-all-collections"
+              type="button"
+              aria-expanded={showAllCollections}
+              onClick={() => {
+                if (showAllCollections) {
+                  collectionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+                setShowAllCollections((v) => !v)
+              }}
+              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-[#15191E]/15 text-sm font-semibold text-[#15191E] hover:border-[#0062D2] hover:text-[#0062D2] transition-colors"
+            >
+              <span>
+                {showAllCollections
+                  ? (isAr ? 'عرض أقل' : 'Show less')
+                  : (isAr ? `عرض جميع المنتجات (${FEATURED_COLLECTIONS.length})` : `View all (${FEATURED_COLLECTIONS.length})`)}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-300 ${showAllCollections ? 'rotate-180' : ''}`}
+              />
+            </button>
           </div>
         </div>
       </section>
