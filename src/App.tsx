@@ -98,8 +98,11 @@ function App() {
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {/* 🌟 الصفحة الرئيسية المعتمدة بالتصميم المعماري المتكامل */}
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+
+          {/* الصفحات الفرعية المغلفة بالتخطيط المشترك */}
           <Route element={<Layout />}>
-            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
             <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
             <Route path="/brands" element={<PageTransition><Brands /></PageTransition>} />
             <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
@@ -117,12 +120,12 @@ function App() {
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           </Route>
 
-          {/* 👈 مسار المعاينة المعمارية البيضاء النظيفة بالكامل (Clean White Architecture) */}
+          {/* 👈 مسار المعاينة للمحافظة على التوافق مع أي روابط سابقة */}
           <Route path="/preview" element={<PageTransition><HomeCleanWhitePreview /></PageTransition>} />
         </Routes>
       </Suspense>
 
-      {!isGamePage && location.pathname !== '/preview' && (
+      {!isGamePage && (
         <>
           <WhatsAppButton />
           <AIChatWidget />
