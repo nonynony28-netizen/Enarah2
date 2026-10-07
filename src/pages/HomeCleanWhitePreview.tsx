@@ -1885,7 +1885,7 @@ export default function HomeCleanWhitePreview() {
           ===================================================================== */}
       <footer className="bg-[#101820] text-white/70 border-t border-white/10 pt-20 pb-12">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 pb-16 border-b border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-white/10">
             {/* Col 1: Brand Info (2 cols on lg) */}
             <div className="lg:col-span-2 space-y-4">
               <div className="flex items-center gap-3">
@@ -1941,43 +1941,6 @@ export default function HomeCleanWhitePreview() {
                 <li>
                   <Link to="/contact" className="hover:text-white transition-colors">
                     اتصل بنا
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Col 3: Collections */}
-            <div>
-              <h4 className="text-sm font-semibold text-white mb-4">التشكيلات والحلول</h4>
-              <ul className="space-y-2.5 text-sm">
-                <li>
-                  <Link to="/products?category=chandeliers" className="hover:text-white transition-colors">
-                    الثريات الفاخرة
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=spotlights" className="hover:text-white transition-colors">
-                    السبوت لايت المعماري
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=outdoor" className="hover:text-white transition-colors">
-                    الإنارة الخارجية والواجهات
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=switches" className="hover:text-white transition-colors">
-                    المفاتيح والبرايز
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=electrical" className="hover:text-white transition-colors">
-                    مواد التأسيس والكوابل
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=solar" className="hover:text-white transition-colors">
-                    أنظمة الطاقة الشمسية
                   </Link>
                 </li>
               </ul>
