@@ -1349,27 +1349,34 @@ export default function HomeCleanWhitePreview() {
           Headline: حين يلتقي اللون بالضوء
           Feature: Real Architectural Wall Photography + Physical Light Wash Simulation
           ===================================================================== */}
-      <section className="py-24 sm:py-32 bg-[#FFFFFF]">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+      {/* =====================================================================
+          SECTION 07: Color & Light (Paint & Color Temperature Interaction)
+          Eyebrow: COLOR & LIGHT STUDIO
+          Headline: حين يلتقي اللون بالضوء
+          Feature: Real Architectural Wall Photography + Physical Light Wash Simulation
+          Mobile Optimized: Sticky live visualizer + unified in-view controls
+          ===================================================================== */}
+      <section className="py-10 sm:py-20 lg:py-28 bg-[#FFFFFF]">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-10 lg:px-16">
           {/* Header */}
-          <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0062D2]/10 border border-[#0062D2]/20 text-[#0062D2] text-xs font-semibold tracking-wider uppercase mb-3">
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-12 lg:mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0062D2]/10 border border-[#0062D2]/20 text-[#0062D2] text-xs font-semibold tracking-wider uppercase mb-2.5 sm:mb-3">
               <Sparkles className="w-3.5 h-3.5" />
               <span>COLOR & LIGHT STUDIO · استوديو الإضاءة المعمارية</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight mb-4">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight mb-2.5 sm:mb-4">
               حين يلتقي اللون بالضوء
             </h2>
-            <p className="text-sm sm:text-base text-[#68717D] leading-relaxed">
+            <p className="text-xs sm:text-base text-[#68717D] leading-relaxed max-w-2xl mx-auto">
               تفاعل فيزيائي حقيقي بين درجة حرارة الضوء (CCT) ولون طلاء الجدار. عاين كيف يُغيّر الكشاف المعماري إشراق المساحة وتأثيرها البصري على جدار حقيقي.
             </p>
           </div>
 
           {/* Main Studio Frame */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch max-w-6xl mx-auto">
-            {/* 1. Real Architectural Wall Showcase (7 cols) */}
-            <div className="lg:col-span-7 flex flex-col">
-              <div className="relative aspect-[4/3] w-full rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-xl bg-[#15191E] flex flex-col justify-between">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-10 items-start max-w-6xl mx-auto">
+            {/* 1. Real Architectural Wall Showcase (7 cols) - Sticky on mobile so it stays visible while scrolling & toggling! */}
+            <div className="lg:col-span-7 flex flex-col sticky top-[62px] sm:top-[68px] lg:static z-20 bg-white py-1 sm:py-0">
+              <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-md sm:shadow-xl bg-[#15191E] flex flex-col justify-between">
                 {/* 5 Real Wall Photography Layers with Smooth Cross-Fade */}
                 {paintColors.map((color) => {
                   const isSelected = selectedPaintId === color.id
@@ -1419,10 +1426,10 @@ export default function HomeCleanWhitePreview() {
                 />
 
                 {/* Floating Top Badge: Fixture Specs & Kelvin */}
-                <div className="relative z-20 p-4 sm:p-5 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5 bg-black/60 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-white text-xs font-medium shadow-lg select-none">
+                <div className="relative z-20 p-3 sm:p-5 flex items-center justify-between">
+                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-white text-[11px] sm:text-xs font-medium shadow-lg select-none">
                     <span
-                      className="w-2.5 h-2.5 rounded-full shadow-sm transition-colors duration-500"
+                      className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full shadow-sm transition-colors duration-500"
                       style={{
                         backgroundColor:
                           paintTemp === 'warm' ? '#FFB85A' : paintTemp === 'natural' ? '#FFFFFF' : '#93C5FD',
@@ -1435,7 +1442,7 @@ export default function HomeCleanWhitePreview() {
                       }}
                     />
                     <span className="hidden sm:inline">كشاف سقف غاطس مضاد للوهج · 36°</span>
-                    <span className="sm:hidden">كشاف غاطس 36°</span>
+                    <span className="sm:hidden">كشاف سقف 36°</span>
                     <span className="text-white/40">|</span>
                     <span className="font-mono text-amber-300 font-bold">
                       {paintTemp === 'warm' ? '3000K' : paintTemp === 'natural' ? '4000K' : '6000K'}
@@ -1444,21 +1451,21 @@ export default function HomeCleanWhitePreview() {
                 </div>
 
                 {/* Floating Bottom Badge: Active Paint Spec & LRV */}
-                <div className="relative z-20 p-4 sm:p-5 flex items-end justify-between">
-                  <div className="bg-white/95 backdrop-blur-md border border-black/5 px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-3.5 select-none transition-all duration-300">
+                <div className="relative z-20 p-3 sm:p-5 flex items-end justify-between">
+                  <div className="bg-white/95 backdrop-blur-md border border-black/5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl shadow-xl flex items-center gap-2.5 sm:gap-3.5 select-none transition-all duration-300">
                     <div
-                      className="w-8 h-8 rounded-xl shadow-inner border border-black/10 shrink-0 transition-colors duration-500"
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl shadow-inner border border-black/10 shrink-0 transition-colors duration-500"
                       style={{ backgroundColor: currentPaint.hex }}
                     />
                     <div className="text-right">
-                      <div className="text-xs font-bold text-[#15191E] flex items-center gap-1.5">
+                      <div className="text-[11px] sm:text-xs font-bold text-[#15191E] flex items-center gap-1 sm:gap-1.5">
                         <span>{currentPaint.name}</span>
-                        <span className="text-[10px] text-[#0062D2] font-semibold bg-[#0062D2]/10 px-1.5 py-0.5 rounded">
+                        <span className="text-[9px] sm:text-[10px] text-[#0062D2] font-semibold bg-[#0062D2]/10 px-1 sm:px-1.5 py-0.5 rounded">
                           {currentPaint.ral}
                         </span>
                       </div>
-                      <div className="text-[10px] text-[#68717D] mt-0.5">
-                        معامل انعكاس الضوء: <strong className="text-[#15191E] font-medium">{currentPaint.lrv}</strong>
+                      <div className="text-[9px] sm:text-[10px] text-[#68717D] mt-0.5">
+                        انعكاس الضوء: <strong className="text-[#15191E] font-medium">{currentPaint.lrv}</strong>
                       </div>
                     </div>
                   </div>
@@ -1471,7 +1478,7 @@ export default function HomeCleanWhitePreview() {
               </div>
 
               {/* Mobile shake trigger notice */}
-              <div className="mt-3 text-center sm:hidden">
+              <div className="mt-1.5 text-center sm:hidden">
                 <button
                   onClick={async () => {
                     const granted = await requestPermission()
@@ -1479,38 +1486,38 @@ export default function HomeCleanWhitePreview() {
                       alert('تم تفعيل مستشعر هز الهاتف لتغيير الإضاءة!')
                     }
                   }}
-                  className="text-xs text-[#0062D2] font-medium flex items-center justify-center gap-1.5 mx-auto py-1"
+                  className="text-[11px] text-[#0062D2] font-medium inline-flex items-center justify-center gap-1.5 py-0.5"
                 >
-                  <Sliders className="w-3.5 h-3.5" />
-                  <span>هز هاتفك لتغيير حرارة الإضاءة</span>
+                  <Sliders className="w-3 h-3" />
+                  <span>يمكنك أيضاً هز الهاتف لتغيير الإضاءة</span>
                 </button>
               </div>
             </div>
 
             {/* 2. Studio Controls & Architectural Advice (5 cols) */}
             <div
-              className="lg:col-span-5 flex flex-col justify-between space-y-5 bg-white p-6 sm:p-7 rounded-3xl border border-[#E5E9F0] shadow-sm"
+              className="lg:col-span-5 flex flex-col justify-between space-y-4 sm:space-y-5 bg-white p-4 sm:p-7 rounded-2xl sm:rounded-3xl border border-[#E5E9F0] shadow-sm"
               style={{ fontFamily: "'Cairo', 'IBM Plex Sans Arabic', -apple-system, sans-serif" }}
             >
               {/* Step 1: Paint Color Selection */}
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-4 rounded-full bg-[#0062D2]" />
-                    <h4 className="text-[13px] sm:text-sm font-bold text-[#0F172A]">
+                <div className="flex items-center justify-between mb-2.5 sm:mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="w-1.5 h-3.5 sm:h-4 rounded-full bg-[#0062D2]" />
+                    <h4 className="text-xs sm:text-sm font-bold text-[#0F172A]">
                       لون الطلاء المعماري
                     </h4>
                     <span className="text-[10px] text-[#64748B] font-mono uppercase tracking-wider hidden sm:inline">
                       · Wall Finish
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-[#0062D2] font-semibold bg-[#0062D2]/8 px-2.5 py-0.5 rounded-full border border-[#0062D2]/15">
+                  <div className="flex items-center gap-1 text-[11px] sm:text-xs text-[#0062D2] font-semibold bg-[#0062D2]/8 px-2 sm:px-2.5 py-0.5 rounded-full border border-[#0062D2]/15">
                     <span>{currentPaint.name}</span>
                     <span className="text-[10px] opacity-75 font-mono">({currentPaint.ral})</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-5 gap-2 sm:gap-2.5">
+                <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5">
                   {paintColors.map((color) => {
                     const active = selectedPaintId === color.id
                     return (
@@ -1518,7 +1525,7 @@ export default function HomeCleanWhitePreview() {
                         key={color.id}
                         type="button"
                         onClick={() => setSelectedPaintId(color.id)}
-                        className={`group relative p-2 sm:p-2.5 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center gap-1.5 ${
+                        className={`group relative p-1.5 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col items-center justify-center text-center gap-1 sm:gap-1.5 ${
                           active
                             ? 'bg-slate-50 border-[#0062D2] shadow-sm ring-2 ring-[#0062D2]/20 -translate-y-0.5'
                             : 'bg-[#F8FAFC] border-[#E2E8F0] hover:bg-white hover:border-[#CBD5E1]'
@@ -1527,17 +1534,17 @@ export default function HomeCleanWhitePreview() {
                       >
                         <div className="relative">
                           <span
-                            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full block border border-black/10 shadow-sm transition-transform duration-300 group-hover:scale-105"
+                            className="w-7 h-7 sm:w-9 sm:h-9 rounded-full block border border-black/10 shadow-sm transition-transform duration-200 group-hover:scale-105"
                             style={{ backgroundColor: color.hex }}
                           />
                           {active && (
-                            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#0062D2] text-white flex items-center justify-center shadow-xs">
-                              <CheckCircle2 className="w-2.5 h-2.5" />
+                            <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-[#0062D2] text-white flex items-center justify-center shadow-xs">
+                              <CheckCircle2 className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
                             </span>
                           )}
                         </div>
                         <span
-                          className={`text-[10.5px] sm:text-[11.5px] font-semibold block leading-tight whitespace-nowrap ${
+                          className={`text-[10px] sm:text-[11.5px] font-semibold block leading-tight whitespace-nowrap ${
                             active ? 'text-[#0062D2]' : 'text-[#334155]'
                           }`}
                         >
@@ -1551,22 +1558,22 @@ export default function HomeCleanWhitePreview() {
 
               {/* Step 2: Light Kelvin Selection */}
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-4 rounded-full bg-[#0062D2]" />
-                    <h4 className="text-[13px] sm:text-sm font-bold text-[#0F172A]">
+                <div className="flex items-center justify-between mb-2.5 sm:mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="w-1.5 h-3.5 sm:h-4 rounded-full bg-[#0062D2]" />
+                    <h4 className="text-xs sm:text-sm font-bold text-[#0F172A]">
                       حرارة الإضاءة المسلطة
                     </h4>
                     <span className="text-[10px] text-[#64748B] font-mono uppercase tracking-wider hidden sm:inline">
                       · CCT
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-bold text-[#0062D2] bg-[#0062D2]/8 px-2.5 py-0.5 rounded-full border border-[#0062D2]/15">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-[#0062D2] bg-[#0062D2]/8 px-2 sm:px-2.5 py-0.5 rounded-full border border-[#0062D2]/15">
                     {paintTemp === 'warm' ? '3000K · دافئ' : paintTemp === 'natural' ? '4000K · طبيعي' : '6000K · نهاري'}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
                   {[
                     {
                       key: 'warm',
@@ -1599,15 +1606,15 @@ export default function HomeCleanWhitePreview() {
                         key={btn.key}
                         type="button"
                         onClick={() => setPaintTemp(btn.key as 'warm' | 'natural' | 'cool')}
-                        className={`p-3 rounded-2xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center relative overflow-hidden group ${
+                        className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center justify-center relative overflow-hidden group ${
                           active
                             ? 'bg-[#0062D2] border-[#0062D2] text-white shadow-md shadow-[#0062D2]/20 -translate-y-0.5'
                             : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#334155] hover:bg-white hover:border-[#CBD5E1]'
                         }`}
                       >
-                        <div className="flex items-center gap-1.5 mb-1">
+                        <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
                           <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0 transition-transform group-hover:scale-110"
+                            className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0 transition-transform group-hover:scale-110"
                             style={{
                               backgroundColor: btn.dot,
                               border: btn.dot === '#FFFFFF' ? '1px solid #CBD5E1' : 'none',
@@ -1618,10 +1625,10 @@ export default function HomeCleanWhitePreview() {
                             {btn.kelvin}
                           </span>
                         </div>
-                        <span className={`text-[11.5px] font-semibold block leading-tight ${active ? 'text-white' : 'text-[#0F172A]'}`}>
+                        <span className={`text-[10.5px] sm:text-[11.5px] font-semibold block leading-tight ${active ? 'text-white' : 'text-[#0F172A]'}`}>
                           {btn.label}
                         </span>
-                        <span className={`text-[9.5px] block mt-0.5 font-normal ${active ? 'text-white/80' : 'text-[#64748B]'}`}>
+                        <span className={`text-[8.5px] sm:text-[9.5px] block mt-0.5 font-normal ${active ? 'text-white/80' : 'text-[#64748B]'}`}>
                           {btn.mood}
                         </span>
                       </button>
@@ -1631,43 +1638,43 @@ export default function HomeCleanWhitePreview() {
               </div>
 
               {/* Step 3: Interior Designer & Architectural Advice */}
-              <div className="rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] p-4 sm:p-5 space-y-3 shadow-xs">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]/80">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-white border border-[#E2E8F0] text-[#0062D2] flex items-center justify-center shadow-xs">
-                      <Sparkles className="w-4 h-4" />
+              <div className="rounded-xl sm:rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] p-3.5 sm:p-5 space-y-2.5 sm:space-y-3 shadow-xs">
+                <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-[#E2E8F0]/80">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white border border-[#E2E8F0] text-[#0062D2] flex items-center justify-center shadow-xs">
+                      <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold text-[#0F172A] block leading-tight">
+                      <span className="text-[11.5px] sm:text-xs font-bold text-[#0F172A] block leading-tight">
                         استشارة التصميم الداخلي والإضاءة
                       </span>
-                      <span className="text-[10px] text-[#64748B] block mt-0.5 font-normal">
+                      <span className="text-[9.5px] sm:text-[10px] text-[#64748B] block mt-0.5 font-normal">
                         تحليل التوافق المعماري بين الطلاء والضوء
                       </span>
                     </div>
                   </div>
-                  <span className="text-[11px] font-semibold text-[#0062D2] bg-white border border-[#0062D2]/20 px-2.5 py-0.5 rounded-full shadow-xs">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-[#0062D2] bg-white border border-[#0062D2]/20 px-2 sm:px-2.5 py-0.5 rounded-full shadow-xs">
                     {currentPaint.contrastMood[paintTemp]}
                   </span>
                 </div>
 
                 {/* Editorial quote with subtle vertical accent bar */}
-                <div className="border-r-2 border-[#0062D2] pr-3 py-0.5">
-                  <p className="text-[13px] sm:text-sm text-[#334155] leading-relaxed font-normal">
+                <div className="border-r-2 border-[#0062D2] pr-2.5 sm:pr-3 py-0.5">
+                  <p className="text-xs sm:text-sm text-[#334155] leading-relaxed font-normal">
                     {currentPaint.advice[paintTemp]}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
-                  <div className="bg-white p-2.5 rounded-xl border border-[#E2E8F0]/80 flex flex-col justify-center">
-                    <span className="text-[#64748B] text-[10px] block mb-0.5 font-normal">الفراغ الموصى به:</span>
-                    <strong className="text-[#0F172A] font-semibold block text-[11.5px] truncate">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 pt-0.5 sm:pt-1 text-[11px]">
+                  <div className="bg-white p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-[#E2E8F0]/80 flex flex-col justify-center">
+                    <span className="text-[#64748B] text-[9.5px] sm:text-[10px] block mb-0.5 font-normal">الفراغ الموصى به:</span>
+                    <strong className="text-[#0F172A] font-semibold block text-[11px] sm:text-[11.5px] truncate">
                       {currentPaint.roomSuggestion[paintTemp]}
                     </strong>
                   </div>
-                  <div className="bg-white p-2.5 rounded-xl border border-[#E2E8F0]/80 flex flex-col justify-center">
-                    <span className="text-[#64748B] text-[10px] block mb-0.5 font-normal">معامل الانعكاس (LRV):</span>
-                    <strong className="text-[#0062D2] font-semibold block text-[11.5px]">
+                  <div className="bg-white p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-[#E2E8F0]/80 flex flex-col justify-center">
+                    <span className="text-[#64748B] text-[9.5px] sm:text-[10px] block mb-0.5 font-normal">معامل الانعكاس (LRV):</span>
+                    <strong className="text-[#0062D2] font-semibold block text-[11px] sm:text-[11.5px]">
                       {currentPaint.lrv}
                     </strong>
                   </div>
