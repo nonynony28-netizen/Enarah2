@@ -1985,7 +1985,7 @@ export default function HomeCleanWhitePreview() {
 
             {/* Col 4: Contact & Locations */}
             <div>
-              <h4 className="text-sm font-semibold text-white mb-4">معرض بنغازي</h4>
+              <h4 className="text-sm font-semibold text-white mb-4">التواصل</h4>
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
