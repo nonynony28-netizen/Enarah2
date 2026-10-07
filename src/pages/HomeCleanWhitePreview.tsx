@@ -1488,40 +1488,46 @@ export default function HomeCleanWhitePreview() {
             </div>
 
             {/* 2. Studio Controls & Architectural Advice (5 cols) */}
-            <div className="lg:col-span-5 flex flex-col justify-between space-y-6 bg-[#F7F8FA] p-6 sm:p-8 rounded-3xl border border-[#E7EAF0]">
+            <div
+              className="lg:col-span-5 flex flex-col justify-between space-y-5 bg-white p-6 sm:p-7 rounded-3xl border border-[#E5E9F0] shadow-sm"
+              style={{ fontFamily: "'Cairo', 'IBM Plex Sans Arabic', -apple-system, sans-serif" }}
+            >
               {/* Step 1: Paint Color Selection */}
               <div>
-                <div className="flex items-center justify-between mb-3.5">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-[#0062D2] text-white text-xs font-bold flex items-center justify-center shadow-xs">
-                      1
-                    </span>
-                    <span className="text-sm font-bold text-[#15191E]">
-                      اختر لون طلاء الجدار:
+                    <span className="w-1.5 h-4 rounded-full bg-[#0062D2]" />
+                    <h4 className="text-[13px] sm:text-sm font-bold text-[#0F172A]">
+                      لون الطلاء المعماري
+                    </h4>
+                    <span className="text-[10px] text-[#64748B] font-mono uppercase tracking-wider hidden sm:inline">
+                      · Wall Finish
                     </span>
                   </div>
-                  <span className="text-[11px] text-[#68717D] font-medium">
-                    {currentPaint.name}
-                  </span>
+                  <div className="flex items-center gap-1.5 text-xs text-[#0062D2] font-semibold bg-[#0062D2]/8 px-2.5 py-0.5 rounded-full border border-[#0062D2]/15">
+                    <span>{currentPaint.name}</span>
+                    <span className="text-[10px] opacity-75 font-mono">({currentPaint.ral})</span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-2 sm:gap-2.5">
                   {paintColors.map((color) => {
                     const active = selectedPaintId === color.id
                     return (
                       <button
                         key={color.id}
+                        type="button"
                         onClick={() => setSelectedPaintId(color.id)}
-                        className={`p-2.5 rounded-2xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-1.5 group ${
+                        className={`group relative p-2 sm:p-2.5 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center gap-1.5 ${
                           active
-                            ? 'bg-white border-[#0062D2] ring-2 ring-[#0062D2]/25 shadow-md -translate-y-0.5'
-                            : 'bg-white/80 border-[#E7EAF0] hover:bg-white hover:border-[#CCD2DB]'
+                            ? 'bg-slate-50 border-[#0062D2] shadow-sm ring-2 ring-[#0062D2]/20 -translate-y-0.5'
+                            : 'bg-[#F8FAFC] border-[#E2E8F0] hover:bg-white hover:border-[#CBD5E1]'
                         }`}
-                        title={color.name}
+                        title={`${color.name} (${color.toneEn})`}
                       >
                         <div className="relative">
                           <span
-                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-black/15 shadow-sm block transition-transform group-hover:scale-105"
+                            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full block border border-black/10 shadow-sm transition-transform duration-300 group-hover:scale-105"
                             style={{ backgroundColor: color.hex }}
                           />
                           {active && (
@@ -1531,8 +1537,8 @@ export default function HomeCleanWhitePreview() {
                           )}
                         </div>
                         <span
-                          className={`text-[11px] font-bold block truncate max-w-full ${
-                            active ? 'text-[#0062D2]' : 'text-[#15191E]'
+                          className={`text-[10.5px] sm:text-[11.5px] font-semibold block leading-tight whitespace-nowrap ${
+                            active ? 'text-[#0062D2]' : 'text-[#334155]'
                           }`}
                         >
                           {color.name}
@@ -1545,17 +1551,18 @@ export default function HomeCleanWhitePreview() {
 
               {/* Step 2: Light Kelvin Selection */}
               <div>
-                <div className="flex items-center justify-between mb-3.5">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-[#0062D2] text-white text-xs font-bold flex items-center justify-center shadow-xs">
-                      2
-                    </span>
-                    <span className="text-sm font-bold text-[#15191E]">
-                      اختر حرارة الإضاءة المسلطة:
+                    <span className="w-1.5 h-4 rounded-full bg-[#0062D2]" />
+                    <h4 className="text-[13px] sm:text-sm font-bold text-[#0F172A]">
+                      حرارة الإضاءة المسلطة
+                    </h4>
+                    <span className="text-[10px] text-[#64748B] font-mono uppercase tracking-wider hidden sm:inline">
+                      · CCT
                     </span>
                   </div>
-                  <span className="text-[11px] text-[#0062D2] font-mono font-semibold">
-                    {paintTemp === 'warm' ? '3000K' : paintTemp === 'natural' ? '4000K' : '6000K'}
+                  <span className="text-xs font-mono font-bold text-[#0062D2] bg-[#0062D2]/8 px-2.5 py-0.5 rounded-full border border-[#0062D2]/15">
+                    {paintTemp === 'warm' ? '3000K · دافئ' : paintTemp === 'natural' ? '4000K · طبيعي' : '6000K · نهاري'}
                   </span>
                 </div>
 
@@ -1566,56 +1573,55 @@ export default function HomeCleanWhitePreview() {
                       kelvin: '3000K',
                       label: 'أصفر دافئ',
                       mood: 'أجواء حميمية',
-                      dot: '#FFB85A'
+                      dot: '#FFB85A',
+                      glow: 'rgba(255, 184, 90, 0.45)'
                     },
                     {
                       key: 'natural',
                       kelvin: '4000K',
                       label: 'شمسي طبيعي',
                       mood: 'توازن واقعي',
-                      dot: '#FFFFFF'
+                      dot: '#FFFFFF',
+                      glow: 'rgba(255, 255, 255, 0.45)'
                     },
                     {
                       key: 'cool',
                       kelvin: '6000K',
                       label: 'أبيض نهاري',
                       mood: 'وضوح ونشاط',
-                      dot: '#93C5FD'
+                      dot: '#93C5FD',
+                      glow: 'rgba(147, 197, 253, 0.45)'
                     }
                   ].map((btn) => {
                     const active = paintTemp === btn.key
                     return (
                       <button
                         key={btn.key}
+                        type="button"
                         onClick={() => setPaintTemp(btn.key as 'warm' | 'natural' | 'cool')}
                         className={`p-3 rounded-2xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center relative overflow-hidden group ${
                           active
-                            ? 'bg-[#15191E] border-[#15191E] text-white shadow-lg -translate-y-0.5'
-                            : 'bg-white border-[#E7EAF0] text-[#15191E] hover:bg-white hover:border-[#CCD2DB]'
+                            ? 'bg-[#0062D2] border-[#0062D2] text-white shadow-md shadow-[#0062D2]/20 -translate-y-0.5'
+                            : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#334155] hover:bg-white hover:border-[#CBD5E1]'
                         }`}
                       >
-                        {active && (
-                          <span
-                            className="absolute top-0 left-0 right-0 h-1"
-                            style={{ backgroundColor: btn.dot === '#FFFFFF' ? '#0062D2' : btn.dot }}
-                          />
-                        )}
                         <div className="flex items-center gap-1.5 mb-1">
                           <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
+                            className="w-2.5 h-2.5 rounded-full shrink-0 transition-transform group-hover:scale-110"
                             style={{
                               backgroundColor: btn.dot,
-                              border: btn.dot === '#FFFFFF' ? '1px solid #D2D6DC' : 'none'
+                              border: btn.dot === '#FFFFFF' ? '1px solid #CBD5E1' : 'none',
+                              boxShadow: active ? `0 0 8px ${btn.glow}` : 'none'
                             }}
                           />
-                          <span className={`text-xs sm:text-sm font-bold font-mono ${active ? 'text-white' : 'text-[#15191E]'}`}>
+                          <span className={`text-xs sm:text-sm font-mono font-bold ${active ? 'text-white' : 'text-[#0F172A]'}`}>
                             {btn.kelvin}
                           </span>
                         </div>
-                        <span className={`text-[11px] font-bold block ${active ? 'text-white/95' : 'text-[#15191E]'}`}>
+                        <span className={`text-[11.5px] font-semibold block leading-tight ${active ? 'text-white' : 'text-[#0F172A]'}`}>
                           {btn.label}
                         </span>
-                        <span className={`text-[9px] block mt-0.5 ${active ? 'text-white/60' : 'text-[#68717D]'}`}>
+                        <span className={`text-[9.5px] block mt-0.5 font-normal ${active ? 'text-white/80' : 'text-[#64748B]'}`}>
                           {btn.mood}
                         </span>
                       </button>
@@ -1625,40 +1631,43 @@ export default function HomeCleanWhitePreview() {
               </div>
 
               {/* Step 3: Interior Designer & Architectural Advice */}
-              <div className="rounded-2xl bg-white border border-[#E7EAF0] p-4 sm:p-5 space-y-3 shadow-xs">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E7EAF0]">
+              <div className="rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] p-4 sm:p-5 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]/80">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-[#0062D2] text-white flex items-center justify-center shadow-xs">
+                    <div className="w-8 h-8 rounded-xl bg-white border border-[#E2E8F0] text-[#0062D2] flex items-center justify-center shadow-xs">
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold text-[#15191E] block">
-                        رأي مهندس التصميم الداخلي
+                      <span className="text-xs font-bold text-[#0F172A] block leading-tight">
+                        استشارة التصميم الداخلي والإضاءة
                       </span>
-                      <span className="text-[10px] text-[#68717D]">
-                        تحليل تفاعل خامة الطلاء مع الضوء
+                      <span className="text-[10px] text-[#64748B] block mt-0.5 font-normal">
+                        تحليل التوافق المعماري بين الطلاء والضوء
                       </span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-semibold text-[#0062D2] bg-[#0062D2]/10 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-semibold text-[#0062D2] bg-white border border-[#0062D2]/20 px-2.5 py-0.5 rounded-full shadow-xs">
                     {currentPaint.contrastMood[paintTemp]}
                   </span>
                 </div>
 
-                <p className="text-xs sm:text-sm text-[#15191E] leading-relaxed font-medium">
-                  "{currentPaint.advice[paintTemp]}"
-                </p>
+                {/* Editorial quote with subtle vertical accent bar */}
+                <div className="border-r-2 border-[#0062D2] pr-3 py-0.5">
+                  <p className="text-[13px] sm:text-sm text-[#334155] leading-relaxed font-normal">
+                    {currentPaint.advice[paintTemp]}
+                  </p>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
-                  <div className="bg-[#F7F8FA] p-2.5 rounded-xl border border-[#E7EAF0]">
-                    <span className="text-[#68717D] text-[10px] block mb-0.5">الفراغ المثالي:</span>
-                    <strong className="text-[#15191E] font-semibold block text-[11px] truncate">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E2E8F0]/80 flex flex-col justify-center">
+                    <span className="text-[#64748B] text-[10px] block mb-0.5 font-normal">الفراغ الموصى به:</span>
+                    <strong className="text-[#0F172A] font-semibold block text-[11.5px] truncate">
                       {currentPaint.roomSuggestion[paintTemp]}
                     </strong>
                   </div>
-                  <div className="bg-[#F7F8FA] p-2.5 rounded-xl border border-[#E7EAF0]">
-                    <span className="text-[#68717D] text-[10px] block mb-0.5">معامل الانعكاس:</span>
-                    <strong className="text-[#0062D2] font-semibold block text-[11px]">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E2E8F0]/80 flex flex-col justify-center">
+                    <span className="text-[#64748B] text-[10px] block mb-0.5 font-normal">معامل الانعكاس (LRV):</span>
+                    <strong className="text-[#0062D2] font-semibold block text-[11.5px]">
                       {currentPaint.lrv}
                     </strong>
                   </div>
