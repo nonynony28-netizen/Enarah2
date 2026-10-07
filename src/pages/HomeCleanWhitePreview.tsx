@@ -31,7 +31,8 @@ import {
   Sliders,
   Zap,
   Globe,
-  Building2
+  Building2,
+  ShoppingCart
 } from 'lucide-react'
 import type { ProjectItem } from '../data/projectsData'
 import {
@@ -1682,6 +1683,75 @@ export default function HomeCleanWhitePreview() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          SECTION: Italian & Turkish Wires (Direct from Factory Showcase)
+          ===================================================================== */}
+      <section id="wires-import-showcase" className="py-14 sm:py-16 md:py-24 lg:py-28 relative overflow-hidden bg-[#F5F8FC] border-t border-slate-200">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-16 items-center" dir={isAr ? 'rtl' : 'ltr'}>
+            
+            {/* العمود التحريري (العنوان، الوصف، وزر الإجراء على الديسكتوب) */}
+            <div className="order-1 lg:col-span-5 text-right space-y-4">
+              <h2 className="mobile-section-h2 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
+                {isAr ? (
+                  <>أسلاك وكوابل إيطالية وتركية <br className="hidden sm:inline" /><span className="text-blue-600">من المصنع مباشرة</span></>
+                ) : (
+                  <>Italian & Turkish Wires <br className="hidden sm:inline" /><span className="text-blue-600">Direct from Source</span></>
+                )}
+              </h2>
+
+              <p className="mobile-body text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-normal">
+                {isAr
+                  ? 'نوفر أفضل وأجود أنواع الأسلاك والكوابل الإيطالية والتركية المعتمدة لجميع مشاريع التأسيس السكني والتجاري بنحاس نقي 100% وعزل حراري فائق الأمان.'
+                  : 'We supply certified Italian and Turkish wires and cables engineered with 100% pure electrolytic copper and flame-retardant PVC insulation.'}
+              </p>
+
+              {/* زر الإجراء السريع لسطح المكتب */}
+              <div className="pt-2 hidden lg:block">
+                <Link 
+                  to="/products"
+                  className="mobile-btn inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center group"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>{isAr ? 'استكشف كتالوج الأسلاك واطلب أونلاين' : 'Explore Wire Catalog & Order Online'}</span>
+                  <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180 group-hover:-translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+
+            {/* عمود الصورة المعمارية الكبرى */}
+            <div className="order-2 lg:col-span-7 w-full">
+              <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] bg-slate-100">
+                <img
+                  src="/images/wires-italian-turkish-showcase.jpg"
+                  alt={isAr ? "أسلاك وكوابل كهربائية إيطالية وتركية معتمدة من المصنع مباشرة مع علمي تركيا وإيطاليا" : "Certified Italian and Turkish electrical wires and cables direct from factory with flags"}
+                  width={1024}
+                  height={576}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* زر الإجراء السريع على الموبايل (يظهر تحت الصورة مباشرة لراحة التصفح) */}
+            <div className="order-3 lg:hidden w-full pt-1">
+              <Link 
+                to="/products"
+                className="mobile-btn inline-flex items-center justify-center gap-2.5 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer text-center group"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>{isAr ? 'استكشف كتالوج الأسلاك واطلب أونلاين' : 'Explore Wire Catalog & Order Online'}</span>
+                <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180 group-hover:-translate-x-1 transition-transform" />
+              </Link>
+            </div>
+
+          </div>
+
         </div>
       </section>
 
