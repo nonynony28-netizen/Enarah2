@@ -50,7 +50,20 @@ const getPaintColors = (isAr: boolean) => [
   {
     id: 'white',
     name: isAr ? 'أبيض ناصع' : 'Pure White',
+    toneEn: 'Pure Off-White',
     hex: '#F8F9FA',
+    lrv: '88% (عكس فائق)',
+    ral: 'RAL 9016',
+    roomSuggestion: {
+      warm: isAr ? 'المجالس العائلية وغرف النوم الرئيسية' : 'Family lounges & master bedrooms',
+      natural: isAr ? 'الصالات الرئيسية والممرات المعمارية' : 'Living areas & corridors',
+      cool: isAr ? 'المكاتب الحديثة وصالات العرض' : 'Modern offices & showrooms'
+    },
+    contrastMood: {
+      warm: isAr ? 'دفء كلاسيكي مريح' : 'Cozy ambient warmth',
+      natural: isAr ? 'تطابق معماري نقي' : 'Purest architectural fidelity',
+      cool: isAr ? 'إشراق نهاري عالي الوضوح' : 'High-clarity daylight brilliance'
+    },
     advice: {
       warm: isAr
         ? 'يعطي دفئاً ومظهراً كلاسيكياً مريحاً للعين، خيار مثالي لغرف النوم والمجالس العائلية.'
@@ -66,7 +79,20 @@ const getPaintColors = (isAr: boolean) => [
   {
     id: 'beige',
     name: isAr ? 'بيج دافئ' : 'Warm Beige',
+    toneEn: 'Cashmere Beige',
     hex: '#F4ECE1',
+    lrv: '68% (انعكاس متوازن)',
+    ral: 'RAL 1015',
+    roomSuggestion: {
+      warm: isAr ? 'الصالات الفاخرة والمجالس الملكية' : 'Luxury majlis & salons',
+      natural: isAr ? 'غرف المعيشة وصالات الطعام' : 'Living rooms & dining areas',
+      cool: isAr ? 'غير محبذ مع البيج الدافئ' : 'Not recommended with beige'
+    },
+    contrastMood: {
+      warm: isAr ? 'انسجام استثنائي فاخر' : 'Opulent warm harmony',
+      natural: isAr ? 'توازن واقعي يظهر خامة الطلاء' : 'Natural balanced fidelity',
+      cool: isAr ? 'يبهت درجات البيج' : 'Dulls warm undertones'
+    },
     advice: {
       warm: isAr
         ? 'انسجام معماري استثنائي! يعزز عمق البيج ويخلق أجواء حميمية وفخمة للصالات والمجالس.'
@@ -82,7 +108,20 @@ const getPaintColors = (isAr: boolean) => [
   {
     id: 'grey',
     name: isAr ? 'رمادي عصري' : 'Modern Grey',
+    toneEn: 'Contemporary Grey',
     hex: '#E2E6EA',
+    lrv: '54% (تدرج حيادي)',
+    ral: 'RAL 7035',
+    roomSuggestion: {
+      warm: isAr ? 'المجالس العصرية بحذر لوني' : 'Modern lounges with care',
+      natural: isAr ? 'المساحات المعمارية المفتوحة' : 'Open architectural spaces',
+      cool: isAr ? 'المكاتب التقنية وصالات العرض' : 'Minimalist tech offices'
+    },
+    contrastMood: {
+      warm: isAr ? 'يكسر البرودة بمسحة صفراء' : 'Softens cool undertones',
+      natural: isAr ? 'التطابق المعماري الأكثر دقة' : 'Definitive architectural match',
+      cool: isAr ? 'طابع تقني معاصر يوحي بالاتساع' : 'Futuristic architectural feel'
+    },
     advice: {
       warm: isAr
         ? 'تنبيه معماري: الضوء الدافئ الشديد قد يُكسب الرمادي مسحة مصفرة، استخدمه بحذر.'
@@ -98,7 +137,20 @@ const getPaintColors = (isAr: boolean) => [
   {
     id: 'navy',
     name: isAr ? 'أزرق كحلي' : 'Deep Navy',
+    toneEn: 'Royal Accent Navy',
     hex: '#1E293B',
+    lrv: '11% (امتصاص وتباين)',
+    ral: 'RAL 5008',
+    roomSuggestion: {
+      warm: isAr ? 'الجدران المميزة (Accent Walls)' : 'Feature accent walls',
+      natural: isAr ? 'جدران التحف واللوحات الفنية' : 'Art gallery walls & salons',
+      cool: isAr ? 'المساحات المستقبلية وصالات العرض' : 'Modern minimalist showrooms'
+    },
+    contrastMood: {
+      warm: isAr ? 'تباين درامي فاخر وهادئ' : 'Rich dramatic contrast',
+      natural: isAr ? 'إظهار عمق الكحلي بواقعية' : 'Balanced optical depth',
+      cool: isAr ? 'تركيز ضوئي حاد معاصر' : 'Crisp modern focus'
+    },
     advice: {
       warm: isAr
         ? 'يخلق تبايناً درامياً فاخراً يبرز تفاصيل الجدران المميزة (Accent Walls) بأناقة هادئة.'
@@ -114,7 +166,20 @@ const getPaintColors = (isAr: boolean) => [
   {
     id: 'green',
     name: isAr ? 'أخضر زيتي' : 'Olive Green',
+    toneEn: 'Heritage Olive',
     hex: '#3F4E3F',
+    lrv: '16% (عمق ترابي فخم)',
+    ral: 'RAL 6003',
+    roomSuggestion: {
+      warm: isAr ? 'المجالس، غرف القراءة والاسترخاء' : 'Reading lounges & majlis',
+      natural: isAr ? 'المساحات المعيشية المتصلة بالطبيعة' : 'Biophilic living spaces',
+      cool: isAr ? 'صالات الاستقبال وبيئات العمل' : 'Executive reception spaces'
+    },
+    contrastMood: {
+      warm: isAr ? 'طابع عضوي ترابي مريح' : 'Earthy organic warmth',
+      natural: isAr ? 'نضارة طبيعية واقعية نابضة' : 'Fresh natural presence',
+      cool: isAr ? 'طابع رسمي منضبط' : 'Disciplined formal tone'
+    },
     advice: {
       warm: isAr
         ? 'يعزز الطابع الطبيعي والترابي للأخضر الزيتي، ويوفر بيئة دافئة مريحة للاسترخاء.'
@@ -351,13 +416,23 @@ export default function HomeCleanWhitePreview() {
 
   const { neutralOpacity: simNeutralOpacity, coolOpacity: simCoolOpacity } = getSimOpacities(simKelvin)
 
-  // Preload all 4 photorealistic variations (all-off, 3000K, 4000K, 6000K)
+  // Preload all photorealistic variations for Room Simulator & Wall Simulator
   useEffect(() => {
     const simPhotos = [
       '/images/simulator/room-all-off.jpg?v=2',
       '/images/simulator/room-3000k.jpg?v=2',
       '/images/simulator/room-4000k.jpg?v=2',
-      '/images/simulator/room-6000k.jpg?v=2'
+      '/images/simulator/room-6000k.jpg?v=2',
+      '/images/wall-simulator/wall-white-warm.jpg',
+      '/images/wall-simulator/wall-white-cool.jpg',
+      '/images/wall-simulator/wall-beige-warm.jpg',
+      '/images/wall-simulator/wall-beige-cool.jpg',
+      '/images/wall-simulator/wall-grey-warm.jpg',
+      '/images/wall-simulator/wall-grey-cool.jpg',
+      '/images/wall-simulator/wall-navy-warm.jpg',
+      '/images/wall-simulator/wall-navy-cool.jpg',
+      '/images/wall-simulator/wall-green-warm.jpg',
+      '/images/wall-simulator/wall-green-cool.jpg'
     ]
     simPhotos.forEach((src) => {
       const img = new Image()
@@ -1270,77 +1345,132 @@ export default function HomeCleanWhitePreview() {
 
       {/* =====================================================================
           SECTION 07: Color & Light (Paint & Color Temperature Interaction)
-          Eyebrow: COLOR & LIGHT
+          Eyebrow: COLOR & LIGHT STUDIO
           Headline: حين يلتقي اللون بالضوء
-          Feature: Wall Paint & Light Interaction with Interior Designer Advice
+          Feature: Real Architectural Wall Photography + Physical Light Wash Simulation
           ===================================================================== */}
       <section className="py-24 sm:py-32 bg-[#FFFFFF]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
-              COLOR & LIGHT
-            </span>
+          {/* Header */}
+          <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0062D2]/10 border border-[#0062D2]/20 text-[#0062D2] text-xs font-semibold tracking-wider uppercase mb-3">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>COLOR & LIGHT STUDIO · استوديو الإضاءة المعمارية</span>
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight mb-4">
               حين يلتقي اللون بالضوء
             </h2>
             <p className="text-sm sm:text-base text-[#68717D] leading-relaxed">
-              تفاعل لون طلاء الجدار مع درجة حرارة الضوء يغيّر تماماً إدراك الفراغ. اختر لون الطلاء واكتشف الإضاءة المناسبة له.
+              تفاعل فيزيائي حقيقي بين درجة حرارة الضوء (CCT) ولون طلاء الجدار. عاين كيف يُغيّر الكشاف المعماري إشراق المساحة وتأثيرها البصري على جدار حقيقي.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center max-w-5xl mx-auto bg-[#F7F8FA] p-6 sm:p-10 rounded-3xl border border-[#E7EAF0]">
-            {/* Visual Canvas (5 cols) */}
-            <div className="lg:col-span-5 relative">
-              <div
-                className="relative aspect-square w-full rounded-2xl overflow-hidden border border-[#E7EAF0] shadow-inner transition-colors duration-500 flex flex-col justify-end p-6"
-                style={{ backgroundColor: currentPaint.hex }}
-              >
-                {/* Spotlight cone cast onto wall */}
+          {/* Main Studio Frame */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch max-w-6xl mx-auto">
+            {/* 1. Real Architectural Wall Showcase (7 cols) */}
+            <div className="lg:col-span-7 flex flex-col">
+              <div className="relative aspect-[4/3] w-full rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-xl bg-[#15191E] flex flex-col justify-between">
+                {/* 5 Real Wall Photography Layers with Smooth Cross-Fade */}
+                {paintColors.map((color) => {
+                  const isSelected = selectedPaintId === color.id
+                  return (
+                    <div
+                      key={color.id}
+                      className={`absolute inset-0 transition-opacity duration-700 pointer-events-none ${
+                        isSelected ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                      }`}
+                    >
+                      {/* 3000K Base Warm Photo */}
+                      <img
+                        src={`/images/wall-simulator/wall-${color.id}-warm.jpg`}
+                        alt={`${color.name} 3000K`}
+                        className="w-full h-full object-cover select-none"
+                      />
+                      {/* 6000K Cool Photo with smooth transition according to Kelvin */}
+                      <img
+                        src={`/images/wall-simulator/wall-${color.id}-cool.jpg`}
+                        alt={`${color.name} 6000K`}
+                        className="absolute inset-0 w-full h-full object-cover select-none transition-opacity duration-500"
+                        style={{
+                          opacity: paintTemp === 'warm' ? 0 : paintTemp === 'natural' ? 0.52 : 1
+                        }}
+                      />
+                    </div>
+                  )
+                })}
+
+                {/* Interactive Lens Aperture Highlight at Ceiling Fixture */}
                 <div
-                  className="absolute inset-0 pointer-events-none transition-all duration-500"
+                  className="absolute top-[6.8%] left-1/2 -translate-x-1/2 w-4 h-2 rounded-full blur-[1px] pointer-events-none transition-all duration-500 z-20"
                   style={{
-                    clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-                    background:
+                    backgroundColor:
                       paintTemp === 'warm'
-                        ? 'linear-gradient(to bottom, rgba(255, 180, 80, 0.35), transparent 85%)'
+                        ? 'rgba(255, 190, 90, 0.95)'
                         : paintTemp === 'natural'
-                        ? 'linear-gradient(to bottom, rgba(255, 245, 220, 0.25), transparent 85%)'
-                        : 'linear-gradient(to bottom, rgba(200, 230, 255, 0.28), transparent 85%)',
-                    opacity: paintTransitioning ? 0.3 : 1
+                        ? 'rgba(255, 255, 250, 0.95)'
+                        : 'rgba(215, 235, 255, 0.95)',
+                    boxShadow:
+                      paintTemp === 'warm'
+                        ? '0 0 18px 5px rgba(255, 180, 80, 0.7)'
+                        : paintTemp === 'natural'
+                        ? '0 0 16px 4px rgba(255, 255, 240, 0.6)'
+                        : '0 0 18px 5px rgba(180, 220, 255, 0.7)'
                   }}
                 />
 
-                {/* Ceiling Spotlight Fixture */}
-                <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center">
-                  <div className="w-8 h-2 bg-slate-800 rounded-full" />
-                  <div
-                    className="w-4 h-4 rounded-full mt-0.5 shadow-md transition-colors duration-300"
-                    style={{
-                      backgroundColor:
-                        paintTemp === 'warm'
-                          ? '#F59E0B'
-                          : paintTemp === 'natural'
-                          ? '#FEF08A'
-                          : '#BAE6FD'
-                    }}
-                  />
+                {/* Floating Top Badge: Fixture Specs & Kelvin */}
+                <div className="relative z-20 p-4 sm:p-5 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5 bg-black/60 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-white text-xs font-medium shadow-lg select-none">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shadow-sm transition-colors duration-500"
+                      style={{
+                        backgroundColor:
+                          paintTemp === 'warm' ? '#FFB85A' : paintTemp === 'natural' ? '#FFFFFF' : '#93C5FD',
+                        boxShadow:
+                          paintTemp === 'warm'
+                            ? '0 0 8px #FFB85A'
+                            : paintTemp === 'natural'
+                            ? '0 0 8px #FFFFFF'
+                            : '0 0 8px #93C5FD'
+                      }}
+                    />
+                    <span className="hidden sm:inline">كشاف سقف غاطس مضاد للوهج · 36°</span>
+                    <span className="sm:hidden">كشاف غاطس 36°</span>
+                    <span className="text-white/40">|</span>
+                    <span className="font-mono text-amber-300 font-bold">
+                      {paintTemp === 'warm' ? '3000K' : paintTemp === 'natural' ? '4000K' : '6000K'}
+                    </span>
+                  </div>
+
+                  <div className="hidden sm:flex items-center gap-1.5 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full text-white/90 text-xs font-medium shadow-lg select-none">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>صورة فوتوغرافية حقيقية</span>
+                  </div>
                 </div>
 
-                {/* Overlay Badge */}
-                <div className="relative z-10 bg-white/95 backdrop-blur-md p-3.5 rounded-xl border border-black/5 shadow-sm text-xs">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[#68717D]">الطلاء:</span>
-                    <strong className="text-[#15191E]">{currentPaint.name}</strong>
+                {/* Floating Bottom Badge: Active Paint Spec & LRV */}
+                <div className="relative z-20 p-4 sm:p-5 flex items-end justify-between">
+                  <div className="bg-white/95 backdrop-blur-md border border-black/5 px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-3.5 select-none transition-all duration-300">
+                    <div
+                      className="w-8 h-8 rounded-xl shadow-inner border border-black/10 shrink-0 transition-colors duration-500"
+                      style={{ backgroundColor: currentPaint.hex }}
+                    />
+                    <div className="text-right">
+                      <div className="text-xs font-bold text-[#15191E] flex items-center gap-1.5">
+                        <span>{currentPaint.name}</span>
+                        <span className="text-[10px] text-[#0062D2] font-semibold bg-[#0062D2]/10 px-1.5 py-0.5 rounded">
+                          {currentPaint.ral}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[#68717D] mt-0.5">
+                        معامل انعكاس الضوء: <strong className="text-[#15191E] font-medium">{currentPaint.lrv}</strong>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#68717D]">الإضاءة:</span>
-                    <strong className="text-[#0062D2]">
-                      {paintTemp === 'warm'
-                        ? '3000K (أصفر دافئ)'
-                        : paintTemp === 'natural'
-                        ? '4000K (شمسي طبيعي)'
-                        : '6000K (أبيض نهاري)'}
-                    </strong>
+
+                  <div className="hidden md:flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3.5 py-2 rounded-2xl text-white/90 text-[11px] shadow-lg select-none">
+                    <Sparkles className="w-3.5 h-3.5 text-[#FFD285]" />
+                    <span>تفاعل لوني واقعي</span>
                   </div>
                 </div>
               </div>
@@ -1354,85 +1484,189 @@ export default function HomeCleanWhitePreview() {
                       alert('تم تفعيل مستشعر هز الهاتف لتغيير الإضاءة!')
                     }
                   }}
-                  className="text-[11px] text-[#0062D2] underline"
+                  className="text-xs text-[#0062D2] font-medium flex items-center justify-center gap-1.5 mx-auto py-1"
                 >
-                  تفعيل ميزة هز الهاتف لتغيير الإضاءة
+                  <Sliders className="w-3.5 h-3.5" />
+                  <span>هز هاتفك لتغيير حرارة الإضاءة</span>
                 </button>
               </div>
             </div>
 
-            {/* Controls & Architectural Advice (7 cols) */}
-            <div className="lg:col-span-7 flex flex-col justify-center space-y-8">
-              {/* 1. Paint Color Selection */}
+            {/* 2. Studio Controls & Architectural Advice (5 cols) */}
+            <div className="lg:col-span-5 flex flex-col justify-between space-y-6 bg-[#F7F8FA] p-6 sm:p-8 rounded-3xl border border-[#E7EAF0]">
+              {/* Step 1: Paint Color Selection */}
               <div>
-                <span className="text-xs font-semibold text-[#15191E] block mb-3">
-                  1. اختر لون طلاء الجدار:
-                </span>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-[#0062D2] text-white text-xs font-bold flex items-center justify-center shadow-xs">
+                      1
+                    </span>
+                    <span className="text-sm font-bold text-[#15191E]">
+                      اختر لون طلاء الجدار:
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#68717D] font-medium">
+                    {currentPaint.name}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-5 gap-2">
                   {paintColors.map((color) => {
                     const active = selectedPaintId === color.id
                     return (
                       <button
                         key={color.id}
                         onClick={() => setSelectedPaintId(color.id)}
-                        className={`p-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-2 transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-2xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-1.5 group ${
                           active
-                            ? 'bg-white border-[#0062D2] text-[#0062D2] shadow-sm ring-2 ring-[#0062D2]/20'
-                            : 'bg-white/60 border-[#E7EAF0] text-[#15191E] hover:bg-white'
+                            ? 'bg-white border-[#0062D2] ring-2 ring-[#0062D2]/25 shadow-md -translate-y-0.5'
+                            : 'bg-white/80 border-[#E7EAF0] hover:bg-white hover:border-[#CCD2DB]'
                         }`}
+                        title={color.name}
                       >
+                        <div className="relative">
+                          <span
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-black/15 shadow-sm block transition-transform group-hover:scale-105"
+                            style={{ backgroundColor: color.hex }}
+                          />
+                          {active && (
+                            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#0062D2] text-white flex items-center justify-center shadow-xs">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                            </span>
+                          )}
+                        </div>
                         <span
-                          className="w-5 h-5 rounded-full border border-black/10 shadow-inner"
-                          style={{ backgroundColor: color.hex }}
-                        />
-                        <span>{color.name}</span>
+                          className={`text-[11px] font-bold block truncate max-w-full ${
+                            active ? 'text-[#0062D2]' : 'text-[#15191E]'
+                          }`}
+                        >
+                          {color.name}
+                        </span>
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              {/* 2. Light Kelvin Selection */}
+              {/* Step 2: Light Kelvin Selection */}
               <div>
-                <span className="text-xs font-semibold text-[#15191E] block mb-3">
-                  2. اختر حرارة الإضاءة المسلطة:
-                </span>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-[#0062D2] text-white text-xs font-bold flex items-center justify-center shadow-xs">
+                      2
+                    </span>
+                    <span className="text-sm font-bold text-[#15191E]">
+                      اختر حرارة الإضاءة المسلطة:
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#0062D2] font-mono font-semibold">
+                    {paintTemp === 'warm' ? '3000K' : paintTemp === 'natural' ? '4000K' : '6000K'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2.5">
                   {[
-                    { key: 'warm', label: '3000K أصفر دافئ' },
-                    { key: 'natural', label: '4000K شمسي طبيعي' },
-                    { key: 'cool', label: '6000K أبيض نهاري' }
+                    {
+                      key: 'warm',
+                      kelvin: '3000K',
+                      label: 'أصفر دافئ',
+                      mood: 'أجواء حميمية',
+                      dot: '#FFB85A'
+                    },
+                    {
+                      key: 'natural',
+                      kelvin: '4000K',
+                      label: 'شمسي طبيعي',
+                      mood: 'توازن واقعي',
+                      dot: '#FFFFFF'
+                    },
+                    {
+                      key: 'cool',
+                      kelvin: '6000K',
+                      label: 'أبيض نهاري',
+                      mood: 'وضوح ونشاط',
+                      dot: '#93C5FD'
+                    }
                   ].map((btn) => {
                     const active = paintTemp === btn.key
                     return (
                       <button
                         key={btn.key}
                         onClick={() => setPaintTemp(btn.key as 'warm' | 'natural' | 'cool')}
-                        className={`py-3 px-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                        className={`p-3 rounded-2xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center relative overflow-hidden group ${
                           active
-                            ? 'bg-[#0062D2] text-white border-[#0062D2] shadow-sm'
-                            : 'bg-white border-[#E7EAF0] text-[#15191E] hover:bg-slate-50'
+                            ? 'bg-[#15191E] border-[#15191E] text-white shadow-lg -translate-y-0.5'
+                            : 'bg-white border-[#E7EAF0] text-[#15191E] hover:bg-white hover:border-[#CCD2DB]'
                         }`}
                       >
-                        {btn.label}
+                        {active && (
+                          <span
+                            className="absolute top-0 left-0 right-0 h-1"
+                            style={{ backgroundColor: btn.dot === '#FFFFFF' ? '#0062D2' : btn.dot }}
+                          />
+                        )}
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
+                            style={{
+                              backgroundColor: btn.dot,
+                              border: btn.dot === '#FFFFFF' ? '1px solid #D2D6DC' : 'none'
+                            }}
+                          />
+                          <span className={`text-xs sm:text-sm font-bold font-mono ${active ? 'text-white' : 'text-[#15191E]'}`}>
+                            {btn.kelvin}
+                          </span>
+                        </div>
+                        <span className={`text-[11px] font-bold block ${active ? 'text-white/95' : 'text-[#15191E]'}`}>
+                          {btn.label}
+                        </span>
+                        <span className={`text-[9px] block mt-0.5 ${active ? 'text-white/60' : 'text-[#68717D]'}`}>
+                          {btn.mood}
+                        </span>
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              {/* 3. Interior Designer & Architectural Advice */}
-              <div className="p-4 rounded-xl bg-[#EBF3FC] border border-[#0062D2]/20 flex items-start gap-3.5">
-                <div className="w-8 h-8 rounded-lg bg-white text-[#0062D2] flex items-center justify-center shrink-0 shadow-xs">
-                  <CheckCircle2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-[#0062D2] block mb-1">
-                    رأي مهندس التصميم الداخلي:
+              {/* Step 3: Interior Designer & Architectural Advice */}
+              <div className="rounded-2xl bg-white border border-[#E7EAF0] p-4 sm:p-5 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E7EAF0]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-[#0062D2] text-white flex items-center justify-center shadow-xs">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#15191E] block">
+                        رأي مهندس التصميم الداخلي
+                      </span>
+                      <span className="text-[10px] text-[#68717D]">
+                        تحليل تفاعل خامة الطلاء مع الضوء
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-semibold text-[#0062D2] bg-[#0062D2]/10 px-2 py-0.5 rounded-full">
+                    {currentPaint.contrastMood[paintTemp]}
                   </span>
-                  <p className="text-xs sm:text-sm text-[#15191E] leading-relaxed">
-                    {currentPaint.advice[paintTemp]}
-                  </p>
+                </div>
+
+                <p className="text-xs sm:text-sm text-[#15191E] leading-relaxed font-medium">
+                  "{currentPaint.advice[paintTemp]}"
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
+                  <div className="bg-[#F7F8FA] p-2.5 rounded-xl border border-[#E7EAF0]">
+                    <span className="text-[#68717D] text-[10px] block mb-0.5">الفراغ المثالي:</span>
+                    <strong className="text-[#15191E] font-semibold block text-[11px] truncate">
+                      {currentPaint.roomSuggestion[paintTemp]}
+                    </strong>
+                  </div>
+                  <div className="bg-[#F7F8FA] p-2.5 rounded-xl border border-[#E7EAF0]">
+                    <span className="text-[#68717D] text-[10px] block mb-0.5">معامل الانعكاس:</span>
+                    <strong className="text-[#0062D2] font-semibold block text-[11px]">
+                      {currentPaint.lrv}
+                    </strong>
+                  </div>
                 </div>
               </div>
             </div>
