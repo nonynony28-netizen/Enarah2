@@ -859,7 +859,7 @@ export default function HomeCleanWhitePreview() {
 
               {/* Location line */}
               <p className="mt-8 text-sm text-[#68717D] text-center">
-                طرابلس — ليبيا · الريادة في حلول الإنارة والتأسيس الكهربائي
+                بنغازي — ليبيا · الريادة في حلول الإنارة والتأسيس الكهربائي
               </p>
 
               {/* Quality micro-card */}
@@ -1903,7 +1903,7 @@ export default function HomeCleanWhitePreview() {
                 روّاد توريد وحلول الإضاءة المعمارية والمواد الكهربائية المعتمدة في ليبيا منذ أكثر من ثلاثة عقود. نسعى لتقديم أعلى معايير الجودة والسلامة والتصميم العصري.
               </p>
               <div className="pt-2 flex items-center gap-4 text-xs text-white/60">
-                <span>طرابلس، ليبيا</span>
+                <span>بنغازي، ليبيا</span>
                 <span>·</span>
                 <span>س.ت: 1988/4432</span>
               </div>
@@ -1985,19 +1985,27 @@ export default function HomeCleanWhitePreview() {
 
             {/* Col 4: Contact & Locations */}
             <div>
-              <h4 className="text-sm font-semibold text-white mb-4">التواصل والمعارض</h4>
+              <h4 className="text-sm font-semibold text-white mb-4">معرض بنغازي</h4>
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
-                  <span>طريق 20 رمضان (11 يونيو سابقاً) بالقرب من معهد النفط، طرابلس</span>
+                  <span>ليبيا - بنغازي - الليثي - مقابل مدرسة العيد الفضي</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 text-[#0062D2] shrink-0" />
-                  <span dir="ltr">+218 91 212 1303</span>
+                  <a href="tel:+218916580068" className="hover:text-white transition-colors" dir="ltr">
+                    +218 91 658 0068
+                  </a>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Phone className="w-4 h-4 text-[#0062D2] shrink-0" />
+                  <a href="tel:+218926580068" className="hover:text-white transition-colors" dir="ltr">
+                    +218 92 658 0068
+                  </a>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Clock className="w-4 h-4 text-[#0062D2] shrink-0" />
-                  <span>السبت - الخميس: 9:00 ص - 8:30 م</span>
+                  <span>السبت - الخميس: 8:30 ص - 9:00 م</span>
                 </div>
               </div>
             </div>

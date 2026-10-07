@@ -745,7 +745,7 @@ export default function Home() {
               <div className="mt-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
                 <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                  {isAr ? 'تأسست 1988 | طرابلس - ليبيا' : 'EST. 1988 | Tripoli - Libya'}
+                  {isAr ? 'تأسست 1988 | بنغازي - ليبيا' : 'EST. 1988 | Benghazi - Libya'}
                 </span>
               </div>
             </div>
