@@ -1441,11 +1441,6 @@ export default function HomeCleanWhitePreview() {
                       {paintTemp === 'warm' ? '3000K' : paintTemp === 'natural' ? '4000K' : '6000K'}
                     </span>
                   </div>
-
-                  <div className="hidden sm:flex items-center gap-1.5 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full text-white/90 text-xs font-medium shadow-lg select-none">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>صورة فوتوغرافية حقيقية</span>
-                  </div>
                 </div>
 
                 {/* Floating Bottom Badge: Active Paint Spec & LRV */}
