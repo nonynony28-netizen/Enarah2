@@ -134,8 +134,18 @@ export default function Projects() {
               }
             })
 
-          // دمج المشاريع المجلوبة مع المشاريع الأساسية لضمان عدم اختفاء مصحة الحياة أو المشاريع المدمجة أبداً
-          const fetchedNames = new Set(formattedProjects.map((p) => p.name.trim()))
+          // إزالة أي تكرار بالاسم سواء في قاعدة البيانات أو لوحة التحكم
+          const seenNames = new Set<string>()
+          const uniqueFetched: ProjectItem[] = []
+          for (const proj of formattedProjects.reverse()) {
+            const cleanName = proj.name.trim()
+            if (!seenNames.has(cleanName)) {
+              seenNames.add(cleanName)
+              uniqueFetched.push(proj)
+            }
+          }
+
+          // دمج المشاريع المجلوبة مع المشاريع الأساسية لضمان عدم اختفاء أي مشروع رئيسي مدمج
           const missingInitials = INITIAL_PROJECTS
             .map((p) => {
               const localized = getLocalizedProject(p, isAr)
@@ -146,9 +156,9 @@ export default function Projects() {
                 description: localized.description
               }
             })
-            .filter((p) => !fetchedNames.has(p.name.trim()))
+            .filter((p) => !seenNames.has(p.name.trim()))
 
-          const merged = [...formattedProjects.reverse(), ...missingInitials]
+          const merged = [...uniqueFetched, ...missingInitials]
           if (merged.length > 0) {
             setProjects(merged)
           }
