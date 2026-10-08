@@ -78,9 +78,9 @@ export default function Projects() {
         if (res.ok && data.success && Array.isArray(data.data)) {
           const formattedProjects: ProjectItem[] = data.data
             .filter((item: { type?: string }) => item.type !== 'contact')
-            .filter((item: { phone?: string }) => {
+            .filter((item: any) => {
               try {
-                const phoneData = item.phone ? JSON.parse(item.phone) : {}
+                const phoneData = item.rawPhone ? JSON.parse(item.rawPhone) : (item.phone ? JSON.parse(item.phone) : {})
                 return phoneData.type === 'project'
               } catch {
                 return false
@@ -89,7 +89,7 @@ export default function Projects() {
             .filter((item: any) => {
               let mediaData: any = {}
               try {
-                mediaData = item.phone ? JSON.parse(item.phone) : {}
+                mediaData = item.rawPhone ? JSON.parse(item.rawPhone) : (item.phone ? JSON.parse(item.phone) : {})
               } catch {}
               return !isExcludedProject({
                 name: item.name,
@@ -100,7 +100,7 @@ export default function Projects() {
             .map((item: any, index: number) => {
               let mediaData: any = {}
               try {
-                mediaData = item.phone ? JSON.parse(item.phone) : {}
+                mediaData = item.rawPhone ? JSON.parse(item.rawPhone) : (item.phone ? JSON.parse(item.phone) : {})
               } catch {}
 
               const rawImage = getOptimizedProjectImages(
@@ -134,8 +134,23 @@ export default function Projects() {
               }
             })
 
-          if (formattedProjects.length > 0) {
-            setProjects(formattedProjects.reverse())
+          // دمج المشاريع المجلوبة مع المشاريع الأساسية لضمان عدم اختفاء مصحة الحياة أو المشاريع المدمجة أبداً
+          const fetchedNames = new Set(formattedProjects.map((p) => p.name.trim()))
+          const missingInitials = INITIAL_PROJECTS
+            .map((p) => {
+              const localized = getLocalizedProject(p, isAr)
+              return {
+                ...p,
+                name: localized.name,
+                category: localized.category,
+                description: localized.description
+              }
+            })
+            .filter((p) => !fetchedNames.has(p.name.trim()))
+
+          const merged = [...formattedProjects.reverse(), ...missingInitials]
+          if (merged.length > 0) {
+            setProjects(merged)
           }
         }
       } catch (e) {
