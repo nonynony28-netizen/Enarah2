@@ -496,33 +496,6 @@ export default function Home() {
         }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3.5 group">
-            <div
-              className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg transition-transform duration-300 group-hover:scale-105 ${
-                isScrolled ? 'bg-[#0062D2] text-white shadow-md shadow-[#0062D2]/20' : 'bg-white text-[#15191E]'
-              }`}
-            >
-              إ
-            </div>
-            <div className="flex flex-col">
-              <span
-                className={`font-semibold tracking-tight text-lg leading-tight transition-colors ${
-                  isScrolled ? 'text-[#15191E]' : 'text-white'
-                }`}
-              >
-                الإنارة الحديثة
-              </span>
-              <span
-                className={`text-[10px] tracking-widest uppercase font-mono transition-colors ${
-                  isScrolled ? 'text-[#68717D]' : 'text-white/80'
-                }`}
-              >
-                ENARAH MODERN · 1988
-              </span>
-            </div>
-          </Link>
-
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
             <Link
@@ -576,7 +549,7 @@ export default function Home() {
           </nav>
 
           {/* Primary CTA & Mobile Toggle */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 ms-auto lg:ms-0">
             <Link
               to="/contact"
               className={`hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${
