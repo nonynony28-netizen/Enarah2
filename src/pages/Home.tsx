@@ -495,9 +495,9 @@ export default function Home() {
             : 'bg-gradient-to-b from-black/60 via-black/20 to-transparent py-5 text-white'
         }`}
       >
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-between">
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative flex items-center justify-between min-h-[44px]">
+          {/* Desktop Nav Links - Centered */}
+          <nav className="hidden lg:flex items-center justify-center gap-8 text-sm font-medium absolute left-1/2 -translate-x-1/2">
             <Link
               to="/products"
               className={`transition-colors hover:text-[#0062D2] ${
@@ -549,7 +549,7 @@ export default function Home() {
           </nav>
 
           {/* Primary CTA & Mobile Toggle */}
-          <div className="flex items-center gap-4 ms-auto lg:ms-0">
+          <div className="flex items-center gap-4 ms-auto z-10">
             <Link
               to="/contact"
               className={`hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${
