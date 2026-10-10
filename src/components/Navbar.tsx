@@ -87,7 +87,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white text-[#15191E] border-b border-[#E7EAF0] px-6 py-8 shadow-xl"
+            className="fixed inset-x-0 top-[57px] bottom-0 z-[100] overflow-y-auto bg-white text-[#15191E] px-6 py-8 shadow-2xl lg:hidden"
           >
             <div className="flex flex-col gap-4 text-base font-semibold">
               <Link
