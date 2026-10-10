@@ -344,16 +344,39 @@ export default function Contact() {
                   </div>
                 </div>
 
-                {/* معرض طرابلس */}
+                {/* فرع البيضاء 1 - مفترق رويفع الأنصاري */}
                 <div className="p-4 rounded-2xl bg-white border border-[#E7EAF0] space-y-2">
-                  <span className="font-bold text-[#15191E] text-sm block">معرض طرابلس</span>
+                  <span className="font-bold text-[#15191E] text-sm block">معرض البيضاء — مفترق رويفع الأنصاري</span>
                   <div className="flex items-start gap-2.5 text-xs text-[#68717D]">
                     <MapPin className="w-3.5 h-3.5 text-[#0062D2] shrink-0 mt-0.5" />
-                    <span>طريق 20 رمضان (11 يونيو سابقاً) بالقرب من معهد النفط</span>
+                    <span>مفترق رويفع الأنصاري، البيضاء</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <Phone className="w-3.5 h-3.5 text-[#0062D2]" />
-                    <a href="tel:+218912121303" className="font-medium text-[#15191E] hover:underline" dir="ltr">+218 91 212 1303</a>
+                  <div className="flex items-center gap-4 text-xs">
+                    <a href="tel:+218911910600" className="font-medium text-[#15191E] hover:underline" dir="ltr">+218 91 191 0600</a>
+                    <span className="text-slate-300">·</span>
+                    <a href="tel:+218921910600" className="font-medium text-[#15191E] hover:underline" dir="ltr">+218 92 191 0600</a>
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] text-[#68717D]">
+                    <Clock className="w-3 h-3 text-[#0062D2]" />
+                    <span>السبت — الخميس: 8:30 ص – 9:00 م</span>
+                  </div>
+                </div>
+
+                {/* فرع البيضاء 2 - مقابل مول البكوش */}
+                <div className="p-4 rounded-2xl bg-white border border-[#E7EAF0] space-y-2">
+                  <span className="font-bold text-[#15191E] text-sm block">معرض البيضاء — مقابل مول البكوش</span>
+                  <div className="flex items-start gap-2.5 text-xs text-[#68717D]">
+                    <MapPin className="w-3.5 h-3.5 text-[#0062D2] shrink-0 mt-0.5" />
+                    <span>مقابل مول البكوش، البيضاء</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs">
+                    <a href="tel:+218919219100" className="font-medium text-[#15191E] hover:underline" dir="ltr">+218 91 921 9100</a>
+                    <span className="text-slate-300">·</span>
+                    <a href="tel:+218929219100" className="font-medium text-[#15191E] hover:underline" dir="ltr">+218 92 921 9100</a>
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] text-[#68717D]">
+                    <Clock className="w-3 h-3 text-[#0062D2]" />
+                    <span>السبت — الخميس: 8:30 ص – 9:00 م</span>
                   </div>
                 </div>
               </div>
@@ -361,13 +384,13 @@ export default function Contact() {
               {/* Direct WhatsApp Action */}
               <div className="mt-8 pt-6 border-t border-[#E7EAF0]">
                 <a
-                  href="https://wa.me/218912121303"
+                  href="https://wa.me/218916580068"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3 px-4 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#128C7E] text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
                 >
                   <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                  <span>محادثة فورية عبر واتساب</span>
+                  <span>محادثة فورية عبر واتساب (معرض بنغازي)</span>
                 </a>
               </div>
             </div>
@@ -377,7 +400,7 @@ export default function Contact() {
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-semibold text-[#15191E]">موقع المعرض على الخريطة</span>
                 <a
-                  href="https://maps.google.com/?q=32.8687,13.1672"
+                  href="https://maps.google.com/?q=Benghazi+Al-Laythi+Libya"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs font-semibold text-[#0062D2] hover:underline inline-flex items-center gap-1"
@@ -392,7 +415,7 @@ export default function Contact() {
                   <span className="text-xs font-semibold text-[#15191E] block">
                     معرض وشركة الإنارة الحديثة
                   </span>
-                  <span className="text-[11px] text-[#68717D] block">طرابلس، طريق 20 رمضان</span>
+                  <span className="text-[11px] text-[#68717D] block">بنغازي، الليثي — مقابل مدرسة العيد الفضي</span>
                 </div>
               </div>
             </div>

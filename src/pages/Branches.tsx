@@ -8,20 +8,9 @@ export default function Branches() {
 
   const branches = [
     {
-      id: 'tripoli',
-      name: isAr ? 'المقر الرئيسي والمعرض المركزي — طرابلس' : 'Tripoli Main Showroom & HQ',
-      tag: isAr ? 'المعرض الرئيسي' : 'Flagship Showroom',
-      address: isAr
-        ? 'طريق 20 رمضان (11 يونيو سابقاً) بالقرب من معهد النفط، طرابلس'
-        : '20 Ramadan Road (formerly June 11), near Oil Institute, Tripoli',
-      phones: ['+218912121303', '+218916580068'],
-      hours: isAr ? 'السبت — الخميس: 9:00 ص – 8:30 م' : 'Sat — Thu: 9:00 AM – 8:30 PM',
-      mapsUrl: 'https://maps.google.com/?q=32.8687,13.1672'
-    },
-    {
       id: 'benghazi',
       name: isAr ? 'معرض بنغازي — الليثي' : 'Benghazi Branch — Al-Laythi',
-      tag: isAr ? 'فرع بنغازي' : 'Benghazi Branch',
+      tag: isAr ? 'المعرض الرئيسي' : 'Flagship Showroom',
       address: isAr ? 'الليثي، مقابل مدرسة العيد الفضي' : 'Al-Laythi, Opposite Silver Feast School',
       phones: ['+218916580068', '+218926580068'],
       hours: isAr ? 'السبت — الخميس: 8:30 ص – 9:00 م' : 'Sat — Thu: 8:30 AM – 9:00 PM',

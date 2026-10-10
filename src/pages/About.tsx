@@ -21,8 +21,8 @@ export default function About() {
       year: '1988',
       title: isAr ? 'التأسيس والانطلاقة الأولى' : 'Establishment & Inception',
       desc: isAr
-        ? 'انطلقت شركة الإنارة الحديثة في طرابلس برؤية معمارية تضع الجودة والموثوقية في قلب التأسيس الكهربائي.'
-        : 'Founded in Tripoli with an architectural vision placing quality at the core of electrical systems.'
+        ? 'انطلقت شركة الإنارة الحديثة في ليبيا برؤية معمارية تضع الجودة والموثوقية في قلب التأسيس الكهربائي.'
+        : 'Founded in Libya with an architectural vision placing quality at the core of electrical systems.'
     },
     {
       year: '2005',
@@ -112,7 +112,7 @@ export default function About() {
             </h2>
             <div className="space-y-4 text-sm sm:text-base text-[#68717D] leading-relaxed font-normal">
               <p>
-                تأسست شركة الإنارة الحديثة في طرابلس عام 1988، بهدف الارتقاء بمفهوم الإضاءة من مجرد عنصر وظيفي تقليدي إلى قيمة معمارية محورية تُبرز جمال الفراغ وتمنحه شخصيته المستقلة.
+                تأسست شركة الإنارة الحديثة في ليبيا عام 1988، بهدف الارتقاء بمفهوم الإضاءة من مجرد عنصر وظيفي تقليدي إلى قيمة معمارية محورية تُبرز جمال الفراغ وتمنحه شخصيته المستقلة.
               </p>
               <p>
                 نواكب باستمرار التطور التقني المتسارع في عالم الإضاءة والتحكم الذكي، ونوفر للمهندسين الاستشاريين والمقاولين وأصحاب الذوق الرفيع باقة متكاملة من المنتجات الأصلية المطابقة للمواصفات العالمية.
