@@ -1,94 +1,96 @@
-import { useState, useRef, useEffect } from 'react'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { BookOpen, ArrowLeft, ArrowRight, X, Calendar, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, ArrowRight, X, Calendar, Clock, BookOpen, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 
-// نمط الوهج الأزرق للعناوين الفخمة
-const glowingTitleStyle = {
-  textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
-}
-
-// مكون الأنيميشن السريع
-function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '50px' })
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      style={{ willChange: "opacity, transform" }} // تسريع الأداء
-    >
-      {children}
-    </motion.div>
-  )
-}
-
 // ==========================================
-// قاعدة بيانات المقالات (مدمجة في الكود)
+// Articles Database
 // ==========================================
 const getBlogPosts = (isAr: boolean) => [
   {
     id: 1,
-    badge: isAr ? 'مقال هندسي' : 'Engineering Article',
-    title: isAr ? 'كيف تبرز فخامة منزلك؟ الدليل الشامل لإضاءة الواجهات' : 'How to Highlight the Luxury of Your Home? The Comprehensive Guide to Facade Lighting',
-    summary: isAr ? 'واجهة منزلك هي بطاقة التعارف الأولى. اكتشف كيف يمكن للإضاءة المدروسة أن ترفع قيمة عقارك وتمنحه فخامة الفنادق.' : 'Your home facade is the first introduction card. Discover how structured lighting can increase your property value and give it hotel luxury.',
+    badge: isAr ? 'دليل معماري' : 'Architectural Guide',
+    title: isAr
+      ? 'الدليل الشامل لإضاءة الواجهات الخارجية: إبراز الفخامة وحساب الزوايا'
+      : 'Comprehensive Guide to Facade Lighting: Architectural Highlights & Beam Angles',
+    summary: isAr
+      ? 'واجهة المبنى هي التعبير البصري الأول. اكتشف كيف تحوّل الإضاءة المدروسة الجدران الصامتة إلى لوحة معمارية آسرة تبرز أدق التفاصيل الحجرية والرخامية.'
+      : 'The building facade is the primary visual statement. Discover how calculated lighting transforms architecture into an evocative statement.',
     coverImage: '/images/project-facade.jpg',
     date: isAr ? '15 مايو 2026' : 'May 15, 2026',
     readTime: isAr ? '4 دقائق قراءة' : '4 min read',
     sections: [
       {
-        heading: isAr ? 'أهمية إضاءة الواجهة' : 'Importance of Facade Lighting',
-        text: isAr ? 'لا تقتصر أهمية إضاءة الواجهات على الجانب الأمني فقط، بل تعتبر العنصر الأهم في إبراز التفاصيل المعمارية ليلاً. الإضاءة الصحيحة تخلق ظلالاً فنية على الحجر المعماري وتجعل المبنى يبدو أكبر وأكثر فخامة.' : 'The importance of facade lighting is not limited to security only, but is the most critical element in highlighting architectural details at night. Proper lighting creates artistic shadows on stonework and makes the building look larger and more luxurious.',
+        heading: isAr ? 'القيمة المعمارية لإضاءة الواجهة' : 'Architectural Value of Facade Lighting',
+        text: isAr
+          ? 'لا تقتصر أهمية إضاءة الواجهات على الجانب الأمني فقط، بل تعتبر العنصر الأهم في إبراز التفاصيل المعمارية ليلاً. الإضاءة المحسوبة تخلق ظلالاً فنية على الحجر المعماري وتمنح الصرح هيبة وفخامة تليق به.'
+          : 'Facade lighting goes far beyond security; it is the premier tool for sculpting nighttime architectural depth and highlighting material textures.',
         image: ''
       },
       {
-        heading: isAr ? 'تقنية الإضاءة الجدارية (Up-Down)' : 'Wall Up-Down Lighting Tech',
-        text: isAr ? 'تعتبر هذه التقنية من أحدث صيحات الإضاءة الخارجية. فهي تسلط الضوء للأعلى والأسفل في نفس الوقت، مما يرسم خطوطاً مضيئة أنيقة على الجدران دون التسبب في توهج مزعج للعين.' : 'This technique is considered one of the latest trends in outdoor lighting. It casts light upwards and downwards simultaneously, drawing elegant luminous lines on walls without causing glare.',
+        heading: isAr ? 'تقنية الإضاءة الجدارية (Up-Down Lighting)' : 'Up-Down Wall Grazing Tech',
+        text: isAr
+          ? 'تعتبر هذه التقنية من أهم ركائز الإضاءة المعمارية الحديثة؛ حيث توجه الضوء رأسياً للأعلى والأسفل بالتوازي مع خطوط الجدار، مما يرسم مسارات ضوئية ناعمة دون التسبب في أي وهج مباشر للمارة أو الجالسين.'
+          : 'A cornerstone of modern architectural illumination, directing light vertically without producing intrusive glare for pedestrians.',
         image: '/images/project-villa.jpg'
       }
     ]
   },
   {
     id: 2,
-    badge: isAr ? 'مقال هندسي' : 'Engineering Article',
-    title: isAr ? 'السر وراء فخامة الصالات: فن الدمج بين الإضاءة المخفية والسبوت لايت' : 'The Secret Behind Living Room Luxury: The Art of Mixing Cove Lighting and Spotlights',
-    summary: isAr ? 'هل تساءلت يوماً لماذا تبدو بعض الصالات مريحة وأنيقة بشكل استثنائي؟ السر يكمن في هندسة توزيع الضوء.' : 'Have you ever wondered why some living rooms look exceptionally comfortable and elegant? The secret lies in lighting distribution engineering.',
+    badge: isAr ? 'تصميم داخلي' : 'Interior Lighting',
+    title: isAr
+      ? 'هندسة الإضاءة في الصالات الفاخرة: فن التناغم بين المخفي والسبوت لايت'
+      : 'Living Room Photometrics: Harmonizing Cove Lighting & Architectural Spotlights',
+    summary: isAr
+      ? 'كيف تحقق بيئة بصرية مريحة للعين وفخمة المظهر في نفس الوقت؟ السر يكمن في تقسيم الإضاءة إلى طبقات ثلاث مدروسة بعناية فائقة.'
+      : 'How to achieve a glare-free, visually comfortable, yet ultra-luxurious ambiance using the three-layer architectural illumination rule.',
     coverImage: '/images/project-company.jpg',
     date: isAr ? '10 مايو 2026' : 'May 10, 2026',
     readTime: isAr ? '3 دقائق قراءة' : '3 min read',
     sections: [
       {
-        heading: isAr ? 'قاعدة الطبقات الثلاث' : 'The Three Layers Rule',
-        text: isAr ? 'للحصول على صالة فاخرة، يجب أن تعتمد على ثلاث طبقات: الإضاءة العامة (مثل الثريات)، الإضاءة المحيطية (مثل الإضاءة المخفية في الجبس)، وإضاءة المهام (مثل السبوت لايت الموجه للوحات أو الطاولات).' : 'For a luxurious living room, you must rely on three layers: general lighting (like chandeliers), ambient lighting (like hidden cove lighting in gypsum), and task lighting (like spotlights directed at paintings or tables).',
+        heading: isAr ? 'قاعدة الطبقات الضوئية الثلاث' : 'The Three Lighting Layers',
+        text: isAr
+          ? 'لتحقيق صالة متوازنة ومريحة، يجب الفصل بين: الإضاءة المحيطية (مثل مجاري الليد المخفية في الأسقف)، الإضاءة الوظيفية (مثل إضاءات القراءة والعمل)، وإضاءة المهام الديكورية (مثل السبوت المركز على اللوحات والتحف).'
+          : 'Balanced spaces require distinct layers: indirect ambient cove light, functional task lighting, and focused accent beams.',
         image: ''
       },
       {
-        heading: isAr ? 'السبوت لايت المانع للتوهج (Anti-glare)' : 'Anti-glare Spotlight',
-        text: isAr ? 'الخطأ الشائع هو استخدام سبوت لايت باهر يزعج الجالسين. السبوت لايت المانع للتوهج مصمم بعدسة عميقة بحيث يضيء المكان دون أن ترى مصدر الضوء مباشرة، مما يوفر راحة تامة للعين.' : 'A common mistake is using highly bright spotlights that bother guests. Anti-glare spotlights are designed with a deep lens so they light the place without letting you see the light source directly, ensuring absolute eye comfort.',
+        heading: isAr ? 'السبوت لايت المانع للتوهج (Deep Anti-Glare)' : 'Deep Anti-Glare Optics',
+        text: isAr
+          ? 'تتميز كشافات السبوت لايت المعمارية الحديثة بوجود مصدر الضوء في تجويف غائر (Deep Recessed) يمنع رؤية اللمبة مباشرة من زوايا الجلوس الطبيعية، فتصل الإضاءة للأرضيات والجدران دون أن تتعب العين إطلاقاً.'
+          : 'Deep recessed optics ensure the source diode remains completely invisible from standard sightlines, providing pure illumination without eye fatigue.',
         image: '/images/project-shop.jpg'
       }
     ]
   },
   {
     id: 3,
-    badge: isAr ? 'مقال تسويقي' : 'Marketing Article',
-    title: isAr ? 'كيف تضاعف مبيعات مشروعك التجاري باستخدام "هندسة الإضاءة"؟' : 'How to Double Your Commercial Project Sales Using "Lighting Design"?',
-    summary: isAr ? 'الإضاءة في المطاعم والمقاهي أداة تسويقية تتحكم في مزاج الزبون وتزيد من مدة بقائه ومبيعاتك.' : 'Lighting in restaurants and cafes is a marketing tool that controls the customer\'s mood, increasing their stay duration and your sales.',
+    badge: isAr ? 'مشاريع وتجارة' : 'Commercial Spaces',
+    title: isAr
+      ? 'سيكولوجية الضوء في المشاريع التجارية: كيف ترفع الإضاءة من قيمة علامتك؟'
+      : 'Commercial Photometrics: Elevating Brand Value & Customer Experience with Light',
+    summary: isAr
+      ? 'في المطاعم والمقاهي وصالات العرض، الإضاءة ليست تفصيلاً ثانوياً بل أداة جذب حاسمة تؤثر في زمن بقاء العميل وراحته النفسية وإدراكه لجودة المكان.'
+      : 'In retail and hospitality, lighting is a strategic driver that dictates dwell time, psychological comfort, and perceived brand value.',
     coverImage: '/images/project-shop.jpg',
     date: isAr ? '5 مايو 2026' : 'May 5, 2026',
     readTime: isAr ? '5 دقائق قراءة' : '5 min read',
     sections: [
       {
-        heading: isAr ? 'سيكولوجية الألوان (Kelvin)' : 'Color Psychology (Kelvin)',
-        text: isAr ? 'في المقاهي والمطاعم الفاخرة، يُنصح دائماً باستخدام الإضاءة الدافئة جداً (2700K - 3000K). هذه الدرجة من اللون تخلق شعوراً بالدفء والراحة النفسية، مما يشجع الزبون على الجلوس لفترة أطول وطلب المزيد.' : 'In luxury cafes and restaurants, it is highly recommended to use very warm lighting (2700K - 3000K). This color temperature creates a sense of warmth and psychological comfort, encouraging customers to stay longer and order more.',
+        heading: isAr ? 'درجة حرارة اللون وسيكولوجية الاسترخاء (Kelvin)' : 'Color Temperature & Ambience (Kelvin)',
+        text: isAr
+          ? 'تفضل الصالات الراقية والمقاهي درجات الإضاءة الدافئة (Warm White بين 2700K و 3000K) لأنها تعزز الإحساس بالألفة والراحة، بينما تتطلب صالات العرض الحديثة والمكاتب إضاءة محايدة (Natural White 4000K) لدقة إظهار الألوان.'
+          : 'High-end hospitality leverages warm whites (2700K-3000K) to create intimate luxury, whereas modern showrooms utilize 4000K for color precision.',
         image: ''
       },
       {
-        heading: isAr ? 'توزيع الإضاءة المركزة' : 'Focused Lighting Distribution',
-        text: isAr ? 'بدلاً من إضاءة المكان بالكامل بشكل متساوٍ، قم بتسليط إضاءة المعلقات (Pendant Lights) مباشرة فوق الطاولات مع تعتيم الممرات قليلاً. هذا يعطي الزبائن خصوصية ويجعل أطباق الطعام تبدو أشهى.' : 'Instead of illuminating the entire space evenly, cast pendant lights directly over tables while slightly dimming corridors. This offers customers privacy and makes food dishes look more delicious.',
+        heading: isAr ? 'معامل إظهار الألوان الحقيقي (CRI > 90)' : 'High Color Rendering Index (CRI > 90)',
+        text: isAr
+          ? 'المشاريع الناجحة تختار دائماً مصادر إضاءة ذات معامل CRI لا يقل عن 90، ما يضمن ظهور ألوان الديكور والمنتجات والأطعمة بكامل نضارتها الطبيعية دون أي بهتان أو تشويه لوني.'
+          : 'Premium installations require CRI > 90 to ensure that textures, architectural finishes, and displays reflect their authentic rich tones.',
         image: '/images/project-company.jpg'
       }
     ]
@@ -117,179 +119,221 @@ export default function Blog() {
   }, [selectedPost])
 
   return (
-    <div className="pt-24 md:pt-32 pb-24 bg-transparent min-h-screen relative overflow-hidden text-slate-900">
-      
-      {/* شبكة هندسية خفيفة جداً في الخلفية للفخامة */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c708_1px,transparent_1px),linear-gradient(to_bottom,#0284c708_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+    <div
+      dir="rtl"
+      className="min-h-screen bg-[#F7F8FA] text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white pt-24 pb-28"
+    >
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+        {/* Back Link */}
+        <div className="mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors"
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
+          </Link>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* زر الرجوع للرئيسية */}
-        <FadeIn>
-          <div className="mb-6 flex justify-start">
-            <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:text-blue-600 font-semibold transition-all shadow-sm">
-              <ArrowRight className={`w-4 h-4 ${isAr ? '' : 'rotate-180'}`} />
-              {isAr ? 'العودة للرئيسية' : 'Back to Home'}
-            </Link>
-          </div>
-        </FadeIn>
+        {/* Editorial Hero Header */}
+        <div className="mb-14 sm:mb-18 max-w-3xl">
+          <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
+            JOURNAL & INSIGHTS
+          </span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
+            هندسة الإضاءة والأفكار المعمارية
+          </h1>
+          <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
+            مقالات ودراسات بصرية متخصصة تضع بين يديك خلاصة خبرتنا في حساب زوايا الضوء، وتوزيع الكشافات، وتأسيس الأنظمة الكهربائية المتينة.
+          </p>
+        </div>
 
-        {/* عنوان الصفحة */}
-        <FadeIn delay={0.1}>
-          <div className="text-center mb-16 md:mb-20">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-slate-900">
-              {isAr ? (
-                <>مدونة <span className="text-blue-600">الإنارة</span></>
-              ) : (
-                <>ENARAH <span className="text-blue-600">Blog</span></>
-              )}
-            </h1>
-            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed text-base md:text-lg font-normal">
-              {isAr 
-                ? 'نصائح هندسية، أفكار تصميمية، وأحدث صيحات عالم الإضاءة لنجعل مساحتك أكثر إشراقاً'
-                : 'Engineering tips, design ideas, and the latest trends in the lighting world to make your space brighter'
-              }
-            </p>
-            <div className="flex items-center justify-center gap-1.5 mt-5">
-              <div className="w-16 h-[1px] bg-slate-200" />
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-              <div className="w-16 h-[1px] bg-slate-200" />
-            </div>
-          </div>
-        </FadeIn>
+        {/* Blog Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+          {blogPosts.map((post) => (
+            <article
+              key={post.id}
+              onClick={() => setSelectedPost(post)}
+              className="bg-white rounded-2xl overflow-hidden border border-[#E7EAF0] shadow-xs hover:border-[#0062D2]/40 hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group"
+            >
+              <div>
+                {/* Cover Image */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-900 border-b border-[#E7EAF0]">
+                  <img
+                    src={post.coverImage}
+                    alt={post.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/default-product.jpg'
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
 
-        {/* شبكة كروت المقالات */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogPosts.map((post, i) => (
-            <FadeIn key={post.id} delay={i * 0.08}>
-              <div 
-                onClick={() => setSelectedPost(post)}
-                style={{ willChange: "transform, opacity" }} 
-                className="group cursor-pointer relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-xl transition-all duration-200 shadow-sm flex flex-col h-full"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 border-b border-slate-100">
-                  <img src={post.coverImage} alt={post.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-80" />
-                  
-                  <div className="absolute top-3.5 right-3.5 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-md shadow-sm">
-                    {post.badge}
+                  {/* Badge */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <span className="bg-white/95 backdrop-blur-md text-[#15191E] text-xs font-semibold px-3 py-1 rounded-full border border-white/20">
+                      {post.badge}
+                    </span>
                   </div>
                 </div>
-                
-                <div className="p-6 flex-grow flex flex-col relative z-20">
-                  <div className="flex items-center gap-3 text-xs font-semibold text-slate-500 mb-3">
-                    <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {post.date}</span>
-                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {post.readTime}</span>
+
+                {/* Metadata & Title */}
+                <div className="p-6">
+                  <div className="flex items-center gap-4 text-xs font-medium text-[#68717D] mb-3">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-[#0062D2]" />
+                      <span>{post.date}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[#0062D2]" />
+                      <span>{post.readTime}</span>
+                    </span>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">{post.title}</h3>
-                  <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-normal flex-grow line-clamp-3 mb-5">{post.summary}</p>
-                  
-                  <span className="mt-auto inline-flex items-center gap-1.5 text-xs text-blue-600 font-bold group-hover:text-blue-700 transition-colors">
-                    {isAr ? 'اقرأ المقال كاملاً' : 'Read full article'}
-                    <ArrowLeft className={`w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform ${isAr ? '' : 'rotate-180 group-hover:translate-x-1'}`} />
-                  </span>
+
+                  <h3 className="text-lg font-semibold text-[#15191E] group-hover:text-[#0062D2] transition-colors line-clamp-2 leading-snug mb-3">
+                    {post.title}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-[#68717D] leading-relaxed font-normal line-clamp-3">
+                    {post.summary}
+                  </p>
                 </div>
               </div>
-            </FadeIn>
+
+              {/* Card Footer Action */}
+              <div className="px-6 pb-6 pt-2">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0062D2] group-hover:text-[#0047A5] transition-colors">
+                  <span>{isAr ? 'قراءة المقال كاملاً' : 'Read Article'}</span>
+                  <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                </span>
+              </div>
+            </article>
           ))}
         </div>
 
-        {/* ==========================================
-            نافذة قراءة المقال الكامل (Modal)
-        ========================================== */}
-        <AnimatePresence>
-          {selectedPost && (
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+        {/* Newsletter / Consultation Strip */}
+        <div className="bg-[#101820] text-white rounded-3xl p-10 sm:p-14 text-center">
+          <div className="max-w-2xl mx-auto">
+            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
+              ARCHITECTURAL CONSULTING
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
+              هل ترغب في دراسة ضوئية لمشروعك؟
+            </h3>
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed font-normal mb-8">
+              فريقنا الهندسي في طرابلس وبنغازي جاهز لتقديم المشورة المعمارية وتحليل مخططات المبنى لضمان توزيع ضوئي مثالي.
+            </p>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs sm:text-sm font-semibold rounded-full transition-colors"
             >
-              {/* الخلفية المعتمة */}
-              <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setSelectedPost(null)} />
-              
-              {/* نافذة المقال */}
-              <motion.div
-                initial={{ opacity: 0, y: 30, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.96 }}
-                transition={{ duration: 0.25, ease: "easeOut" }} 
-                className="relative w-full max-w-4xl max-h-[90vh] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+              <span>طلب استشارة أو تسعيرة</span>
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* =====================================================================
+          Article Reading Modal
+          ===================================================================== */}
+      <AnimatePresence>
+        {selectedPost && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md"
+            onClick={() => setSelectedPost(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-3xl max-h-[90vh] bg-white text-[#15191E] rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-[#E7EAF0]"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedPost(null)}
+                className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-colors"
+                aria-label="إغلاق"
               >
-                {/* زر الإغلاق */}
-                <button
-                  onClick={() => setSelectedPost(null)}
-                  className="absolute top-4 left-4 z-50 p-2 bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl transition-all duration-200 shadow-md"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <X className="w-5 h-5" />
+              </button>
 
-                {/* صورة المقال الرئيسية */}
-                <div className="relative w-full h-56 md:h-80 flex-shrink-0">
-                  <img src={selectedPost.coverImage} alt={selectedPost.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/default-product.jpg' }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-95" />
-                </div>
-
-                {/* محتوى المقال (قابل للتمرير) */}
-                <div className="flex-grow overflow-y-auto p-6 md:p-10 custom-scrollbar bg-white">
-                  <div className="max-w-3xl mx-auto">
-                    <div className="flex items-center justify-center gap-4 text-xs font-semibold text-slate-500 mb-6">
-                      <span className="flex items-center gap-1.5 bg-slate-100 px-3.5 py-1.5 rounded-lg border border-slate-200"><Calendar className="w-4 h-4 text-blue-600" /> {selectedPost.date}</span>
-                      <span className="flex items-center gap-1.5 bg-slate-100 px-3.5 py-1.5 rounded-lg border border-slate-200"><Clock className="w-4 h-4 text-blue-600" /> {selectedPost.readTime}</span>
-                    </div>
-                    
-                    <h2 className="text-2xl md:text-4xl font-bold text-slate-900 text-center mb-8 leading-tight">
-                      {selectedPost.title}
-                    </h2>
-
-                    <p className="text-base text-slate-700 leading-relaxed text-center mb-10 font-normal bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
-                      <span className="text-blue-600 text-3xl leading-none">"</span>
-                      {selectedPost.summary}
-                      <span className="text-blue-600 text-3xl leading-none">"</span>
-                    </p>
-
-                    <div className="w-16 h-1 bg-blue-600 mx-auto mb-10 rounded-full" />
-
-                    {/* الأقسام الداخلية والصور */}
-                    {selectedPost.sections.map((sec, idx) => (
-                      <div key={idx} className="mb-10">
-                        <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2.5">
-                          <span className="w-1.5 h-5 bg-blue-600 rounded-full inline-block"></span>
-                          {sec.heading}
-                        </h3>
-                        <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 font-normal">{sec.text}</p>
-                        
-                        {sec.image && (
-                          <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                            <img src={sec.image} alt={sec.heading} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" onError={(e) => { e.currentTarget.style.display = 'none' }} />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    
-                    <div className="text-center pt-6 border-t border-slate-200 mt-10">
-                      <p className="text-slate-500 text-xs font-semibold mb-4">
-                        {isAr ? 'هل أعجبك المقال؟ شاركه الآن' : 'Did you like the article? Share it now'}
-                      </p>
-                      <button onClick={() => setSelectedPost(null)} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors cursor-pointer active:scale-95 text-xs sm:text-sm shadow-md shadow-blue-500/20">
-                        {isAr ? 'العودة للمدونة' : 'Back to Blog'}
-                      </button>
-                    </div>
-
+              {/* Cover Image */}
+              <div className="relative aspect-[16/9] w-full bg-slate-900 shrink-0">
+                <img
+                  src={selectedPost.coverImage}
+                  alt={selectedPost.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/default-product.jpg'
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute bottom-4 right-6 left-6 text-white">
+                  <span className="text-xs font-semibold text-[#0062D2] bg-white px-3 py-1 rounded-full mb-2 inline-block">
+                    {selectedPost.badge}
+                  </span>
+                  <div className="flex items-center gap-4 text-xs text-white/80">
+                    <span>{selectedPost.date}</span>
+                    <span>•</span>
+                    <span>{selectedPost.readTime}</span>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </div>
 
-      </div>
-      
-      {/* تخصيص شريط التمرير داخل المقال */}
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.6); }
-      `}} />
+              {/* Scrollable Content */}
+              <div className="p-6 sm:p-10 overflow-y-auto space-y-8">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight leading-snug mb-4">
+                    {selectedPost.title}
+                  </h2>
+                  <p className="text-base text-[#68717D] leading-relaxed bg-[#F7F8FA] p-5 rounded-2xl border border-[#E7EAF0]">
+                    {selectedPost.summary}
+                  </p>
+                </div>
+
+                {selectedPost.sections.map((sec, idx) => (
+                  <div key={idx} className="space-y-4">
+                    <h3 className="text-xl font-semibold text-[#15191E] tracking-tight border-r-4 border-[#0062D2] pr-3">
+                      {sec.heading}
+                    </h3>
+                    <p className="text-sm sm:text-base text-[#68717D] leading-relaxed font-normal">
+                      {sec.text}
+                    </p>
+                    {sec.image && (
+                      <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-slate-900 border border-[#E7EAF0] my-4">
+                        <img
+                          src={sec.image}
+                          alt={sec.heading}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/images/default-product.jpg'
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                <div className="pt-6 border-t border-[#E7EAF0] flex items-center justify-between">
+                  <span className="text-xs text-[#68717D]">شركة الإنارة الحديثة — قسم الدراسات الهندسية</span>
+                  <button
+                    onClick={() => setSelectedPost(null)}
+                    className="px-5 py-2 rounded-full bg-[#15191E] text-white text-xs font-semibold hover:bg-slate-800 transition-colors"
+                  >
+                    إغلاق المقال
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

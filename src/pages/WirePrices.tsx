@@ -6,10 +6,6 @@ import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../hooks/useCart'
 import WireAnatomyScroll from '../components/WireAnatomyScroll'
 
-// نمط الوهج الأزرق للعناوين
-const glowingTitleStyle = {
-  textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)'
-}
 
 // مكون الأنيميشن السريع
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
