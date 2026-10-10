@@ -9,30 +9,30 @@ export default function Branches() {
   const branches = [
     {
       id: 'benghazi',
-      name: isAr ? 'معرض بنغازي — الليثي' : 'Benghazi Branch — Al-Laythi',
+      name: isAr ? 'فرع بنغازي - الليثي' : 'Benghazi Branch - Al-Laythi',
       tag: isAr ? 'المعرض الرئيسي' : 'Flagship Showroom',
-      address: isAr ? 'الليثي، مقابل مدرسة العيد الفضي' : 'Al-Laythi, Opposite Silver Feast School',
-      phones: ['+218916580068', '+218926580068'],
-      hours: isAr ? 'السبت — الخميس: 8:30 ص – 9:00 م' : 'Sat — Thu: 8:30 AM – 9:00 PM',
-      mapsUrl: 'https://maps.google.com/?q=Benghazi,Libya'
+      address: isAr ? 'مقابل مدرسة العيد الفضي، بنغازي' : 'Opposite Silver Feast School, Benghazi',
+      phones: ['0916580068', '0926580068'],
+      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+      mapsUrl: 'https://maps.google.com/?q=Benghazi+Al-Laythi+Libya'
     },
     {
       id: 'bayda-1',
-      name: isAr ? 'معرض البيضاء — مفترق رويفع الأنصاري' : 'Al-Bayda Branch 1 — Ruwaifa',
+      name: isAr ? 'فرع البيضاء الأول' : 'First Al-Bayda Branch',
       tag: isAr ? 'فرع البيضاء' : 'Al-Bayda Branch',
       address: isAr ? 'مفترق رويفع الأنصاري، البيضاء' : 'Ruwaifa Al-Ansari Intersection, Al-Bayda',
-      phones: ['+218911910600', '+218921910600'],
-      hours: isAr ? 'السبت — الخميس: 8:30 ص – 9:00 م' : 'Sat — Thu: 8:30 AM – 9:00 PM',
-      mapsUrl: 'https://maps.google.com/?q=Bayda,Libya'
+      phones: ['0911910600', '0921910600'],
+      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+      mapsUrl: 'https://maps.google.com/?q=Bayda+Libya'
     },
     {
       id: 'bayda-2',
-      name: isAr ? 'معرض البيضاء — مقابل مول البكوش' : 'Al-Bayda Branch 2 — Al-Bakoosh',
+      name: isAr ? 'فرع البيضاء الثاني' : 'Second Al-Bayda Branch',
       tag: isAr ? 'فرع البيضاء' : 'Al-Bayda Branch',
       address: isAr ? 'مقابل مول البكوش، البيضاء' : 'Opposite Al-Bakoosh Mall, Al-Bayda',
-      phones: ['+218919219100', '+218929219100'],
-      hours: isAr ? 'السبت — الخميس: 8:30 ص – 9:00 م' : 'Sat — Thu: 8:30 AM – 9:00 PM',
-      mapsUrl: 'https://maps.google.com/?q=Bayda,Libya'
+      phones: ['0919219100', '0929219100'],
+      hours: isAr ? 'من الساعة 8 صباحاً حتى الساعة 10 مساءً' : 'From 8:00 AM to 10:00 PM',
+      mapsUrl: 'https://maps.google.com/?q=Bayda+Libya'
     }
   ]
 
@@ -56,25 +56,27 @@ export default function Branches() {
         {/* Editorial Hero Header */}
         <div className="mb-14 sm:mb-18 max-w-3xl">
           <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
-            SHOWROOMS & LOCATIONS
+            {isAr ? 'فروعنا ومعارضنا' : 'OUR LOCATIONS'}
           </span>
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
-            شبكة معارضنا وفروعنا
+            {isAr ? 'فروعنا' : 'Our Branches'}
           </h1>
           <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
-            نسعد باستقبالكم في معارضنا للتعرف على تشكيلات الإنارة المعمارية وتجربة محاكاة درجات حرارة الضوء واستشارة مهندسينا المختصين.
+            {isAr
+              ? 'نخدمكم عبر فروعنا داخل ليبيا لتوفير أفضل حلول الإضاءة المعمارية والمواد الكهربائية والأسلاك المعتمدة.'
+              : 'We serve you through our branches in Libya to provide the best certified lighting and electrical solutions.'}
           </p>
         </div>
 
-        {/* Showrooms Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+        {/* Showrooms Grid - 3 Columns on large screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           {branches.map((b) => (
             <div
               key={b.id}
-              className="bg-white rounded-3xl p-8 border border-[#E7EAF0] shadow-xs hover:border-[#0062D2]/40 transition-all duration-300 flex flex-col justify-between"
+              className="bg-white rounded-3xl p-8 border border-[#E7EAF0] shadow-xs hover:border-[#0062D2]/40 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center justify-between gap-4 mb-5">
                   <span className="text-xs font-semibold text-[#0062D2] bg-[#EBF3FC] px-3.5 py-1 rounded-full border border-[#0062D2]/15">
                     {b.tag}
                   </span>
@@ -106,12 +108,12 @@ export default function Branches() {
 
                   <div className="flex items-start gap-3">
                     <Phone className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
-                    <div className="flex flex-wrap gap-x-4 gap-y-1" dir="ltr">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono font-semibold text-[#15191E]" dir="ltr">
                       {b.phones.map((p, i) => (
                         <a
                           key={i}
                           href={`tel:${p}`}
-                          className="font-semibold text-[#15191E] hover:text-[#0062D2] transition-colors"
+                          className="hover:text-[#0062D2] transition-colors"
                         >
                           {p}
                         </a>
@@ -124,7 +126,7 @@ export default function Branches() {
               <div className="mt-8 pt-6 border-t border-[#E7EAF0] flex items-center justify-between">
                 <a
                   href={`tel:${b.phones[0]}`}
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-[#0062D2] hover:text-[#0047A5]"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5" />
                   <span>اتصال مباشر بالمعرض</span>
