@@ -316,58 +316,44 @@ export default function Contact() {
             {/* Showroom & HQ Card */}
             <div className="bg-white rounded-3xl p-8 border border-[#E7EAF0] shadow-xs">
               <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
-                HEADQUARTERS & SHOWROOM
+                OUR SHOWROOMS & BRANCHES
               </span>
               <h3 className="text-xl font-semibold text-[#15191E] mb-6 tracking-tight">
-                المقر الرئيسي والمعرض
+                المعارض وخدمة العملاء
               </h3>
 
-              <div className="space-y-5 text-sm">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#F7F8FA] text-[#0062D2] flex items-center justify-center shrink-0 border border-[#E7EAF0]">
-                    <MapPin className="w-4 h-4" />
+              <div className="space-y-6 text-sm">
+                {/* فرع بنغازي الرئيسي */}
+                <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E7EAF0] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#15191E] text-sm">معرض بنغازي — الليثي</span>
+                    <span className="text-[11px] font-semibold text-[#0062D2] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">الفرع النشط</span>
                   </div>
-                  <div>
-                    <span className="font-semibold text-[#15191E] block mb-0.5">العنوان</span>
-                    <span className="text-xs text-[#68717D] leading-relaxed block">
-                      طريق 20 رمضان (11 يونيو سابقاً) بالقرب من معهد النفط، طرابلس — ليبيا
-                    </span>
+                  <div className="flex items-start gap-2.5 text-xs text-[#68717D]">
+                    <MapPin className="w-3.5 h-3.5 text-[#0062D2] shrink-0 mt-0.5" />
+                    <span>الليثي — مقابل مدرسة العيد الفضي، بنغازي</span>
                   </div>
-                </div>
-
-                <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#F7F8FA] text-[#0062D2] flex items-center justify-center shrink-0 border border-[#E7EAF0]">
-                    <Phone className="w-4 h-4" />
+                  <div className="flex items-center gap-4 text-xs">
+                    <a href="tel:+218916580068" className="font-semibold text-[#0062D2] hover:underline" dir="ltr">+218 91 658 0068</a>
+                    <span className="text-slate-300">·</span>
+                    <a href="tel:+218926580068" className="font-semibold text-[#0062D2] hover:underline" dir="ltr">+218 92 658 0068</a>
                   </div>
-                  <div>
-                    <span className="font-semibold text-[#15191E] block mb-0.5">الهاتف المباشر</span>
-                    <a
-                      href="tel:+218912121303"
-                      dir="ltr"
-                      className="text-xs text-[#0062D2] font-semibold hover:underline block"
-                    >
-                      +218 91 212 1303
-                    </a>
-                    <a
-                      href="tel:+218916580068"
-                      dir="ltr"
-                      className="text-xs text-[#68717D] hover:underline block mt-0.5"
-                    >
-                      +218 91 658 0068
-                    </a>
+                  <div className="flex items-center gap-2 text-[11px] text-[#68717D]">
+                    <Clock className="w-3 h-3 text-[#0062D2]" />
+                    <span>السبت — الخميس: 8:30 ص – 9:00 م</span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#F7F8FA] text-[#0062D2] flex items-center justify-center shrink-0 border border-[#E7EAF0]">
-                    <Clock className="w-4 h-4" />
+                {/* معرض طرابلس */}
+                <div className="p-4 rounded-2xl bg-white border border-[#E7EAF0] space-y-2">
+                  <span className="font-bold text-[#15191E] text-sm block">معرض طرابلس</span>
+                  <div className="flex items-start gap-2.5 text-xs text-[#68717D]">
+                    <MapPin className="w-3.5 h-3.5 text-[#0062D2] shrink-0 mt-0.5" />
+                    <span>طريق 20 رمضان (11 يونيو سابقاً) بالقرب من معهد النفط</span>
                   </div>
-                  <div>
-                    <span className="font-semibold text-[#15191E] block mb-0.5">أوقات العمل</span>
-                    <span className="text-xs text-[#68717D] block">
-                      السبت — الخميس: 9:00 صباحاً – 8:30 مساءً
-                    </span>
-                    <span className="text-xs text-[#68717D] block">الجمعة: عطلة أسبوعية</span>
+                  <div className="flex items-center gap-2 text-xs">
+                    <Phone className="w-3.5 h-3.5 text-[#0062D2]" />
+                    <a href="tel:+218912121303" className="font-medium text-[#15191E] hover:underline" dir="ltr">+218 91 212 1303</a>
                   </div>
                 </div>
               </div>

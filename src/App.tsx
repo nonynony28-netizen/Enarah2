@@ -20,6 +20,7 @@ const Contact = lazy(() => import('./pages/Contact'))
 const Blog = lazy(() => import('./pages/Blog'))
 const WirePrices = lazy(() => import('./pages/WirePrices'))
 const Contractors = lazy(() => import('./pages/Contractors'))
+const Offers = lazy(() => import('./pages/Offers'))
 const Game = lazy(() => import('./pages/Game'))
 const HomeCleanWhitePreview = lazy(() => import('./pages/HomeCleanWhitePreview'))
 
@@ -104,6 +105,7 @@ function App() {
           {/* الصفحات الفرعية المغلفة بالتخطيط المشترك */}
           <Route element={<Layout />}>
             <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
+            <Route path="/offers" element={<PageTransition><Offers /></PageTransition>} />
             <Route path="/brands" element={<PageTransition><Brands /></PageTransition>} />
             <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
             <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} /> 

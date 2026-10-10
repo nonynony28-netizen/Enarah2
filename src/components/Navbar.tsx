@@ -1,556 +1,151 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Menu, X, Lightbulb, Award, Zap, Sparkles, ChevronDown, 
-  Home, BookOpen, Info, MapPin, PhoneCall, Phone, Sliders, Globe, ShoppingCart, Gamepad2
-} from 'lucide-react'
+import { Menu, X, ArrowLeft, ArrowRight } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
-import { useCart } from '../hooks/useCart'
-import CartPanel from './CartPanel'
-import { trackConversionEvent } from '../utils/analytics'
-
-// نمط الوهج للعناوين والشعارات المضيئة
-const glowingTitleStyle = { textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)' }
 
 export default function Navbar() {
-  const { toggleLanguage, t, isAr } = useLanguage()
-  const { cartCount, setIsCartOpen } = useCart()
-
-  const servicesDropdownLabel = t('nav.servicesDropdown') || 'الأقسام والخدمات';
-  const servicesDropdownItems = [
-    { path: '/products', label: t('nav.products'), desc: isAr ? 'تصفح أحدث حلول الإضاءة ومواد الكهرباء الذكية بجودة عالية.' : 'Browse the latest lighting solutions and smart electrical materials.', icon: Lightbulb },
-    { path: '/contractors', label: t('nav.contractors'), desc: isAr ? 'بوابة مخصصة للمقاولين وشركات التشطيب لطلب عروض أسعار للكميات والتوريدات.' : 'Dedicated portal for contractors and finishing companies to request custom bulk quotes.', icon: Sliders },
-    { path: '/brands', label: t('nav.brands'), desc: isAr ? 'شركاء النجاح وأفضل الماركات والبراندات العالمية المعتمدة.' : 'Our partners and top certified global brands.', icon: Award },
-    { path: '/projects', label: t('nav.projects'), desc: isAr ? 'استكشف جزءاً من مشاريعنا وتأسيساتنا الكهربائية والهندسية.' : 'Explore some of our executed electrical and engineering projects.', icon: Sparkles },
-  ];
-
-  const commercialLinks = [
-    { path: '/products', label: t('nav.products'), icon: Lightbulb },
-    { path: '/contractors', label: t('nav.contractors'), icon: Sliders },
-    { path: '/brands', label: t('nav.brands'), icon: Award },
-    { path: '/projects', label: t('nav.projects'), icon: Sparkles },
-  ];
-
-  const corporateLinks = [
-    { path: '/about', label: t('nav.about'), icon: Info },
-    { path: '/branches', label: t('nav.branches'), icon: MapPin },
-    { path: '/blog', label: t('nav.blog'), icon: BookOpen },
-  ];
-
-  const localizedOtherLinks = [
-    { path: '/blog', label: t('nav.blog'), icon: BookOpen },
-    { path: '/about', label: t('nav.about'), icon: Info },
-    { path: '/branches', label: t('nav.branches'), icon: MapPin },
-    { path: '/contact', label: t('nav.contact'), icon: PhoneCall },
-  ];
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
+  const { isAr } = useLanguage()
 
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
-    }
-    return 'dark';
-  });
+  const navLinks = [
+    { path: '/products', label: isAr ? 'المنتجات' : 'Products' },
+    { path: '/offers', label: isAr ? 'العروض' : 'Offers' },
+    { path: '/projects', label: isAr ? 'المشاريع' : 'Projects' },
+    { path: '/brands', label: isAr ? 'العلامات التجارية' : 'Brands' },
+    { path: '/wire-prices', label: isAr ? 'أسعار الأسلاك' : 'Wire Prices' },
+    { path: '/about', label: isAr ? 'عن الشركة' : 'About' },
+    { path: '/contact', label: isAr ? 'اتصل بنا' : 'Contact' },
+  ]
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'light') {
-      root.classList.add('light');
-    } else {
-      root.classList.remove('light');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+  const secondaryLinks = [
+    { path: '/branches', label: isAr ? 'فروعنا' : 'Branches' },
+    { path: '/blog', label: isAr ? 'المدونة' : 'Blog' },
+    { path: '/game', label: isAr ? 'لعبة بطل الإنارة' : 'Game' },
+  ]
 
-  useEffect(() => {
-    const handleThemeChange = () => {
-      const isLight = window.document.documentElement.classList.contains('light');
-      setTheme(isLight ? 'light' : 'dark');
-    };
-    window.addEventListener('themechange', handleThemeChange);
-    return () => window.removeEventListener('themechange', handleThemeChange);
-  }, []);
-
-  const playClickSound = () => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.06);
-      
-      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
-      
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.06);
-    } catch (e) {
-      console.warn("Audio Context not supported or blocked", e);
-    }
-  };
-
-  const toggleTheme = () => {
-    playClickSound();
-
-    // Trigger Laser Sweep Overlay
-    const sweep = document.createElement('div');
-    sweep.className = 'theme-transition-sweep';
-    document.body.appendChild(sweep);
-    
-    // Toggle the theme halfway through the sweep animation (approx 350ms)
-    setTimeout(() => {
-      setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-    }, 350);
-
-    // Clean up sweep element
-    setTimeout(() => {
-      sweep.remove();
-    }, 800);
-  };
-
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  const isHomePage = location.pathname === '/' || location.pathname === '/preview'
-  const [heroVideoFinished, setHeroVideoFinished] = useState(!isHomePage)
-
-  useEffect(() => {
-    if (!isHomePage) {
-      setHeroVideoFinished(true)
-      return
-    }
-
-    const handleHeroDone = () => {
-      setHeroVideoFinished(true)
-    }
-
-    const handleScrollOrTouch = () => {
-      if (window.scrollY > 40) {
-        setHeroVideoFinished(true)
-      }
-    }
-
-    window.addEventListener('enarah_hero_finished', handleHeroDone)
-    window.addEventListener('scroll', handleScrollOrTouch, { passive: true })
-    window.addEventListener('touchstart', handleScrollOrTouch, { passive: true })
-
-    return () => {
-      window.removeEventListener('enarah_hero_finished', handleHeroDone)
-      window.removeEventListener('scroll', handleScrollOrTouch)
-      window.removeEventListener('touchstart', handleScrollOrTouch)
-    }
-  }, [isHomePage])
-
-  useEffect(() => {
-    setIsOpen(false)
-    setIsDropdownOpen(false)
-    setIsMobileDropdownOpen(false)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [location.pathname])
-
-  if (location.pathname.startsWith('/game')) return null
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/'
+    return location.pathname.startsWith(path)
+  }
 
   return (
-    <>
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ 
-          y: heroVideoFinished ? 0 : -100,
-          opacity: heroVideoFinished ? 1 : 0
-        }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 right-0 left-0 z-50 transition-all duration-500 ${
-          heroVideoFinished ? 'pointer-events-auto' : 'pointer-events-none'
-        } ${
-          scrolled
-            ? 'bg-white/95 backdrop-blur-xl shadow-md border-b border-slate-200 py-2.5'
-            : 'bg-white/85 backdrop-blur-md border-b border-slate-200/60 py-3.5'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`flex items-center justify-between h-14 md:h-16 w-full ${isAr ? 'flex-row-reverse md:flex-row' : 'flex-row'}`}>
+    <header className="sticky top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#E7EAF0] py-3.5 transition-all duration-300 font-sans">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative flex items-center justify-between min-h-[44px]">
+        {/* Desktop Nav Links - Perfectly Centered */}
+        <nav className="hidden lg:flex items-center justify-center gap-7 text-sm font-medium absolute left-1/2 -translate-x-1/2">
+          <Link
+            to="/"
+            className={`transition-colors py-1 ${
+              location.pathname === '/'
+                ? 'text-[#0062D2] font-semibold border-b-2 border-[#0062D2]'
+                : 'text-[#15191E] hover:text-[#0062D2]'
+            }`}
+          >
+            {isAr ? 'الرئيسية' : 'Home'}
+          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`transition-colors py-1 ${
+                isActive(link.path)
+                  ? 'text-[#0062D2] font-semibold border-b-2 border-[#0062D2]'
+                  : 'text-[#15191E] hover:text-[#0062D2]'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
-            {/* Logo Group containing Logo & Mobile Cart Button to space them nicely */}
-            <div className="flex items-center gap-4 flex-row">
-              <Link to="/" className="flex items-center gap-3 group">
-                <motion.div
-                  whileHover={{ rotate: 15, scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <Lightbulb className="w-7 h-7 text-blue-600 drop-shadow-sm" />
-                </motion.div>
-                <span className="font-extrabold text-xl md:text-2xl tracking-tight">
-                  {isAr ? (
-                    <>
-                      <span className="text-slate-900">الإنارة</span>{' '}
-                      <span className="text-blue-600">الحديثة</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-slate-900">ENARAH</span>{' '}
-                      <span className="text-blue-600">MODERN</span>
-                    </>
-                  )}
-                </span>
-              </Link>
+        {/* Primary CTA & Mobile Toggle */}
+        <div className="flex items-center gap-4 ms-auto z-10">
+          <Link
+            to="/contact"
+            className="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide bg-[#0062D2] text-white hover:bg-[#0047A5] transition-all duration-200 shadow-sm active:scale-98"
+          >
+            {isAr ? 'تواصل معنا' : 'Contact Us'}
+          </Link>
 
-              {/* Shopping Cart Button for Mobile (Positioned on the opposite side of Hamburger Menu) */}
-              <div className="md:hidden flex items-center">
-                <button
-                  onClick={() => setIsCartOpen(true)}
-                  className="relative h-10 w-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:border-slate-300"
-                  title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartCount > 0 && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: [0, 1.4, 1] }}
-                      transition={{ type: 'spring', stiffness: 450, damping: 12 }}
-                      key={cartCount}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-white text-[10px] font-bold text-white flex items-center justify-center"
-                    >
-                      {cartCount}
-                    </motion.span>
-                  )}
-                </button>
-              </div>
-            </div>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-lg text-[#15191E] hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="القائمة"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </div>
 
-            {/* Desktop Nav قائمة الكمبيوتر */}
-            <div className="hidden md:flex items-center gap-1 relative flex-row">
-              {/* الرئيسية */}
+      {/* Mobile Drawer Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden bg-white text-[#15191E] border-b border-[#E7EAF0] px-6 py-8 shadow-xl"
+          >
+            <div className="flex flex-col gap-4 text-base font-semibold">
               <Link
                 to="/"
-                className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 ${
-                  location.pathname === '/' ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-xs' : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
+                onClick={() => setMobileMenuOpen(false)}
+                className={`py-2 px-3 rounded-lg transition-colors flex items-center justify-between ${
+                  location.pathname === '/' ? 'bg-blue-50 text-[#0062D2]' : 'hover:bg-slate-50'
                 }`}
               >
-                {t('nav.home')}
+                <span>{isAr ? 'الرئيسية' : 'Home'}</span>
+                {isAr ? <ArrowLeft className="w-4 h-4 opacity-50" /> : <ArrowRight className="w-4 h-4 opacity-50" />}
               </Link>
-
-              {/* القائمة المنسدلة التفاعلية (أقسامنا وأسعارنا) */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setIsDropdownOpen(true)}
-                onMouseLeave={() => setIsDropdownOpen(false)}
-              >
-                <button
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 outline-none cursor-pointer ${
-                    servicesDropdownItems.some(item => location.pathname === item.path)
-                      ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-xs'
-                      : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`py-2 px-3 rounded-lg transition-colors flex items-center justify-between ${
+                    isActive(link.path) ? 'bg-blue-50 text-[#0062D2]' : 'hover:bg-slate-50'
                   }`}
                 >
-                  {servicesDropdownLabel}
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
-                </button>
+                  <span>{link.label}</span>
+                  {isAr ? <ArrowLeft className="w-4 h-4 opacity-50" /> : <ArrowRight className="w-4 h-4 opacity-50" />}
+                </Link>
+              ))}
 
-                <AnimatePresence>
-                  {isDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                      transition={{ duration: 0.18, ease: 'easeOut' }}
-                      className={`absolute top-full mt-2 w-[480px] bg-white border border-slate-200 rounded-2xl p-4 shadow-2xl z-50 grid grid-cols-2 gap-2 backdrop-blur-2xl ${
-                        isAr ? 'right-0' : 'left-0'
-                      }`}
-                    >
-                      {servicesDropdownItems.map((item) => {
-                        const isSubActive = location.pathname === item.path;
-                        return (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`flex items-start gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-slate-50 border border-transparent hover:border-slate-200 ${
-                              isSubActive ? 'bg-blue-50/70 border-blue-200' : ''
-                            }`}
-                          >
-                            <div className={`p-2 rounded-lg ${isSubActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
-                              <item.icon className="w-4 h-4" />
-                            </div>
-                            <div className={`flex-grow ${isAr ? 'text-right' : 'text-left'}`}>
-                              <h4 className="text-sm font-semibold text-slate-900 mb-0.5">{item.label}</h4>
-                              <p className="text-xs text-slate-500 leading-relaxed font-normal">{item.desc}</p>
-                            </div>
-                          </Link>
-                        )
-                      })}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* باقي الروابط */}
-              {localizedOtherLinks.map((link) => {
-                const isActive = location.pathname === link.path;
-                return (
+              <div className="pt-2 pb-1 border-t border-slate-100 my-1">
+                <span className="text-xs font-semibold text-[#68717D] uppercase tracking-wider px-3 block mb-2">
+                  {isAr ? 'أقسام إضافية' : 'Additional'}
+                </span>
+                {secondaryLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 z-10 ${
-                      isActive ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-xs' : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-between ${
+                      isActive(link.path) ? 'bg-blue-50 text-[#0062D2]' : 'text-[#475569] hover:bg-slate-50'
                     }`}
                   >
-                    {link.label}
+                    <span>{link.label}</span>
+                    {isAr ? <ArrowLeft className="w-3.5 h-3.5 opacity-40" /> : <ArrowRight className="w-3.5 h-3.5 opacity-40" />}
                   </Link>
-                )
-              })}
+                ))}
+              </div>
 
-              {/* زر اللعبة المباشر */}
-              <Link
-                to="/game"
-                className={`relative px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 shadow-sm ${
-                  location.pathname === '/game'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
-                    : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
-                }`}
-              >
-                <Gamepad2 className="w-4 h-4 text-blue-600" />
-                <span>{isAr ? 'بطل الإنارة' : 'Enarah Hero'}</span>
-              </Link>
-
-              {/* Shopping Cart Button (Desktop) */}
-              <div className="ml-1.5 pl-1.5 border-l border-slate-200 flex items-center justify-center">
-                <button
-                  onClick={() => setIsCartOpen(true)}
-                  className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all duration-200 active:scale-95 cursor-pointer"
-                  title={isAr ? 'عربة التسوق' : 'Shopping Cart'}
+              <div className="pt-4 border-t border-slate-100">
+                <Link
+                  to="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-3.5 rounded-full bg-[#0062D2] text-white font-semibold text-center block shadow-sm hover:bg-[#0047A5] transition-colors"
                 >
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartCount > 0 && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: [0, 1.4, 1] }}
-                      transition={{ type: 'spring', stiffness: 450, damping: 12 }}
-                      key={cartCount}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border border-white text-[10px] font-bold text-white flex items-center justify-center"
-                    >
-                      {cartCount}
-                    </motion.span>
-                  )}
-                </button>
+                  {isAr ? 'تواصل معنا' : 'Contact Us'}
+                </Link>
               </div>
-
-              {/* Language Switcher */}
-              <div className="ml-1.5 pl-1.5 border-l border-slate-200 flex items-center justify-center">
-                <button
-                  onClick={toggleLanguage}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
-                  title={isAr ? 'Switch to English' : 'التغيير للعربية'}
-                >
-                  <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span className="whitespace-nowrap">{isAr ? 'EN' : 'العربية'}</span>
-                </button>
-              </div>
-
             </div>
-
-            {/* Mobile Actions & Menu Button */}
-            <div className="flex md:hidden items-center gap-2">
-              <button
-                onClick={toggleLanguage}
-                className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 text-xs font-semibold shrink-0"
-                title={isAr ? 'Switch to English' : 'التغيير للعربية'}
-              >
-                <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                <span className="whitespace-nowrap">{isAr ? 'EN' : 'AR'}</span>
-              </button>
-
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 active:scale-95 transition-all"
-              >
-                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Mobile Nav قائمة الجوال */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            key="mobile-nav-menu-wrapper"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-40 md:hidden"
-          >
-            {/* الخلفية المظلمة الشفافة السريعة */}
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-            
-            <motion.div
-              initial={{ x: isAr ? '100%' : '-100%' }} 
-              animate={{ x: 0 }} 
-              exit={{ x: isAr ? '100%' : '-100%' }}
-              transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
-              className={`absolute top-0 bottom-0 w-[80%] max-w-sm bg-white shadow-2xl overflow-y-auto flex flex-col justify-between ${
-                isAr ? 'right-0 border-l border-slate-200' : 'left-0 border-r border-slate-200'
-              }`}
-            >
-              <div className="relative z-10">
-                {/* رأس المنيو الجانبي */}
-                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-200 bg-slate-50">
-                  <div className="flex items-center gap-2">
-                    <Lightbulb className="w-6 h-6 text-blue-600" />
-                    <span className="font-extrabold text-lg text-slate-900">
-                      {isAr ? (
-                        <>الإنارة <span className="text-blue-600">الحديثة</span></>
-                      ) : (
-                        <>ENARAH <span className="text-blue-600">MODERN</span></>
-                      )}
-                    </span>
-                  </div>
-                  <button 
-                    onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 active:scale-95 transition-all cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* روابط القائمة المباشرة والمنظمة بدون تكرار */}
-                <div className="flex flex-col px-4 pt-5 pb-6 gap-4">
-                  {/* الرئيسية */}
-                  <Link
-                    to="/"
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                      location.pathname === '/' 
-                        ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-2xs' 
-                        : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    <Home className="w-4 h-4 text-blue-600" />
-                    <span>{t('nav.home')}</span>
-                  </Link>
-
-                  {/* مجموعة: التسوق والتوريدات (مباشرة وبدون أكورديون) */}
-                  <div className="flex flex-col gap-1 pt-1">
-                    <span className="text-[11px] font-bold text-slate-400 px-3 pb-1 tracking-wider">
-                      {isAr ? 'التسوق والتوريدات' : 'Products & Services'}
-                    </span>
-                    {commercialLinks.map((item) => {
-                      const isActive = location.pathname === item.path;
-                      return (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          onClick={() => setIsOpen(false)}
-                          className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                            isActive
-                              ? 'text-blue-700 bg-blue-50 border border-blue-200 font-bold shadow-2xs'
-                              : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50'
-                          }`}
-                        >
-                          <item.icon className="w-4 h-4 text-blue-600 shrink-0" />
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-
-                  {/* مجموعة: عن الشركة */}
-                  <div className="flex flex-col gap-1 pt-1">
-                    <span className="text-[11px] font-bold text-slate-400 px-3 pb-1 tracking-wider">
-                      {isAr ? 'عن الشركة والمحتوى' : 'Company & Info'}
-                    </span>
-                    {corporateLinks.map((link) => {
-                      const isActive = location.pathname === link.path;
-                      return (
-                        <Link
-                          key={link.path}
-                          to={link.path}
-                          onClick={() => setIsOpen(false)}
-                          className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                            isActive
-                              ? 'text-blue-700 bg-blue-50 border border-blue-200 font-bold shadow-2xs'
-                              : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50'
-                          }`}
-                        >
-                          <link.icon className="w-4 h-4 text-blue-600 shrink-0" />
-                          <span>{link.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-
-                  {/* بطل الإنارة (عنصر تفاعلي منضبط) */}
-                  <Link
-                    to="/game"
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
-                      location.pathname === '/game'
-                        ? 'text-white bg-blue-600 border-blue-600 shadow-sm'
-                        : 'text-blue-700 bg-blue-50/70 border-blue-200/80 hover:bg-blue-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Gamepad2 className="w-4 h-4 text-blue-600" />
-                      <span>{isAr ? 'بطل الإنارة' : 'Enarah Hero'}</span>
-                    </div>
-                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
-                      {isAr ? 'العب واكسب خصم' : 'Play & Win Discount'}
-                    </span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* تذييل القائمة الجانبية الموحد: تواصل مباشر وسريع بدون تكرار */}
-              <div className="relative z-10 p-4 border-t border-slate-200 bg-slate-50 flex flex-col gap-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <Link
-                    to="/contact"
-                    onClick={() => setIsOpen(false)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border ${
-                      location.pathname === '/contact'
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <PhoneCall className="w-3.5 h-3.5 text-blue-600" />
-                    <span>{t('nav.contact')}</span>
-                  </Link>
-
-                  <a
-                    href="tel:0916580068"
-                    onClick={() => trackConversionEvent('phone_click', { source: 'navbar_mobile', phone: '0916580068' })}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-all active:scale-95"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-blue-600" />
-                    <span dir="ltr">0916580068</span>
-                  </a>
-                </div>
-                
-                <span className="text-[11px] text-center text-slate-500 font-normal">
-                  {isAr ? 'خدمة مبيعات واستفسارات فورية' : 'Direct sales & inquiries'}
-                </span>
-              </div>
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <CartPanel />
-    </>
+    </header>
   )
 }
