@@ -251,22 +251,24 @@ export default function Blog() {
         </div>
 
         {/* Newsletter / Consultation Strip */}
-        <div className="bg-[#101820] text-white rounded-3xl p-10 sm:p-14 text-center">
+        <div className="bg-[#101820] text-white rounded-3xl p-10 sm:p-14 text-center border border-[#202936]">
           <div className="max-w-2xl mx-auto">
             <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
-              ARCHITECTURAL CONSULTING
+              {isAr ? 'استشارات معمارية متخصصة' : 'ARCHITECTURAL CONSULTING'}
             </span>
-            <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
-              هل ترغب في دراسة ضوئية لمشروعك؟
+            <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-4">
+              {isAr ? 'هل ترغب في دراسة ضوئية لمشروعك؟' : 'Need an Architectural Lighting Study?'}
             </h3>
-            <p className="text-sm sm:text-base text-white/80 leading-relaxed font-normal mb-8">
-              فريقنا الهندسي في بنغازي والبيضاء جاهز لتقديم المشورة المعمارية وتحليل مخططات المبنى لضمان توزيع ضوئي مثالي.
+            <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal mb-8">
+              {isAr
+                ? 'فريقنا الهندسي في بنغازي والبيضاء جاهز لتقديم المشورة المعمارية وتحليل مخططات المبنى لضمان توزيع ضوئي مثالي.'
+                : 'Our engineering team in Benghazi & Al-Bayda is ready to review your architectural plans for photometric optimization.'}
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs sm:text-sm font-semibold rounded-full transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs sm:text-sm font-semibold rounded-full transition-colors shadow-md"
             >
-              <span>طلب استشارة أو تسعيرة</span>
+              <span>{isAr ? 'طلب استشارة أو تسعيرة' : 'Request Consultation or Quote'}</span>
               <ArrowLeft className="w-4 h-4" />
             </Link>
           </div>

@@ -241,26 +241,28 @@ export default function About() {
         </div>
 
         {/* CTA Strip */}
-        <div className="bg-[#101820] text-white rounded-3xl p-10 sm:p-14 text-center">
-          <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
-            هل تخطط لمشروعك القادم؟
+        <div className="bg-[#101820] text-white rounded-3xl p-10 sm:p-14 text-center border border-[#202936]">
+          <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-4">
+            {isAr ? 'هل تخطط لمشروعك القادم؟' : 'Planning Your Next Project?'}
           </h3>
-          <p className="text-sm sm:text-base text-white/80 max-w-lg mx-auto mb-8 font-normal">
-            تواصل مع مهندسينا للحصول على استشارة متخصصة ودراسة ضوئية شاملة لمساحتك.
+          <p className="text-sm sm:text-base text-slate-300 max-w-lg mx-auto mb-8 font-normal">
+            {isAr
+              ? 'تواصل مع مهندسينا في بنغازي للحصول على استشارة متخصصة ودراسة ضوئية شاملة لمساحتك وتحديد الكابلات المناسبة.'
+              : 'Contact our engineers in Benghazi for architectural lighting studies and certified wire calculations.'}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-7 py-3 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs sm:text-sm font-semibold rounded-full transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs sm:text-sm font-semibold rounded-full transition-colors shadow-md"
             >
-              <span>تواصل مع خبرائنا</span>
+              <span>{isAr ? 'تواصل مع خبرائنا' : 'Contact Our Engineers'}</span>
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <Link
               to="/branches"
               className="inline-flex items-center gap-2 px-7 py-3 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold rounded-full transition-colors border border-white/15"
             >
-              <span>فروعنا ومعارضنا</span>
+              <span>{isAr ? 'فروعنا ومعارضنا' : 'Our Showrooms'}</span>
             </Link>
           </div>
         </div>
