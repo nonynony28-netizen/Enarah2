@@ -32,7 +32,9 @@ import {
   Zap,
   Globe,
   Building2,
-  ShoppingCart
+  ShoppingCart,
+  BookOpen,
+  Gamepad2
 } from 'lucide-react'
 import type { ProjectItem } from '../data/projectsData'
 import {
@@ -294,6 +296,54 @@ export default function Home() {
   // Navigation scroll state
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleMouseEnter = () => {
+    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current)
+    setDropdownOpen(true)
+  }
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setDropdownOpen(false)
+    }, 150)
+  }
+
+  const moreLinks = [
+    {
+      path: '/contractors',
+      label: isAr ? 'قسم المقاولين والكميات' : 'Contractors & Bulk Supply',
+      desc: isAr ? 'عروض أسعار خاصة وتوريد المشاريع الكبرى' : 'Special bulk quotes for contractors',
+      icon: Building2,
+      badge: isAr ? 'خاص' : 'Pro'
+    },
+    {
+      path: '/branches',
+      label: isAr ? 'فروعنا' : 'Our Branches',
+      desc: isAr ? 'معارض بنغازي والبيضاء وأوقات العمل' : 'Benghazi & Al-Bayda showrooms',
+      icon: MapPin
+    },
+    {
+      path: '/blog',
+      label: isAr ? 'المدونة' : 'Architectural Blog',
+      desc: isAr ? 'هندسة الإضاءة والأفكار المعمارية' : 'Lighting design & photometrics',
+      icon: BookOpen
+    },
+    {
+      path: '/about',
+      label: isAr ? 'من نحن' : 'About Us',
+      desc: isAr ? 'تاريخنا ومسيرة ريادتنا منذ عام 1988' : 'Pioneering heritage since 1988',
+      icon: Award
+    },
+    {
+      path: '/game',
+      label: isAr ? 'بطل الإنارة (اللعبة)' : 'Light Quest Game',
+      desc: isAr ? 'تحدي الإنارة التفاعلي وكوبونات الخصم' : 'Interactive mini-game & vouchers',
+      icon: Gamepad2,
+      badge: isAr ? 'تفاعلية' : 'Play'
+    }
+  ]
 
   // Hero Video State & Adaptive Local Blob Caching
   const heroVideoRef = useRef<HTMLVideoElement>(null)
@@ -497,7 +547,7 @@ export default function Home() {
       >
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative flex items-center justify-between min-h-[44px]">
           {/* Desktop Nav Links - Centered */}
-          <nav className="hidden lg:flex items-center justify-center gap-8 text-sm font-medium absolute left-1/2 -translate-x-1/2">
+          <nav className="hidden lg:flex items-center justify-center gap-7 text-sm font-medium absolute left-1/2 -translate-x-1/2">
             <Link
               to="/products"
               className={`transition-colors hover:text-[#0062D2] ${
@@ -505,6 +555,14 @@ export default function Home() {
               }`}
             >
               المنتجات
+            </Link>
+            <Link
+              to="/offers"
+              className={`transition-colors hover:text-[#0062D2] ${
+                isScrolled ? 'text-[#15191E]' : 'text-white/95 hover:text-white'
+              }`}
+            >
+              العروض
             </Link>
             <Link
               to="/projects"
@@ -530,14 +588,89 @@ export default function Home() {
             >
               أسعار الأسلاك
             </Link>
-            <Link
-              to="/about"
-              className={`transition-colors hover:text-[#0062D2] ${
-                isScrolled ? 'text-[#15191E]' : 'text-white/95 hover:text-white'
-              }`}
+
+            {/* خانة المزيد (القائمة المنسدلة للأقسام الأخرى) */}
+            <div
+              className="relative"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
-              عن الشركة
-            </Link>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className={`inline-flex items-center gap-1.5 transition-colors cursor-pointer py-1 ${
+                  dropdownOpen
+                    ? 'text-[#0062D2] font-semibold'
+                    : isScrolled
+                    ? 'text-[#15191E] hover:text-[#0062D2]'
+                    : 'text-white/95 hover:text-white'
+                }`}
+                aria-expanded={dropdownOpen}
+              >
+                <span>المزيد</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    dropdownOpen
+                      ? 'rotate-180 text-[#0062D2]'
+                      : isScrolled
+                      ? 'text-slate-400'
+                      : 'text-white/70'
+                  }`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ duration: 0.16, ease: 'easeOut' }}
+                    className="absolute top-full -right-6 mt-2.5 w-80 bg-white text-[#15191E] rounded-2xl shadow-xl border border-[#E7EAF0] p-2 z-50 text-right"
+                    dir="rtl"
+                  >
+                    <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                      <span className="text-[11px] font-semibold text-[#68717D] uppercase tracking-wider block">
+                        أقسام وخدمات إضافية
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      {moreLinks.map((item) => {
+                        const IconComponent = item.icon
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => setDropdownOpen(false)}
+                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-[#15191E] transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-[#EBF3FC] text-[#0062D2] group-hover:bg-[#0062D2] group-hover:text-white transition-colors flex items-center justify-center shrink-0 mt-0.5">
+                              <IconComponent className="w-4 h-4" />
+                            </div>
+                            <div className="flex flex-col flex-grow">
+                              <div className="flex items-center justify-between gap-1.5">
+                                <span className="text-xs font-semibold group-hover:text-[#0062D2] transition-colors leading-tight">
+                                  {item.label}
+                                </span>
+                                {item.badge && (
+                                  <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-200">
+                                    {item.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[11px] text-[#68717D] font-normal leading-tight mt-1 line-clamp-1">
+                                {item.desc}
+                              </span>
+                            </div>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <Link
               to="/contact"
               className={`transition-colors hover:text-[#0062D2] ${
@@ -580,55 +713,90 @@ export default function Home() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="lg:hidden bg-white text-[#15191E] border-b border-[#E7EAF0] px-6 py-8 shadow-xl"
+              className="lg:hidden bg-white text-[#15191E] border-b border-[#E7EAF0] px-6 py-8 shadow-xl max-h-[85vh] overflow-y-auto"
             >
-              <div className="flex flex-col gap-5 text-base font-semibold">
+              <div className="flex flex-col gap-4 text-base font-semibold">
                 <Link
                   to="/products"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
                 >
-                  المنتجات والتشكيلات
+                  <span>المنتجات والتشكيلات</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40" />
+                </Link>
+                <Link
+                  to="/offers"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
+                >
+                  <span>العروض والتخفيضات</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40" />
                 </Link>
                 <Link
                   to="/projects"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
                 >
-                  المشاريع المنفذة
+                  <span>المشاريع المنفذة</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40" />
                 </Link>
                 <Link
                   to="/brands"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
                 >
-                  العلامات والشركاء
+                  <span>العلامات والشركاء</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40" />
                 </Link>
                 <Link
                   to="/wire-prices"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
                 >
-                  أسعار الأسلاك
-                </Link>
-                <Link
-                  to="/about"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
-                >
-                  عن الإنارة الحديثة (منذ 1988)
+                  <span>أسعار الأسلاك</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40" />
                 </Link>
                 <Link
                   to="/contact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
                 >
-                  اتصل بنا
+                  <span>اتصل بنا</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40" />
                 </Link>
+
+                {/* أقسام إضافية في الجوال */}
+                <div className="pt-2 pb-1 border-t border-slate-100">
+                  <span className="text-xs font-semibold text-[#68717D] uppercase tracking-wider block mb-2">
+                    أقسام وخدمات إضافية
+                  </span>
+                  <div className="space-y-1">
+                    {moreLinks.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="py-2 px-3 rounded-lg text-sm text-[#475569] hover:bg-slate-50 transition-colors flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <item.icon className="w-4 h-4 text-[#0062D2]" />
+                          <span>{item.label}</span>
+                          {item.badge && (
+                            <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-200">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <ArrowLeft className="w-3.5 h-3.5 opacity-40" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
                 <Link
                   to="/contact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mt-2 text-center py-3 bg-[#0062D2] text-white rounded-xl font-semibold shadow-sm"
+                  className="mt-2 text-center py-3 bg-[#0062D2] text-white rounded-xl font-semibold shadow-sm hover:bg-[#0047A5] transition-colors"
                 >
                   ابدأ استشارة مجانية
                 </Link>
