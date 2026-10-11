@@ -249,37 +249,89 @@ export default function Brands() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#15191E] font-sans pb-20">
       
-      {/* 01. Compact Minimal Introduction */}
-      <section className="pt-10 sm:pt-14 pb-7 border-b border-[#E7EAF0] bg-white">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight mb-1.5">
-            {isAr ? 'العلامات التجارية' : 'Brands'}
-          </h1>
-          <p className="text-sm text-[#68717D]">
-            {isAr ? 'نخبة من العلامات التجارية في عالم الكهرباء والإضاءة.' : 'Curated international brands in electrical and lighting systems.'}
-          </p>
+      {/* =====================================================================
+          01. Architectural Hero Header (Deep Corporate Navy #101820)
+          ===================================================================== */}
+      <section className="relative bg-[#101820] text-white pt-12 pb-14 overflow-hidden border-b border-[#202936]">
+        {/* Subtle grid pattern & architectural glow */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#0062D2]/15 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="relative max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-2xl space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#0062D2] animate-pulse" />
+                <span>{isAr ? 'شراكات وتوكيلات معتمدة في ليبيا' : 'Authorized Brand Partnerships in Libya'}</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white">
+                {isAr ? 'علامات تجارية عالمية بمواصفات قياسية' : 'World-Class Electrical & Lighting Brands'}
+              </h1>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                {isAr
+                  ? 'نحرص في شركة الإنارة الحديثة منذ عام 1988 على توريد كبرى العلامات الإيطالية، التركية والأوروبية الحاصلة على شهادات الجودة والأمان الدولية للمشاريع السكنية والتجارية.'
+                  : 'Since 1988, Enarah Modern has partnered with top-tier Italian, Turkish, and European brands certified for maximum safety and performance in residential and commercial infrastructure.'}
+              </p>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'منتجات أصلية 100%' : '100% Authentic Products'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'مطابقة للمواصفات القياسية' : 'Standard Compliance Certified'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'توريد موثق في بنغازي وليبيا' : 'Benghazi & Libya Supply'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Metrics Badge Card */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-md lg:w-auto shrink-0">
+              <div className="text-center px-4 py-2">
+                <span className="block text-2xl sm:text-3xl font-bold text-white font-mono">14+</span>
+                <span className="text-[11px] text-slate-400 mt-1 block">{isAr ? 'علامة معتمدة' : 'Brands'}</span>
+              </div>
+              <div className="text-center px-4 py-2 border-r border-l border-white/10">
+                <span className="block text-2xl sm:text-3xl font-bold text-[#0062D2] font-mono">35+</span>
+                <span className="text-[11px] text-slate-400 mt-1 block">{isAr ? 'عاماً من الخبرة' : 'Years Experience'}</span>
+              </div>
+              <div className="text-center px-4 py-2 col-span-2 sm:col-span-1">
+                <span className="block text-2xl sm:text-3xl font-bold text-emerald-400 font-mono">100%</span>
+                <span className="text-[11px] text-slate-400 mt-1 block">{isAr ? 'جودة وتوثيق' : 'Verified Quality'}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 02. Minimalist Gallery Content */}
+      {/* =====================================================================
+          02. Minimalist Gallery Content & Filter Workspace
+          ===================================================================== */}
       <main className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-8 sm:py-12">
         
         {/* Clean Filter Tabs (Section 08: Swiss Minimalist styling) */}
-        <div className="flex items-center gap-2 pb-4 mb-8 overflow-x-auto scrollbar-none border-b border-[#E7EAF0]">
+        <div className="flex items-center gap-2 pb-4 mb-8 overflow-x-auto no-scrollbar border-b border-[#E7EAF0]">
           {filterTabs.map((tab) => {
             const isActive = selectedFilter === tab.key
             return (
               <button
                 key={tab.key}
                 onClick={() => setSelectedFilter(tab.key as typeof selectedFilter)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-2 ${
                   isActive
-                    ? 'bg-[#15191E] text-white'
-                    : 'bg-white text-[#68717D] border border-[#E7EAF0] hover:text-[#15191E] hover:border-slate-300'
+                    ? 'bg-[#101820] text-white shadow-xs'
+                    : 'bg-white text-[#64748B] border border-[#E7EAF0] hover:text-[#15191E] hover:border-slate-300'
                 }`}
               >
                 <span>{tab.label}</span>
-                <span className={`text-[11px] tabular-nums ${isActive ? 'text-slate-300' : 'text-[#94A3B8]'}`}>
+                <span className={`text-[11px] px-1.5 py-0.5 rounded-md font-mono ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>
                   {tab.count}
                 </span>
               </button>
@@ -288,68 +340,94 @@ export default function Brands() {
         </div>
 
         {/* 03. Brand Gallery Grid (4 columns desktop, 3 tablet, 2 mobile) */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredBrands.map((b) => (
             <div
               key={b.id}
               onClick={() => setActiveBrandModal(b)}
-              className="bg-white border border-[#E7EAF0] rounded-xl p-4 sm:p-5 hover:border-[#CBD5E1] transition-colors duration-200 flex flex-col justify-between group cursor-pointer"
+              className="bg-white border border-[#E2E8F0] rounded-2xl p-5 hover:border-[#0062D2] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
             >
-              {/* Logo Area (object-contain, normalized scale, authentic aspect ratio) */}
-              <div className="aspect-[16/10] bg-[#F8FAFC] rounded-lg p-4 flex items-center justify-center mb-3.5 group-hover:bg-slate-50 transition-colors">
-                <img
-                  src={b.logoUrl}
-                  alt={b.name}
-                  loading="lazy"
-                  className="max-h-11 w-auto max-w-[85%] object-contain transition-transform duration-200 group-hover:scale-[1.02]"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-              </div>
+              {/* Subtle hover accent bar */}
+              <div className="absolute top-0 inset-x-0 h-1 bg-[#0062D2] opacity-0 group-hover:opacity-100 transition-opacity" />
 
-              {/* Brand Meta */}
-              <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#F1F3F7]">
-                <div>
-                  <h3 className="text-sm font-semibold text-[#15191E] leading-snug">
-                    {b.name}
-                  </h3>
-                  <span className="text-[11px] text-[#68717D] block">
-                    {b.origin}
-                  </span>
+              <div>
+                {/* Logo Area (object-contain, normalized scale, authentic aspect ratio) */}
+                <div className="aspect-[16/10] bg-[#F8FAFC] rounded-xl p-6 flex items-center justify-center mb-4 group-hover:bg-slate-50/80 transition-colors border border-slate-100">
+                  <img
+                    src={b.logoUrl}
+                    alt={b.name}
+                    loading="lazy"
+                    className="max-h-12 w-auto max-w-[85%] object-contain transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
                 </div>
 
-                <span className="text-xs text-[#0062D2] opacity-0 group-hover:opacity-100 transition-opacity p-1" title={isAr ? 'عرض التفاصيل' : 'Details'}>
-                  <ArrowUpRight className="w-4 h-4" />
+                {/* Brand Meta */}
+                <div className="space-y-1.5 mb-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-base font-bold text-[#15191E] group-hover:text-[#0062D2] transition-colors">
+                      {b.name}
+                    </h3>
+                    <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                      {b.origin}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-[#0062D2] font-medium">
+                    {isAr ? b.category : b.categoryEn}
+                  </p>
+                </div>
+
+                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+                  {isAr ? b.description : b.descriptionEn}
+                </p>
+              </div>
+
+              {/* Action link & details trigger */}
+              <div className="pt-3 border-t border-[#F1F5F9] flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span className="group-hover:text-[#0062D2] transition-colors flex items-center gap-1">
+                  <span>{isAr ? 'عرض التفاصيل والاستفسار' : 'View Details'}</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </span>
+                {b.hasCatalogProducts && (
+                  <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    {isAr ? 'متوفر بالكتالوج' : 'In Catalog'}
+                  </span>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* 04. Neutral Quiet Inquiry Section (Section 10: Zero unsupported claims) */}
-        <div className="mt-14 pt-8 border-t border-[#E7EAF0] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-          <div className="max-w-xl">
-            <h2 className="text-sm sm:text-base font-semibold text-[#15191E] mb-1">
-              {isAr ? 'توريد منتجات العلامات للمشاريع والمقاولات' : 'Project & Commercial Supply'}
+        {/* 04. Neutral Project & Commercial Supply Banner */}
+        <div className="mt-14 p-6 sm:p-8 bg-gradient-to-r from-slate-900 to-[#101820] text-white rounded-2xl border border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-md">
+          <div className="max-w-2xl space-y-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 text-xs text-slate-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+              <span>{isAr ? 'توريد المشاريع والمقاولات الكبرى' : 'Bulk Project & Contractor Supply'}</span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-white">
+              {isAr ? 'هل تحتاج إلى كشف مقايسة أو توريد كميات تجارية لمشروعك؟' : 'Need Commercial Quotations or Bulk Electrical Supply?'}
             </h2>
-            <p className="text-xs text-[#68717D] leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
               {isAr
-                ? 'نوفر كشوفات مقايسة وتوريد مباشر لكافة المواد والمعدات الكهربائية المعتمدة للمشاريع في بنغازي وكافة المدن الليبية.'
-                : 'Direct commercial supply and quotations for certified electrical infrastructure across Libya.'}
+                ? 'فريقنا الهندسي في بنغازي جاهز لدراسة جداول الكميات والمواصفات وتقديم عروض أسعار تفصيلية لكافة المواد المعتمدة مع توفير الشحن والتسليم المباشر.'
+                : 'Our technical sales team in Benghazi provides itemized Bill of Quantities (BOQ) quotations, fast logistics, and technical data sheets.'}
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             <Link
               to="/products"
-              className="px-4 py-2 rounded-lg border border-[#E7EAF0] hover:bg-slate-50 text-xs font-medium text-[#15191E] transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-white/20 hover:bg-white/10 text-xs font-semibold text-white transition-colors"
             >
-              {isAr ? 'كتالوج الأسلاك' : 'Wires Catalog'}
+              {isAr ? 'تصفح كتالوج الأسلاك' : 'Wires Catalog'}
             </Link>
             <Link
               to="/contact"
-              className="px-4 py-2 rounded-lg bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-medium transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold transition-colors shadow-xs"
             >
               {isAr ? 'تواصل مع المعرض' : 'Contact Showroom'}
             </Link>
@@ -365,16 +443,16 @@ export default function Brands() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
             onClick={() => setActiveBrandModal(null)}
           >
             <motion.div
-              initial={{ scale: 0.98, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.98, opacity: 0 }}
-              transition={{ duration: 0.16 }}
+              initial={{ scale: 0.96, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-[#E7EAF0] relative overflow-hidden text-right"
+              className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative overflow-hidden text-right"
               dir={isAr ? 'rtl' : 'ltr'}
             >
               <button
