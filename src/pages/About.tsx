@@ -73,66 +73,103 @@ export default function About() {
 
   return (
     <div
-      dir="rtl"
-      className="min-h-screen bg-[#F7F8FA] text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white pt-24 pb-28"
+      dir={isAr ? 'rtl' : 'ltr'}
+      className="min-h-screen bg-[#F8FAFC] text-[#15191E] font-sans antialiased pb-24"
     >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-        {/* Back Link */}
-        <div className="mb-8">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
-          </Link>
-        </div>
+      {/* =====================================================================
+          01. Architectural Hero Header (Deep Corporate Navy #101820)
+          ===================================================================== */}
+      <section className="relative bg-[#101820] text-white pt-12 pb-16 overflow-hidden border-b border-[#202936]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#0062D2]/15 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Editorial Hero Header */}
-        <div className="mb-16 sm:mb-20 max-w-3xl">
-          <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
-            SINCE 1988
-          </span>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
-            خبرة تمتد لأكثر من ثلاثة عقود
-          </h1>
-          <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
-            منذ أكثر من 35 عاماً، نكرّس خبرتنا الهندسية في توفير أرقى حلول الإنارة المعمارية والأنظمة الكهربائية المعتمدة في ليبيا.
-          </p>
-        </div>
+        <div className="relative max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+            <div className="max-w-2xl space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#0062D2] animate-pulse" />
+                <span>{isAr ? 'تأسست عام 1988 · بنغازي - ليبيا' : 'Established 1988 · Benghazi, Libya'}</span>
+              </div>
 
-        {/* Brand Story Asymmetric Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center bg-white rounded-3xl p-8 sm:p-12 border border-[#E7EAF0] shadow-sm mb-20">
-          <div className="lg:col-span-6 space-y-6 text-[#15191E]">
-            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block">
-              OUR ARCHITECTURAL PHILOSOPHY
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-semibold tracking-tight text-[#15191E] leading-snug">
-              الضوء يشكّل المكان ويصنع الفارق
-            </h2>
-            <div className="space-y-4 text-sm sm:text-base text-[#68717D] leading-relaxed font-normal">
-              <p>
-                تأسست شركة الإنارة الحديثة في ليبيا عام 1988، بهدف الارتقاء بمفهوم الإضاءة من مجرد عنصر وظيفي تقليدي إلى قيمة معمارية محورية تُبرز جمال الفراغ وتمنحه شخصيته المستقلة.
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white">
+                {isAr ? 'خبرة هندسية تمتد لأكثر من 35 عاماً' : 'Over 35 Years of Architectural Engineering'}
+              </h1>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                {isAr
+                  ? 'منذ عام 1988، نكرّس خبرتنا الهندسية في توفير أرقى حلول الإنارة المعمارية، المفاتيح الذكية، والمواد الكهربائية وأسلاك التأسيس المعتمدة في بنغازي وكافة المدن الليبية.'
+                  : 'Since 1988, we have dedicated our technical expertise to providing premier architectural lighting, smart switches, and certified electrical wires across Libya.'}
               </p>
-              <p>
-                نواكب باستمرار التطور التقني المتسارع في عالم الإضاءة والتحكم الذكي، ونوفر للمهندسين الاستشاريين والمقاولين وأصحاب الذوق الرفيع باقة متكاملة من المنتجات الأصلية المطابقة للمواصفات العالمية.
-              </p>
+
+              <div className="flex flex-wrap items-center gap-6 pt-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'معايير جودة أوروبية' : 'European Standards'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'نحاس إيطالي نقي 100%' : '100% Pure Italian Copper'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'شراكات مع كبرى المصانع' : 'Authorized Alliances'}</span>
+                </div>
+              </div>
             </div>
 
-            {/* Metrics */}
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-[#E7EAF0]">
+            {/* Metrics Showcase Card */}
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-md lg:w-96 shrink-0 grid grid-cols-2 gap-6 shadow-xl">
               <div>
-                <span className="text-3xl font-bold text-[#15191E] block">+35</span>
-                <span className="text-xs text-[#68717D] mt-1 block">عاماً من الريادة</span>
+                <span className="text-3xl sm:text-4xl font-extrabold text-white block tracking-tight">+35</span>
+                <span className="text-xs text-slate-400 mt-1 block font-medium">
+                  {isAr ? 'عاماً من الريادة والخبرة' : 'Years of Heritage'}
+                </span>
               </div>
               <div>
-                <span className="text-3xl font-bold text-[#15191E] block">+500</span>
-                <span className="text-xs text-[#68717D] mt-1 block">مشروعاً ناجحاً</span>
+                <span className="text-3xl sm:text-4xl font-extrabold text-[#0062D2] block tracking-tight">+500</span>
+                <span className="text-xs text-slate-400 mt-1 block font-medium">
+                  {isAr ? 'مشروعاً منجزاً في ليبيا' : 'Completed Projects'}
+                </span>
               </div>
               <div>
-                <span className="text-3xl font-bold text-[#15191E] block">+15</span>
-                <span className="text-xs text-[#68717D] mt-1 block">علامة دولية</span>
+                <span className="text-3xl sm:text-4xl font-extrabold text-white block tracking-tight">+14</span>
+                <span className="text-xs text-slate-400 mt-1 block font-medium">
+                  {isAr ? 'وكالة وعلامة معتمدة' : 'Authorized Brands'}
+                </span>
               </div>
+              <div>
+                <span className="text-3xl sm:text-4xl font-extrabold text-[#0062D2] block tracking-tight">100%</span>
+                <span className="text-xs text-slate-400 mt-1 block font-medium">
+                  {isAr ? 'منتجات أصلية موثقة' : 'Authentic Certified'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pt-12">
+        {/* Brand Story Asymmetric Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center bg-white rounded-3xl p-8 sm:p-12 border border-[#E7EAF0] shadow-sm mb-16">
+          <div className="lg:col-span-6 space-y-6 text-[#15191E]">
+            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block">
+              {isAr ? 'فلسفتنا المعمارية' : 'OUR ARCHITECTURAL PHILOSOPHY'}
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#15191E] leading-snug">
+              {isAr ? 'الضوء يشكّل الفراغ ويصنع الفارق المعماري' : 'Light Shapes Space & Defines Architecture'}
+            </h2>
+            <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+              <p>
+                {isAr
+                  ? 'تأسست شركة الإنارة الحديثة في ليبيا عام 1988، بهدف الارتقاء بمفهوم الإضاءة من مجرد عنصر وظيفي تقليدي إلى قيمة معمارية محورية تُبرز جمال الفراغ وتمنحه شخصيته المستقلة.'
+                  : 'Founded in Libya in 1988, Enarah Modern elevated lighting from a mere functional necessity to a core architectural element shaping interior spaces.'}
+              </p>
+              <p>
+                {isAr
+                  ? 'نواكب باستمرار التطور التقني المتسارع في عالم الإضاءة والتحكم الذكي، ونوفر للمهندسين الاستشاريين والمقاولين وأصحاب الذوق الرفيع باقة متكاملة من المنتجات الأصلية المطابقة للمواصفات العالمية.'
+                  : 'We continually adopt global lighting technologies, smart building controls, and certified electrical infrastructure for architects, contractors, and discerning homeowners.'}
+              </p>
             </div>
           </div>
 

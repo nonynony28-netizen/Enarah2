@@ -38,81 +38,140 @@ export default function Branches() {
 
   return (
     <div
-      dir="rtl"
-      className="min-h-screen bg-[#F7F8FA] text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white pt-24 pb-28"
+      dir={isAr ? 'rtl' : 'ltr'}
+      className="min-h-screen bg-[#F8FAFC] text-[#15191E] font-sans antialiased pb-20"
     >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-        {/* Back Link */}
-        <div className="mb-8">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
-          </Link>
-        </div>
+      {/* =====================================================================
+          01. Architectural Hero Header (Deep Corporate Navy #101820)
+          ===================================================================== */}
+      <section className="relative bg-[#101820] text-white pt-12 pb-14 overflow-hidden border-b border-[#202936]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#0062D2]/15 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Editorial Hero Header */}
-        <div className="mb-14 sm:mb-18 max-w-3xl">
-          <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
-            {isAr ? 'فروعنا ومعارضنا' : 'OUR LOCATIONS'}
-          </span>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
-            {isAr ? 'فروعنا' : 'Our Branches'}
-          </h1>
-          <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
-            {isAr
-              ? 'نخدمكم عبر فروعنا داخل ليبيا لتوفير أفضل حلول الإضاءة المعمارية والمواد الكهربائية والأسلاك المعتمدة.'
-              : 'We serve you through our branches in Libya to provide the best certified lighting and electrical solutions.'}
-          </p>
-        </div>
+        <div className="relative max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-2xl space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#0062D2] animate-pulse" />
+                <span>{isAr ? 'معارضنا في ليبيا' : 'Showrooms in Libya'}</span>
+              </div>
 
-        {/* Showrooms Grid - 3 Columns on large screens */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white">
+                {isAr ? 'فروعنا ومعارضنا المعتمدة' : 'Our Showrooms & Branches'}
+              </h1>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                {isAr
+                  ? 'نسعد باستقبالكم في صالات عرض شركة الإنارة الحديثة في بنغازي والبيضاء للاطلاع على أحدث أنظمة الإنارة المعمارية، المفاتيح الذكية، وأسلاك النحاس الإيطالية المعتمدة.'
+                  : 'Visit our flagship showrooms in Benghazi and Al-Bayda to experience cutting-edge architectural lighting, smart switches, and certified Italian electrical cables.'}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'المعرض الرئيسي: بنغازي - الليثي' : 'Flagship: Benghazi Al-Laythi'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'فروع البيضاء (فرعان)' : 'Al-Bayda (2 Branches)'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'استشارات ومقايسات هندسية' : 'Technical Consultations'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Timing Card */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md lg:w-80 shrink-0 space-y-3">
+              <div className="flex items-center gap-2 text-[#0062D2] font-semibold text-xs">
+                <Clock className="w-4 h-4 text-[#0062D2]" />
+                <span>{isAr ? 'مواعيد العمل الرسمية' : 'Official Working Hours'}</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {isAr
+                  ? 'السبت - الخميس: من 8:30 صباحاً حتى 9:00 مساءً (الجمعة عطلة)'
+                  : 'Saturday - Thursday: 8:30 AM to 9:00 PM (Friday Closed)'}
+              </p>
+              <div className="pt-2 border-t border-white/10">
+                <a
+                  href="tel:+218916580068"
+                  className="inline-flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>{isAr ? 'اتصال مباشر بالإدارة' : 'Call Head Office'}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          02. Branches Grid
+          ===================================================================== */}
+      <main className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-10 sm:py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {branches.map((b) => (
             <div
               key={b.id}
-              className="bg-white rounded-3xl p-8 border border-[#E7EAF0] shadow-xs hover:border-[#0062D2]/40 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+              className={`bg-white rounded-2xl p-7 border transition-all duration-300 flex flex-col justify-between group hover:shadow-lg relative overflow-hidden ${
+                b.id === 'benghazi'
+                  ? 'border-[#0062D2]/50 shadow-md ring-1 ring-[#0062D2]/20'
+                  : 'border-[#E2E8F0] hover:border-slate-400'
+              }`}
             >
+              {/* Accent top bar */}
+              <div
+                className={`absolute top-0 inset-x-0 h-1.5 ${
+                  b.id === 'benghazi' ? 'bg-[#0062D2]' : 'bg-slate-200 group-hover:bg-[#0062D2] transition-colors'
+                }`}
+              />
+
               <div>
                 <div className="flex items-center justify-between gap-4 mb-5">
-                  <span className="text-xs font-semibold text-[#0062D2] bg-[#EBF3FC] px-3.5 py-1 rounded-full border border-[#0062D2]/15">
+                  <span
+                    className={`text-xs font-semibold px-3 py-1 rounded-full border ${
+                      b.id === 'benghazi'
+                        ? 'bg-[#EBF3FC] text-[#0062D2] border-[#0062D2]/20'
+                        : 'bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
                     {b.tag}
                   </span>
                   <a
                     href={b.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-semibold text-[#68717D] hover:text-[#0062D2] inline-flex items-center gap-1.5 transition-colors"
+                    className="text-xs font-medium text-slate-500 hover:text-[#0062D2] inline-flex items-center gap-1 transition-colors"
                   >
-                    <span>الاتجاهات</span>
+                    <span>{isAr ? 'الاتجاهات' : 'Directions'}</span>
                     <Navigation className="w-3.5 h-3.5" />
                   </a>
                 </div>
 
-                <h3 className="text-xl font-semibold text-[#15191E] mb-6 tracking-tight">
+                <h3 className="text-xl font-bold text-[#15191E] mb-5 tracking-tight group-hover:text-[#0062D2] transition-colors">
                   {b.name}
                 </h3>
 
-                <div className="space-y-4 text-xs sm:text-sm text-[#68717D]">
+                <div className="space-y-4 text-xs sm:text-sm text-slate-600 mb-6">
                   <div className="flex items-start gap-3">
                     <MapPin className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
-                    <span className="leading-relaxed">{b.address}</span>
+                    <span className="leading-relaxed font-medium text-[#15191E]">{b.address}</span>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Clock className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
+                    <Clock className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                     <span>{b.hours}</span>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Phone className="w-4 h-4 text-[#0062D2] shrink-0 mt-0.5" />
+                    <Phone className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                     <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono font-semibold text-[#15191E]" dir="ltr">
                       {b.phones.map((p, i) => (
                         <a
                           key={i}
-                          href={`tel:${p}`}
+                          href={`tel:+218${p.replace(/^0/, '')}`}
                           className="hover:text-[#0062D2] transition-colors"
                         >
                           {p}
@@ -123,27 +182,52 @@ export default function Branches() {
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-[#E7EAF0] flex items-center justify-between">
+              {/* Action Buttons */}
+              <div className="pt-5 border-t border-slate-100 flex items-center gap-3">
                 <a
-                  href={`tel:${b.phones[0]}`}
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors"
+                  href={`tel:+218${b.phones[0].replace(/^0/, '')}`}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#101820] hover:bg-[#0062D2] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5" />
-                  <span>اتصال مباشر بالمعرض</span>
+                  <span>{isAr ? 'اتصال بالمعرض' : 'Call'}</span>
                 </a>
+
                 <a
-                  href={b.mapsUrl}
+                  href={`https://wa.me/218${b.phones[0].replace(/^0/, '')}?text=${encodeURIComponent(
+                    isAr ? `مرحباً، أود الاستفسار عن أصناف متوفرة في ${b.name}` : `Hello, inquiring about products at ${b.name}`
+                  )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-[#68717D] hover:text-[#15191E] inline-flex items-center gap-1"
+                  className="py-2.5 px-4 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  title="واتساب"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>{isAr ? 'واتساب' : 'WhatsApp'}</span>
                 </a>
               </div>
             </div>
           ))}
         </div>
-      </div>
+
+        {/* Commercial Logistics Info */}
+        <div className="mt-14 p-6 sm:p-8 bg-white border border-[#E2E8F0] rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
+          <div className="space-y-1 max-w-2xl">
+            <h4 className="text-base font-bold text-[#15191E]">
+              {isAr ? 'هل موقعك خارج مدينتي بنغازي أو البيضاء؟' : 'Located outside Benghazi or Al-Bayda?'}
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
+              {isAr
+                ? 'توفر شركة الإنارة الحديثة خدمة الشحن والتسليم المباشر للمواد الكهربائية وكابلات التأسيس لكافة المدن والمناطق الليبية بالتنسيق مع شركات النقل المعتمدة.'
+                : 'Enarah Modern provides direct freight and logistics across all Libyan cities in coordination with verified transport carriers.'}
+            </p>
+          </div>
+          <Link
+            to="/contact"
+            className="px-6 py-2.5 rounded-xl bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold transition-colors shrink-0 shadow-xs"
+          >
+            {isAr ? 'تواصل مع قسم الشحن والتوزيع' : 'Logistics Contact'}
+          </Link>
+        </div>
+      </main>
     </div>
   )
 }
