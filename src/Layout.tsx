@@ -12,9 +12,9 @@ export default function Layout() {
       </div>
 
       <Navbar />
-      <div className="relative z-10 w-full">
+      <main className="relative w-full">
         <Outlet />
-      </div>
+      </main>
       <Footer />
     </div>
   );
