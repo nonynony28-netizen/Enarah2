@@ -213,18 +213,6 @@ export default function Navbar() {
               )}
             </AnimatePresence>
           </div>
-
-          {/* اتصل بنا */}
-          <Link
-            to="/contact"
-            className={`transition-colors py-1 ${
-              location.pathname === '/contact'
-                ? 'text-[#0062D2] font-semibold border-b-2 border-[#0062D2]'
-                : 'text-[#15191E] hover:text-[#0062D2]'
-            }`}
-          >
-            {isAr ? 'اتصل بنا' : 'Contact'}
-          </Link>
         </nav>
 
         {/* Primary CTA Button & Mobile Toggle */}
@@ -280,17 +268,6 @@ export default function Navbar() {
                   {isAr ? <ArrowLeft className="w-4 h-4 opacity-50" /> : <ArrowRight className="w-4 h-4 opacity-50" />}
                 </Link>
               ))}
-
-              <Link
-                to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`py-2 px-3 rounded-lg transition-colors flex items-center justify-between ${
-                  location.pathname === '/contact' ? 'bg-blue-50 text-[#0062D2]' : 'hover:bg-slate-50'
-                }`}
-              >
-                <span>{isAr ? 'اتصل بنا' : 'Contact'}</span>
-                {isAr ? <ArrowLeft className="w-4 h-4 opacity-50" /> : <ArrowRight className="w-4 h-4 opacity-50" />}
-              </Link>
 
               {/* أقسام إضافية في الجوال */}
               <div className="pt-3 pb-1 border-t border-slate-100 my-1">
