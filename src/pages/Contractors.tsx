@@ -1,5 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
-import { Building2, FileText, Phone, MessageSquare, AlertCircle, Loader2, CheckCircle, WifiOff, RefreshCw } from 'lucide-react'
+import {
+  Building2,
+  FileText,
+  Phone,
+  MessageSquare,
+  AlertCircle,
+  Loader2,
+  WifiOff,
+  RefreshCw,
+  CheckCircle2,
+  ShieldCheck,
+  Zap,
+  Clock
+} from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 import { trackConversionEvent } from '../utils/analytics'
 
@@ -144,64 +157,96 @@ export default function Contractors() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-900 pt-28 pb-16 relative overflow-hidden">
-      <div className="max-w-4xl mx-auto px-6 relative z-10">
-        {/* Page Header */}
-        <div className="text-center space-y-4 mb-12">
-          <div className="inline-flex p-3 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 mb-2 shadow-sm">
-            <Building2 className="w-7 h-7" />
+    <div className="min-h-screen bg-[#F8FAFC] text-[#15191E] font-sans pb-24">
+      
+      {/* 01. Premium Deep Navy B2B Hero Section (Section 05 & 06) */}
+      <section className="relative bg-[#101820] text-white pt-12 sm:pt-16 pb-14 sm:pb-20 border-b border-white/10 overflow-hidden">
+        {/* Subtle Architectural Glow & Grid */}
+        <div className="absolute inset-0 bg-radial from-[#0062D2]/10 via-transparent to-transparent pointer-events-none" />
+        <div 
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `linear-gradient(to right, #FFFFFF 1px, transparent 1px), linear-gradient(to bottom, #FFFFFF 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
+
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Right Column (Text Hierarchy) */}
+            <div className="lg:col-span-7 space-y-5 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+              {/* Eyebrow Pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-blue-200 tracking-wide">
+                <Building2 className="w-3.5 h-3.5 text-[#0062D2]" />
+                <span>{isAr ? 'حلول التوريد الهندسي للمشاريع B2B' : 'B2B Engineering Procurement'}</span>
+              </div>
+
+              {/* Main Heading */}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                {isAr ? 'بوابة المقاولين والكميات' : 'Contractors & Bulk Portal'}
+              </h1>
+
+              {/* Preserved Intro Text */}
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
+                {isAr 
+                  ? 'نهتم بتقديم أفضل عروض الأسعار والتسهيلات الخاصة لشركات التشطيب، المقاولين، والمشاريع الكبرى. املأ بياناتك وموادك المطلوبة للتواصل المباشر مع قسم المبيعات والكميات لدينا.'
+                  : 'We provide specialized pricing and logistics services for contractors, finishing companies, and large-scale projects. Fill in your details below for a direct quote.'}
+              </p>
+
+              {/* Architectural Trust Points (Derived from Verified Services) */}
+              <div className="pt-2 flex flex-wrap gap-4 text-xs font-medium text-slate-300">
+                <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg">
+                  <CheckCircle2 className="w-4 h-4 text-[#0062D2] shrink-0" />
+                  <span>{isAr ? 'توريد مباشر من الوكالات المعتمدة' : 'Direct Authorized Supply'}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg">
+                  <Clock className="w-4 h-4 text-[#0062D2] shrink-0" />
+                  <span>{isAr ? 'مراجعة وتسعير فوري للكميات' : 'Rapid Project Quotation'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Left Column (Authentic Architectural Infrastructure Photography) */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-slate-900 group">
+                <img
+                  src="/images/contractors-b2b-hero.jpg"
+                  alt={isAr ? 'بنية تحتية كهربائية وتمديدات هندسية للمشاريع' : 'Commercial electrical infrastructure installation'}
+                  className="w-full h-[280px] sm:h-[320px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#101820] via-transparent to-transparent opacity-80" />
+                <div className="absolute bottom-4 right-4 left-4 flex items-center justify-between text-xs text-slate-200">
+                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
+                    <ShieldCheck className="w-4 h-4 text-[#0062D2]" />
+                    <span>{isAr ? 'معايير الجودة والمواصفات المعتمدة' : 'Certified Engineering Standards'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-none text-slate-900">
-            {isAr ? 'بوابة المقاولين والكميات' : 'Contractors & Bulk Portal'}
-          </h1>
-          <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto leading-relaxed font-normal">
-            {isAr 
-              ? 'نهتم بتقديم أفضل عروض الأسعار والتسهيلات الخاصة لشركات التشطيب، المقاولين، والمشاريع الكبرى. املأ بياناتك وموادك المطلوبة للتواصل المباشر مع قسم المبيعات والكميات لدينا.'
-              : 'We provide specialized pricing and logistics services for contractors, finishing companies, and large-scale projects. Fill in your details below for a direct quote.'}
-          </p>
         </div>
+      </section>
 
-        {/* Info Grid & Form Card */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-          {/* Left panel: Info cards */}
-          <div className="md:col-span-4 space-y-4">
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <div className="p-2 w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
-                <FileText className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-sm text-slate-900">
-                {isAr ? 'توفير وتوريد مباشر' : 'Direct Supply'}
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                {isAr 
-                  ? 'نوفر كابلات وأسلاك النحاس، إنارة ذكية، سبوت لايت، وقواطع كهربائية بكميات ضخمة بأسعار تنافسية.'
-                  : 'We supply high-grade cables, wires, smart switches, and spotlights directly from approved manufacturers.'}
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <div className="p-2 w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
-                <Phone className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-sm text-slate-900">
-                {isAr ? 'متابعة وتأكيد سريع' : 'Fast Response'}
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                {isAr 
-                  ? 'يقوم منسق المبيعات لدينا بمراجعة طلبك وتحديد الخصومات الخاصة بحجم تعاملاتك فور استلام الطلب.'
-                  : 'Our dedicated sales coordinators analyze your list and apply scale discounts immediately upon request.'}
-              </p>
-            </div>
-          </div>
-
-          {/* Right panel: Quote Request Form */}
-          <div className="md:col-span-8">
-            <div className="p-6 md:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-6">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900 mb-1">
-                  {isAr ? 'طلب تسعير مواد ومشاريع' : 'Request a Project Quote'}
-                </h2>
-                <p className="text-xs text-slate-500 font-normal">
+      {/* 02. Quotation Workspace (Section 07 & 08: Clean White Procurement Interface) */}
+      <main className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 -mt-8 sm:-mt-10 relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Main Form Container (8 Cols on Desktop) */}
+          <div className="lg:col-span-8">
+            <div className="bg-white border border-[#DCE6F5] rounded-2xl p-6 sm:p-10 shadow-sm">
+              
+              {/* Form Section Header */}
+              <div className="border-b border-[#EDF2F7] pb-5 mb-6">
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <span className="w-1.5 h-6 bg-[#0062D2] rounded-full shrink-0" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#15191E] tracking-tight">
+                    {isAr ? 'طلب تسعير مواد ومشاريع' : 'Request a Project Quote'}
+                  </h2>
+                </div>
+                <p className="text-xs sm:text-sm text-[#475569] pr-4">
                   {isAr 
                     ? 'سيتم حفظ طلبك وإرسال نسخة منسقة ومفصلة مباشرة إلى قسم التوريد والمبيعات عبر الواتساب.' 
                     : 'Your inquiry will be logged and dispatched directly to our bulk supply division on WhatsApp.'}
@@ -210,7 +255,7 @@ export default function Contractors() {
 
               {/* تنبيه انقطاع الإنترنت وحفظ المسودة */}
               {offlineError && (
-                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3 mb-6">
                   <div className="flex items-center gap-2.5">
                     <WifiOff className="w-4 h-4 text-amber-600 shrink-0" />
                     <div>
@@ -225,7 +270,7 @@ export default function Contractors() {
                   <button
                     type="button"
                     onClick={() => handleWhatsAppSubmit()}
-                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all cursor-pointer"
+                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all cursor-pointer shadow-xs"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
@@ -235,7 +280,7 @@ export default function Contractors() {
 
               {/* تنبيه تعذر الاتصال بالسيرفر أو فشل الإرسال */}
               {!offlineError && serverError && (
-                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center justify-between gap-3">
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center justify-between gap-3 mb-6">
                   <div className="flex items-center gap-2.5">
                     <RefreshCw className="w-4 h-4 text-red-600 shrink-0" />
                     <div>
@@ -248,7 +293,7 @@ export default function Contractors() {
                   <button
                     type="button"
                     onClick={() => handleWhatsAppSubmit()}
-                    className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all cursor-pointer"
+                    className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg shrink-0 flex items-center gap-1 transition-all cursor-pointer shadow-xs"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
@@ -257,52 +302,57 @@ export default function Contractors() {
               )}
 
               {error && (
-                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2 mb-6">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
 
-              <div className="space-y-4">
-                {/* الاسم / اسم الشركة */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 block">
-                    {isAr ? 'الاسم أو اسم الشركة / المؤسسة *' : 'Your Name or Company Name *'}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder={isAr ? 'مثال: شركة الرواد للتشطيبات المعمارية' : 'e.g. Al-Rowad Architectural Finishing'}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-900 transition-all placeholder:text-slate-400"
-                    required
-                  />
-                </div>
+              {/* Form Grid (Section 08: 2-column desktop grid for short inputs, full-width for textarea) */}
+              <form onSubmit={handleWhatsAppSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  
+                  {/* الاسم / اسم الشركة */}
+                  <div className="space-y-1.5 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+                    <label className="text-xs font-bold text-[#15191E] block">
+                      {isAr ? 'الاسم أو اسم الشركة / المؤسسة *' : 'Your Name or Company Name *'}
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder={isAr ? 'مثال: شركة الرواد للتشطيبات المعمارية' : 'e.g. Al-Rowad Architectural Finishing'}
+                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-sm focus:outline-none focus:bg-white focus:border-[#0062D2] focus:ring-2 focus:ring-[#0062D2]/15 text-[#15191E] transition-all placeholder:text-[#94A3B8]"
+                      required
+                    />
+                  </div>
 
-                {/* رقم الهاتف */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 block">
-                    {isAr ? 'رقم الهاتف للتواصل للتسعير *' : 'Contact Phone Number *'}
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder={isAr ? 'مثال: 091XXXXXXX' : 'e.g. 091XXXXXXX'}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-900 transition-all placeholder:text-slate-400 text-left dir-ltr"
-                    required
-                  />
+                  {/* رقم الهاتف */}
+                  <div className="space-y-1.5 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+                    <label className="text-xs font-bold text-[#15191E] block">
+                      {isAr ? 'رقم الهاتف للتواصل للتسعير *' : 'Contact Phone Number *'}
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder={isAr ? 'مثال: 091XXXXXXX' : 'e.g. 091XXXXXXX'}
+                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-sm focus:outline-none focus:bg-white focus:border-[#0062D2] focus:ring-2 focus:ring-[#0062D2]/15 text-[#15191E] transition-all placeholder:text-[#94A3B8] text-left dir-ltr"
+                      required
+                    />
+                  </div>
+
                 </div>
 
                 {/* نوع النشاط */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 block">
+                <div className="space-y-1.5 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+                  <label className="text-xs font-bold text-[#15191E] block">
                     {isAr ? 'نوع المشروع / تصنيف النشاط *' : 'Activity / Project Classification *'}
                   </label>
                   <select
                     value={formData.projectType}
                     onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-900 transition-all cursor-pointer"
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-sm focus:outline-none focus:bg-white focus:border-[#0062D2] focus:ring-2 focus:ring-[#0062D2]/15 text-[#15191E] transition-all cursor-pointer"
                   >
                     {isAr ? (
                       <>
@@ -323,8 +373,8 @@ export default function Contractors() {
                 </div>
 
                 {/* المواد المطلوبة */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 block">
+                <div className="space-y-1.5 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+                  <label className="text-xs font-bold text-[#15191E] block">
                     {isAr ? 'تفاصيل المواد، المقاسات، والكميات المطلوبة بالتفصيل *' : 'List of Wires, Lights, and Quantities *'}
                   </label>
                   <textarea
@@ -335,43 +385,102 @@ export default function Contractors() {
                       : "Type your detailed list here:\ne.g.:\n- 20 rolls of Italian wire 2.5 mm\n- 150 spotlights size 7cm, warm white, 7W\n- Copper cables size..."
                     }
                     rows={6}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-900 transition-all placeholder:text-slate-400 resize-none leading-relaxed"
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-sm focus:outline-none focus:bg-white focus:border-[#0062D2] focus:ring-2 focus:ring-[#0062D2]/15 text-[#15191E] transition-all placeholder:text-[#94A3B8] resize-none leading-relaxed"
                     required
                   />
                 </div>
-              </div>
 
-              {/* زر الإرسال عبر الواتساب مع مؤشر الحفظ في الخلفية */}
-              <button
-                onClick={handleWhatsAppSubmit}
-                disabled={loading}
-                className="w-full py-3.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 shadow-md shadow-blue-500/25 disabled:opacity-75 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>{isAr ? 'جاري حفظ الطلب والتحويل...' : 'Saving inquiry...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <MessageSquare className="w-5 h-5 fill-current" />
-                    <span>
-                      {isAr ? 'إرسال طلب التسعير للواتساب' : 'Send Quote Request via WhatsApp'}
-                    </span>
-                  </>
-                )}
-              </button>
+                {/* زر الإرسال عبر الواتساب (Section 10: Preserved exact label & functionality) */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-4 bg-[#0062D2] hover:bg-[#0047A5] text-white rounded-xl font-bold flex items-center justify-center gap-2.5 cursor-pointer transition-all duration-150 active:scale-[0.99] shadow-sm disabled:opacity-75 disabled:cursor-not-allowed text-sm sm:text-base"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>{isAr ? 'جاري حفظ الطلب والتحويل...' : 'Saving inquiry...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <MessageSquare className="w-5 h-5 fill-current" />
+                        <span>
+                          {isAr ? 'إرسال طلب التسعير للواتساب' : 'Send Quote Request via WhatsApp'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
 
-              {/* ملاحظة بخصوص التتبع */}
-              <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-100 text-slate-600 text-xs text-center leading-normal font-normal">
-                {isAr 
-                  ? '⚡ سيتلقى قسم المبيعات والكميات طلبك موضحاً عليه رمز تعريفي تلقائي للمقاولين لتمييزه وتسريعه.'
-                  : '⚡ Sales department will receive this request flagged with a contractor code for priority handling.'}
-              </div>
+                {/* ملاحظة بخصوص التتبع والرمز التعريفي (Section 10) */}
+                <div className="p-3.5 rounded-xl bg-[#F0F7FF] border border-[#BFDBFE]/60 text-[#1E3A8A] text-xs text-center leading-relaxed font-medium">
+                  {isAr 
+                    ? '⚡ سيتلقى قسم المبيعات والكميات طلبك موضحاً عليه رمز تعريفي تلقائي للمقاولين لتمييزه وتسريعه.'
+                    : '⚡ Sales department will receive this request flagged with a contractor code for priority handling.'}
+                </div>
+
+              </form>
+
             </div>
           </div>
+
+          {/* Right/Side Panel: Preserved Business Benefits (Section 11) */}
+          <div className="lg:col-span-4 space-y-4">
+            
+            {/* Benefit Card 1: Direct Supply */}
+            <div className="p-6 rounded-2xl bg-white border border-[#DCE6F5] shadow-sm space-y-3 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+              <div className="w-10 h-10 rounded-xl bg-[#F0F6FD] text-[#0062D2] flex items-center justify-center border border-[#D6E4F8]">
+                <FileText className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-[#15191E]">
+                {isAr ? 'توفير وتوريد مباشر' : 'Direct Supply'}
+              </h3>
+              <p className="text-xs text-[#475569] leading-relaxed font-normal">
+                {isAr 
+                  ? 'نوفر كابلات وأسلاك النحاس، إنارة ذكية، سبوت لايت، وقواطع كهربائية بكميات ضخمة بأسعار تنافسية.'
+                  : 'We supply high-grade cables, wires, smart switches, and spotlights directly from approved manufacturers.'}
+              </p>
+            </div>
+
+            {/* Benefit Card 2: Fast Response */}
+            <div className="p-6 rounded-2xl bg-white border border-[#DCE6F5] shadow-sm space-y-3 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+              <div className="w-10 h-10 rounded-xl bg-[#F0F6FD] text-[#0062D2] flex items-center justify-center border border-[#D6E4F8]">
+                <Phone className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-[#15191E]">
+                {isAr ? 'متابعة وتأكيد سريع' : 'Fast Response'}
+              </h3>
+              <p className="text-xs text-[#475569] leading-relaxed font-normal">
+                {isAr 
+                  ? 'يقوم منسق المبيعات لدينا بمراجعة طلبك وتحديد الخصومات الخاصة بحجم تعاملاتك فور استلام الطلب.'
+                  : 'Our dedicated sales coordinators analyze your list and apply scale discounts immediately upon request.'}
+              </p>
+            </div>
+
+            {/* B2B Direct Helpline Card */}
+            <div className="p-6 rounded-2xl bg-[#101820] text-white border border-white/10 shadow-sm space-y-3 text-right" dir={isAr ? 'rtl' : 'ltr'}>
+              <div className="flex items-center gap-2 text-xs font-semibold text-blue-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{isAr ? 'الفرع الرئيسي بنغازي - الليثي' : 'Benghazi Main Showroom'}</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed font-normal">
+                {isAr 
+                  ? 'يمكنكم أيضاً زيارة معرضنا أو التواصل المباشر مع مهندسي المبيعات خلال ساعات العمل الرسمية.'
+                  : 'You can also visit our showroom or contact sales engineers directly during official hours.'}
+              </p>
+              <div className="pt-2 border-t border-white/10 flex flex-col gap-1 text-xs">
+                <span className="text-slate-400">{isAr ? 'هواتف قسم المبيعات والمشاريع:' : 'Sales & Projects Helplines:'}</span>
+                <span className="font-bold text-white tabular-nums text-sm text-left dir-ltr inline-block">+218 91 658 0068</span>
+                <span className="font-bold text-white tabular-nums text-sm text-left dir-ltr inline-block">+218 92 658 0068</span>
+              </div>
+            </div>
+
+          </div>
+
         </div>
-      </div>
+      </main>
+
     </div>
   )
 }
