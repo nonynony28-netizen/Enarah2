@@ -43,8 +43,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     id: '1.5',
     size: '1.5 مم²',
     sizeEn: '1.5 mm²',
-    manufacturer: 'صناعة إيطالية معتمدة',
-    manufacturerEn: 'Certified Italian Standard',
+    manufacturer: 'صناعة إيطالية · نحاس نقي 100%',
+    manufacturerEn: '100% Pure Copper · Made in Italy',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
     price: 45.0,
@@ -54,8 +54,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     id: '2.5',
     size: '2.5 مم²',
     sizeEn: '2.5 mm²',
-    manufacturer: 'صناعة إيطالية معتمدة',
-    manufacturerEn: 'Certified Italian Standard',
+    manufacturer: 'صناعة إيطالية · نحاس نقي 100%',
+    manufacturerEn: '100% Pure Copper · Made in Italy',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
     price: 75.0,
@@ -65,8 +65,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     id: '4.0',
     size: '4.0 مم²',
     sizeEn: '4.0 mm²',
-    manufacturer: 'صناعة إيطالية معتمدة',
-    manufacturerEn: 'Certified Italian Standard',
+    manufacturer: 'صناعة إيطالية · نحاس نقي 100%',
+    manufacturerEn: '100% Pure Copper · Made in Italy',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
     price: 115.0,
@@ -76,8 +76,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     id: '6.0',
     size: '6.0 مم²',
     sizeEn: '6.0 mm²',
-    manufacturer: 'صناعة إيطالية معتمدة',
-    manufacturerEn: 'Certified Italian Standard',
+    manufacturer: 'صناعة إيطالية · نحاس نقي 100%',
+    manufacturerEn: '100% Pure Copper · Made in Italy',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
     price: 165.0,
@@ -87,8 +87,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     id: '10.0',
     size: '10.0 مم²',
     sizeEn: '10.0 mm²',
-    manufacturer: 'صناعة إيطالية معتمدة',
-    manufacturerEn: 'Certified Italian Standard',
+    manufacturer: 'صناعة إيطالية · نحاس نقي 100%',
+    manufacturerEn: '100% Pure Copper · Made in Italy',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
     price: 290.0,
@@ -98,8 +98,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     id: '16.0',
     size: '16.0 مم²',
     sizeEn: '16.0 mm²',
-    manufacturer: 'صناعة إيطالية معتمدة',
-    manufacturerEn: 'Certified Italian Standard',
+    manufacturer: 'صناعة إيطالية · نحاس نقي 100%',
+    manufacturerEn: '100% Pure Copper · Made in Italy',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
     price: 450.0,
@@ -109,8 +109,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     id: '25.0',
     size: '25.0 مم²',
     sizeEn: '25.0 mm²',
-    manufacturer: 'صناعة إيطالية معتمدة',
-    manufacturerEn: 'Certified Italian Standard',
+    manufacturer: 'صناعة إيطالية · نحاس نقي 100%',
+    manufacturerEn: '100% Pure Copper · Made in Italy',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
     price: 680.0,
@@ -278,8 +278,8 @@ export default function WirePrices() {
     setAddingId(itemId)
     addToCart({
       id: itemId,
-      name: isAr ? `سلك إيطالي مقاس ${wire.size}` : `Italian Wire ${wire.sizeEn}`,
-      description: isAr ? wire.packageType : wire.packageTypeEn,
+      name: isAr ? `سلك نحاس إيطالي مقاس ${wire.size}` : `Italian Copper Wire ${wire.sizeEn}`,
+      description: isAr ? `${wire.packageType} · نحاس نقي 100%` : `${wire.packageTypeEn} · 100% Pure Copper`,
       image: '/images/cat-cables.jpg',
       price: wire.price
     })
@@ -290,10 +290,10 @@ export default function WirePrices() {
 
   // Share Functionality (Section 11)
   const handleShare = useCallback(async () => {
-    const shareTitle = isAr ? 'أسعار الأسلاك والكابلات | الإنارة الحديثة' : 'Wire & Cable Prices | Enarah Modern'
+    const shareTitle = isAr ? 'أسعار أسلاك النحاس الإيطالية | الإنارة الحديثة' : 'Italian Copper Wire Prices | Enarah Modern'
     const shareText = isAr
-      ? `تابع المؤشر اليومي المعتمد لأسعار الأسلاك والكابلات الإيطالية في ليبيا: ${window.location.href}`
-      : `Check official wire and cable prices in Libya: ${window.location.href}`
+      ? `تابع المؤشر اليومي المعتمد لأسعار أسلاك النحاس الإيطالية الأصلية (نحاس نقي 100%): ${window.location.href}`
+      : `Check official certified Italian copper wire prices (100% pure copper): ${window.location.href}`
 
     if (navigator.share) {
       try {
@@ -351,10 +351,10 @@ export default function WirePrices() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight mb-1">
-                {isAr ? 'أسعار الأسلاك والكابلات' : 'Wire & Cable Prices'}
+                {isAr ? 'أسعار أسلاك النحاس الإيطالية' : 'Italian Copper Wire Prices'}
               </h1>
               <p className="text-sm text-[#68717D]">
-                {isAr ? 'تابع أحدث أسعار الأسلاك والكابلات.' : 'Real-time certified electrical wire and cable pricing.'}
+                {isAr ? 'المؤشر اليومي المعتمد لأسعار أسلاك النحاس الإيطالية الأصلية 100% (لفة 100 متر).' : 'Daily official price index for 100% pure copper certified Italian wires (100m rolls).'}
               </p>
             </div>
 
@@ -393,8 +393,8 @@ export default function WirePrices() {
             <Info className="w-3.5 h-3.5 text-[#0062D2] shrink-0" />
             <span>
               {isAr
-                ? 'الأسعار المنشورة هي أسعار البيع الرسمية المعتمدة لدى شركة الإنارة الحديثة في بنغازي (لفة 100 متر أصلية من المصنع مباشرة).'
-                : 'Published prices reflect certified official showroom rates at Enarah Modern, Benghazi (100m factory rolls).'}
+                ? 'جميع الأسلاك في هذا المؤشر هي أسلاك نحاس نقي 100% صناعة إيطالية معتمدة، وفق أسعار البيع الرسمية لدى شركة الإنارة الحديثة في بنغازي (لفة 100 متر أصلية من المصنع مباشرة).'
+                : 'All wires in this index are certified 100% pure copper made in Italy, reflecting official showroom rates at Enarah Modern, Benghazi (100m factory rolls).'}
             </span>
           </div>
         </div>
@@ -409,7 +409,7 @@ export default function WirePrices() {
           {/* Table Header Bar */}
           <div className="px-5 py-3.5 bg-[#F8FAFC] border-b border-[#E7EAF0] flex items-center justify-between">
             <span className="text-xs font-semibold text-[#15191E] uppercase tracking-wider">
-              {isAr ? 'جدول أسعار الأسلاك الإيطالية المعتمدة' : 'Certified Italian Wire Price Schedule'}
+              {isAr ? 'جدول أسعار أسلاك النحاس الإيطالية المعتمدة (نحاس نقي 100% - لفة 100 متر)' : 'Certified Italian Copper Wire Schedule (100% Pure Copper · 100m Roll)'}
             </span>
             <span className="text-xs text-[#68717D]">
               {isAr ? 'العملة: دينار ليبي (د.ل)' : 'Currency: LYD'}
@@ -751,12 +751,12 @@ export default function WirePrices() {
           >
             <div>
               <h2 className="text-base sm:text-lg font-semibold text-[#15191E] flex items-center gap-2">
-                <span>{isAr ? 'التشريح الهندسي للأسلاك الإيطالية المعتمدة' : 'Technical Anatomy of Certified Italian Wires'}</span>
+                <span>{isAr ? 'التشريح الهندسي لأسلاك النحاس الإيطالية' : 'Technical Anatomy of Italian Copper Wires'}</span>
               </h2>
               <p className="text-xs text-[#68717D] mt-0.5">
                 {isAr
-                  ? 'تعرف على طبقات النحاس النقي والعزل الحراري المعتمد لمقاومة الأحمال والحرارة.'
-                  : 'Interactive layer breakdown of 100% pure copper core and thermal insulation.'}
+                  ? 'تعرف على طبقات النحاس النقي 100% والعزل الحراري الإيطالي المعتمد لمقاومة الأحمال والحرارة.'
+                  : 'Interactive layer breakdown of 100% pure copper core and certified insulation.'}
               </p>
             </div>
             <div className="p-2 rounded-lg bg-[#F8FAFC] border border-[#E7EAF0] text-[#68717D]">
