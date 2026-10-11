@@ -120,33 +120,71 @@ export default function Blog() {
 
   return (
     <div
-      dir="rtl"
-      className="min-h-screen bg-[#F7F8FA] text-[#15191E] font-sans antialiased selection:bg-[#0062D2] selection:text-white pt-24 pb-28"
+      dir={isAr ? 'rtl' : 'ltr'}
+      className="min-h-screen bg-[#F8FAFC] text-[#15191E] font-sans antialiased pb-20"
     >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-        {/* Back Link */}
-        <div className="mb-8">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#68717D] hover:text-[#0062D2] transition-colors"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            <span>{isAr ? 'العودة للرئيسية' : 'Back to Home'}</span>
-          </Link>
-        </div>
+      {/* =====================================================================
+          01. Architectural Hero Header (Deep Corporate Navy #101820)
+          ===================================================================== */}
+      <section className="relative bg-[#101820] text-white pt-12 pb-14 overflow-hidden border-b border-[#202936]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#0062D2]/15 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Editorial Hero Header */}
-        <div className="mb-14 sm:mb-18 max-w-3xl">
-          <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
-            JOURNAL & INSIGHTS
-          </span>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#15191E] tracking-tight leading-[1.12] mb-5">
-            هندسة الإضاءة والأفكار المعمارية
-          </h1>
-          <p className="text-base sm:text-lg text-[#68717D] font-normal leading-relaxed">
-            مقالات ودراسات بصرية متخصصة تضع بين يديك خلاصة خبرتنا في حساب زوايا الضوء، وتوزيع الكشافات، وتأسيس الأنظمة الكهربائية المتينة.
-          </p>
+        <div className="relative max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-2xl space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#0062D2] animate-pulse" />
+                <span>{isAr ? 'دراسات ومقالات معمارية' : 'Architectural Journal & Insights'}</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white">
+                {isAr ? 'هندسة الإضاءة والأفكار المعمارية' : 'Lighting Engineering & Architectural Insights'}
+              </h1>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                {isAr
+                  ? 'مقالات ودراسات بصرية متخصصة تضع بين يديك خلاصة خبرتنا في حساب زوايا الضوء، توزيع الكشافات المانعة للتوهج، وتأسيس الأنظمة الكهربائية المتينة في المباني الليبية.'
+                  : 'Specialized photometrics research, anti-glare techniques, and electrical infrastructure standards from our engineering team in Benghazi.'}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-6 pt-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'حساب زوايا الضوء والـ Photometrics' : 'Photometrics & Beam Angles'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'تقنيات مانع التوهج (Anti-Glare)' : 'Deep Anti-Glare Optics'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span>{isAr ? 'معايير التأسيس والأسلاك' : 'Wiring Infrastructure'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Reading badge */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md lg:w-80 shrink-0 space-y-3">
+              <div className="flex items-center gap-2 text-[#0062D2] font-semibold text-xs">
+                <BookOpen className="w-4 h-4 text-[#0062D2]" />
+                <span>{isAr ? 'المجلة الهندسية المعتمدة' : 'Official Technical Journal'}</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {isAr
+                  ? 'مكتوبة ومراجعة بواسطة مهندسي الإضاءة المعمارية لدى شركة الإنارة الحديثة في بنغازي.'
+                  : 'Authored and reviewed by lighting engineers at Enarah Modern Showroom.'}
+              </p>
+              <div className="pt-2 border-t border-white/10 text-xs text-slate-400">
+                {isAr ? '3 مقالات متخصصة متاحة للقراءة الفورية' : '3 In-depth articles available'}
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pt-12">
 
         {/* Blog Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
