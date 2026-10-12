@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { VERIFIED_WIRES, type WireProduct } from '../data/wiresData'
+import { ItalianFlag, TurkishFlag, OriginFlagBadge } from '../components/CountryFlags'
 import { useLanguage } from '../hooks/useLanguage'
 
 export default function Products() {
@@ -132,11 +133,20 @@ export default function Products() {
       {/* 01. Compact Minimal Introduction ("Quiet Precision") */}
       <section className="pt-10 sm:pt-14 pb-7 border-b border-[#E7EAF0] bg-white">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[#0062D2]/10 text-[#0062D2] border border-[#0062D2]/20">
+              <span className="flex items-center gap-1.5">
+                <ItalianFlag className="w-4 h-2.5" />
+                <TurkishFlag className="w-4 h-2.5" />
+              </span>
+              <span>{isAr ? 'أسلاك وكابلات نحاسية معتمدة' : 'Certified Copper Wires & Cables'}</span>
+            </span>
+          </div>
           <h1 className="text-2xl sm:text-3xl font-semibold text-[#15191E] tracking-tight mb-1.5">
             {isAr ? 'الأسلاك والكابلات' : 'Wires & Cables'}
           </h1>
           <p className="text-sm text-[#68717D]">
-            {isAr ? 'تصفح الأسلاك والكابلات المتوفرة لدينا.' : 'Browse our available certified wires and cables.'}
+            {isAr ? 'كتالوج معتمد للأسلاك الإيطالية الأصلية والكابلات التركية بأعلى معايير النقاء النحاسي والسلامة.' : 'Certified catalog of authentic Italian single-core wires and Turkish multi-core cables.'}
           </p>
         </div>
       </section>
@@ -301,15 +311,23 @@ export default function Products() {
               {filteredProducts.map((wire) => (
                 <div
                   key={wire.id}
-                  className="bg-white border border-[#E7EAF0] rounded-xl p-5 hover:border-[#CBD5E1] transition-colors duration-200 flex flex-col justify-between group"
+                  className="bg-white border border-[#E7EAF0] rounded-xl p-5 hover:border-[#CBD5E1] transition-all duration-200 hover:shadow-xs flex flex-col justify-between group"
                 >
                   {/* 1. Product Image Container */}
-                  <div className="relative aspect-[4/3] bg-[#F8FAFC] rounded-lg overflow-hidden mb-4 flex items-center justify-center p-3">
+                  <div className="relative aspect-[4/3] bg-[#F8FAFC] rounded-lg overflow-hidden mb-4 flex items-center justify-center p-3 border border-[#F1F3F7]">
+                    {/* Origin Badge with Flag */}
+                    <div className="absolute top-2.5 end-2.5 z-10 flex items-center gap-1.5 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-md border border-[#E7EAF0] shadow-xs">
+                      <OriginFlagBadge origin={wire.origin} className="w-4 h-2.5" />
+                      <span className="text-[11px] font-semibold text-[#15191E]">
+                        {wire.origin.includes('إيطاليا') ? (isAr ? 'إيطاليا' : 'Italy') : (isAr ? 'تركيا' : 'Turkey')}
+                      </span>
+                    </div>
+
                     <img
                       src={wire.image}
                       alt={wire.name}
                       loading="lazy"
-                      className="w-full h-full object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   </div>
 
@@ -317,12 +335,13 @@ export default function Products() {
                   <div className="flex-1 flex flex-col">
                     {/* Size & Origin Header */}
                     <div className="flex items-center justify-between text-xs text-[#68717D] mb-1.5">
-                      <span className="font-semibold text-[#0062D2] text-sm tabular-nums">
+                      <span className="font-bold text-[#0062D2] text-sm tabular-nums">
                         {wire.size}
                       </span>
-                      <span className="text-[11px] text-[#68717D]">
-                        {wire.origin.includes('إيطاليا') ? 'إيطاليا 🇮🇹' : 'تركيا 🇹🇷'}
-                      </span>
+                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#475569]">
+                        <OriginFlagBadge origin={wire.origin} className="w-3.5 h-2.5" />
+                        <span>{wire.origin.includes('إيطاليا') ? (isAr ? 'صنع في إيطاليا' : 'Made in Italy') : (isAr ? 'صنع في تركيا' : 'Made in Turkey')}</span>
+                      </div>
                     </div>
 
                     {/* Product Name */}
@@ -392,13 +411,27 @@ export default function Products() {
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="mb-5">
-                <span className="text-xs font-semibold text-[#0062D2] block mb-1">
-                  {activeModalProduct.origin}
-                </span>
-                <h3 className="text-xl font-bold text-[#15191E] tracking-tight">
-                  {activeModalProduct.name}
-                </h3>
+              {/* Product Visual Header with Photo & Flag */}
+              <div className="flex items-center gap-4 bg-[#F8FAFC] border border-[#E7EAF0] rounded-xl p-3 mb-5">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-white rounded-lg border border-[#E7EAF0] p-1.5 flex items-center justify-center">
+                  <img
+                    src={activeModalProduct.image}
+                    alt={activeModalProduct.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="inline-flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-md border border-[#E7EAF0] text-[11px] font-semibold text-[#15191E] mb-1 shadow-2xs">
+                    <OriginFlagBadge origin={activeModalProduct.origin} className="w-3.5 h-2.5" />
+                    <span>{activeModalProduct.origin}</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-[#15191E] leading-snug">
+                    {activeModalProduct.name}
+                  </h3>
+                  <div className="text-sm font-bold text-[#0062D2] mt-0.5 tabular-nums">
+                    {activeModalProduct.price} د.ل <span className="text-xs font-normal text-[#68717D]">/ {activeModalProduct.packaging}</span>
+                  </div>
+                </div>
               </div>
 
               {/* Compatible Size Family Variant Switcher (Section 10) */}
@@ -433,7 +466,10 @@ export default function Products() {
                 </div>
                 <div className="flex items-center justify-between p-2.5">
                   <span className="text-[#68717D]">{isAr ? 'بلد المنشأ:' : 'Origin:'}</span>
-                  <span className="font-medium text-[#15191E]">{activeModalProduct.origin}</span>
+                  <div className="flex items-center gap-1.5 font-medium text-[#15191E]">
+                    <OriginFlagBadge origin={activeModalProduct.origin} className="w-4 h-2.5" />
+                    <span>{activeModalProduct.origin}</span>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between p-2.5">
                   <span className="text-[#68717D]">{isAr ? 'مادة الموصل:' : 'Conductor:'}</span>
@@ -535,7 +571,11 @@ export default function Products() {
                             : 'hover:bg-slate-50 text-[#475569]'
                         }`}
                       >
-                        <span>{o.label}</span>
+                        <div className="flex items-center gap-2">
+                          {o.id === 'italy' && <ItalianFlag className="w-4 h-2.5" />}
+                          {o.id === 'turkey' && <TurkishFlag className="w-4 h-2.5" />}
+                          <span>{o.label}</span>
+                        </div>
                         {selectedOrigin === o.id && <Check className="w-3.5 h-3.5 text-[#0062D2]" />}
                       </button>
                     ))}

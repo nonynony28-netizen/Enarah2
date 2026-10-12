@@ -37,7 +37,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'عزل PVC فائق المقاومة للحرارة حتى 70°C',
     applications: 'تمديدات الإنارة المعمارية، المفاتيح والسبوتات، والخطوط الخفيفة.',
     applicationsEn: 'Architectural lighting circuits, light switches, and spots.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/wire-it-1-5mm.jpg',
     inStock: true
   },
   {
@@ -57,7 +57,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'عزل PVC فائق المقاومة للحرارة حتى 70°C',
     applications: 'تأسيس مخارج الكهرباء (البرايز)، الأفياش العامة، والأجهزة المنزلية المتوسطة.',
     applicationsEn: 'General wall outlets, sockets, and medium home appliances.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/wire-it-2-5mm.jpg',
     inStock: true
   },
   {
@@ -77,7 +77,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'عزل حراري عالي التحمل ضد الاشتعال',
     applications: 'المكيفات (حتى 24,000 BTU)، سخانات المياه، وأفران المطابخ الكهربائية.',
     applicationsEn: 'Air conditioners (up to 24k BTU), water heaters, and electric kitchen ovens.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/wire-it-4-0mm.jpg',
     inStock: true
   },
   {
@@ -97,7 +97,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'عزل ثنائي الطبقات فائق الأمان ومضاد للهب',
     applications: 'خطوط التغذية الفرعية للمطابخ، أحمال التكييف المركزي، وغرف الخدمات.',
     applicationsEn: 'Sub-feeder lines for kitchens, central HVAC, and utility rooms.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/wire-it-6-0mm.jpg',
     inStock: true
   },
   {
@@ -117,7 +117,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'عزل صناعي ثقيل مقاوم للرطوبة والحرارة العالية',
     applications: 'تغذية لوحات التوزيع الفرعية، المصاعد، والمضخات الغاطسة الكبرى.',
     applicationsEn: 'Distribution board mains, elevators, and large submersible pumps.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/wire-it-10-0mm.jpg',
     inStock: true
   },
   {
@@ -137,7 +137,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'عزل صناعي متقدم ضد الاحتكاك والضغط الميكانيكي',
     applications: 'الخطوط المغذية الرئيسية من العداد إلى اللوحة العمومية للمباني السكنية والتجارية.',
     applicationsEn: 'Main service entrance lines from electric meter to main distribution panel.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/wire-it-16-0mm.jpg',
     inStock: true
   },
   {
@@ -157,7 +157,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'عزل مدرع فائق التحمل للضغوط الكبرى',
     applications: 'محطات التحويل، المولدات الكهربائية الكبرى، والمجمعات التجارية والصناعية.',
     applicationsEn: 'Substations, commercial generators, and heavy industrial facilities.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/wire-it-25-0mm.jpg',
     inStock: true
   },
   {
@@ -177,7 +177,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'غلاف خارجي مضاعف مقاوم للعوامل الجوية والرطوبة',
     applications: 'التأسيسات الخارجية، ورش العمل، والتوصيلات الأرضية الآمنة المؤرضة.',
     applicationsEn: 'Outdoor installations, workshops, and safe grounded wiring.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/cable-tr-3x2-5mm.jpg',
     inStock: true
   },
   {
@@ -197,7 +197,7 @@ export const VERIFIED_WIRES: WireProduct[] = [
     insulation: 'غلاف خارجي مضاعف فائق المتانة ضد الضغط والانحناء',
     applications: 'الأحمال الثقيلة الخارجية، المضخات الزراعية والصناعية، والمكيفات الخارجية.',
     applicationsEn: 'Heavy outdoor loads, agricultural pumps, and exterior HVAC units.',
-    image: '/images/wires-italian-turkish-showcase.jpg',
+    image: '/images/wires/cable-tr-3x4-0mm.jpg',
     inStock: true
   }
 ]
