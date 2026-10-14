@@ -195,13 +195,18 @@ const getPaintColors = (isAr: boolean) => [
   }
 ]
 
-// Same product list as the live homepage (single source of truth),
-// so any product added to ENARAH_PRODUCTS appears here automatically.
 const FEATURED_COLLECTIONS = ENARAH_PRODUCTS.map((p) => ({
   id: p.id,
   nameAr: p.categoryAr,
   nameEn: p.categoryEn,
-  image: p.image
+  titleAr: p.titleAr,
+  titleEn: p.titleEn,
+  descAr: p.descAr,
+  descEn: p.descEn,
+  tagAr: p.tagAr,
+  tagEn: p.tagEn,
+  image: p.image,
+  group: p.group
 }))
 
 const GLOBAL_BRANDS = [
@@ -287,8 +292,9 @@ export default function HomeCleanWhitePreview() {
   const { isAr } = useLanguage()
   const paintColors = getPaintColors(isAr)
 
-  // Section 04: in-place "show all products" toggle (no store navigation)
+  // Section 04: in-place "show all products" toggle & quick-view modal
   const [showAllCollections, setShowAllCollections] = useState(false)
+  const [activeCollectionModal, setActiveCollectionModal] = useState<typeof FEATURED_COLLECTIONS[0] | null>(null)
   const collectionsRef = useRef<HTMLElement>(null)
 
   // Navigation scroll state
@@ -459,7 +465,7 @@ export default function HomeCleanWhitePreview() {
   }, [])
 
   // Mobile shake interaction for paint simulator
-  const { requestPermission } = useShake({
+  useShake({
     onShake: () => {
       setPaintTemp((prev) => (prev === 'warm' ? 'natural' : prev === 'natural' ? 'cool' : 'warm'))
       setPaintTransitioning(true)
@@ -895,75 +901,319 @@ export default function HomeCleanWhitePreview() {
           Minimal international layout: one row visible, in-place "show all"
           (does NOT navigate to the store)
           ===================================================================== */}
-      <section ref={collectionsRef} className="pt-2 pb-16 sm:pb-28 bg-[#FFFFFF] scroll-mt-28">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          {/* Subtle transition separator */}
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-[#E7EAF0] to-transparent mb-10 sm:mb-16" />
+      {/* =====================================================================
+          SECTION 04: ENARAH SIGNATURE COLLECTION ("من تصميمنا وتصنيعنا")
+          Luxury Architectural Lighting Collection Showcase
+          - Deep-navy architectural framing (#0B1528) with subtle precision grid
+          - Crisp white presentation plinths/cards for maximum product clarity
+          - Asymmetric editorial composition (Dominant Hero + Complementary Trio)
+          - In-place smooth expansion for all 16 collections
+          - Interactive quick-view modal for architectural specs & WhatsApp inquiry
+          ===================================================================== */}
+      <section ref={collectionsRef} className="py-20 sm:py-28 bg-[#0B1528] text-white scroll-mt-28 relative overflow-hidden border-t border-slate-800/80">
+        {/* Subtle architectural grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.035] pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, #FFFFFF 1px, transparent 0)',
+            backgroundSize: '32px 32px'
+          }}
+        />
 
-          {/* Header — minimal */}
-          <div className="flex items-end justify-between gap-6 mb-6 sm:mb-10">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
+          {/* Section Introduction: Editorial Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-14 pb-8 border-b border-white/10">
             <div>
-              <span className="text-[11px] sm:text-xs font-semibold text-[#0062D2] tracking-[0.25em] uppercase block mb-3">
-                Made by Enarah
-              </span>
-              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-2 h-2 rounded-full bg-[#0062D2] animate-pulse" />
+                <span className="text-[11px] sm:text-xs font-semibold text-[#38BDF8] tracking-[0.25em] uppercase" dir="ltr">
+                  ENARAH SIGNATURE COLLECTION · MADE BY ENARAH
+                </span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.2]">
                 {isAr ? 'من تصميمنا وتصنيعنا' : 'Designed & Made by Us'}
               </h2>
+              <p className="text-sm sm:text-base text-slate-300 mt-3 max-w-2xl font-normal leading-relaxed">
+                {isAr
+                  ? 'من ENARAH، نقدم تصنيعات تجمع دقة التفاصيل، وتنوّع الحلول، ورقي التصميم.'
+                  : 'From ENARAH, we offer creations that combine precision of detail, diversity of solutions, and elegance of design.'}
+              </p>
             </div>
-            <span className="hidden sm:block text-sm text-[#68717D] tabular-nums shrink-0" dir="ltr">
-              {String(FEATURED_COLLECTIONS.length).padStart(2, '0')} Collections
-            </span>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-slate-300 font-mono tabular-nums" dir="ltr">
+                {String(FEATURED_COLLECTIONS.length).padStart(2, '0')} Architectural Lines
+              </span>
+            </div>
           </div>
 
-          {/* Products row (first 4) + in-place expansion
-              Phones: 2 per row (2×2) · Desktop: 4 in one row · extras centered */}
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-8 sm:gap-x-6">
-            <AnimatePresence initial={false}>
-              {(showAllCollections ? FEATURED_COLLECTIONS : FEATURED_COLLECTIONS.slice(0, 4)).map((col, i) => (
+          {/* Primary 4 Collections — Asymmetric Architectural Showcase */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+            {/* Dominant Hero Showcase: Collection 01 (Chandeliers) */}
+            {(() => {
+              const hero = FEATURED_COLLECTIONS[0]
+              return (
                 <motion.article
-                  key={col.id}
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: i >= 4 ? Math.min((i - 4) * 0.04, 0.4) : 0 }}
-                  className="group w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-4.5rem)/4)]"
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  onClick={() => setActiveCollectionModal(hero)}
+                  className="group lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col justify-between border border-white/10 hover:border-[#0062D2]/40 shadow-xl shadow-black/20 hover:shadow-2xl transition-all duration-300 cursor-pointer relative overflow-hidden text-right"
                 >
-                  {/* Image — compact 4:3 */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl sm:rounded-2xl bg-[#F5F6F8] border border-[#EEF0F3]">
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-[11px] sm:text-xs font-mono font-bold tracking-wider text-[#0062D2] bg-blue-50 px-2.5 py-1 rounded-md" dir="ltr">
+                        COLLECTION 01
+                      </span>
+                      {hero.tagAr && (
+                        <span className="text-[11px] sm:text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                          {hero.tagAr}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider hidden sm:block" dir="ltr">
+                      ARCHITECTURAL HERO
+                    </span>
+                  </div>
+
+                  {/* Image Showcase — Spacious & Clean */}
+                  <div className="relative w-full h-[260px] sm:h-[340px] lg:h-[380px] flex items-center justify-center p-3 sm:p-6 overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-b from-slate-50/70 to-white">
                     <img
-                      src={col.image}
-                      alt={col.nameAr}
+                      src={hero.image}
+                      alt={hero.nameAr}
                       loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      className="max-h-full max-w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                       onError={(e) => {
                         e.currentTarget.src = '/images/default-product.jpg'
                       }}
                     />
-                    <span
-                      className="absolute top-2 left-2 sm:top-3 sm:left-3 text-[10px] sm:text-[11px] font-semibold text-[#15191E] bg-white/90 backdrop-blur px-2 py-0.5 rounded-full tabular-nums"
-                      dir="ltr"
-                    >
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
                   </div>
 
-                  {/* Caption — stacked so it fits on narrow phones */}
-                  <div className="mt-3">
-                    <h3 className="text-sm sm:text-base font-semibold text-[#15191E] leading-snug group-hover:text-[#0062D2] transition-colors">
-                      {col.nameAr}
-                    </h3>
-                    <span className="block mt-0.5 text-[10px] sm:text-[11px] text-[#9AA1AB] uppercase tracking-wider truncate" dir="ltr">
-                      {col.nameEn}
-                    </span>
+                  {/* Typography & Details */}
+                  <div className="mt-6">
+                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                      <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 group-hover:text-[#0062D2] transition-colors tracking-tight">
+                        {hero.nameAr}
+                      </h3>
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider shrink-0" dir="ltr">
+                        {hero.nameEn}
+                      </span>
+                    </div>
+
+                    <p className="mt-2 text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed font-normal">
+                      {hero.descAr}
+                    </p>
+
+                    {/* Navigation Action */}
+                    <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-semibold text-[#0062D2]">
+                      <span className="group-hover:underline underline-offset-4">
+                        {isAr ? 'استكشف التشكيلة والمعايير' : 'Explore Collection & Specs'}
+                      </span>
+                      <div className="w-8 h-8 rounded-full bg-blue-50 text-[#0062D2] group-hover:bg-[#0062D2] group-hover:text-white flex items-center justify-center transition-all duration-300">
+                        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                      </div>
+                    </div>
                   </div>
                 </motion.article>
-              ))}
-            </AnimatePresence>
+              )
+            })()}
+
+            {/* Complementary Column: Collection 02 (Spotlights) + Collections 03 & 04 (Profiles & Lamps) */}
+            <div className="lg:col-span-5 flex flex-col justify-between gap-5 sm:gap-6">
+              {/* Secondary Feature Card: Collection 02 (Spotlights) */}
+              {(() => {
+                const spot = FEATURED_COLLECTIONS[1]
+                return (
+                  <motion.article
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    onClick={() => setActiveCollectionModal(spot)}
+                    className="group bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between border border-white/10 hover:border-[#0062D2]/40 shadow-xl shadow-black/20 hover:shadow-2xl transition-all duration-300 cursor-pointer relative overflow-hidden text-right"
+                  >
+                    <div className="flex items-center justify-between gap-4 mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] sm:text-xs font-mono font-bold tracking-wider text-[#0062D2] bg-blue-50 px-2.5 py-1 rounded-md" dir="ltr">
+                          COLLECTION 02
+                        </span>
+                        {spot.tagAr && (
+                          <span className="text-[11px] sm:text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[180px]">
+                            {spot.tagAr}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-slate-400 uppercase tracking-wider hidden sm:block" dir="ltr">
+                        PRECISION OPTICS
+                      </span>
+                    </div>
+
+                    {/* Spotlight Image Container */}
+                    <div className="relative w-full h-[170px] sm:h-[190px] flex items-center justify-center p-3 overflow-hidden rounded-xl bg-gradient-to-b from-slate-50/70 to-white">
+                      <img
+                        src={spot.image}
+                        alt={spot.nameAr}
+                        loading="lazy"
+                        className="max-h-full max-w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                        onError={(e) => {
+                          e.currentTarget.src = '/images/default-product.jpg'
+                        }}
+                      />
+                    </div>
+
+                    <div className="mt-4">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-[#0062D2] transition-colors tracking-tight">
+                          {spot.nameAr}
+                        </h3>
+                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider" dir="ltr">
+                          {spot.nameEn}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-slate-600 line-clamp-1 leading-relaxed">
+                        {spot.descAr}
+                      </p>
+
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#0062D2]">
+                        <span className="group-hover:underline underline-offset-4">
+                          {isAr ? 'استكشف التشكيلة' : 'Explore Collection'}
+                        </span>
+                        <div className="w-7 h-7 rounded-full bg-blue-50 text-[#0062D2] group-hover:bg-[#0062D2] group-hover:text-white flex items-center justify-center transition-all duration-300">
+                          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.article>
+                )
+              })()}
+
+              {/* Tertiary Cards: Collections 03 (LED Profiles) & 04 (LED Bulbs) Side by Side */}
+              <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                {[FEATURED_COLLECTIONS[2], FEATURED_COLLECTIONS[3]].map((col, idx) => (
+                  <motion.article
+                    key={col.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 + idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    onClick={() => setActiveCollectionModal(col)}
+                    className="group bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col justify-between border border-white/10 hover:border-[#0062D2]/40 shadow-xl shadow-black/20 hover:shadow-2xl transition-all duration-300 cursor-pointer relative overflow-hidden text-right"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-wider text-[#0062D2] bg-blue-50 px-2 py-0.5 rounded" dir="ltr">
+                        0{idx + 3}
+                      </span>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider truncate max-w-[90px]" dir="ltr">
+                        {col.nameEn}
+                      </span>
+                    </div>
+
+                    <div className="relative w-full h-[115px] sm:h-[135px] flex items-center justify-center p-2 overflow-hidden rounded-lg bg-gradient-to-b from-slate-50/70 to-white">
+                      <img
+                        src={col.image}
+                        alt={col.nameAr}
+                        loading="lazy"
+                        className="max-h-full max-w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                        onError={(e) => {
+                          e.currentTarget.src = '/images/default-product.jpg'
+                        }}
+                      />
+                    </div>
+
+                    <div className="mt-3">
+                      <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#0062D2] transition-colors truncate">
+                        {col.nameAr}
+                      </h4>
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-[#0062D2]">
+                        <span>{isAr ? 'استكشاف' : 'Explore'}</span>
+                        <ArrowLeft className="w-3 h-3 transition-transform group-hover:-translate-x-1" />
+                      </div>
+                    </div>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Show all / show less — stays on the page */}
-          <div className="mt-12 flex justify-center">
+          {/* In-Place Expansion for Remaining 12 Collections (05 to 16) */}
+          <AnimatePresence>
+            {showAllCollections && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                {/* Architectural divider */}
+                <div className="flex items-center gap-4 my-8 sm:my-12">
+                  <div className="h-px bg-white/10 flex-grow" />
+                  <span className="text-xs font-semibold text-slate-300 uppercase tracking-widest px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
+                    {isAr ? 'كافة التشكيلات المعمارية والكهربائية (12 تشكيلة إضافية)' : 'Complete Architectural & Electrical Lines'}
+                  </span>
+                  <div className="h-px bg-white/10 flex-grow" />
+                </div>
+
+                {/* Balanced 4-column luxury grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-right">
+                  {FEATURED_COLLECTIONS.slice(4).map((col, idx) => (
+                    <motion.article
+                      key={col.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: Math.min(idx * 0.04, 0.4) }}
+                      onClick={() => setActiveCollectionModal(col)}
+                      className="group bg-white rounded-2xl p-5 border border-white/10 hover:border-[#0062D2]/40 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[11px] font-mono font-bold text-[#0062D2] bg-blue-50 px-2 py-0.5 rounded" dir="ltr">
+                            COLLECTION {String(idx + 5).padStart(2, '0')}
+                          </span>
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider truncate max-w-[120px]" dir="ltr">
+                            {col.nameEn}
+                          </span>
+                        </div>
+
+                        <div className="relative w-full h-[150px] flex items-center justify-center p-2 rounded-xl bg-slate-50/70 overflow-hidden mb-4">
+                          <img
+                            src={col.image}
+                            alt={col.nameAr}
+                            loading="lazy"
+                            className="max-h-full max-w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                            onError={(e) => {
+                              e.currentTarget.src = '/images/default-product.jpg'
+                            }}
+                          />
+                        </div>
+
+                        <h4 className="text-base font-bold text-slate-900 group-hover:text-[#0062D2] transition-colors leading-snug">
+                          {col.nameAr}
+                        </h4>
+                        <p className="mt-1 text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                          {col.descAr}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#0062D2]">
+                        <span className="group-hover:underline underline-offset-4">
+                          {isAr ? 'استكشف التشكيلة' : 'Explore'}
+                        </span>
+                        <div className="w-6 h-6 rounded-full bg-blue-50 text-[#0062D2] group-hover:bg-[#0062D2] group-hover:text-white flex items-center justify-center transition-colors">
+                          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+                        </div>
+                      </div>
+                    </motion.article>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Show all / Show less toggle button */}
+          <div className="mt-12 sm:mt-16 flex justify-center">
             <button
               id="toggle-all-collections"
               type="button"
@@ -974,12 +1224,12 @@ export default function HomeCleanWhitePreview() {
                 }
                 setShowAllCollections((v) => !v)
               }}
-              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-[#15191E]/15 text-sm font-semibold text-[#15191E] hover:border-[#0062D2] hover:text-[#0062D2] transition-colors"
+              className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 text-sm font-semibold backdrop-blur-md transition-all duration-300 shadow-sm cursor-pointer active:scale-[0.98]"
             >
               <span>
                 {showAllCollections
-                  ? (isAr ? 'عرض أقل' : 'Show less')
-                  : (isAr ? `عرض جميع المنتجات (${FEATURED_COLLECTIONS.length})` : `View all (${FEATURED_COLLECTIONS.length})`)}
+                  ? (isAr ? 'عرض تشكيلات أقل' : 'Show less')
+                  : (isAr ? `عرض جميع المنتجات (${FEATURED_COLLECTIONS.length})` : `View all collections (${FEATURED_COLLECTIONS.length})`)}
               </span>
               <ChevronDown
                 className={`w-4 h-4 transition-transform duration-300 ${showAllCollections ? 'rotate-180' : ''}`}
@@ -987,6 +1237,111 @@ export default function HomeCleanWhitePreview() {
             </button>
           </div>
         </div>
+
+        {/* Architectural Quick View Modal */}
+        <AnimatePresence>
+          {activeCollectionModal && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+            >
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setActiveCollectionModal(null)}
+                className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+              />
+
+              {/* Modal Card */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="relative w-full max-w-3xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200 z-10 text-right"
+              >
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setActiveCollectionModal(null)}
+                  aria-label={isAr ? 'إغلاق' : 'Close'}
+                  className="absolute top-4 left-4 z-20 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                {/* Modal Body: 2-column layout on md+ */}
+                <div className="p-6 sm:p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    {/* Image Column */}
+                    <div className="md:col-span-5">
+                      <div className="w-full aspect-square rounded-2xl bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4 border border-slate-100 shadow-inner">
+                        <img
+                          src={activeCollectionModal.image}
+                          alt={activeCollectionModal.nameAr}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Details Column */}
+                    <div className="md:col-span-7 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-[11px] font-mono font-bold text-[#0062D2] bg-blue-50 px-2.5 py-1 rounded-md" dir="ltr">
+                            ENARAH SIGNATURE
+                          </span>
+                          {activeCollectionModal.tagAr && (
+                            <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                              {activeCollectionModal.tagAr}
+                            </span>
+                          )}
+                        </div>
+
+                        <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
+                          {activeCollectionModal.nameAr}
+                        </h3>
+                        <p className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mt-1" dir="ltr">
+                          {activeCollectionModal.nameEn}
+                        </p>
+
+                        <p className="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                          {activeCollectionModal.descAr}
+                        </p>
+                      </div>
+
+                      {/* Direct Actions */}
+                      <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
+                        <a
+                          href={`https://wa.me/218913224213?text=${encodeURIComponent(
+                            `السلام عليكم، أود الاستفسار عن تشكيلة: ${activeCollectionModal.nameAr} (${activeCollectionModal.nameEn}) لدى شركة الإنارة.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#0062D2] hover:bg-[#004FAF] text-white text-xs sm:text-sm font-semibold transition-colors shadow-sm"
+                        >
+                          <span>{isAr ? 'طلب كتالوج وتسعير واتساب' : 'Request Catalog via WhatsApp'}</span>
+                          <ArrowLeft className="w-4 h-4" />
+                        </a>
+
+                        <a
+                          href="tel:+218913224213"
+                          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors"
+                        >
+                          <Phone className="w-4 h-4 text-slate-600" />
+                          <span>{isAr ? 'اتصال مباشر' : 'Call'}</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* =====================================================================
@@ -1330,7 +1685,7 @@ export default function HomeCleanWhitePreview() {
           Feature: Real Architectural Wall Photography + Physical Light Wash Simulation
           Mobile Optimized: Sticky live visualizer + unified in-view controls
           ===================================================================== */}
-      <section className="py-10 sm:py-20 lg:py-28 bg-[#FFFFFF]">
+      <section id="color-light-studio" className="py-10 sm:py-20 lg:py-28 bg-[#FFFFFF]">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-10 lg:px-16">
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-12 lg:mb-16">
@@ -1350,7 +1705,10 @@ export default function HomeCleanWhitePreview() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-10 items-start max-w-6xl mx-auto">
             {/* 1. Real Architectural Wall Showcase (7 cols) - Sticky on mobile so it stays visible while scrolling & toggling! */}
             <div className="lg:col-span-7 flex flex-col sticky top-[62px] sm:top-[68px] lg:static z-20 bg-white py-1 sm:py-0">
-              <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-md sm:shadow-xl bg-[#15191E] flex flex-col justify-between">
+              <div
+                className="relative aspect-[4/3] w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-[#E7EAF0] shadow-md sm:shadow-xl bg-[#15191E] flex flex-col justify-between"
+                style={{ aspectRatio: '1200 / 896' }}
+              >
                 {/* 5 Real Wall Photography Layers with Smooth Cross-Fade */}
                 {paintColors.map((color) => {
                   const isSelected = selectedPaintId === color.id
@@ -1444,27 +1802,7 @@ export default function HomeCleanWhitePreview() {
                     </div>
                   </div>
 
-                  <div className="hidden md:flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3.5 py-2 rounded-2xl text-white/90 text-[11px] shadow-lg select-none">
-                    <Sparkles className="w-3.5 h-3.5 text-[#FFD285]" />
-                    <span>تفاعل لوني واقعي</span>
-                  </div>
                 </div>
-              </div>
-
-              {/* Mobile shake trigger notice */}
-              <div className="mt-1.5 text-center sm:hidden">
-                <button
-                  onClick={async () => {
-                    const granted = await requestPermission()
-                    if (granted) {
-                      alert('تم تفعيل مستشعر هز الهاتف لتغيير الإضاءة!')
-                    }
-                  }}
-                  className="text-[11px] text-[#0062D2] font-medium inline-flex items-center justify-center gap-1.5 py-0.5"
-                >
-                  <Sliders className="w-3 h-3" />
-                  <span>يمكنك أيضاً هز الهاتف لتغيير الإضاءة</span>
-                </button>
               </div>
             </div>
 
@@ -1866,7 +2204,7 @@ export default function HomeCleanWhitePreview() {
                   إ
                 </div>
                 <div>
-                  <span className="font-semibold text-white text-lg block">الإنارة الحديثة</span>
+                  <span className="font-semibold text-white text-lg block">شركة الإنارة</span>
                   <span className="text-[10px] font-mono tracking-widest text-white/60 uppercase block">
                     ENARAH MODERN · EST. 1988
                   </span>

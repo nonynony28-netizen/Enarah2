@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { MapPin, Phone, Clock, ArrowRight, ExternalLink, Navigation } from 'lucide-react'
+import { MapPin, Phone, Clock, ArrowRight, ExternalLink, Navigation, MessageCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
 
@@ -208,24 +208,47 @@ export default function Branches() {
           ))}
         </div>
 
-        {/* Commercial Logistics Info */}
-        <div className="mt-14 p-6 sm:p-8 bg-white border border-[#E2E8F0] rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
-          <div className="space-y-1 max-w-2xl">
-            <h4 className="text-base font-bold text-[#15191E]">
-              {isAr ? 'هل موقعك خارج مدينتي بنغازي أو البيضاء؟' : 'Located outside Benghazi or Al-Bayda?'}
+        {/* Commercial Logistics & Sales Shipping Info */}
+        <div className="mt-14 p-6 sm:p-8 bg-white border border-slate-200/90 rounded-2xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-xs">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-[11px] font-semibold text-[#0066FF]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0066FF] animate-pulse" />
+              <span>{isAr ? 'خدمة الشحن والتوريد لكافة المدن' : 'Nationwide Libya Supply'}</span>
+            </div>
+            <h4 className="text-base sm:text-lg font-bold text-[#15191E]">
+              {isAr ? 'التواصل مع قسم المبيعات للتوصيل والشحن لكافة مدن ليبيا' : 'Sales Department — Shipping & Delivery Across Libya'}
             </h4>
             <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
               {isAr
-                ? 'توفر شركة الإنارة الحديثة خدمة الشحن والتسليم المباشر للمواد الكهربائية وكابلات التأسيس لكافة المدن والمناطق الليبية بالتنسيق مع شركات النقل المعتمدة.'
-                : 'Enarah Modern provides direct freight and logistics across all Libyan cities in coordination with verified transport carriers.'}
+                ? 'توفر شركة الإنارة الحديثة خدمة الشحن والتسليم المباشر للمواد الكهربائية وكابلات التأسيس لكافة المدن والمناطق الليبية بالتنسيق مع شركات النقل المعتمدة عبر قسم المبيعات.'
+                : 'Enarah Modern provides direct dispatch and shipping of certified electrical supplies to all Libyan cities via our dedicated sales department.'}
             </p>
           </div>
-          <Link
-            to="/contact"
-            className="px-6 py-2.5 rounded-xl bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold transition-colors shrink-0 shadow-xs"
-          >
-            {isAr ? 'تواصل مع قسم الشحن والتوزيع' : 'Logistics Contact'}
-          </Link>
+          <div className="flex flex-wrap items-center gap-3 shrink-0 w-full sm:w-auto">
+            <a
+              href="tel:0916580068"
+              className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs sm:text-sm font-bold transition-all shadow-xs flex items-center justify-center gap-2.5"
+            >
+              <Phone className="w-4 h-4" />
+              <span dir="ltr" className="font-mono">0916580068</span>
+              <span>·</span>
+              <span>{isAr ? 'اتصال بالمبيعات' : 'Call Sales'}</span>
+            </a>
+            <a
+              href={`https://wa.me/218916580068?text=${encodeURIComponent(
+                isAr
+                  ? 'مرحباً، أود التواصل مع قسم المبيعات بخصوص التوصيل والشحن لكافة مدن ليبيا'
+                  : 'Hello, inquiring about sales shipping & delivery across Libya'
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 sm:flex-initial px-4 py-3 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2"
+              title={isAr ? 'واتساب المبيعات' : 'Sales WhatsApp'}
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              <span>{isAr ? 'واتساب المبيعات' : 'WhatsApp'}</span>
+            </a>
+          </div>
         </div>
       </main>
     </div>

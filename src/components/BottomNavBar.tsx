@@ -12,8 +12,7 @@ export default function BottomNavBar() {
   const navItems = [
     { path: '/', label: isAr ? 'الرئيسية' : 'Home', icon: Home },
     { path: '/products', label: isAr ? 'المنتجات' : 'Products', icon: Lightbulb },
-    { path: '/wire-prices', label: isAr ? 'الأسعار' : 'Prices', icon: Zap },
-    { path: '/game', label: isAr ? '🎮 اللعبة' : '🎮 Game', icon: Gamepad2 },
+    { path: '/offers', label: isAr ? 'العروض' : 'Offers', icon: Zap },
     { path: '/projects', label: isAr ? 'المشاريع' : 'Projects', icon: Sparkles },
     { path: '/branches', label: isAr ? 'الفروع' : 'Branches', icon: MapPin },
   ]

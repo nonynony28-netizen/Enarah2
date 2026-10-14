@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, MessageCircle, Phone, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -18,10 +18,70 @@ export interface BrandItem {
   hasCatalogProducts?: boolean
 }
 
+/**
+ * Animated Counter Component
+ * Lightweight, accessible, respects prefers-reduced-motion, with smooth deceleration curve.
+ */
+function AnimatedCounter({ target, suffix = '', duration = 1200 }: { target: number; suffix?: string; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState(0)
+  const elementRef = useRef<HTMLSpanElement>(null)
+  const hasAnimatedRef = useRef(false)
+
+  useEffect(() => {
+    // Respect prefers-reduced-motion
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplayValue(target)
+      hasAnimatedRef.current = true
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimatedRef.current) {
+          hasAnimatedRef.current = true
+          const startTime = performance.now()
+
+          const step = (currentTime: number) => {
+            const elapsed = currentTime - startTime
+            const progress = Math.min(elapsed / duration, 1)
+            // Ease-out cubic curve
+            const easeOut = 1 - Math.pow(1 - progress, 3)
+            const current = Math.round(easeOut * target)
+            setDisplayValue(current)
+
+            if (progress < 1) {
+              requestAnimationFrame(step)
+            } else {
+              setDisplayValue(target)
+            }
+          }
+
+          requestAnimationFrame(step)
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    const el = elementRef.current
+    if (el) observer.observe(el)
+
+    return () => {
+      if (el) observer.unobserve(el)
+    }
+  }, [target, duration])
+
+  return (
+    <span ref={elementRef} className="tabular-nums font-sans inline-block" dir="ltr">
+      {hasAnimatedRef.current ? displayValue : target}
+      {suffix}
+    </span>
+  )
+}
+
 export default function Brands() {
   const { isAr } = useLanguage()
 
-  // Verified Brand Data (Preserved from existing records, flags removed for Swiss minimalism)
+  // Verified Brand Data (All 14 Authentic Brands Preserved)
   const brands: BrandItem[] = useMemo(() => [
     {
       id: 'legrand',
@@ -247,127 +307,167 @@ export default function Brands() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#15191E] font-sans pb-20">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans pb-20">
       
       {/* =====================================================================
-          01. Architectural Hero Header (Deep Corporate Navy #101820)
+          01. Architectural Hero Header (Deep Corporate Navy #0B1528)
           ===================================================================== */}
-      <section className="relative bg-[#101820] text-white pt-12 pb-14 overflow-hidden border-b border-[#202936]">
-        {/* Subtle grid pattern & architectural glow */}
+      <section className="relative bg-[#0B1528] text-white pt-10 sm:pt-14 lg:pt-16 pb-12 sm:pb-16 overflow-hidden border-b border-white/10">
+        {/* Subtle architectural engineering grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#0062D2]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-80 h-80 bg-[#0066FF]/15 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div className="max-w-2xl space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md">
-                <span className="w-2 h-2 rounded-full bg-[#0062D2] animate-pulse" />
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12">
+            
+            {/* Narrative & Heading */}
+            <div className="max-w-2xl space-y-4 sm:space-y-5">
+              {/* Refined Eyebrow */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                 <span>{isAr ? 'شراكات وتوكيلات معتمدة في ليبيا' : 'Authorized Brand Partnerships in Libya'}</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white">
+              {/* Exact Heading: Confident, Balanced, Refined Sizing */}
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-[1.25] text-white">
                 {isAr ? 'علامات تجارية عالمية بمواصفات قياسية' : 'World-Class Electrical & Lighting Brands'}
               </h1>
 
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+              {/* Business Description: Improved Line Length, Comfortable Line Height */}
+              <p className="text-sm sm:text-[15px] lg:text-base text-slate-300 leading-relaxed font-normal max-w-xl">
                 {isAr
-                  ? 'نحرص في شركة الإنارة الحديثة منذ عام 1988 على توريد كبرى العلامات الإيطالية، التركية والأوروبية الحاصلة على شهادات الجودة والأمان الدولية للمشاريع السكنية والتجارية.'
-                  : 'Since 1988, Enarah Modern has partnered with top-tier Italian, Turkish, and European brands certified for maximum safety and performance in residential and commercial infrastructure.'}
+                  ? 'نحرص في شركة الإنارة الحديثة منذ عام 1988 على توريد كبرى العلامات العالمية والأوروبية والتركية الحاصلة على شهادات الجودة والأمان الدولية للمشاريع السكنية والتجارية.'
+                  : 'Since 1988, Enarah Modern has partnered with top-tier global, European, and Turkish brands certified for maximum safety and performance in residential and commercial infrastructure.'}
               </p>
 
               {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-xs text-slate-300">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-xs text-slate-300 font-normal">
                 <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                   <span>{isAr ? 'منتجات أصلية 100%' : '100% Authentic Products'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                   <span>{isAr ? 'مطابقة للمواصفات القياسية' : 'Standard Compliance Certified'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                   <span>{isAr ? 'توريد موثق في بنغازي وليبيا' : 'Benghazi & Libya Supply'}</span>
                 </div>
               </div>
             </div>
 
-            {/* Quick Metrics Badge Card */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-md lg:w-auto shrink-0">
-              <div className="text-center px-4 py-2">
-                <span className="block text-2xl sm:text-3xl font-bold text-white font-mono">14+</span>
-                <span className="text-[11px] text-slate-400 mt-1 block">{isAr ? 'علامة معتمدة' : 'Brands'}</span>
-              </div>
-              <div className="text-center px-4 py-2 border-r border-l border-white/10">
-                <span className="block text-2xl sm:text-3xl font-bold text-[#0062D2] font-mono">35+</span>
-                <span className="text-[11px] text-slate-400 mt-1 block">{isAr ? 'عاماً من الخبرة' : 'Years Experience'}</span>
-              </div>
-              <div className="text-center px-4 py-2 col-span-2 sm:col-span-1">
-                <span className="block text-2xl sm:text-3xl font-bold text-emerald-400 font-mono">100%</span>
-                <span className="text-[11px] text-slate-400 mt-1 block">{isAr ? 'جودة وتوثيق' : 'Verified Quality'}</span>
+            {/* Redesigned Statistics Panel: Compact Horizontal Composition, Clear Hierarchy, Subtle Separators */}
+            <div className="w-full lg:w-auto shrink-0">
+              <div className="bg-[#111C2E]/90 border border-white/10 rounded-2xl p-4 sm:p-5 lg:min-w-[360px] shadow-sm">
+                <div className="text-[11px] font-mono tracking-wider text-blue-400 uppercase mb-3.5 pb-2.5 border-b border-white/10 flex items-center justify-between">
+                  <span>{isAr ? 'مؤشرات الشراكة والتوثيق' : 'PARTNERSHIP METRICS'}</span>
+                  <span className="text-slate-400 font-sans normal-case text-[11px]">1988 — 2026</span>
+                </div>
+
+                <div className="grid grid-cols-3 divide-x divide-x-reverse divide-white/10 text-center">
+                  {/* Metric 1: 14+ Brands */}
+                  <div className="px-2 sm:px-3">
+                    <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans" dir="ltr">
+                      <AnimatedCounter target={14} suffix="+" />
+                    </div>
+                    <span className="text-xs text-slate-300 font-medium block mt-1">
+                      {isAr ? 'علامة معتمدة' : 'Brands'}
+                    </span>
+                  </div>
+
+                  {/* Metric 2: 38+ Years of Experience (Updated from 35+) */}
+                  <div className="px-2 sm:px-3">
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-400 tracking-tight font-sans" dir="ltr">
+                      <AnimatedCounter target={38} suffix="+" />
+                    </div>
+                    <span className="text-xs text-slate-300 font-medium block mt-1">
+                      {isAr ? 'عاماً من الخبرة' : 'Years Experience'}
+                    </span>
+                  </div>
+
+                  {/* Metric 3: 100% Quality & Verification */}
+                  <div className="px-2 sm:px-3">
+                    <div className="text-2xl sm:text-3xl font-bold text-emerald-400 tracking-tight font-sans" dir="ltr">
+                      <AnimatedCounter target={100} suffix="%" />
+                    </div>
+                    <span className="text-xs text-slate-300 font-medium block mt-1">
+                      {isAr ? 'جودة وتوثيق' : 'Verified Quality'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
       {/* =====================================================================
-          02. Minimalist Gallery Content & Filter Workspace
+          02. Minimalist Brand Gallery & Refined Filter Bar
           ===================================================================== */}
       <main className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-8 sm:py-12">
         
-        {/* Clean Filter Tabs (Section 08: Swiss Minimalist styling) */}
-        <div className="flex items-center gap-2 pb-4 mb-8 overflow-x-auto no-scrollbar border-b border-[#E7EAF0]">
-          {filterTabs.map((tab) => {
-            const isActive = selectedFilter === tab.key
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setSelectedFilter(tab.key as typeof selectedFilter)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-                  isActive
-                    ? 'bg-[#101820] text-white shadow-xs'
-                    : 'bg-white text-[#64748B] border border-[#E7EAF0] hover:text-[#15191E] hover:border-slate-300'
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span className={`text-[11px] px-1.5 py-0.5 rounded-md font-mono ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                  {tab.count}
-                </span>
-              </button>
-            )
-          })}
+        {/* Refined Horizontal Filter Navigation (Subtle blue underline & restrained count highlight) */}
+        <div className="border-b border-slate-200 mb-8 sm:mb-10">
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar pb-px -mb-px">
+            {filterTabs.map((tab) => {
+              const isActive = selectedFilter === tab.key
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setSelectedFilter(tab.key as typeof selectedFilter)}
+                  className={`group relative py-3 px-3.5 sm:px-5 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-2 border-b-2 ${
+                    isActive
+                      ? 'border-[#0066FF] text-[#0B1528] font-semibold'
+                      : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[11px] font-mono px-2 py-0.5 rounded-full transition-colors ${
+                      isActive
+                        ? 'bg-[#0066FF]/10 text-[#0066FF] font-semibold'
+                        : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200/80 group-hover:text-slate-700'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
-        {/* 03. Brand Gallery Grid (4 columns desktop, 3 tablet, 2 mobile) */}
+        {/* Brand Gallery Grid: Clean White Cards, Generous Spacing, Authentic Logos */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredBrands.map((b) => (
             <div
               key={b.id}
               onClick={() => setActiveBrandModal(b)}
-              className="bg-white border border-[#E2E8F0] rounded-2xl p-5 hover:border-[#0062D2] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
+              className="bg-white border border-slate-200/90 rounded-2xl p-5 hover:border-[#0066FF]/50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
             >
-              {/* Subtle hover accent bar */}
-              <div className="absolute top-0 inset-x-0 h-1 bg-[#0062D2] opacity-0 group-hover:opacity-100 transition-opacity" />
+              {/* Subtle top accent bar */}
+              <div className="absolute top-0 inset-x-0 h-1 bg-[#0066FF] opacity-0 group-hover:opacity-100 transition-opacity" />
 
               <div>
-                {/* Logo Area (object-contain, normalized scale, authentic aspect ratio) */}
-                <div className="aspect-[16/10] bg-[#F8FAFC] rounded-xl p-6 flex items-center justify-center mb-4 group-hover:bg-slate-50/80 transition-colors border border-slate-100">
+                {/* Logo Plinth: Clean surface with comfortable padding and restrained height */}
+                <div className="h-28 sm:h-32 bg-[#F8FAFC] rounded-xl p-4 sm:p-5 flex items-center justify-center mb-4 group-hover:bg-slate-50 transition-colors border border-slate-100">
                   <img
                     src={b.logoUrl}
                     alt={b.name}
                     loading="lazy"
-                    className="max-h-12 w-auto max-w-[85%] object-contain transition-transform duration-300 group-hover:scale-105"
+                    className="max-h-11 sm:max-h-12 w-auto max-w-[80%] object-contain transition-transform duration-300 group-hover:scale-105"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                     }}
                   />
                 </div>
 
-                {/* Brand Meta */}
+                {/* Brand Header: Name & Origin */}
                 <div className="space-y-1.5 mb-3">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-base font-bold text-[#15191E] group-hover:text-[#0062D2] transition-colors">
+                    <h3 className="text-base font-bold text-slate-900 group-hover:text-[#0066FF] transition-colors">
                       {b.name}
                     </h3>
                     <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
@@ -375,19 +475,20 @@ export default function Brands() {
                     </span>
                   </div>
 
-                  <p className="text-xs text-[#0062D2] font-medium">
+                  <p className="text-xs text-[#0066FF] font-semibold">
                     {isAr ? b.category : b.categoryEn}
                   </p>
                 </div>
 
-                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+                {/* Description */}
+                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4 font-normal">
                   {isAr ? b.description : b.descriptionEn}
                 </p>
               </div>
 
-              {/* Action link & details trigger */}
-              <div className="pt-3 border-t border-[#F1F5F9] flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span className="group-hover:text-[#0062D2] transition-colors flex items-center gap-1">
+              {/* Bottom Action Footer */}
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span className="group-hover:text-[#0066FF] transition-colors flex items-center gap-1">
                   <span>{isAr ? 'عرض التفاصيل والاستفسار' : 'View Details'}</span>
                   <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </span>
@@ -401,11 +502,14 @@ export default function Brands() {
           ))}
         </div>
 
-        {/* 04. Neutral Project & Commercial Supply Banner */}
-        <div className="mt-14 p-6 sm:p-8 bg-gradient-to-r from-slate-900 to-[#101820] text-white rounded-2xl border border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-md">
-          <div className="max-w-2xl space-y-2">
+        {/* 03. Project & Commercial Supply Banner */}
+        <div className="mt-14 p-6 sm:p-8 bg-[#0B1528] text-white rounded-2xl border border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-sm relative overflow-hidden">
+          {/* Subtle micro grid */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+          
+          <div className="relative max-w-2xl space-y-2">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 text-xs text-slate-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0066FF]" />
               <span>{isAr ? 'توريد المشاريع والمقاولات الكبرى' : 'Bulk Project & Contractor Supply'}</span>
             </div>
             <h2 className="text-lg sm:text-xl font-bold text-white">
@@ -418,7 +522,7 @@ export default function Brands() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="relative flex flex-wrap items-center gap-3 shrink-0">
             <Link
               to="/products"
               className="px-5 py-2.5 rounded-xl border border-white/20 hover:bg-white/10 text-xs font-semibold text-white transition-colors"
@@ -427,7 +531,7 @@ export default function Brands() {
             </Link>
             <Link
               to="/contact"
-              className="px-5 py-2.5 rounded-xl bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold transition-colors shadow-xs"
+              className="px-5 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-semibold transition-colors shadow-xs"
             >
               {isAr ? 'تواصل مع المعرض' : 'Contact Showroom'}
             </Link>
@@ -436,14 +540,14 @@ export default function Brands() {
 
       </main>
 
-      {/* 05. Brand Detail Sheet / Modal (Preserving 100% of data without cluttering gallery) */}
+      {/* 04. Brand Detail Modal */}
       <AnimatePresence>
         {activeBrandModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
             onClick={() => setActiveBrandModal(null)}
           >
             <motion.div
@@ -457,14 +561,14 @@ export default function Brands() {
             >
               <button
                 onClick={() => setActiveBrandModal(null)}
-                className="absolute top-4 left-4 p-1.5 rounded-lg hover:bg-slate-100 text-[#68717D] hover:text-[#15191E] transition-colors cursor-pointer"
-                aria-label="إغلاق"
+                className="absolute top-4 left-4 p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
+                aria-label={isAr ? 'إغلاق' : 'Close'}
               >
                 <X className="w-5 h-5" />
               </button>
 
               {/* Modal Logo */}
-              <div className="h-16 w-32 bg-[#F8FAFC] rounded-lg p-3 flex items-center justify-center mb-4">
+              <div className="h-16 w-32 bg-[#F8FAFC] rounded-lg p-3 flex items-center justify-center mb-4 border border-slate-100">
                 <img
                   src={activeBrandModal.logoUrl}
                   alt={activeBrandModal.name}
@@ -475,28 +579,28 @@ export default function Brands() {
               {/* Title & Origin */}
               <div className="mb-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-xl font-bold text-[#15191E]">
+                  <h3 className="text-xl font-bold text-slate-900">
                     {activeBrandModal.name}
                   </h3>
-                  <span className="text-xs text-[#68717D] bg-slate-100 px-2 py-0.5 rounded-md">
+                  <span className="text-xs text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">
                     {activeBrandModal.origin}
                   </span>
                 </div>
-                <span className="text-xs font-medium text-[#0062D2] block">
+                <span className="text-xs font-semibold text-[#0066FF] block">
                   {isAr ? activeBrandModal.category : activeBrandModal.categoryEn}
                 </span>
               </div>
 
               {/* Description */}
-              <p className="text-xs sm:text-sm text-[#475569] leading-relaxed mb-6 font-normal">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 font-normal">
                 {isAr ? activeBrandModal.description : activeBrandModal.descriptionEn}
               </p>
 
               {/* Modal Actions */}
-              <div className="space-y-2 pt-4 border-t border-[#F1F3F7]">
+              <div className="space-y-2 pt-4 border-t border-slate-100">
                 <button
                   onClick={() => openWhatsAppInquiry(activeBrandModal)}
-                  className="w-full py-2.5 px-4 rounded-lg bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>{isAr ? 'استفسار عن أصناف العلامة عبر واتساب' : 'Inquire via WhatsApp'}</span>
@@ -506,7 +610,7 @@ export default function Brands() {
                   {activeBrandModal.hasCatalogProducts ? (
                     <Link
                       to="/products"
-                      className="flex-1 py-2 px-3 rounded-lg border border-[#E7EAF0] hover:bg-slate-50 text-xs font-medium text-center text-[#15191E] transition-colors"
+                      className="flex-1 py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-medium text-center text-slate-800 transition-colors"
                       onClick={() => setActiveBrandModal(null)}
                     >
                       {isAr ? 'عرض منتجات الأسلاك المتوفرة' : 'View Wire Catalog'}
@@ -514,7 +618,7 @@ export default function Brands() {
                   ) : null}
                   <a
                     href="tel:+218916580068"
-                    className="p-2 rounded-lg border border-[#E7EAF0] text-[#15191E] hover:bg-slate-50 transition-colors flex items-center justify-center shrink-0"
+                    className="p-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center shrink-0"
                     title={isAr ? 'اتصال هاتفي بالمعرض' : 'Call Showroom'}
                   >
                     <Phone className="w-4 h-4" />

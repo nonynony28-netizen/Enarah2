@@ -10,7 +10,7 @@ export default function Footer() {
     { path: '/offers', label: isAr ? 'التخفيضات والعروض' : 'Offers & Discounts' },
     { path: '/projects', label: isAr ? 'المشاريع المنفذة' : 'Executed Projects' },
     { path: '/brands', label: isAr ? 'العلامات التجارية' : 'Global Brands' },
-    { path: '/wire-prices', label: isAr ? 'أسعار الأسلاك' : 'Wire Prices' },
+    { path: '/contractors', label: isAr ? 'قسم المقاولين والكميات' : 'Contractors & Wholesale' },
     { path: '/branches', label: isAr ? 'فروعنا' : 'Our Branches' },
     { path: '/about', label: isAr ? 'عن الشركة' : 'About Company' },
     { path: '/blog', label: isAr ? 'المدونة المعمارية' : 'Architectural Blog' },
@@ -26,7 +26,7 @@ export default function Footer() {
           <div className="md:col-span-5 space-y-6">
             <div>
               <span className="font-bold text-white text-2xl tracking-tight block">
-                {isAr ? 'الإنارة الحديثة' : 'ENARAH MODERN'}
+                {isAr ? 'شركة الإنارة' : 'ENARAH MODERN'}
               </span>
               <span className="text-[11px] font-mono tracking-widest text-[#0062D2] uppercase block mt-1">
                 ENARAH MODERN · EST. 1988

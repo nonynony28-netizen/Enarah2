@@ -29,7 +29,6 @@ export default function Navbar() {
     { path: '/offers', label: isAr ? 'العروض' : 'Offers' },
     { path: '/projects', label: isAr ? 'المشاريع' : 'Projects' },
     { path: '/brands', label: isAr ? 'العلامات التجارية' : 'Brands' },
-    { path: '/wire-prices', label: isAr ? 'أسعار الأسلاك' : 'Wire Prices' },
   ]
 
   // Grouped extra sections requested by user: المقاولين، فروعنا، المدونة، من نحن، اللعبة
