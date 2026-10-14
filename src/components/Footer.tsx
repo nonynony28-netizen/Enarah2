@@ -15,7 +15,7 @@ export default function Footer() {
     { path: '/about', label: isAr ? 'عن الشركة' : 'About Company' },
     { path: '/blog', label: isAr ? 'المدونة المعمارية' : 'Architectural Blog' },
     { path: '/game', label: isAr ? 'لعبة بطل الإنارة' : 'Lighting Game' },
-    { path: '/contact', label: isAr ? 'اتصل بنا' : 'Contact Us' },
+    { path: '/contact', label: isAr ? 'تواصل معنا' : 'Contact Us' },
   ]
 
   return (

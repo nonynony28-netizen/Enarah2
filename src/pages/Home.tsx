@@ -679,14 +679,6 @@ export default function Home() {
               </AnimatePresence>
             </div>
 
-            <Link
-              to="/contact"
-              className={`transition-colors hover:text-[#0062D2] ${
-                isScrolled ? 'text-[#15191E]' : 'text-white/95 hover:text-white'
-              }`}
-            >
-              اتصل بنا
-            </Link>
           </nav>
 
           {/* Primary CTA & Mobile Toggle */}
@@ -764,15 +756,6 @@ export default function Home() {
                   <span>أسعار الأسلاك</span>
                   <ArrowLeft className="w-4 h-4 opacity-40" />
                 </Link>
-                <Link
-                  to="/contact"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
-                >
-                  <span>اتصل بنا</span>
-                  <ArrowLeft className="w-4 h-4 opacity-40" />
-                </Link>
-
                 {/* أقسام إضافية في الجوال */}
                 <div className="pt-2 pb-1 border-t border-slate-100">
                   <span className="text-xs font-semibold text-[#68717D] uppercase tracking-wider block mb-2">
@@ -806,7 +789,7 @@ export default function Home() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="mt-2 text-center py-3 bg-[#0062D2] text-white rounded-xl font-semibold shadow-sm hover:bg-[#0047A5] transition-colors"
                 >
-                  ابدأ استشارة مجانية
+                  تواصل معنا
                 </Link>
               </div>
             </motion.div>
@@ -2437,7 +2420,7 @@ export default function Home() {
                 </li>
                 <li>
                   <Link to="/contact" className="hover:text-white transition-colors">
-                    اتصل بنا
+                    تواصل معنا
                   </Link>
                 </li>
               </ul>

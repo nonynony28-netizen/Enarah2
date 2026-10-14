@@ -544,14 +544,6 @@ export default function HomeCleanWhitePreview() {
             >
               عن الشركة
             </Link>
-            <Link
-              to="/contact"
-              className={`transition-colors hover:text-[#0062D2] ${
-                isScrolled ? 'text-[#15191E]' : 'text-white/95 hover:text-white'
-              }`}
-            >
-              اتصل بنا
-            </Link>
           </nav>
 
           {/* Primary CTA & Mobile Toggle */}
@@ -627,16 +619,9 @@ export default function HomeCleanWhitePreview() {
                 <Link
                   to="/contact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
-                >
-                  اتصل بنا
-                </Link>
-                <Link
-                  to="/contact"
-                  onClick={() => setMobileMenuOpen(false)}
                   className="mt-2 text-center py-3 bg-[#0062D2] text-white rounded-xl font-semibold shadow-sm"
                 >
-                  ابدأ استشارة مجانية
+                  تواصل معنا
                 </Link>
               </div>
             </motion.div>
@@ -2251,7 +2236,7 @@ export default function HomeCleanWhitePreview() {
                 </li>
                 <li>
                   <Link to="/contact" className="hover:text-white transition-colors">
-                    اتصل بنا
+                    تواصل معنا
                   </Link>
                 </li>
               </ul>
