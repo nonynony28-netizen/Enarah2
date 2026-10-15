@@ -34,7 +34,8 @@ import {
   Building2,
   ShoppingCart,
   BookOpen,
-  Gamepad2
+  Gamepad2,
+  Trophy
 } from 'lucide-react'
 import type { ProjectItem } from '../data/projectsData'
 import {
@@ -44,6 +45,11 @@ import {
 } from '../data/projectsData'
 import { initHeroVideoCache, getOptimalHeroVideoPath } from '../utils/videoCache'
 import { ENARAH_PRODUCTS } from '../components/EnarahProductsCarousel'
+
+// Lazy load GameEngine for instant interactive play on homepage without heavy initial bundle
+const GameEngine = React.lazy(() =>
+  import('../components/game/GameEngine').then((module) => ({ default: module.GameEngine }))
+)
 
 /* =========================================================================
    1. Data Definitions (Colors, Brands, Featured Categories, Trust Items)
@@ -2295,6 +2301,137 @@ export default function Home() {
                 </div>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          SECTION 08.5: Interactive Game (رحلة النور | بطل الإنارة الحديثة)
+          Directly Playable on the Homepage
+          ===================================================================== */}
+      <section id="game-section" className="relative py-20 sm:py-28 bg-[#0B0F17] text-white overflow-hidden border-t border-[#1C2633]">
+        {/* Ambient lighting glows */}
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#0062D2]/15 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+
+        <div className="relative z-10 max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+          {/* Section Header */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 gap-6">
+            <div className="max-w-2xl space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#0062D2] animate-pulse" />
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>{isAr ? 'تجربة تفاعلية حصرية في الصفحة الرئيسية' : 'Exclusive Interactive Experience'}</span>
+              </div>
+              
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                {isAr ? 'رحلة النور | بطل الإنارة الحديثة 🎮' : 'Light Quest | Modern Enarah Hero 🎮'}
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                {isAr
+                  ? 'العب الآن مباشرة! تحكم ببطل اللمبة الذكية، واجمع كابلات النحاس الإيطالية وشرارات الطاقة لإنارة المصابيح وتشغيل القاطع الرئيسي للفوز بكوبون خصم حقيقي (5% إلى 10%) على مشترياتك.'
+                  : 'Play directly right here! Guide our Lightbulb Hero, collect certified copper wires and energy sparks to illuminate chandeliers and win an instant discount voucher.'}
+              </p>
+            </div>
+
+            {/* Quick Actions & Fullscreen Link */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-semibold">
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>{isAr ? 'كوبون خصم فوري 5% - 10%' : '5% - 10% Instant Voucher'}</span>
+              </div>
+
+              <Link
+                to="/game"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-semibold backdrop-blur-md transition-all active:scale-95 group"
+              >
+                <span>{isAr ? 'فتح في صفحة مخصصة' : 'Dedicated Fullscreen Page'}</span>
+                <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Embedded Playable Game Canvas Box */}
+          <div className="bg-[#11161F]/90 rounded-3xl p-3 sm:p-6 border border-[#222E3D] shadow-2xl backdrop-blur-md overflow-hidden mb-10">
+            <React.Suspense
+              fallback={
+                <div className="h-[420px] sm:h-[520px] flex flex-col items-center justify-center gap-4 text-slate-400">
+                  <Loader2 className="w-8 h-8 text-[#0062D2] animate-spin" />
+                  <span className="text-xs font-medium">{isAr ? 'جارٍ تحميل محرك اللعبة...' : 'Loading game engine...'}</span>
+                </div>
+              }
+            >
+              <GameEngine />
+            </React.Suspense>
+          </div>
+
+          {/* Instructions & Game Rules Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="p-5 rounded-2xl bg-[#141B24] border border-[#222E3D] flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <Zap className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm text-white mb-1">
+                  {isAr ? '1. اجمع كابلات النحاس' : '1. Collect Copper Cables'}
+                </h4>
+                <p className="text-slate-400 text-xs leading-relaxed font-normal">
+                  {isAr
+                    ? 'اجمع لفات الأسلاك الإيطالية والسبوت لايت لتوسيع دائرة الضوء وكسب وقت إضافي.'
+                    : 'Gather certified copper wire coils and spotlights to expand your light radius.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#141B24] border border-[#222E3D] flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-[#0062D2] shrink-0">
+                <Lightbulb className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm text-white mb-1">
+                  {isAr ? '2. أنر المصابيح المعمارية' : '2. Light Up Fixtures'}
+                </h4>
+                <p className="text-slate-400 text-xs leading-relaxed font-normal">
+                  {isAr
+                    ? 'اقترب من الثريات ومصابيح الإنارة المعمارية لتشغيلها وفتح الأبواب الموصدة.'
+                    : 'Approach chandeliers and architectural fixtures to activate them and unlock gates.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#141B24] border border-[#222E3D] flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
+                <Power className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm text-white mb-1">
+                  {isAr ? '3. شغّل القاطع الرئيسي' : '3. Master Switch'}
+                </h4>
+                <p className="text-slate-400 text-xs leading-relaxed font-normal">
+                  {isAr
+                    ? 'بعد إنارة كافة النقاط، توجه لقاطع التيار الرئيسي لإنارة المدينة بالكامل وإنهاء المرحلة.'
+                    : 'After lighting all fixtures, activate the master breaker to complete the stage.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#141B24] border border-[#222E3D] flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                <Trophy className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm text-white mb-1">
+                  {isAr ? '4. احصل على كود الخصم' : '4. Get Your Discount'}
+                </h4>
+                <p className="text-slate-400 text-xs leading-relaxed font-normal">
+                  {isAr
+                    ? 'مبروك! انسخ كود الخصم الفوري واستخدمه مباشرة في مشترياتك بصالات العرض.'
+                    : 'Congratulations! Copy your voucher and redeem it instantly at our showrooms.'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
