@@ -588,14 +588,6 @@ export default function Home() {
             >
               العلامات التجارية
             </Link>
-            <Link
-              to="/wire-prices"
-              className={`transition-colors hover:text-[#0062D2] ${
-                isScrolled ? 'text-[#15191E]' : 'text-white/95 hover:text-white'
-              }`}
-            >
-              أسعار الأسلاك
-            </Link>
 
             {/* خانة المزيد (القائمة المنسدلة للأقسام الأخرى) */}
             <div
@@ -746,14 +738,6 @@ export default function Home() {
                   className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
                 >
                   <span>العلامات والشركاء</span>
-                  <ArrowLeft className="w-4 h-4 opacity-40" />
-                </Link>
-                <Link
-                  to="/wire-prices"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
-                >
-                  <span>أسعار الأسلاك</span>
                   <ArrowLeft className="w-4 h-4 opacity-40" />
                 </Link>
                 {/* أقسام إضافية في الجوال */}

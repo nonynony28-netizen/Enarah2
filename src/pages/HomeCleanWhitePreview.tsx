@@ -529,14 +529,6 @@ export default function HomeCleanWhitePreview() {
               العلامات التجارية
             </Link>
             <Link
-              to="/wire-prices"
-              className={`transition-colors hover:text-[#0062D2] ${
-                isScrolled ? 'text-[#15191E]' : 'text-white/95 hover:text-white'
-              }`}
-            >
-              أسعار الأسلاك
-            </Link>
-            <Link
               to="/about"
               className={`transition-colors hover:text-[#0062D2] ${
                 isScrolled ? 'text-[#15191E]' : 'text-white/95 hover:text-white'
@@ -601,13 +593,6 @@ export default function HomeCleanWhitePreview() {
                   className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
                 >
                   العلامات والشركاء
-                </Link>
-                <Link
-                  to="/wire-prices"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
-                >
-                  أسعار الأسلاك
                 </Link>
                 <Link
                   to="/about"
