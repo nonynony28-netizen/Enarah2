@@ -5,6 +5,7 @@ import WhatsAppButton from './components/WhatsAppButton'
 import AIChatWidget from './components/AIChatWidget'
 import OfflineNotice from './components/OfflineNotice'
 import Layout from './Layout'
+import ScrollRestoration from './components/ScrollRestoration'
 
 import Home from './pages/Home'
 import { initErrorMonitoring } from './utils/errorTracker'
@@ -95,6 +96,7 @@ function App() {
 
   return (
     <>
+      <ScrollRestoration />
       <OfflineNotice />
 
       <Suspense fallback={<PageLoader />}>

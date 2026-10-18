@@ -10,6 +10,7 @@ export default function Footer() {
     { path: '/offers', label: isAr ? 'التخفيضات والعروض' : 'Offers & Discounts' },
     { path: '/projects', label: isAr ? 'المشاريع المنفذة' : 'Executed Projects' },
     { path: '/brands', label: isAr ? 'العلامات التجارية' : 'Global Brands' },
+    { path: '/wire-prices', label: isAr ? 'أسعار الأسلاك' : 'Wire Prices' },
     { path: '/contractors', label: isAr ? 'قسم المقاولين والكميات' : 'Contractors & Wholesale' },
     { path: '/branches', label: isAr ? 'فروعنا' : 'Our Branches' },
     { path: '/about', label: isAr ? 'عن الشركة' : 'About Company' },
@@ -46,13 +47,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Quick Links (3 cols) */}
-          <div className="md:col-span-3 space-y-4">
+          {/* Column 2: Quick Links (4 cols) */}
+          <div className="md:col-span-4 space-y-4">
             <h4 className="text-sm font-semibold text-white tracking-wider uppercase">
               {isAr ? 'التنقل السريع' : 'Quick Navigation'}
             </h4>
-            <ul className="space-y-2.5 text-sm">
-              {quickLinks.slice(0, 6).map((link) => (
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-sm">
+              {quickLinks.map((link) => (
                 <li key={link.path}>
                   <Link
                     to={link.path}
@@ -65,8 +66,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Contact & Benghazi Showroom (4 cols) */}
-          <div className="md:col-span-4 space-y-4">
+          {/* Column 3: Contact & Benghazi Showroom (3 cols) */}
+          <div className="md:col-span-3 space-y-4">
             <h4 className="text-sm font-semibold text-white tracking-wider uppercase">
               {isAr ? 'التواصل' : 'Contact & Showroom'}
             </h4>

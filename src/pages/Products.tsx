@@ -5,7 +5,6 @@ import {
   X,
   SlidersHorizontal,
   ChevronDown,
-  ArrowUpRight,
   MessageCircle,
   Phone,
   Check

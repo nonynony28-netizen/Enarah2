@@ -9,7 +9,10 @@ html, body, #root {
 
 html {
   scrollbar-gutter: stable;
-  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 /* تحسين استهلاك المعالج مع تسريع معالجة الإطارات الخفيفة جداً للجوال */

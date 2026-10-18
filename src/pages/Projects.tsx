@@ -9,7 +9,6 @@ import {
   ChevronRight,
   ChevronLeft,
   X,
-  Layers,
   Sparkles,
   Building,
   CheckCircle2

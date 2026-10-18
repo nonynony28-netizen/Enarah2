@@ -12,7 +12,8 @@ import {
   BookOpen,
   Award,
   Gamepad2,
-  Sparkles
+  Sparkles,
+  Zap
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 
@@ -31,7 +32,7 @@ export default function Navbar() {
     { path: '/brands', label: isAr ? 'العلامات التجارية' : 'Brands' },
   ]
 
-  // Grouped extra sections requested by user: المقاولين، فروعنا، المدونة، من نحن، اللعبة
+  // Grouped extra sections requested by user: المقاولين، أسعار الأسلاك، فروعنا، المدونة، من نحن، اللعبة
   const moreLinks = [
     {
       path: '/contractors',
@@ -39,6 +40,13 @@ export default function Navbar() {
       desc: isAr ? 'عروض أسعار خاصة وتوريد المشاريع الكبرى' : 'Special bulk quotes for contractors',
       icon: Building2,
       badge: isAr ? 'خاص' : 'Pro'
+    },
+    {
+      path: '/wire-prices',
+      label: isAr ? 'أسعار الأسلاك' : 'Wire Prices',
+      desc: isAr ? 'جدول أسعار الأسلاك والمناشئ المعتمدة' : 'Daily certified wire prices',
+      icon: Zap,
+      badge: isAr ? 'يومي' : 'Daily'
     },
     {
       path: '/branches',

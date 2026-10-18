@@ -333,6 +333,13 @@ export default function Home() {
       badge: isAr ? 'خاص' : 'Pro'
     },
     {
+      path: '/wire-prices',
+      label: isAr ? 'أسعار الأسلاك' : 'Wire Prices',
+      desc: isAr ? 'جدول أسعار الأسلاك والمناشئ المعتمدة' : 'Daily certified wire prices',
+      icon: Zap,
+      badge: isAr ? 'يومي' : 'Daily'
+    },
+    {
       path: '/branches',
       label: isAr ? 'فروعنا' : 'Our Branches',
       desc: isAr ? 'معارض بنغازي والبيضاء وأوقات العمل' : 'Benghazi & Al-Bayda showrooms',
