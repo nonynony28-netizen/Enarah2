@@ -804,6 +804,14 @@ button, .btn, .mobile-btn {
   }
 }
 
-
-
-
+/* ============================================================================
+   SEQUENTIAL REVEAL SYSTEM (Zero Layout Shifts, Accessible, Hardware-Accelerated)
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  [data-seq-reveal],
+  [data-seq-reveal-group] [data-seq-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

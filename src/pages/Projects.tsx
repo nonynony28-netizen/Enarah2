@@ -22,6 +22,7 @@ import {
   getOptimizedProjectImages,
   getOptimizedProjectImageUrl
 } from '../data/projectsData'
+import { SequentialRevealGroup, SequentialRevealItem } from '../components/ui/SequentialReveal'
 
 export default function Projects() {
   const { isAr } = useLanguage()
@@ -252,29 +253,29 @@ export default function Projects() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <SequentialRevealGroup className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center" staggerDelay={100} duration={350} distance={6}>
             {/* Right Column: Editorial Typography & Authentic Text */}
             <div className="lg:col-span-7 space-y-4 text-right" dir={isAr ? 'rtl' : 'ltr'}>
               {/* Eyebrow Pill */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-blue-200 tracking-wide">
+              <SequentialRevealItem index={0} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-blue-200 tracking-wide">
                 <Building className="w-3.5 h-3.5 text-[#0062D2]" />
                 <span>{isAr ? 'معرض المشاريع المعمارية المتخصصة' : 'Architectural Portfolio'}</span>
-              </div>
+              </SequentialRevealItem>
 
               {/* Main Heading (Preserved Exact Title) */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+              <SequentialRevealItem index={1} as="h1" className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
                 {isAr ? 'مساحات أضاءتها خبرتنا' : 'Spaces Illuminated by Our Expertise'}
-              </h1>
+              </SequentialRevealItem>
 
               {/* Preserved Subtitle */}
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
+              <SequentialRevealItem index={2} as="p" className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
                 {isAr 
                   ? 'توثيق بصري لمشاريع تجارية وسكنية وصالات عرض أضفت حلولنا المعمارية عليها بعداً جمالياً ووظيفياً متفرداً.'
                   : 'A visual documentation of commercial, residential, and showroom projects where our architectural lighting solutions brought unique aesthetic and functional dimensions.'}
-              </p>
+              </SequentialRevealItem>
 
               {/* Authentic Sector Indicators */}
-              <div className="pt-2 flex flex-wrap items-center gap-3 text-xs font-medium text-slate-300">
+              <SequentialRevealItem index={3} className="pt-2 flex flex-wrap items-center gap-3 text-xs font-medium text-slate-300">
                 <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#0062D2] shrink-0" />
                   <span>{isAr ? 'مولات ومراكز تجارية' : 'Commercial Malls'}</span>
@@ -287,11 +288,11 @@ export default function Projects() {
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#0062D2] shrink-0" />
                   <span>{isAr ? 'معارض ومساحات ضيافة' : 'Showrooms & Hospitality'}</span>
                 </div>
-              </div>
+              </SequentialRevealItem>
             </div>
 
             {/* Left Column: Authentic Architectural Exterior Project Photograph */}
-            <div className="lg:col-span-5">
+            <SequentialRevealItem index={4} className="lg:col-span-5">
               <div className="relative rounded-2xl overflow-hidden border border-white/15 shadow-xl bg-slate-900 group">
                 <img
                   src="/images/project-facade.jpg"
@@ -307,8 +308,8 @@ export default function Projects() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </SequentialRevealItem>
+          </SequentialRevealGroup>
         </div>
       </section>
 
@@ -376,10 +377,15 @@ export default function Projects() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8">
             {filteredProjects.map((p, idx) => {
               const spanClass = getGridSpan(idx, filteredProjects.length)
+              // Animate only small visible groups with subtle stagger in correct RTL visual order
+              const staggerIndex = idx < 4 ? idx : idx % 2
 
               return (
-                <div
+                <SequentialRevealItem
                   key={p.id}
+                  index={staggerIndex}
+                  duration={350}
+                  distance={6}
                   onClick={() => openGallery(p)}
                   className={`group relative rounded-2xl overflow-hidden bg-slate-900 border border-[#E2E8F0] cursor-pointer shadow-xs transition-all duration-300 hover:shadow-lg ${spanClass}`}
                 >
@@ -429,7 +435,7 @@ export default function Projects() {
                       <ArrowUpRight className="w-5 h-5" />
                     </div>
                   </div>
-                </div>
+                </SequentialRevealItem>
               )
             })}
           </div>

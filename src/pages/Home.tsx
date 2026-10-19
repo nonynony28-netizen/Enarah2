@@ -45,6 +45,8 @@ import {
 } from '../data/projectsData'
 import { initHeroVideoCache, getOptimalHeroVideoPath } from '../utils/videoCache'
 import { ENARAH_PRODUCTS } from '../components/EnarahProductsCarousel'
+import { CinematicStatsGrid } from '../components/ui/StatReveal'
+import { SequentialRevealGroup, SequentialRevealItem } from '../components/ui/SequentialReveal'
 
 // Lazy load GameEngine for instant interactive play on homepage without heavy initial bundle
 const GameEngine = React.lazy(() =>
@@ -235,62 +237,19 @@ const GLOBAL_BRANDS = [
 ]
 
 /* =========================================================================
-   SyncedStats: all numbers share ONE animation clock & ONE trigger,
-   so they start together and land on their final values at the same moment.
+   SyncedStats: "Static Numbers, Cinematic Reveal"
+   Zero count-up or jumping digits. Displays final numbers immediately with
+   subtle architectural reveal and fine divider lines.
    ========================================================================= */
 
-type StatItem = { value: number; prefix?: string; label: string }
+type StatItem = { value: number; prefix?: string; suffix?: string; label: string }
 
-function SyncedStats({ items, duration = 2200 }: { items: StatItem[]; duration?: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    let raf = 0
-
-    const run = () => {
-      const start = performance.now()
-      const tick = (now: number) => {
-        const t = Math.min((now - start) / duration, 1)
-        setProgress(1 - Math.pow(1 - t, 3)) // easeOutCubic — shared by all numbers
-        if (t < 1) raf = requestAnimationFrame(tick)
-      }
-      raf = requestAnimationFrame(tick)
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          observer.disconnect()
-          run()
-        }
-      },
-      { threshold: 0.5 }
-    )
-    observer.observe(el)
-
-    return () => {
-      observer.disconnect()
-      cancelAnimationFrame(raf)
-    }
-  }, [duration])
-
+function SyncedStats({ items }: { items: StatItem[]; duration?: number }) {
   return (
-    <div ref={ref} className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-[#E7EAF0]">
-      {items.map((item) => (
-        <div key={item.label}>
-          <span className="text-2xl sm:text-3xl font-bold text-[#0062D2] tracking-tight block">
-            <span className="tabular-nums" dir="ltr">
-              {item.prefix}
-              {Math.round(progress * item.value)}
-            </span>
-          </span>
-          <span className="text-xs sm:text-sm text-[#68717D] mt-1 block">{item.label}</span>
-        </div>
-      ))}
-    </div>
+    <CinematicStatsGrid
+      items={items}
+      className="pt-8 mt-8 border-t border-[#E7EAF0]"
+    />
   )
 }
 
@@ -873,79 +832,122 @@ export default function Home() {
       </section>
 
       {/* =====================================================================
-          SECTION 02: Trust Bar (Credibility Strip)
-          Minimal horizontal strip, brand royal blue accents (#0062D2), refined typography
-          Content: منذ 1988 · علامات عالمية · حلول للمشاريع · خبرة فنية متخصصة
+          SECTION 02: Company Highlights (Typography-First Corporate Strip)
+          Direction: Swiss Minimalism meets Premium Corporate Typography.
+          Pure white background, 4 balanced columns, thin light-gray separators.
+          Zero decorative lines, zero icons, zero dots, zero shapes.
+          Selective ENARAH blue on meaningful words, deep navy base, subtle hover transitions.
           ===================================================================== */}
-      <section className="bg-[#FFFFFF] border-b border-[#E7EAF0] py-7 sm:py-9 relative shadow-[0_4px_20px_-10px_rgba(0,98,210,0.04)]">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 items-center divide-y lg:divide-y-0 lg:divide-x lg:divide-x-reverse divide-[#E7EAF0]">
+      <section className="bg-white border-y border-[#E5E7EB] py-7 sm:py-9 lg:py-10 relative">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
+          <SequentialRevealGroup
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+            staggerDelay={100}
+            duration={350}
+            distance={6}
+          >
             
-            {/* Item 1: منذ 1988 */}
-            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
-              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
-                <Award className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
-                  {isAr ? (
-                    <>منذ <span className="text-[#0062D2] font-black">1988</span></>
-                  ) : (
-                    <>Since <span className="text-[#0062D2] font-black">1988</span></>
-                  )}
-                </h3>
-                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
-                  {isAr ? 'أكثر من ثلاثة عقود من الريادة المعمارية' : 'Over three decades of architectural leadership'}
-                </p>
-              </div>
-            </div>
+            {/* Column 01: منذ 1988 */}
+            <SequentialRevealItem
+              index={0}
+              className="p-5 sm:p-6 lg:py-7 lg:px-7 xl:px-8 flex flex-col items-start text-start justify-center group sm:border-e border-[#E5E7EB] border-b sm:border-b lg:border-b-0"
+            >
+              <h3 className="text-lg sm:text-xl lg:text-[21px] font-bold font-sans tracking-tight leading-snug">
+                {isAr ? (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">منذ </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] tabular-nums transition-colors duration-200">1988</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">Since </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] tabular-nums transition-colors duration-200">1988</span>
+                  </>
+                )}
+              </h3>
+              <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#64748B] group-hover:text-[#475569] font-sans font-normal leading-relaxed mt-2 sm:mt-2.5 transition-colors duration-200">
+                {isAr
+                  ? 'أكثر من ثلاثة عقود من الريادة المعمارية في حلول الإنارة والتأسيس'
+                  : 'Over three decades of architectural leadership in lighting and electrical systems'}
+              </p>
+            </SequentialRevealItem>
 
-            {/* Item 2: علامات عالمية */}
-            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
-              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
-                <Globe className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
-                  {isAr ? 'علامات عالمية' : 'Global Brands'}
-                </h3>
-                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
-                  {isAr ? 'شراكات مع رواد الصناعة الأوروبية والدولية' : 'Partnerships with European & global industry leaders'}
-                </p>
-              </div>
-            </div>
+            {/* Column 02: علامات عالمية */}
+            <SequentialRevealItem
+              index={1}
+              className="p-5 sm:p-6 lg:py-7 lg:px-7 xl:px-8 flex flex-col items-start text-start justify-center group border-b border-[#E5E7EB] sm:border-b lg:border-b-0 lg:border-e"
+            >
+              <h3 className="text-lg sm:text-xl lg:text-[21px] font-bold font-sans tracking-tight leading-snug">
+                {isAr ? (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">علامات </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] transition-colors duration-200">عالمية</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">Global </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] transition-colors duration-200">Brands</span>
+                  </>
+                )}
+              </h3>
+              <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#64748B] group-hover:text-[#475569] font-sans font-normal leading-relaxed mt-2 sm:mt-2.5 transition-colors duration-200">
+                {isAr
+                  ? 'شراكات مع رواد الصناعة الأوروبية والدولية'
+                  : 'Partnerships with European & global industry leaders'}
+              </p>
+            </SequentialRevealItem>
 
-            {/* Item 3: حلول للمشاريع */}
-            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
-              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
-                <Building2 className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
-                  {isAr ? 'حلول للمشاريع' : 'Project Solutions'}
-                </h3>
-                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
-                  {isAr ? 'توريد هندسي متكامل للمباني والمجمعات والفلل' : 'Integrated engineering supply for commercial & residential'}
-                </p>
-              </div>
-            </div>
+            {/* Column 03: خبرة فنية متخصصة */}
+            <SequentialRevealItem
+              index={2}
+              className="p-5 sm:p-6 lg:py-7 lg:px-7 xl:px-8 flex flex-col items-start text-start justify-center group sm:border-e border-[#E5E7EB] border-b sm:border-b-0"
+            >
+              <h3 className="text-lg sm:text-xl lg:text-[21px] font-bold font-sans tracking-tight leading-snug">
+                {isAr ? (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">خبرة فنية </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] transition-colors duration-200">متخصصة</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">Technical </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] transition-colors duration-200">Expertise</span>
+                  </>
+                )}
+              </h3>
+              <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#64748B] group-hover:text-[#475569] font-sans font-normal leading-relaxed mt-2 sm:mt-2.5 transition-colors duration-200">
+                {isAr
+                  ? 'استشارات معمارية وتوزيع ضوئي هندسي دقيق'
+                  : 'Architectural consulting and photometric lighting design'}
+              </p>
+            </SequentialRevealItem>
 
-            {/* Item 4: خبرة فنية متخصصة */}
-            <div className="pt-4 lg:pt-0 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-3 px-2 lg:px-3 group cursor-default">
-              <div className="w-10 h-10 rounded-xl bg-[#0062D2]/[0.08] border border-[#0062D2]/15 flex items-center justify-center text-[#0062D2] shrink-0 group-hover:bg-[#0062D2] group-hover:text-white group-hover:border-[#0062D2] transition-all duration-300 shadow-sm">
-                <Lightbulb className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <h3 className="text-lg sm:text-xl font-bold text-[#15191E] font-sans leading-snug whitespace-nowrap group-hover:text-[#0062D2] transition-colors duration-200">
-                  {isAr ? 'خبرة فنية متخصصة' : 'Technical Expertise'}
-                </h3>
-                <p className="text-xs sm:text-[13px] text-[#5A6474] mt-1 font-normal leading-relaxed">
-                  {isAr ? 'استشارات معمارية وتوزيع ضوئي هندسي دقيق' : 'Architectural consulting and photometric lighting design'}
-                </p>
-              </div>
-            </div>
+            {/* Column 04: حلول للمشاريع */}
+            <SequentialRevealItem
+              index={3}
+              className="p-5 sm:p-6 lg:py-7 lg:px-7 xl:px-8 flex flex-col items-start text-start justify-center group"
+            >
+              <h3 className="text-lg sm:text-xl lg:text-[21px] font-bold font-sans tracking-tight leading-snug">
+                {isAr ? (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">حلول </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] transition-colors duration-200">للمشاريع</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[#0B192C] group-hover:text-[#050D18] transition-colors duration-200">Project </span>
+                    <span className="text-[#0062D2] group-hover:text-[#004BB5] transition-colors duration-200">Solutions</span>
+                  </>
+                )}
+              </h3>
+              <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#64748B] group-hover:text-[#475569] font-sans font-normal leading-relaxed mt-2 sm:mt-2.5 transition-colors duration-200">
+                {isAr
+                  ? 'توريد هندسي متكامل للمباني والمجمعات والفلل'
+                  : 'Integrated engineering supply for commercial & residential'}
+              </p>
+            </SequentialRevealItem>
 
-          </div>
+          </SequentialRevealGroup>
         </div>
       </section>
 
@@ -1004,35 +1006,40 @@ export default function Home() {
             </div>
 
             {/* Editorial Story Content (7 cols) */}
-            <div className="lg:col-span-7 flex flex-col justify-center">
-              <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
-                SINCE 1988
-              </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight leading-[1.15] mb-6">
-                خبرة بُنيت على الضوء
-              </h2>
+            <SequentialRevealGroup className="lg:col-span-7 flex flex-col justify-center" staggerDelay={100} duration={350} distance={6}>
+              <SequentialRevealItem index={0}>
+                <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-3">
+                  SINCE 1988
+                </span>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight leading-[1.15] mb-6">
+                  خبرة بُنيت على الضوء
+                </h2>
+              </SequentialRevealItem>
 
-              <div className="space-y-4 text-base sm:text-lg text-[#68717D] leading-relaxed font-normal">
-                <p>
-                  منذ تأسيس شركة الإنارة عام 1988، انطلقنا برؤية معمارية تضع الضوء في قلب التصميم الداخلي والخارجي كعنصر هندسي أصيل يشكّل الفراغ ويحدد شخصيته.
-                </p>
-                <p>
-                  لأكثر من ثلاثة عقود، واكبنا تطور تقنيات الإنارة العالمية وشيّدنا شراكات استراتيجية متينة مع كبرى العلامات الأوروبية والدولية. نجمع بين الدقة الهندسية والذوق الجمالي لنقدم للمهندسين والمقاولين وأصحاب المنازل حلولاً كهربائية متكاملة ترتقي بالمكان وتمنحه حضوراً استثنائياً يدوم.
-                </p>
-              </div>
+              <SequentialRevealItem index={1}>
+                <div className="space-y-4 text-base sm:text-lg text-[#68717D] leading-relaxed font-normal mb-8">
+                  <p>
+                    منذ تأسيس شركة الإنارة عام 1988، انطلقنا برؤية معمارية تضع الضوء في قلب التصميم الداخلي والخارجي كعنصر هندسي أصيل يشكّل الفراغ ويحدد شخصيته.
+                  </p>
+                  <p>
+                    لأكثر من ثلاثة عقود، واكبنا تطور تقنيات الإنارة العالمية وشيّدنا شراكات استراتيجية متينة مع كبرى العلامات الأوروبية والدولية. نجمع بين الدقة الهندسية والذوق الجمالي لنقدم للمهندسين والمقاولين وأصحاب المنازل حلولاً كهربائية متكاملة ترتقي بالمكان وتمنحه حضوراً استثنائياً يدوم.
+                  </p>
+                </div>
+              </SequentialRevealItem>
 
-              {/* Three minimalist stats — synchronized count-up */}
-              <SyncedStats
-                duration={2200}
-                items={[
-                  { value: 35, prefix: '+', label: 'عاماً من الريادة' },
-                  { value: 500, prefix: '+', label: 'مشروع تم تنفيذه' },
-                  { value: 15, prefix: '+', label: 'علامة عالمية معتمدة' }
-                ]}
-              />
+              {/* Three minimalist stats — Static Numbers, Cinematic Reveal */}
+              <SequentialRevealItem index={2}>
+                <SyncedStats
+                  items={[
+                    { value: 35, prefix: '+', label: 'عاماً من الريادة' },
+                    { value: 500, prefix: '+', label: 'مشروع تم تنفيذه' },
+                    { value: 15, prefix: '+', label: 'علامة عالمية معتمدة' }
+                  ]}
+                />
+              </SequentialRevealItem>
 
               {/* CTA */}
-              <div className="mt-10">
+              <SequentialRevealItem index={3} className="mt-10">
                 <Link
                   to="/about"
                   className="inline-flex items-center gap-2.5 px-6 py-3 bg-[#15191E] hover:bg-[#0062D2] text-white text-sm font-semibold rounded-full transition-colors duration-200"
@@ -1040,8 +1047,8 @@ export default function Home() {
                   <span>تعرف على شركة الإنارة</span>
                   <ArrowLeft className="w-4 h-4" />
                 </Link>
-              </div>
-            </div>
+              </SequentialRevealItem>
+            </SequentialRevealGroup>
           </div>
         </div>
       </section>
@@ -2241,34 +2248,37 @@ export default function Home() {
           ===================================================================== */}
       <section className="py-24 sm:py-32 bg-[#F7F8FA] border-t border-[#E7EAF0]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div>
+          <SequentialRevealGroup className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6" staggerDelay={100} duration={350} distance={6}>
+            <SequentialRevealItem index={0}>
               <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
                 SELECTED PROJECTS
               </span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#15191E] tracking-tight">
                 مشاريع تتحدث بلغة الضوء
               </h2>
-            </div>
-            <Link
-              to="/projects"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors group"
-            >
-              <span>استكشف جميع المشاريع</span>
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            </Link>
-          </div>
+            </SequentialRevealItem>
+            <SequentialRevealItem index={1}>
+              <Link
+                to="/projects"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[#0062D2] hover:text-[#0047A5] transition-colors group"
+              >
+                <span>استكشف جميع المشاريع</span>
+                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              </Link>
+            </SequentialRevealItem>
+          </SequentialRevealGroup>
 
           {/* Editorial Grid: 4 Selected Master Projects (Alternating 60/40 & Asymmetric) */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <SequentialRevealGroup className="grid grid-cols-1 md:grid-cols-12 gap-8" staggerDelay={90} duration={350} distance={6}>
             {INITIAL_PROJECTS.slice(0, 4).map((p, idx) => {
               // Asymmetric desktop span: 0 & 3 take 7 cols, 1 & 2 take 5 cols
               const spanClass =
                 idx === 0 || idx === 3 ? 'md:col-span-7 aspect-[16/10]' : 'md:col-span-5 aspect-[4/3]'
 
               return (
-                <div
+                <SequentialRevealItem
                   key={p.id}
+                  index={idx}
                   onClick={() => {
                     setSelectedProject(p)
                     setActiveProjectImgIndex(0)
@@ -2305,10 +2315,10 @@ export default function Home() {
                       <ArrowUpRight className="w-5 h-5" />
                     </div>
                   </div>
-                </div>
+                </SequentialRevealItem>
               )
             })}
-          </div>
+          </SequentialRevealGroup>
         </div>
       </section>
 

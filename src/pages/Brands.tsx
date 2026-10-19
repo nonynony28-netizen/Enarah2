@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, MessageCircle, Phone, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
+import { StatReveal } from '../components/ui/StatReveal'
+import { SequentialRevealGroup, SequentialRevealItem } from '../components/ui/SequentialReveal'
 
 export interface BrandItem {
   id: string
@@ -19,64 +21,9 @@ export interface BrandItem {
 }
 
 /**
- * Animated Counter Component
- * Lightweight, accessible, respects prefers-reduced-motion, with smooth deceleration curve.
+ * AnimatedCounter alias mapping to StatReveal (Static Numbers, Cinematic Reveal)
  */
-function AnimatedCounter({ target, suffix = '', duration = 1200 }: { target: number; suffix?: string; duration?: number }) {
-  const [displayValue, setDisplayValue] = useState(0)
-  const elementRef = useRef<HTMLSpanElement>(null)
-  const hasAnimatedRef = useRef(false)
-
-  useEffect(() => {
-    // Respect prefers-reduced-motion
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setDisplayValue(target)
-      hasAnimatedRef.current = true
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimatedRef.current) {
-          hasAnimatedRef.current = true
-          const startTime = performance.now()
-
-          const step = (currentTime: number) => {
-            const elapsed = currentTime - startTime
-            const progress = Math.min(elapsed / duration, 1)
-            // Ease-out cubic curve
-            const easeOut = 1 - Math.pow(1 - progress, 3)
-            const current = Math.round(easeOut * target)
-            setDisplayValue(current)
-
-            if (progress < 1) {
-              requestAnimationFrame(step)
-            } else {
-              setDisplayValue(target)
-            }
-          }
-
-          requestAnimationFrame(step)
-        }
-      },
-      { threshold: 0.2 }
-    )
-
-    const el = elementRef.current
-    if (el) observer.observe(el)
-
-    return () => {
-      if (el) observer.unobserve(el)
-    }
-  }, [target, duration])
-
-  return (
-    <span ref={elementRef} className="tabular-nums font-sans inline-block" dir="ltr">
-      {hasAnimatedRef.current ? displayValue : target}
-      {suffix}
-    </span>
-  )
-}
+const AnimatedCounter = StatReveal
 
 export default function Brands() {
   const { isAr } = useLanguage()
@@ -318,30 +265,30 @@ export default function Brands() {
         <div className="absolute -top-32 -left-32 w-80 h-80 bg-[#0066FF]/15 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12">
+          <SequentialRevealGroup className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12" staggerDelay={100} duration={350} distance={6}>
             
             {/* Narrative & Heading */}
             <div className="max-w-2xl space-y-4 sm:space-y-5">
               {/* Refined Eyebrow */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10">
+              <SequentialRevealItem index={0} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                 <span>{isAr ? 'شراكات وتوكيلات معتمدة في ليبيا' : 'Authorized Brand Partnerships in Libya'}</span>
-              </div>
+              </SequentialRevealItem>
 
               {/* Exact Heading: Confident, Balanced, Refined Sizing */}
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-[1.25] text-white">
+              <SequentialRevealItem index={1} as="h1" className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-[1.25] text-white">
                 {isAr ? 'علامات تجارية عالمية بمواصفات قياسية' : 'World-Class Electrical & Lighting Brands'}
-              </h1>
+              </SequentialRevealItem>
 
               {/* Business Description: Improved Line Length, Comfortable Line Height */}
-              <p className="text-sm sm:text-[15px] lg:text-base text-slate-300 leading-relaxed font-normal max-w-xl">
+              <SequentialRevealItem index={2} as="p" className="text-sm sm:text-[15px] lg:text-base text-slate-300 leading-relaxed font-normal max-w-xl">
                 {isAr
                   ? 'نحرص في شركة الإنارة الحديثة منذ عام 1988 على توريد كبرى العلامات العالمية والأوروبية والتركية الحاصلة على شهادات الجودة والأمان الدولية للمشاريع السكنية والتجارية.'
                   : 'Since 1988, Enarah Modern has partnered with top-tier global, European, and Turkish brands certified for maximum safety and performance in residential and commercial infrastructure.'}
-              </p>
+              </SequentialRevealItem>
 
               {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-xs text-slate-300 font-normal">
+              <SequentialRevealItem index={3} className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-xs text-slate-300 font-normal">
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                   <span>{isAr ? 'منتجات أصلية 100%' : '100% Authentic Products'}</span>
@@ -354,52 +301,57 @@ export default function Brands() {
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                   <span>{isAr ? 'توريد موثق في بنغازي وليبيا' : 'Benghazi & Libya Supply'}</span>
                 </div>
-              </div>
+              </SequentialRevealItem>
             </div>
 
             {/* Redesigned Statistics Panel: Compact Horizontal Composition, Clear Hierarchy, Subtle Separators */}
-            <div className="w-full lg:w-auto shrink-0">
+            <SequentialRevealItem index={4} className="w-full lg:w-auto shrink-0">
               <div className="bg-[#111C2E]/90 border border-white/10 rounded-2xl p-4 sm:p-5 lg:min-w-[360px] shadow-sm">
-                <div className="text-[11px] font-mono tracking-wider text-blue-400 uppercase mb-3.5 pb-2.5 border-b border-white/10 flex items-center justify-between">
-                  <span>{isAr ? 'مؤشرات الشراكة والتوثيق' : 'PARTNERSHIP METRICS'}</span>
-                  <span className="text-slate-400 font-sans normal-case text-[11px]">1988 — 2026</span>
+                <div className="text-[11px] text-blue-400 mb-3.5 pb-2.5 border-b border-white/10 flex items-center justify-between">
+                  <span className={isAr ? "font-sans font-semibold tracking-normal" : "font-mono tracking-wider uppercase"}>
+                    {isAr ? 'مؤشرات الشراكة والتوثيق' : 'PARTNERSHIP METRICS'}
+                  </span>
+                  <span className="text-slate-400 font-sans normal-case text-[11px] tabular-nums" dir="ltr">1988 — 2026</span>
                 </div>
 
                 <div className="grid grid-cols-3 divide-x divide-x-reverse divide-white/10 text-center">
                   {/* Metric 1: 14+ Brands */}
-                  <div className="px-2 sm:px-3">
-                    <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans" dir="ltr">
-                      <AnimatedCounter target={14} suffix="+" />
-                    </div>
-                    <span className="text-xs text-slate-300 font-medium block mt-1">
-                      {isAr ? 'علامة معتمدة' : 'Brands'}
-                    </span>
-                  </div>
+                  <StatReveal
+                    value={14}
+                    suffix="+"
+                    delay={0}
+                    label={isAr ? 'علامة معتمدة' : 'Brands'}
+                    className="px-2 sm:px-3"
+                    numberClassName="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans block"
+                    labelClassName="text-xs text-slate-300 font-medium block mt-1"
+                  />
 
                   {/* Metric 2: 38+ Years of Experience (Updated from 35+) */}
-                  <div className="px-2 sm:px-3">
-                    <div className="text-2xl sm:text-3xl font-bold text-blue-400 tracking-tight font-sans" dir="ltr">
-                      <AnimatedCounter target={38} suffix="+" />
-                    </div>
-                    <span className="text-xs text-slate-300 font-medium block mt-1">
-                      {isAr ? 'عاماً من الخبرة' : 'Years Experience'}
-                    </span>
-                  </div>
+                  <StatReveal
+                    value={38}
+                    suffix="+"
+                    delay={60}
+                    label={isAr ? 'عاماً من الخبرة' : 'Years Experience'}
+                    className="px-2 sm:px-3"
+                    numberClassName="text-2xl sm:text-3xl font-bold text-blue-400 tracking-tight font-sans block"
+                    labelClassName="text-xs text-slate-300 font-medium block mt-1"
+                  />
 
                   {/* Metric 3: 100% Quality & Verification */}
-                  <div className="px-2 sm:px-3">
-                    <div className="text-2xl sm:text-3xl font-bold text-emerald-400 tracking-tight font-sans" dir="ltr">
-                      <AnimatedCounter target={100} suffix="%" />
-                    </div>
-                    <span className="text-xs text-slate-300 font-medium block mt-1">
-                      {isAr ? 'جودة وتوثيق' : 'Verified Quality'}
-                    </span>
-                  </div>
+                  <StatReveal
+                    value={100}
+                    suffix="%"
+                    delay={120}
+                    label={isAr ? 'جودة وتوثيق' : 'Verified Quality'}
+                    className="px-2 sm:px-3"
+                    numberClassName="text-2xl sm:text-3xl font-bold text-emerald-400 tracking-tight font-sans block"
+                    labelClassName="text-xs text-slate-300 font-medium block mt-1"
+                  />
                 </div>
               </div>
-            </div>
+            </SequentialRevealItem>
 
-          </div>
+          </SequentialRevealGroup>
         </div>
       </section>
 
