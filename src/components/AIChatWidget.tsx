@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Lightbulb, X, Send, Bot, Loader2 } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 
 type Message = {
   id: string
@@ -16,6 +17,9 @@ export default function AIChatWidget() {
   const location = useLocation()
   if (location.pathname.startsWith('/game')) return null
   const [isOpen, setIsOpen] = useState(false)
+
+  // Lock body scroll cleanly on mobile when chat overlay is open
+  useBodyScrollLock(isOpen)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -155,13 +159,13 @@ export default function AIChatWidget() {
 
   return (
     <>
-      {/* زر الشات العائم - مكدس عمودياً فوق زر الواتساب لتوفير المساحة */}
-      <div className={`fixed bottom-[76px] right-5 z-50 flex items-center gap-2.5 transition-all duration-700 ${
+      {/* زر الشات العائم - مكدس عمودياً فوق زر الواتساب لتوفير المساحة مع دعم مناطق الأمان */}
+      <div className={`fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] right-[calc(1.25rem+env(safe-area-inset-right,0px))] z-40 flex items-center gap-2.5 transition-all duration-300 ${
         heroVideoFinished ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-75 pointer-events-none'
       } ${
         isAr ? 'flex-row-reverse' : 'flex-row'
       }`}>
-        {/* فقاعة المحادثة الإبداعية "مساعدك الذكي" */}
+        {/* فقاعة المحادثة الإبداعية "مساعدك الذكي" - تظهر للشاشات الأكبر فقط لمنع حجب محتوى الجوال */}
         <AnimatePresence>
           {!isOpen && (
             <motion.div
@@ -170,7 +174,7 @@ export default function AIChatWidget() {
               exit={{ opacity: 0, x: 10, scale: 0.9 }}
               transition={{ delay: 0.5, duration: 0.4 }}
               onClick={() => setIsOpen(true)}
-              className="relative px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-800 text-[11px] font-bold whitespace-nowrap shadow-lg flex items-center gap-1.5 select-none cursor-pointer hover:bg-slate-50 hover:border-blue-500/50 transition-all duration-300"
+              className="hidden sm:flex relative px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-800 text-[11px] font-bold whitespace-nowrap shadow-lg items-center gap-1.5 select-none cursor-pointer hover:bg-slate-50 hover:border-blue-500/50 transition-all duration-300"
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -185,7 +189,7 @@ export default function AIChatWidget() {
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center text-white shadow-md shadow-blue-600/30 hover:shadow-lg hover:shadow-blue-600/40 hover:scale-108 active:scale-95 transition-all duration-300 group"
+          className="relative w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center text-white shadow-md shadow-blue-600/30 hover:shadow-lg hover:shadow-blue-600/40 hover:scale-108 active:scale-95 transition-all duration-300 group cursor-pointer"
           aria-label="مساعد الذكاء الاصطناعي"
         >
           <AnimatePresence mode="wait">
@@ -224,8 +228,8 @@ export default function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className={`fixed bottom-5 z-50 w-auto md:w-[400px] h-[480px] md:h-[600px] max-h-[85vh] bg-white/98 backdrop-blur-xl border border-slate-200 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
-              isAr ? 'left-4 right-4 md:left-auto md:right-5 text-right' : 'left-4 right-4 md:right-auto md:left-5 text-left'
+            className={`fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] z-[100] w-[calc(100vw-2rem)] sm:w-[400px] h-[min(520px,calc(100dvh-3rem))] max-h-[85vh] bg-white/98 backdrop-blur-xl border border-slate-200 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden ${
+              isAr ? 'right-4 sm:right-5 left-4 sm:left-auto text-right' : 'left-4 sm:left-5 right-4 sm:right-auto text-left'
             }`}
           >
             {/* رأس شات نافذة المساعد الذكي */}

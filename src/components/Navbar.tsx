@@ -16,6 +16,7 @@ import {
   Zap
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -23,6 +24,21 @@ export default function Navbar() {
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const location = useLocation()
   const { isAr } = useLanguage()
+
+  // Safely lock background scrolling when mobile navigation drawer is active
+  useBodyScrollLock(mobileMenuOpen)
+
+  // Close mobile drawer or dropdown on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false)
+        setDropdownOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   // Primary direct navigation links
   const primaryLinks = [
@@ -233,29 +249,30 @@ export default function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-[#15191E] hover:bg-slate-100 transition-colors cursor-pointer"
-            aria-label="القائمة"
+            className="lg:hidden min-w-[44px] min-h-[44px] p-2.5 flex items-center justify-center rounded-xl text-[#15191E] hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+            aria-label={isAr ? (mobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة') : (mobileMenuOpen ? 'Close menu' : 'Open menu')}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Menu (True Mobile UX: 100dvh, Touch Targets >= 44px, Safe Areas) */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-[57px] bottom-0 z-[100] overflow-y-auto bg-white text-[#15191E] px-6 py-8 shadow-2xl lg:hidden"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="fixed inset-x-0 top-[58px] h-[calc(100dvh-58px)] z-[100] overflow-y-auto overscroll-contain bg-white text-[#15191E] px-4 sm:px-6 pt-3 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl lg:hidden flex flex-col justify-between"
           >
-            <div className="flex flex-col gap-4 text-base font-semibold">
+            <div className="flex flex-col gap-2 text-base font-semibold">
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`py-2 px-3 rounded-lg transition-colors flex items-center justify-between ${
+                className={`min-h-[44px] py-2.5 px-3.5 rounded-xl transition-colors flex items-center justify-between ${
                   location.pathname === '/' ? 'bg-blue-50 text-[#0062D2]' : 'hover:bg-slate-50'
                 }`}
               >
@@ -267,7 +284,7 @@ export default function Navbar() {
                   key={link.path}
                   to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-3 rounded-lg transition-colors flex items-center justify-between ${
+                  className={`min-h-[44px] py-2.5 px-3.5 rounded-xl transition-colors flex items-center justify-between ${
                     isActive(link.path) ? 'bg-blue-50 text-[#0062D2]' : 'hover:bg-slate-50'
                   }`}
                 >
@@ -278,7 +295,7 @@ export default function Navbar() {
 
               {/* أقسام إضافية في الجوال */}
               <div className="pt-3 pb-1 border-t border-slate-100 my-1">
-                <span className="text-xs font-semibold text-[#68717D] uppercase tracking-wider px-3 block mb-2">
+                <span className="text-[11px] font-bold text-[#68717D] uppercase tracking-wider px-3 block mb-2">
                   {isAr ? 'أقسام وخدمات إضافية' : 'Additional Sections'}
                 </span>
                 <div className="space-y-1">
@@ -287,12 +304,12 @@ export default function Navbar() {
                       key={link.path}
                       to={link.path}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-between ${
-                        isActive(link.path) ? 'bg-blue-50 text-[#0062D2]' : 'text-[#475569] hover:bg-slate-50'
+                      className={`min-h-[44px] py-2 px-3 rounded-xl text-sm transition-colors flex items-center justify-between ${
+                        isActive(link.path) ? 'bg-blue-50 text-[#0062D2] font-semibold' : 'text-[#475569] hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <link.icon className="w-4 h-4 text-[#0062D2]" />
+                        <link.icon className="w-4 h-4 text-[#0062D2] shrink-0" />
                         <span>{link.label}</span>
                         {link.badge && (
                           <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-200">
@@ -300,21 +317,21 @@ export default function Navbar() {
                           </span>
                         )}
                       </div>
-                      {isAr ? <ArrowLeft className="w-3.5 h-3.5 opacity-40" /> : <ArrowRight className="w-3.5 h-3.5 opacity-40" />}
+                      {isAr ? <ArrowLeft className="w-3.5 h-3.5 opacity-40 shrink-0" /> : <ArrowRight className="w-3.5 h-3.5 opacity-40 shrink-0" />}
                     </Link>
                   ))}
                 </div>
               </div>
+            </div>
 
-              <div className="pt-4 border-t border-slate-100">
-                <Link
-                  to="/contact"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-3.5 rounded-full bg-[#0062D2] text-white font-semibold text-center block shadow-sm hover:bg-[#0047A5] transition-colors"
-                >
-                  {isAr ? 'تواصل معنا' : 'Contact Us'}
-                </Link>
-              </div>
+            <div className="pt-4 mt-4 border-t border-slate-100">
+              <Link
+                to="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full min-h-[48px] py-3 rounded-full bg-[#0062D2] text-white font-semibold text-center flex items-center justify-center shadow-sm hover:bg-[#0047A5] active:scale-98 transition-all"
+              >
+                {isAr ? 'تواصل معنا' : 'Contact Us'}
+              </Link>
             </div>
           </motion.div>
         )}

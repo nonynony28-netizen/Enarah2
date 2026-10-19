@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import type { ProjectItem } from '../data/projectsData'
 import {
   getLocalizedProject,
@@ -69,6 +70,9 @@ export default function Projects() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+
+  // Safely lock background scrolling when project lightbox modal is active
+  useBodyScrollLock(!!selectedProject)
 
   // جلب المشاريع من لوحة التحكم ديناميكياً مع المزامنة الذكية
   useEffect(() => {
@@ -451,27 +455,27 @@ export default function Projects() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 lg:p-8 bg-black/90 backdrop-blur-md"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-0 sm:p-6 bg-black/95 backdrop-blur-md"
             onClick={() => setSelectedProject(null)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              exit={{ scale: 0.98, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-4xl max-h-[92vh] bg-[#101820] text-white rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col"
+              className="relative w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] max-w-4xl bg-[#101820] text-white rounded-none sm:rounded-2xl overflow-y-auto sm:overflow-hidden border-0 sm:border sm:border-white/10 shadow-2xl flex flex-col"
             >
-              {/* Close Button */}
+              {/* Close Button with >= 44px Touch Target & Safe Area Support */}
               <button
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/15"
+                className="absolute top-[max(0.75rem,env(safe-area-inset-top,0.75rem))] left-4 z-30 min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20"
                 aria-label={isAr ? 'إغلاق' : 'Close'}
               >
                 <X className="w-5 h-5" />
               </button>
 
               {/* Main Image Display */}
-              <div className="relative aspect-[16/10] w-full bg-black overflow-hidden flex items-center justify-center">
+              <div className="relative aspect-[16/10] max-h-[48vh] sm:max-h-[60vh] w-full bg-black overflow-hidden flex items-center justify-center shrink-0">
                 {(() => {
                   const imgs = (selectedProject.image || selectedProject.coverImage)
                     .split(',')
@@ -502,7 +506,7 @@ export default function Projects() {
                             (prev) => (prev - 1 + imgs.length) % imgs.length
                           )
                         }
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/15"
+                        className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 z-10"
                         aria-label={isAr ? 'الصورة السابقة' : 'Previous Image'}
                       >
                         <ChevronRight className="w-5 h-5" />
@@ -511,7 +515,7 @@ export default function Projects() {
                         onClick={() =>
                           setActiveImageIndex((prev) => (prev + 1) % imgs.length)
                         }
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/15"
+                        className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 z-10"
                         aria-label={isAr ? 'الصورة التالية' : 'Next Image'}
                       >
                         <ChevronLeft className="w-5 h-5" />
@@ -522,8 +526,8 @@ export default function Projects() {
               </div>
 
               {/* Lightbox Footer Info & Thumbnails */}
-              <div className="p-6 bg-[#15191E] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10" dir={isAr ? 'rtl' : 'ltr'}>
-                <div className="text-right w-full sm:w-auto space-y-1">
+              <div className="p-5 sm:p-6 bg-[#15191E] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10 flex-1 sm:flex-initial pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-6" dir={isAr ? 'rtl' : 'ltr'}>
+                <div className="text-right w-full sm:w-auto space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-[#0062D2] font-semibold">
                       {selectedProject.category}
@@ -533,21 +537,21 @@ export default function Projects() {
                       {isAr ? 'مشروع موثق' : 'Verified Case Study'}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-white">{selectedProject.name}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-white leading-snug">{selectedProject.name}</h3>
                   {selectedProject.description && (
-                    <p className="text-xs text-slate-300 max-w-lg leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-300 max-w-lg leading-relaxed">
                       {selectedProject.description}
                     </p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-between sm:justify-start pt-2 sm:pt-0">
                   {selectedProject.video && (
                     <a
                       href={selectedProject.video}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
+                      className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-[#0062D2] hover:bg-[#0047A5] text-white text-xs font-semibold rounded-xl transition-all shadow-xs"
                     >
                       <PlayCircle className="w-4 h-4" />
                       <span>{isAr ? 'مشاهدة الفيديو' : 'Watch Video'}</span>
@@ -562,12 +566,12 @@ export default function Projects() {
                       .filter(Boolean)
                     if (imgs.length <= 1) return null
                     return (
-                      <div className="flex items-center gap-2 overflow-x-auto max-w-xs pb-1">
+                      <div className="flex items-center gap-2 overflow-x-auto max-w-full sm:max-w-xs pb-1">
                         {imgs.map((img, i) => (
                           <button
                             key={i}
                             onClick={() => setActiveImageIndex(i)}
-                            className={`w-12 h-10 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                            className={`min-h-[44px] min-w-[48px] w-12 h-11 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
                               i === activeImageIndex
                                 ? 'border-[#0062D2] scale-105'
                                 : 'border-white/20 opacity-60 hover:opacity-100'

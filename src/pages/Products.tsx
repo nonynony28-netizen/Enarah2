@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom'
 import { VERIFIED_WIRES, type WireProduct } from '../data/wiresData'
 import { ItalianFlag, TurkishFlag, OriginFlagBadge } from '../components/CountryFlags'
 import { useLanguage } from '../hooks/useLanguage'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 
 export default function Products() {
   const { isAr } = useLanguage()
@@ -24,6 +25,9 @@ export default function Products() {
   const [sortBy, setSortBy] = useState<string>('default')
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
   const [activeModalProduct, setActiveModalProduct] = useState<WireProduct | null>(null)
+
+  // Safely lock background scrolling when mobile filter drawer is open
+  useBodyScrollLock(mobileFilterOpen)
 
   // Filter Options derived from real data
   const origins = [
@@ -114,17 +118,7 @@ export default function Products() {
     window.open(`https://wa.me/218916580068?text=${encodeURIComponent(text)}`, '_blank')
   }
 
-  // Prevent body scroll when mobile filter drawer is open
-  useEffect(() => {
-    if (mobileFilterOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [mobileFilterOpen])
+
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#15191E] font-sans pb-20">
@@ -537,17 +531,17 @@ export default function Products() {
               animate={{ x: 0 }}
               exit={{ x: isAr ? 340 : -340 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
-              className={`fixed inset-y-0 ${isAr ? 'right-0' : 'left-0'} z-[130] w-full max-w-[320px] bg-white p-5 sm:p-6 flex flex-col justify-between overflow-y-auto shadow-2xl`}
+              className={`fixed inset-y-0 ${isAr ? 'right-0' : 'left-0'} z-[130] w-full max-w-[min(320px,100vw)] bg-white p-5 sm:p-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] flex flex-col justify-between overflow-y-auto overscroll-contain shadow-2xl`}
               dir={isAr ? 'rtl' : 'ltr'}
             >
               <div>
-                <div className="sticky top-0 bg-white flex items-center justify-between pb-3.5 border-b border-[#E7EAF0] mb-4 z-10">
+                <div className="sticky top-0 bg-white flex items-center justify-between pb-3.5 border-b border-[#E7EAF0] mb-4 z-10 pt-[max(0.5rem,env(safe-area-inset-top,0.5rem))]">
                   <h3 className="text-base font-semibold text-[#15191E]">
                     {isAr ? 'تصفية الأسلاك والكابلات' : 'Filter Wires'}
                   </h3>
                   <button
                     onClick={() => setMobileFilterOpen(false)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 cursor-pointer"
+                    className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-slate-100 text-slate-500 cursor-pointer flex items-center justify-center"
                     aria-label="إغلاق"
                   >
                     <X className="w-5 h-5" />
@@ -564,9 +558,9 @@ export default function Products() {
                       <button
                         key={o.id}
                         onClick={() => setSelectedOrigin(o.id)}
-                        className={`w-full text-right px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
+                        className={`w-full min-h-[44px] text-right px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
                           selectedOrigin === o.id
-                            ? 'bg-blue-50 text-[#0062D2]'
+                            ? 'bg-blue-50 text-[#0062D2] font-semibold'
                             : 'hover:bg-slate-50 text-[#475569]'
                         }`}
                       >
@@ -591,7 +585,7 @@ export default function Products() {
                       <button
                         key={s.id}
                         onClick={() => setSelectedSize(s.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border text-center transition-colors ${
+                        className={`min-h-[42px] px-2.5 py-2 rounded-lg text-xs font-medium border text-center transition-colors ${
                           selectedSize === s.id
                             ? 'bg-[#0062D2] text-white border-[#0062D2]'
                             : 'bg-white text-[#475569] border-[#E7EAF0] hover:bg-slate-50'
@@ -613,9 +607,9 @@ export default function Products() {
                       <button
                         key={opt.id}
                         onClick={() => setSortBy(opt.id)}
-                        className={`w-full text-right px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
+                        className={`w-full min-h-[44px] text-right px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
                           sortBy === opt.id
-                            ? 'bg-blue-50 text-[#0062D2]'
+                            ? 'bg-blue-50 text-[#0062D2] font-semibold'
                             : 'hover:bg-slate-50 text-[#475569]'
                         }`}
                       >
@@ -631,7 +625,7 @@ export default function Products() {
               <div className="pt-4 border-t border-[#E7EAF0] space-y-2">
                 <button
                   onClick={() => setMobileFilterOpen(false)}
-                  className="w-full py-2.5 bg-[#0062D2] text-white text-xs font-semibold rounded-lg hover:bg-[#0047A5] transition-colors"
+                  className="w-full min-h-[44px] py-2.5 bg-[#0062D2] text-white text-xs font-semibold rounded-lg hover:bg-[#0047A5] transition-colors flex items-center justify-center"
                 >
                   {isAr ? `تطبيق (${filteredProducts.length} صنف)` : `Apply (${filteredProducts.length} items)`}
                 </button>
@@ -641,7 +635,7 @@ export default function Products() {
                       resetFilters()
                       setMobileFilterOpen(false)
                     }}
-                    className="w-full py-2 bg-slate-100 text-[#475569] text-xs font-medium rounded-lg hover:bg-slate-200 transition-colors"
+                    className="w-full min-h-[44px] py-2 bg-slate-100 text-[#475569] text-xs font-medium rounded-lg hover:bg-slate-200 transition-colors flex items-center justify-center"
                   >
                     {isAr ? 'إعادة تعيين الكل' : 'Reset All'}
                   </button>

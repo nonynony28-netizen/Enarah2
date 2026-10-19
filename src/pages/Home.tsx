@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '../hooks/useLanguage'
 import { useShake } from '../hooks/use-shake'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import {
   ArrowLeft,
   ArrowRight,
@@ -271,6 +272,9 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Safely lock background scrolling when mobile navigation drawer is open
+  useBodyScrollLock(mobileMenuOpen)
 
   const handleMouseEnter = () => {
     if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current)
@@ -660,61 +664,64 @@ export default function Home() {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ${
+              className={`lg:hidden min-w-[44px] min-h-[44px] p-2.5 flex items-center justify-center rounded-xl transition-all active:scale-95 cursor-pointer ${
                 isScrolled ? 'text-[#15191E] hover:bg-slate-100' : 'text-white hover:bg-white/10'
               }`}
-              aria-label="القائمة"
+              aria-label={mobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Fullscreen / Drawer Menu */}
+        {/* Mobile Fullscreen Drawer Menu (100dvh, Touch Targets >= 44px, Safe Areas) */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="lg:hidden bg-white text-[#15191E] border-b border-[#E7EAF0] px-6 py-8 shadow-xl max-h-[85vh] overflow-y-auto"
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="fixed inset-x-0 top-[58px] h-[calc(100dvh-58px)] z-[100] overflow-y-auto overscroll-contain bg-white text-[#15191E] px-4 sm:px-6 pt-3 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl lg:hidden flex flex-col justify-between"
             >
-              <div className="flex flex-col gap-4 text-base font-semibold">
+              <div className="flex flex-col gap-2 text-base font-semibold">
                 <Link
                   to="/products"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
                   <span>المنتجات والتشكيلات</span>
-                  <ArrowLeft className="w-4 h-4 opacity-40" />
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
                 <Link
                   to="/offers"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
                   <span>العروض والتخفيضات</span>
-                  <ArrowLeft className="w-4 h-4 opacity-40" />
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
                 <Link
                   to="/projects"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
                   <span>المشاريع المنفذة</span>
-                  <ArrowLeft className="w-4 h-4 opacity-40" />
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
                 <Link
                   to="/brands"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100 flex items-center justify-between"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
                   <span>العلامات والشركاء</span>
-                  <ArrowLeft className="w-4 h-4 opacity-40" />
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
+
                 {/* أقسام إضافية في الجوال */}
-                <div className="pt-2 pb-1 border-t border-slate-100">
-                  <span className="text-xs font-semibold text-[#68717D] uppercase tracking-wider block mb-2">
+                <div className="pt-3 pb-1 border-t border-slate-100 my-1">
+                  <span className="text-[11px] font-bold text-[#68717D] uppercase tracking-wider px-3 block mb-2">
                     أقسام وخدمات إضافية
                   </span>
                   <div className="space-y-1">
@@ -723,10 +730,10 @@ export default function Home() {
                         key={item.path}
                         to={item.path}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="py-2 px-3 rounded-lg text-sm text-[#475569] hover:bg-slate-50 transition-colors flex items-center justify-between"
+                        className="min-h-[44px] py-2 px-3 rounded-xl text-sm text-[#475569] hover:bg-slate-50 transition-colors flex items-center justify-between"
                       >
                         <div className="flex items-center gap-2.5">
-                          <item.icon className="w-4 h-4 text-[#0062D2]" />
+                          <item.icon className="w-4 h-4 text-[#0062D2] shrink-0" />
                           <span>{item.label}</span>
                           {item.badge && (
                             <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-200">
@@ -734,16 +741,18 @@ export default function Home() {
                             </span>
                           )}
                         </div>
-                        <ArrowLeft className="w-3.5 h-3.5 opacity-40" />
+                        <ArrowLeft className="w-3.5 h-3.5 opacity-40 shrink-0" />
                       </Link>
                     ))}
                   </div>
                 </div>
+              </div>
 
+              <div className="pt-4 mt-4 border-t border-slate-100">
                 <Link
                   to="/contact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mt-2 text-center py-3 bg-[#0062D2] text-white rounded-xl font-semibold shadow-sm hover:bg-[#0047A5] transition-colors"
+                  className="w-full min-h-[48px] py-3 rounded-full bg-[#0062D2] text-white font-semibold text-center flex items-center justify-center shadow-sm hover:bg-[#0047A5] active:scale-98 transition-all"
                 >
                   تواصل معنا
                 </Link>

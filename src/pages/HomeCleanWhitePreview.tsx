@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '../hooks/useLanguage'
 import { useShake } from '../hooks/use-shake'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import {
   ArrowLeft,
   ArrowRight,
@@ -267,6 +268,9 @@ export default function HomeCleanWhitePreview() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  // Safely lock background scrolling when mobile navigation drawer is open
+  useBodyScrollLock(mobileMenuOpen)
+
   // Hero Video State & Adaptive Local Blob Caching
   const heroVideoRef = useRef<HTMLVideoElement>(null)
   const [heroVideoSrc, setHeroVideoSrc] = useState<string>(() => {
@@ -519,58 +523,67 @@ export default function HomeCleanWhitePreview() {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ${
+              className={`lg:hidden min-w-[44px] min-h-[44px] p-2.5 flex items-center justify-center rounded-xl transition-all active:scale-95 cursor-pointer ${
                 isScrolled ? 'text-[#15191E] hover:bg-slate-100' : 'text-white hover:bg-white/10'
               }`}
-              aria-label="القائمة"
+              aria-label={mobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Fullscreen / Drawer Menu */}
+        {/* Mobile Fullscreen Drawer Menu (100dvh, Touch Targets >= 44px, Safe Areas) */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="lg:hidden bg-white text-[#15191E] border-b border-[#E7EAF0] px-6 py-8 shadow-xl"
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="fixed inset-x-0 top-[58px] h-[calc(100dvh-58px)] z-[100] overflow-y-auto overscroll-contain bg-white text-[#15191E] px-4 sm:px-6 pt-3 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] shadow-2xl lg:hidden flex flex-col justify-between"
             >
-              <div className="flex flex-col gap-5 text-base font-semibold">
+              <div className="flex flex-col gap-2 text-base font-semibold">
                 <Link
                   to="/products"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
-                  المنتجات والتشكيلات
+                  <span>المنتجات والتشكيلات</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
                 <Link
                   to="/projects"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
-                  المشاريع المنفذة
+                  <span>المشاريع المنفذة</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
                 <Link
                   to="/brands"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
-                  العلامات والشركاء
+                  <span>العلامات والشركاء</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
                 <Link
                   to="/about"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#0062D2] transition-colors py-2 border-b border-slate-100"
+                  className="min-h-[44px] py-2.5 px-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-between"
                 >
-                  عن الإنارة الحديثة (منذ 1988)
+                  <span>عن الإنارة الحديثة (منذ 1988)</span>
+                  <ArrowLeft className="w-4 h-4 opacity-40 shrink-0" />
                 </Link>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-slate-100">
                 <Link
                   to="/contact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mt-2 text-center py-3 bg-[#0062D2] text-white rounded-xl font-semibold shadow-sm"
+                  className="w-full min-h-[48px] py-3 rounded-full bg-[#0062D2] text-white font-semibold text-center flex items-center justify-center shadow-sm hover:bg-[#0047A5] active:scale-98 transition-all"
                 >
                   تواصل معنا
                 </Link>
