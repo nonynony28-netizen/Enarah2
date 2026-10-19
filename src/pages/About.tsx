@@ -347,42 +347,53 @@ export default function About() {
 
         {/* =====================================================================
             03. BUSINESS PILLARS ("ركائز عملنا")
-            Clean International Corporate Standards
+            Architectural Deep Corporate Navy Theme (#101820)
             ===================================================================== */}
-        <div className="mb-20 sm:mb-28">
-          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
-            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
-              CORE PRINCIPLES · معايير التميز
+        <div className="bg-[#101820] text-white rounded-3xl p-8 sm:p-12 lg:p-16 border border-[#202936] shadow-xl relative overflow-hidden mb-20 sm:mb-28">
+          {/* Subtle Architectural Glow & Grid Texture */}
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#0062D2]/15 rounded-full blur-3xl pointer-events-none" />
+          <div 
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{
+              backgroundImage: `linear-gradient(to right, #FFFFFF 1px, transparent 1px), linear-gradient(to bottom, #FFFFFF 1px, transparent 1px)`,
+              backgroundSize: '40px 40px'
+            }}
+          />
+
+          <div className="relative z-10 text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-blue-300 text-xs font-semibold tracking-wider uppercase border border-white/10 mb-3 backdrop-blur-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2] animate-pulse" />
+              <span>CORE PRINCIPLES · {isAr ? 'معايير التميز' : 'Engineering Excellence'}</span>
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#15191E] tracking-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight mb-3">
               {isAr ? 'ركائز عملنا الهندسي' : 'Core Engineering Pillars'}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-xl mx-auto">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl mx-auto">
               {isAr
                 ? 'ثوابت مهنية صارمة تحكم كل منتج ونظام كهربائي نختاره لعملائنا في كافة أرجاء ليبيا.'
                 : 'Rigorous engineering standards governing every fixture, wire, and control system we provide.'}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {pillars.map((item, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E7EAF0] shadow-xs hover:border-[#0062D2]/40 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                className="bg-[#151D28] rounded-2xl p-6 sm:p-8 border border-[#253245] shadow-md hover:border-[#0062D2]/50 hover:bg-[#182333] transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#EBF3FC] text-[#0062D2] flex items-center justify-center mb-6 shadow-2xs">
-                    <item.icon className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-xl bg-[#0062D2]/15 text-[#38bdf8] border border-[#0062D2]/25 flex items-center justify-center mb-6 shadow-xs group-hover:bg-[#0062D2]/25 group-hover:scale-105 transition-all">
+                    <item.icon className="w-6 h-6 text-[#38bdf8]" />
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#15191E] mb-3 leading-snug">
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-3 leading-snug group-hover:text-blue-300 transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#68717D] leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
                     {item.desc}
                   </p>
                 </div>
-                <div className="pt-6 mt-6 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-[#0062D2]">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <div className="pt-6 mt-6 border-t border-[#222E40] flex items-center gap-2 text-xs font-semibold text-blue-400">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-[#0062D2]" />
                   <span>{isAr ? 'معيار معتمد وموثق' : 'Certified Standard'}</span>
                 </div>
               </div>
