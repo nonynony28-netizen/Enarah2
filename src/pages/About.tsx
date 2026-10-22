@@ -97,6 +97,8 @@ export default function About() {
   const railRef = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [activeIndex, setActiveIndex] = useState(0)
+  const isProgrammaticScroll = useRef(false)
+  const scrollTimeout = useRef<number | null>(null)
   const isDragging = useRef(false)
   const startX = useRef(0)
   const startScrollLeft = useRef(0)
@@ -107,12 +109,16 @@ export default function About() {
     const maxScroll = el.scrollWidth - el.clientWidth
     if (maxScroll <= 0) {
       setScrollProgress(0)
-      setActiveIndex(0)
+      if (!isProgrammaticScroll.current) setActiveIndex(0)
       return
     }
     const current = Math.abs(el.scrollLeft)
     const progress = Math.min(Math.max(current / maxScroll, 0), 1)
     setScrollProgress(progress)
+
+    // Prevent intermediate flicker during programmatic scroll transitions
+    if (isProgrammaticScroll.current) return
+
     const slides = el.querySelectorAll('article')
     if (slides.length > 0) {
       const idx = Math.min(
@@ -128,10 +134,35 @@ export default function About() {
     if (!el) return
     const slides = el.querySelectorAll('article')
     const target = slides[index] as HTMLElement | undefined
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
-      setActiveIndex(index)
-    }
+    const first = slides[0] as HTMLElement | undefined
+    if (!target || !first) return
+
+    // 1. Immediately update active state so UI reflects choice with 0 lag
+    setActiveIndex(index)
+    isProgrammaticScroll.current = true
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
+
+    // 2. Temporarily pause scroll snap to eliminate animation fighting/jitter
+    el.style.scrollSnapType = 'none'
+
+    // 3. Compute exact horizontal offset relative to the scroll container
+    const isRtl = isAr || document.documentElement.dir === 'rtl'
+    const distance = Math.abs(target.offsetLeft - first.offsetLeft)
+    const targetLeft = isRtl ? -distance : distance
+
+    // 4. Smoothly scroll ONLY the container (never the page window!)
+    el.scrollTo({
+      left: targetLeft,
+      behavior: 'smooth'
+    })
+
+    // 5. Restore scroll snap and release lock once animation finishes
+    scrollTimeout.current = window.setTimeout(() => {
+      if (el) {
+        el.style.scrollSnapType = 'x mandatory'
+      }
+      isProgrammaticScroll.current = false
+    }, 450)
   }
 
   const scrollRail = (direction: 'next' | 'prev') => {
@@ -573,28 +604,30 @@ export default function About() {
             </div>
           </div>
 
-          {/* Interactive Chapter / Year Selector Chips (Tap to Glide on Mobile & Desktop) */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto pb-2.5 mb-3 sm:mb-6 scrollbar-none select-none">
-            {milestones.map((m, idx) => (
-              <button
-                key={m.year}
-                type="button"
-                onClick={() => scrollToIndex(idx)}
-                aria-label={m.title}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 shrink-0 cursor-pointer flex items-center gap-1.5 border ${
-                  activeIndex === idx
-                    ? m.isCurrent
-                      ? 'bg-[#101820] text-white border-[#202936] shadow-sm'
-                      : 'bg-[#0062D2] text-white border-[#0062D2] shadow-sm'
-                    : 'bg-slate-50 text-slate-600 border-slate-200/80 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <span className="font-mono">{m.yearDisplay}</span>
-                {activeIndex === idx && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                )}
-              </button>
-            ))}
+          {/* Interactive Chapter / Year Selector Track (Glitch-Free & Smooth) */}
+          <div className="mb-4 sm:mb-7 select-none overflow-x-auto scrollbar-none">
+            <div className="inline-flex items-center gap-1 sm:gap-2 p-1 bg-slate-100/90 rounded-full border border-slate-200/80">
+              {milestones.map((m, idx) => {
+                const isActive = activeIndex === idx
+                return (
+                  <button
+                    key={m.year}
+                    type="button"
+                    onClick={() => scrollToIndex(idx)}
+                    aria-label={m.title}
+                    className={`px-3.5 py-1.5 sm:px-4.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-colors duration-200 shrink-0 cursor-pointer font-mono select-none ${
+                      isActive
+                        ? m.isCurrent
+                          ? 'bg-[#101820] text-white shadow-xs'
+                          : 'bg-[#0062D2] text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <span>{m.yearDisplay}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {/* Horizontal Journey Rail (Native Touch Scroll Snap + Mouse Drag) */}
