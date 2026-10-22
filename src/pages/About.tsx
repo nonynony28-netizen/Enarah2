@@ -97,6 +97,9 @@ export default function About() {
   const railRef = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [activeIndex, setActiveIndex] = useState(0)
+  const isDragging = useRef(false)
+  const startX = useRef(0)
+  const startScrollLeft = useRef(0)
 
   const handleRailScroll = () => {
     const el = railRef.current
@@ -124,8 +127,10 @@ export default function About() {
     const el = railRef.current
     if (!el) return
     const slides = el.querySelectorAll('article')
-    if (slides[index]) {
-      slides[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+    const target = slides[index] as HTMLElement | undefined
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+      setActiveIndex(index)
     }
   }
 
@@ -134,6 +139,27 @@ export default function About() {
       ? Math.min(milestones.length - 1, activeIndex + 1)
       : Math.max(0, activeIndex - 1)
     scrollToIndex(nextIdx)
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const el = railRef.current
+    if (!el) return
+    isDragging.current = true
+    startX.current = e.pageX
+    startScrollLeft.current = el.scrollLeft
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current) return
+    const el = railRef.current
+    if (!el) return
+    e.preventDefault()
+    const dx = e.pageX - startX.current
+    el.scrollLeft = startScrollLeft.current - dx
+  }
+
+  const handleMouseUpOrLeave = () => {
+    isDragging.current = false
   }
 
   // Verified chronological milestones — "Journey Slides"
@@ -503,53 +529,83 @@ export default function About() {
             Horizontal Native Scroll Snap, Architectural Color Progression, Large Typographic Years
             ===================================================================== */}
         <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-10 lg:p-12 border border-[#E7EAF0] shadow-xs mb-16 sm:mb-28 overflow-hidden">
-          {/* Section Header with Minimal Controls */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-7 sm:mb-12">
+          {/* Section Header with Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4 sm:mb-8">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 mb-3 text-xs font-medium text-slate-400">
+              <div className="inline-flex items-center gap-2 mb-2 text-xs font-medium text-slate-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
                 <span className="font-mono tracking-wider text-[11px] uppercase">
                   {isAr ? 'مسيرة تمتد لأكثر من 38 عامًا · 1988 — 2026' : '38+ Years of Heritage · 1988 — 2026'}
                 </span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#15191E] tracking-tight leading-[1.2] mb-3">
+              <h2 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#15191E] tracking-tight leading-[1.2] mb-2">
                 {isAr ? 'محطات مضيئة في مسيرتنا' : 'Milestones in Our Journey'}
               </h2>
 
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+              <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
                 {isAr
                   ? 'منذ أكثر من ثلاثة عقود، نواصل بناء مسيرة ترتكز على الجودة، والتطور، وتقديم حلول متقدمة في عالم الإضاءة والتأسيس الكهربائي.'
                   : 'For more than three decades, we have forged a journey founded on quality, continuous evolution, and advanced solutions in architectural lighting and electrical infrastructure.'}
               </p>
             </div>
 
-            {/* Desktop Minimal Previous / Next Controls */}
-            <div className="hidden sm:flex items-center gap-3 shrink-0">
+            {/* Navigation Arrows — Visible on Mobile & Desktop */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0 self-end sm:self-auto">
               <button
                 type="button"
                 onClick={() => scrollRail('prev')}
+                disabled={activeIndex === 0}
                 aria-label={isAr ? 'المحطة السابقة' : 'Previous Milestone'}
-                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#0062D2] hover:text-[#0062D2] text-slate-700 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-200 bg-white hover:border-[#0062D2] hover:text-[#0062D2] text-slate-700 flex items-center justify-center transition-all shadow-xs active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
               </button>
               <button
                 type="button"
                 onClick={() => scrollRail('next')}
+                disabled={activeIndex === milestones.length - 1}
                 aria-label={isAr ? 'المحطة التالية' : 'Next Milestone'}
-                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#0062D2] hover:text-[#0062D2] text-slate-700 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-200 bg-white hover:border-[#0062D2] hover:text-[#0062D2] text-slate-700 flex items-center justify-center transition-all shadow-xs active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          {/* Horizontal Journey Rail (Native Scroll Snap) */}
+          {/* Interactive Chapter / Year Selector Chips (Tap to Glide on Mobile & Desktop) */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto pb-2.5 mb-3 sm:mb-6 scrollbar-none select-none">
+            {milestones.map((m, idx) => (
+              <button
+                key={m.year}
+                type="button"
+                onClick={() => scrollToIndex(idx)}
+                aria-label={m.title}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 shrink-0 cursor-pointer flex items-center gap-1.5 border ${
+                  activeIndex === idx
+                    ? m.isCurrent
+                      ? 'bg-[#101820] text-white border-[#202936] shadow-sm'
+                      : 'bg-[#0062D2] text-white border-[#0062D2] shadow-sm'
+                    : 'bg-slate-50 text-slate-600 border-slate-200/80 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <span className="font-mono">{m.yearDisplay}</span>
+                {activeIndex === idx && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Horizontal Journey Rail (Native Touch Scroll Snap + Mouse Drag) */}
           <div
             ref={railRef}
             onScroll={handleRailScroll}
-            className="flex gap-3.5 sm:gap-6 overflow-x-auto pb-4 pt-1 px-1 sm:px-2 scroll-smooth snap-x snap-mandatory scrollbar-none overscroll-x-contain touch-pan-y [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUpOrLeave}
+            onMouseLeave={handleMouseUpOrLeave}
+            className="flex gap-3.5 sm:gap-6 overflow-x-auto pb-4 pt-1 px-1 sm:px-2 scroll-smooth snap-x snap-mandatory scrollbar-none cursor-grab active:cursor-grabbing select-none [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {milestones.map((m) => (
               <article
@@ -623,7 +679,7 @@ export default function About() {
                 </div>
 
                 {/* Bottom Architectural Signature Rule / Status */}
-                <div className="pt-6 mt-6 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+                <div className="pt-5 mt-5 sm:pt-6 sm:mt-6 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
                   <div
                     className="h-[2px] rounded-full transition-all duration-300 group-hover:w-16"
                     style={{
@@ -636,33 +692,62 @@ export default function About() {
                       {isAr ? 'المسيرة مستمرة ➔' : 'Ongoing Journey ➔'}
                     </span>
                   ) : (
-                    <span className="font-mono text-[10px] text-slate-400 tracking-wider">
-                      ENARAH ARCHITECTURAL
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => scrollRail('next')}
+                      className="font-mono text-[11px] text-[#0062D2] hover:underline font-semibold tracking-wide flex items-center gap-1 cursor-pointer select-none"
+                    >
+                      <span>{isAr ? 'المحطة التالية' : 'Next Milestone'}</span>
+                      <span>{isAr ? '←' : '→'}</span>
+                    </button>
                   )}
                 </div>
               </article>
             ))}
           </div>
 
-          {/* Section Footer: Subtle Progress Indicator & Metadata */}
+          {/* Section Footer: Progress Indicator, Counter & Mobile Quick Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-5 mt-3 border-t border-slate-100">
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] font-mono text-slate-400 uppercase tracking-widest">
-                {isAr ? 'تقدم المسيرة' : 'JOURNEY PROGRESS'}
-              </span>
-              <div className="w-24 sm:w-40 h-[2.5px] bg-slate-100 rounded-full overflow-hidden relative">
-                <div
-                  className="h-full bg-[#0062D2] transition-all duration-200 rounded-full"
-                  style={{
-                    width: `${Math.max(20, (scrollProgress || 0) * 100)}%`,
-                    transformOrigin: isAr ? 'right' : 'left'
-                  }}
-                />
+            <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-4 w-full sm:w-auto">
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] font-mono text-slate-400 uppercase tracking-widest">
+                  {isAr ? 'تقدم المسيرة' : 'JOURNEY PROGRESS'}
+                </span>
+                <div className="w-20 sm:w-40 h-[2.5px] bg-slate-100 rounded-full overflow-hidden relative">
+                  <div
+                    className="h-full bg-[#0062D2] transition-all duration-200 rounded-full"
+                    style={{
+                      width: `${Math.max(20, ((activeIndex + 1) / milestones.length) * 100)}%`,
+                      transformOrigin: isAr ? 'right' : 'left'
+                    }}
+                  />
+                </div>
+                <span className="font-mono text-xs font-semibold text-slate-700">
+                  0{activeIndex + 1} / 0{milestones.length}
+                </span>
               </div>
-              <span className="font-mono text-xs font-semibold text-slate-700">
-                0{activeIndex + 1} / 0{milestones.length}
-              </span>
+
+              {/* Mobile Quick Action Buttons in Footer */}
+              <div className="flex sm:hidden items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => scrollRail('prev')}
+                  disabled={activeIndex === 0}
+                  className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 disabled:opacity-30 flex items-center gap-1 cursor-pointer active:scale-95"
+                >
+                  {isAr ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
+                  <span>{isAr ? 'السابق' : 'Prev'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollRail('next')}
+                  disabled={activeIndex === milestones.length - 1}
+                  className="px-2.5 py-1 rounded-lg border border-[#0062D2]/30 bg-[#0062D2]/5 text-xs font-semibold text-[#0062D2] disabled:opacity-30 flex items-center gap-1 cursor-pointer active:scale-95"
+                >
+                  <span>{isAr ? 'التالي' : 'Next'}</span>
+                  {isAr ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-slate-500">
