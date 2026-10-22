@@ -6,6 +6,8 @@ import {
   Sparkles,
   ArrowRight,
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
   Building2,
   Cpu,
   Globe,
@@ -92,35 +94,130 @@ function AnimatedCounter({
 export default function About() {
   const { isAr } = useLanguage()
 
-  // Verified chronological milestones — All facts preserved
+  const railRef = useRef<HTMLDivElement>(null)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const handleRailScroll = () => {
+    const el = railRef.current
+    if (!el) return
+    const maxScroll = el.scrollWidth - el.clientWidth
+    if (maxScroll <= 0) {
+      setScrollProgress(0)
+      setActiveIndex(0)
+      return
+    }
+    const current = Math.abs(el.scrollLeft)
+    const progress = Math.min(Math.max(current / maxScroll, 0), 1)
+    setScrollProgress(progress)
+    const slides = el.querySelectorAll('article')
+    if (slides.length > 0) {
+      const idx = Math.min(
+        slides.length - 1,
+        Math.max(0, Math.round(progress * (slides.length - 1)))
+      )
+      setActiveIndex(idx)
+    }
+  }
+
+  const scrollToIndex = (index: number) => {
+    const el = railRef.current
+    if (!el) return
+    const slides = el.querySelectorAll('article')
+    if (slides[index]) {
+      slides[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+    }
+  }
+
+  const scrollRail = (direction: 'next' | 'prev') => {
+    const nextIdx = direction === 'next'
+      ? Math.min(milestones.length - 1, activeIndex + 1)
+      : Math.max(0, activeIndex - 1)
+    scrollToIndex(nextIdx)
+  }
+
+  // Verified chronological milestones — "Journey Slides"
   const milestones = [
     {
       year: '1988',
+      yearDisplay: isAr ? '1988' : '1988',
+      index: '01 / 05',
+      tag: isAr ? 'التأسيس والبداية' : 'Founding Era',
       title: isAr ? 'التأسيس والانطلاقة الأولى' : 'Establishment & Inception',
       desc: isAr
-        ? 'انطلقت شركة الإنارة في ليبيا برؤية معمارية تضع الجودة والموثوقية في قلب التأسيس الكهربائي.'
-        : 'Founded in Libya with an architectural vision placing quality at the core of electrical infrastructure.'
+        ? 'بدأت مسيرة الإنارة الحديثة برؤية واضحة تضع الجودة والموثوقية في صميم العمل، لتأسيس حضور راسخ في قطاع الإضاءة والتجهيزات الكهربائية.'
+        : 'The journey of Enarah Modern began with a distinct vision placing quality and reliability at the core of all operations, establishing an enduring presence in lighting and electrical infrastructure.',
+      bgClass: 'bg-[#FAF8F5]',
+      borderClass: 'border-[#EFE9DF] hover:border-[#D8CFBF]',
+      textClass: 'text-[#1E2530]',
+      descClass: 'text-[#4A5568]',
+      accentColor: '#0062D2',
+      yearClass: 'text-[#1E2530]'
     },
     {
       year: '2005',
-      title: isAr ? 'الشراكات الأوروبية والدولية' : 'European & Global Alliances',
+      yearDisplay: isAr ? '2005' : '2005',
+      index: '02 / 05',
+      tag: isAr ? 'التوسع الدولي' : 'Global Alliances',
+      title: isAr ? 'الشراكات العالمية والأوروبية' : 'Global & European Alliances',
       desc: isAr
-        ? 'توسيع نطاق الأعمال واعتماد شراكات توزيع رئيسية مع نخبة مصانع الإضاءة والمفاتيح في فرنسا وإيطاليا وألمانيا.'
-        : 'Expanded operations, securing strategic distribution alliances with top European manufacturers.'
+        ? 'شهدت هذه المرحلة توسعًا مهمًا في نطاق الأعمال، من خلال بناء شراكات مع علامات عالمية وأوروبية رائدة، بما عزز تنوع الحلول ورفع مستوى الجودة المقدمة للعملاء.'
+        : 'This phase marked significant operational expansion through strategic partnerships with leading global and European brands, enriching solution diversity and elevating client service standards.',
+      bgClass: 'bg-[#F1F5F9]',
+      borderClass: 'border-[#DFE7EF] hover:border-[#CBD5E1]',
+      textClass: 'text-[#151F2C]',
+      descClass: 'text-[#475569]',
+      accentColor: '#0284C7',
+      yearClass: 'text-[#151F2C]'
     },
     {
-      year: '2016',
-      title: isAr ? 'دخول عصر الإنارة المعمارية المتطورة' : 'Architectural LED Revolution',
+      year: '2008',
+      yearDisplay: isAr ? '2008' : '2008',
+      index: '03 / 05',
+      tag: isAr ? 'التحول التقني' : 'Smart Lighting Era',
+      title: isAr ? 'دخول عصر الإنارة الذكية' : 'The Smart Lighting Era',
       desc: isAr
-        ? 'إدخال أنظمة الإنارة الخطية (LED Profiles)، والسبوت المعماري المانع للتوهج، وحلول الطاقة الذكية.'
-        : 'Pioneered linear architectural LED profiles, anti-glare recessed optics, and energy-efficient systems.'
+        ? 'مع تطور احتياجات السوق، اتجهت الإنارة الحديثة إلى إدخال أنظمة الإنارة الذكية والحلول الكهربائية المتنوعة، لتقديم حلول أكثر كفاءة ومرونة تلائم تطور المشاريع واحتياجات العملاء.'
+        : 'Adapting to evolving market demands, Enarah Modern pioneered smart lighting controls and intelligent electrical systems, delivering more efficient and flexible solutions tailored to modern architectural projects.',
+      bgClass: 'bg-[#EDF5FC]',
+      borderClass: 'border-[#D2E5F5] hover:border-[#BADAF0]',
+      textClass: 'text-[#0F243A]',
+      descClass: 'text-[#3B5775]',
+      accentColor: '#0062D2',
+      yearClass: 'text-[#0062D2]'
     },
     {
-      year: '2024+',
-      title: isAr ? 'ريادة كبرى المشاريع والصروح' : 'Landmark Projects Leadership',
+      year: '2018',
+      yearDisplay: isAr ? '2018' : '2018',
+      index: '04 / 05',
+      tag: isAr ? 'المشاريع والتوسع' : 'Nationwide Expansion',
+      title: isAr ? 'المشاريع والتوسع في ليبيا' : 'Projects & Nationwide Expansion',
       desc: isAr
-        ? 'توريد وتنفيذ منظومات الإنارة والكهرباء لأبرز المجمعات التجارية، المصحات الطبية، والمباني الفاخرة.'
-        : 'Successfully executing illumination for prominent commercial complexes, medical clinics, and luxury villas.'
+        ? 'مثّلت هذه المرحلة خطوة مهمة في مسيرة الإنارة الحديثة، مع تنفيذ مشاريع متنوعة وتوسيع نطاق العمل على مستوى ليبيا، بما عزز حضور الشركة وخبرتها في تقديم الحلول المتكاملة.'
+        : 'Representing a major step in the company’s evolution, executing diverse landmark developments and expanding across all of Libya, reinforcing our nationwide footprint and integrated capabilities.',
+      bgClass: 'bg-[#F7F4EC]',
+      borderClass: 'border-[#E7DFCE] hover:border-[#D5C9B3]',
+      textClass: 'text-[#231F18]',
+      descClass: 'text-[#5C5346]',
+      accentColor: '#946E24',
+      yearClass: 'text-[#231F18]'
+    },
+    {
+      year: 'today',
+      yearDisplay: isAr ? 'حتى اليوم' : 'Present',
+      index: '05 / 05',
+      isCurrent: true,
+      tag: isAr ? 'المستقبل المستمر' : 'Continuous Evolution',
+      title: isAr ? 'مسيرة مستمرة نحو المستقبل' : 'Continuous Evolution to the Future',
+      desc: isAr
+        ? 'تواصل الإنارة الحديثة مسيرتها بالتطوير المستمر، وتوسيع حلولها وخدماتها، مع الحفاظ على الجودة والثقة ومواكبة أحدث الاتجاهات في عالم الإضاءة والحلول الكهربائية.'
+        : 'Enarah Modern continues its journey through relentless innovation, expanding solutions and services while preserving trust and quality, keeping pace with global lighting and electrical design.',
+      bgClass: 'bg-[#101820]',
+      borderClass: 'border-[#202936] hover:border-[#334155]',
+      textClass: 'text-white',
+      descClass: 'text-slate-300',
+      accentColor: '#38BDF8',
+      yearClass: 'text-white'
     }
   ]
 
@@ -402,48 +499,180 @@ export default function About() {
         </div>
 
         {/* =====================================================================
-            04. COMPANY MILESTONES (Minimal Editorial Timeline)
-            Clear Dates, Connecting Flow & Verified Historical Accuracy
+            04. COMPANY MILESTONES ("Journey Slides" — Editorial Slide Experience)
+            Horizontal Native Scroll Snap, Architectural Color Progression, Large Typographic Years
             ===================================================================== */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 lg:p-14 border border-[#E7EAF0] shadow-sm mb-20 sm:mb-28">
-          <div className="max-w-xl mb-10 sm:mb-12">
-            <span className="text-xs font-semibold text-[#0062D2] tracking-widest uppercase block mb-2">
-              OUR JOURNEY · تاريخنا ومسيرتنا
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#15191E] tracking-tight mb-2">
-              {isAr ? 'محطات مضيئة في مسيرتنا' : 'Milestones in Our Journey'}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-              {isAr
-                ? '38 عامًا من الالتزام بالجودة والتطور المستمر في قطاع الإنارة والتأسيس الكهربائي.'
-                : '38 years of relentless dedication to quality and innovation in electrical infrastructure.'}
-            </p>
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-10 lg:p-12 border border-[#E7EAF0] shadow-xs mb-16 sm:mb-28 overflow-hidden">
+          {/* Section Header with Minimal Controls */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-7 sm:mb-12">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 mb-3 text-xs font-medium text-slate-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+                <span className="font-mono tracking-wider text-[11px] uppercase">
+                  {isAr ? 'مسيرة تمتد لأكثر من 38 عامًا · 1988 — 2026' : '38+ Years of Heritage · 1988 — 2026'}
+                </span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#15191E] tracking-tight leading-[1.2] mb-3">
+                {isAr ? 'محطات مضيئة في مسيرتنا' : 'Milestones in Our Journey'}
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+                {isAr
+                  ? 'منذ أكثر من ثلاثة عقود، نواصل بناء مسيرة ترتكز على الجودة، والتطور، وتقديم حلول متقدمة في عالم الإضاءة والتأسيس الكهربائي.'
+                  : 'For more than three decades, we have forged a journey founded on quality, continuous evolution, and advanced solutions in architectural lighting and electrical infrastructure.'}
+              </p>
+            </div>
+
+            {/* Desktop Minimal Previous / Next Controls */}
+            <div className="hidden sm:flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => scrollRail('prev')}
+                aria-label={isAr ? 'المحطة السابقة' : 'Previous Milestone'}
+                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#0062D2] hover:text-[#0062D2] text-slate-700 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer"
+              >
+                {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollRail('next')}
+                aria-label={isAr ? 'المحطة التالية' : 'Next Milestone'}
+                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#0062D2] hover:text-[#0062D2] text-slate-700 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer"
+              >
+                {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
-          <div className="relative border-r-2 border-slate-100 mr-3 sm:mr-6 pr-6 sm:pr-8 space-y-8 sm:space-y-10">
-            {milestones.map((m, idx) => (
-              <div key={idx} className="relative group">
-                {/* Timeline Node Indicator */}
-                <span className="absolute -right-[31px] sm:-right-[39px] top-1.5 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-white border-3 border-[#0062D2] shadow-xs group-hover:scale-125 transition-transform duration-200" />
+          {/* Horizontal Journey Rail (Native Scroll Snap) */}
+          <div
+            ref={railRef}
+            onScroll={handleRailScroll}
+            className="flex gap-3.5 sm:gap-6 overflow-x-auto pb-4 pt-1 px-1 sm:px-2 scroll-smooth snap-x snap-mandatory scrollbar-none overscroll-x-contain touch-pan-y [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {milestones.map((m) => (
+              <article
+                key={m.year}
+                className={`snap-start snap-always shrink-0 w-[84vw] max-w-[325px] sm:max-w-none sm:w-[380px] lg:w-[420px] xl:w-[440px] ${m.bgClass} ${m.borderClass} border rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-9 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group min-h-[350px] sm:min-h-[380px] select-none`}
+              >
+                {/* Background Translucent Year (Editorial Watermark Typography) */}
+                <div
+                  aria-hidden="true"
+                  className={`absolute -bottom-6 -left-6 font-mono font-black text-8xl sm:text-9xl pointer-events-none select-none tracking-tighter ${
+                    m.isCurrent ? 'text-white/[0.04]' : 'text-black/[0.035]'
+                  }`}
+                >
+                  {m.year === 'today' ? '2026' : m.year}
+                </div>
 
-                <div className="bg-[#F8FAFC] p-5 sm:p-6 rounded-2xl border border-[#E7EAF0] hover:border-[#0062D2]/30 transition-colors">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <span className="font-mono text-base sm:text-lg font-bold text-[#0062D2]">
-                      {m.year}
+                {/* Top Row: Chapter Index & Era Tag */}
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-5 pb-3.5 border-b border-black/[0.06] dark:border-white/[0.08]">
+                    <span className="font-mono text-xs tracking-wider text-slate-400 font-semibold uppercase">
+                      {m.index}
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-full">
-                      {isAr ? `المحطة ${idx + 1}` : `Phase ${idx + 1}`}
-                    </span>
+
+                    {m.isCurrent ? (
+                      <div className="inline-flex items-center gap-2">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#38BDF8] opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#38BDF8]" />
+                        </span>
+                        <span className="text-[11px] font-mono font-semibold text-[#38BDF8] tracking-wider uppercase">
+                          {m.tag}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] font-mono tracking-wider text-slate-500 uppercase">
+                        {m.tag}
+                      </span>
+                    )}
                   </div>
-                  <h4 className="text-sm sm:text-base font-bold text-[#15191E] mb-2 leading-snug">
+
+                  {/* Large Architectural Year Headline */}
+                  {m.isCurrent ? (
+                    <div className="mb-4">
+                      <span className="text-3xl sm:text-4xl lg:text-[42px] font-black text-white tracking-tight leading-none block">
+                        {m.yearDisplay}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mb-4">
+                      <span
+                        className={`font-mono text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-none block ${m.yearClass} group-hover:scale-102 transition-transform duration-300 origin-right rtl:origin-right ltr:origin-left`}
+                      >
+                        {m.yearDisplay}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Milestone Title */}
+                  <h3
+                    className={`text-lg sm:text-xl font-bold ${m.textClass} mb-3 leading-snug tracking-tight`}
+                  >
                     {m.title}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-[#68717D] leading-relaxed font-normal">
+                  </h3>
+
+                  {/* Milestone Description */}
+                  <p
+                    className={`text-xs sm:text-sm ${m.descClass} leading-relaxed font-normal`}
+                  >
                     {m.desc}
                   </p>
                 </div>
-              </div>
+
+                {/* Bottom Architectural Signature Rule / Status */}
+                <div className="pt-6 mt-6 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+                  <div
+                    className="h-[2px] rounded-full transition-all duration-300 group-hover:w-16"
+                    style={{
+                      width: '32px',
+                      backgroundColor: m.accentColor
+                    }}
+                  />
+                  {m.isCurrent ? (
+                    <span className="font-mono text-[11px] text-[#38BDF8] font-semibold tracking-wider">
+                      {isAr ? 'المسيرة مستمرة ➔' : 'Ongoing Journey ➔'}
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[10px] text-slate-400 tracking-wider">
+                      ENARAH ARCHITECTURAL
+                    </span>
+                  )}
+                </div>
+              </article>
             ))}
+          </div>
+
+          {/* Section Footer: Subtle Progress Indicator & Metadata */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-5 mt-3 border-t border-slate-100">
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-mono text-slate-400 uppercase tracking-widest">
+                {isAr ? 'تقدم المسيرة' : 'JOURNEY PROGRESS'}
+              </span>
+              <div className="w-24 sm:w-40 h-[2.5px] bg-slate-100 rounded-full overflow-hidden relative">
+                <div
+                  className="h-full bg-[#0062D2] transition-all duration-200 rounded-full"
+                  style={{
+                    width: `${Math.max(20, (scrollProgress || 0) * 100)}%`,
+                    transformOrigin: isAr ? 'right' : 'left'
+                  }}
+                />
+              </div>
+              <span className="font-mono text-xs font-semibold text-slate-700">
+                0{activeIndex + 1} / 0{milestones.length}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
+              <span>
+                {isAr
+                  ? 'أكثر من ثلاثة عقود من التطوير المستمر وحفظ معايير الجودة'
+                  : 'Over three decades of sustained development and verified quality'}
+              </span>
+            </div>
           </div>
         </div>
 
