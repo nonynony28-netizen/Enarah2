@@ -113,11 +113,14 @@ await (async () => {
     );
   });
 
-  // 4. Cached image reuse & stacked pre-decoded layer architecture
-  await runTest('4. Cached image reuse & stacked pre-decoded layers prevent re-downloads and white flashes', async () => {
+  // 4. Cached image reuse & stacked pre-decoded layer architecture + Mobile non-zero container height
+  await runTest('4. Cached image reuse & stacked pre-decoded layers prevent re-downloads, white flashes, and mobile 0px collapse', async () => {
     assert.ok(pageSource.includes('preloadedImagesRef'), 'Must retain decoded Image instances in memory');
     assert.ok(pageSource.includes('decodedWireIds'), 'Must track decodedWireIds state');
     assert.ok(pageSource.includes('mountedWireIds'), 'Must keep visited/preloaded layers mounted');
+    assert.ok(pageSource.includes('aspect-[4/3] min-h-[260px]'), 'Must use valid Tailwind aspect-[4/3] and explicit min-h-[260px] on mobile');
+    assert.ok(pageSource.includes("aspectRatio: '4 / 3'"), 'Must include inline aspectRatio 4 / 3 for mobile Safari compatibility');
+    assert.ok(pageSource.includes('relative inset-0 w-full h-full block'), 'Active picture layer must be relative in flow on mobile');
     assert.ok(swSource.includes("const CACHE_NAME = 'enarah-app-shell-v10'"), 'Service Worker must bump cache to v10');
   });
 

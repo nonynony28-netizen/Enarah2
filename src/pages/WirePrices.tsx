@@ -2500,7 +2500,10 @@ export default function WirePrices() {
           <div className="bg-white border border-[#E4EAF1] rounded-2xl overflow-hidden shadow-2xs">
             <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
               {/* Left on Desktop (55% -> col-span-7, lg:order-2), First on Mobile (order-1): Stable 4:3 Application Image Container */}
-              <div className="order-1 lg:order-2 lg:col-span-7 bg-[#081D35] relative overflow-hidden aspect-4/3 w-full select-none">
+              <div
+                className="order-1 lg:order-2 lg:col-span-7 bg-[#081D35] relative overflow-hidden aspect-[4/3] min-h-[260px] sm:min-h-[360px] lg:min-h-[440px] w-full select-none"
+                style={{ aspectRatio: '4 / 3' }}
+              >
                 {/* Lightweight Matching Placeholder / Error State (Zero White Flash, Zero Stale Image) */}
                 {!decodedWireIds[selectedAppSizeId] && (
                   <div className="absolute inset-0 z-0 flex flex-col items-center justify-center bg-[#0B1F36] text-white p-6 text-center">
@@ -2562,11 +2565,11 @@ export default function WirePrices() {
                   return (
                     <picture
                       key={appItem.wireId}
-                      className={`absolute inset-0 w-full h-full block transition-opacity duration-120 ease-out ${
+                      className={
                         isCurrent && !failedWireIds[appItem.wireId]
-                          ? 'opacity-100 z-10'
-                          : 'opacity-0 z-0 pointer-events-none'
-                      }`}
+                          ? 'relative inset-0 w-full h-full block transition-opacity duration-150 ease-out opacity-100 z-10'
+                          : 'absolute inset-0 w-full h-full block transition-opacity duration-150 ease-out opacity-0 z-0 pointer-events-none'
+                      }
                     >
                       <source
                         type="image/avif"
@@ -3116,7 +3119,10 @@ export default function WirePrices() {
           aria-labelledby="wire-app-modal-title"
         >
           <div className="bg-white border border-[#E4EAF1] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
-            <div className="relative aspect-4/3 bg-[#081D35] overflow-hidden">
+            <div
+              className="relative aspect-[4/3] min-h-[240px] sm:min-h-[320px] bg-[#081D35] overflow-hidden"
+              style={{ aspectRatio: '4 / 3' }}
+            >
               <picture>
                 <source
                   type="image/avif"
