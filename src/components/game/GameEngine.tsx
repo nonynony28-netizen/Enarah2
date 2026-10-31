@@ -26,11 +26,16 @@ import {
   ShieldAlert,
   Compass,
   Flag,
+  Lightbulb,
+  Shield,
 } from 'lucide-react'
 import {
   GAME_STAGES,
+  GAME_ACHIEVEMENTS,
+  PRODUCT_CATALOG_META,
   type StageDefinition,
   type PlayerProgressionState,
+  type CollectibleProductKind,
   loadPlayerProgression,
   recordStageCompletion,
 } from './platformerWorlds'
@@ -120,14 +125,10 @@ export function GameEngine() {
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
 
-  // Settings & Accessibility
-  const [isMuted, setIsMuted] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('enarah_platformer_muted') === 'true'
-    } catch {
-      return false
-    }
-  })
+  // Audio & Accessibility Settings (Section 9)
+  const [isMuted, setIsMuted] = useState<boolean>(() => sound.isMuted)
+  const [musicVolume, setMusicVolume] = useState<number>(() => sound.musicVolume)
+  const [sfxVolume, setSfxVolume] = useState<number>(() => sound.sfxVolume)
   const [reducedMotion, setReducedMotion] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('enarah_platformer_reduced_motion')
@@ -153,25 +154,34 @@ export function GameEngine() {
   const [hudHealth, setHudHealth] = useState(3)
   const [hudMaxHealth, setHudMaxHealth] = useState(3)
   const [hudEnergy, setHudEnergy] = useState(0)
-  const [hudTotalEnergy, setHudTotalEnergy] = useState(12)
+  const [hudTotalEnergy, setHudTotalEnergy] = useState(9)
   const [hudScore, setHudScore] = useState(0)
   const [hudStageScore, setHudStageScore] = useState(0)
   const [hudStarsEarned, setHudStarsEarned] = useState(3)
   const [hudElapsedSec, setHudElapsedSec] = useState(0)
+  const [hudTimeLeftSec, setHudTimeLeftSec] = useState<number | null>(null)
   const [hudBossHp, setHudBossHp] = useState<number | null>(null)
   const [hudBossMaxHp, setHudBossMaxHp] = useState<number>(3)
+  const [hudBossPhase, setHudBossPhase] = useState<number>(1)
+  const [hudActiveBuffs, setHudActiveBuffs] = useState<{
+    speed: boolean
+    shield: boolean
+    spotlight: boolean
+    floodlight: boolean
+  }>({ speed: false, shield: false, spotlight: false, floodlight: false })
   const [bannerAlert, setBannerAlert] = useState<{ msg: string; type: 'info' | 'success' | 'error' } | null>(null)
   const [copiedCoupon, setCopiedCoupon] = useState(false)
 
-  // Active touch button highlights for visual feedback
+  // Active touch button highlights
   const [touchVisualState, setTouchVisualState] = useState({
     left: false,
     right: false,
     jump: false,
-    run: false,
+    dash: false,
+    attack: false,
   })
 
-  // Mutable Simulation Refs (60fps zero-GC loop)
+  // Mutable Simulation Refs
   const stageRef = useRef<StageDefinition>(cloneStageDefinition(GAME_STAGES[0]))
   const heroRef = useRef<HeroPhysicsState>(createInitialHeroState(GAME_STAGES[0]))
   const cameraRef = useRef<CameraState>({
@@ -179,6 +189,7 @@ export function GameEngine() {
     y: 0,
     viewportW: VIEWPORT_WIDTH,
     viewportH: VIEWPORT_HEIGHT,
+    shakeIntensity: 0,
   })
   const particlesRef = useRef<LightParticle[]>([])
   const popupsRef = useRef<FloatingScorePopup[]>([])
@@ -186,7 +197,9 @@ export function GameEngine() {
   const totalPlayTimeSecRef = useRef<number>(0)
   const stageScoreRef = useRef<number>(0)
   const collectedCountRef = useRef<number>(0)
+  const collectedKindsRef = useRef<CollectibleProductKind[]>([])
   const totalCampaignScoreRef = useRef<number>(0)
+  const bossMusicActiveRef = useRef<boolean>(false)
 
   // Input State Ref
   const keysRef = useRef<{ [code: string]: boolean }>({})
@@ -194,14 +207,18 @@ export function GameEngine() {
     left: boolean
     right: boolean
     jump: boolean
-    run: boolean
+    dash: boolean
+    attack: boolean
   }>({
     left: false,
     right: false,
     jump: false,
-    run: false,
+    dash: false,
+    attack: false,
   })
   const prevJumpHeldRef = useRef<boolean>(false)
+  const prevDashHeldRef = useRef<boolean>(false)
+  const prevAttackHeldRef = useRef<boolean>(false)
 
   // Weekly Leaderboard & Cloud Reward state
   const weeklyInfo = useMemo(() => getWeeklyChallengeInfo(), [])
@@ -271,7 +288,7 @@ export function GameEngine() {
     discountDetails: 'خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!',
     giftItemName: 'كشاف سبوت لايت ذكي مجاني أو مفتاح لمس VIP',
     giftInstructions: 'استلم هديتك من أي فرع للإنارة الحديثة بإبراز هذه الشاشة!',
-    victoryMsg: 'أنت بطل أسطوري حقيقي للإنارة! لقد عبرت العوالم الخمسة وأعدت النور والطاقة للمدينة بنجاح تام.',
+    victoryMsg: 'أنت بطل أسطوري حقيقي للإنارة! لقد عبرت المراحل الثماني وهزمت ملك الظلام الكهربائي بنجاح تام.',
   })
 
   useEffect(() => {
@@ -305,15 +322,25 @@ export function GameEngine() {
     fetchCloudRewards()
   }, [gameState])
 
-  // Sync mute state with sound engine
+  // Stop music when leaving component
   useEffect(() => {
-    sound.isMuted = isMuted
-    try {
-      localStorage.setItem('enarah_platformer_muted', String(isMuted))
-    } catch {}
-  }, [isMuted])
+    return () => {
+      sound.stopMusic()
+    }
+  }, [])
 
-  // Check mobile portrait orientation for landscape recommendation banner
+  // Manage level soundtrack based on gameState
+  useEffect(() => {
+    if (gameState === 'playing' && !isMuted && isCanvasVisible) {
+      const stg = GAME_STAGES[currentStageIdx] || GAME_STAGES[0]
+      const track = sound.getTrackForLevel(stg.worldNumber, bossMusicActiveRef.current)
+      sound.startMusic(track)
+    } else {
+      sound.stopMusic()
+    }
+  }, [currentStageIdx, gameState, isCanvasVisible, isMuted])
+
+  // Check mobile portrait orientation
   useEffect(() => {
     const checkOrientation = () => {
       if (typeof window === 'undefined') return
@@ -330,7 +357,7 @@ export function GameEngine() {
     }
   }, [])
 
-  // IntersectionObserver to pause rendering when game canvas is scrolled offscreen (e.g., on Home page)
+  // IntersectionObserver to pause rendering & music when scrolled offscreen
   useEffect(() => {
     const el = containerRef.current
     if (!el || typeof IntersectionObserver === 'undefined') return
@@ -347,18 +374,20 @@ export function GameEngine() {
     return () => observer.disconnect()
   }, [])
 
-  // Reset stuck inputs on blur or tab visibility change
   const clearAllInputs = useCallback(() => {
     keysRef.current = {}
-    touchInputRef.current = { left: false, right: false, jump: false, run: false }
+    touchInputRef.current = { left: false, right: false, jump: false, dash: false, attack: false }
     prevJumpHeldRef.current = false
-    setTouchVisualState({ left: false, right: false, jump: false, run: false })
+    prevDashHeldRef.current = false
+    prevAttackHeldRef.current = false
+    setTouchVisualState({ left: false, right: false, jump: false, dash: false, attack: false })
   }, [])
 
   useEffect(() => {
     const handleVisibilityOrBlur = () => {
       clearAllInputs()
       if (document.hidden && gameState === 'playing') {
+        sound.stopMusic()
         setGameState('paused')
       }
     }
@@ -414,7 +443,7 @@ export function GameEngine() {
     })
   }, [])
 
-  // Initialize a specific stage
+  // Initialize a specific stage (Levels 1–8)
   const initStage = useCallback(
     (stageIndex: number) => {
       const safeIndex = Math.max(0, Math.min(GAME_STAGES.length - 1, stageIndex))
@@ -426,12 +455,15 @@ export function GameEngine() {
         y: 0,
         viewportW: VIEWPORT_WIDTH,
         viewportH: VIEWPORT_HEIGHT,
+        shakeIntensity: 0,
       }
       particlesRef.current = []
       popupsRef.current = []
       elapsedSecRef.current = 0
       stageScoreRef.current = 0
       collectedCountRef.current = 0
+      collectedKindsRef.current = []
+      bossMusicActiveRef.current = false
       clearAllInputs()
 
       setCurrentStageIdx(safeIndex)
@@ -441,15 +473,18 @@ export function GameEngine() {
       setHudTotalEnergy(cloned.collectibles.length)
       setHudStageScore(0)
       setHudElapsedSec(0)
+      setHudTimeLeftSec(cloned.challengeTimeLimitSec ?? null)
       setHudBossHp(cloned.boss ? cloned.boss.hp : null)
       setHudBossMaxHp(cloned.boss ? cloned.boss.maxHp : 3)
+      setHudBossPhase(1)
+      setHudActiveBuffs({ speed: false, shield: false, spotlight: false, floodlight: false })
       setBannerAlert(null)
 
-      if (cloned.boss) {
-        sound.playBossRoar()
+      if (!isMuted) {
+        sound.startMusic(sound.getTrackForLevel(cloned.worldNumber, false))
       }
     },
-    [clearAllInputs]
+    [clearAllInputs, isMuted]
   )
 
   const startAdventure = useCallback(
@@ -486,12 +521,13 @@ export function GameEngine() {
       initStage(nextIdx)
       setGameState('playing')
     } else {
+      sound.stopMusic()
       sound.playVictory()
       setGameState('game_won')
     }
   }, [currentStageIdx, initStage])
 
-  // Keyboard Controls (Desktop)
+  // Keyboard Controls (Desktop — Section 13)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return
@@ -501,6 +537,7 @@ export function GameEngine() {
         if (gameState === 'playing') {
           e.preventDefault()
           clearAllInputs()
+          sound.stopMusic()
           setGameState('paused')
           return
         } else if (gameState === 'paused') {
@@ -527,6 +564,9 @@ export function GameEngine() {
         code === 'KeyA' ||
         code === 'KeyD' ||
         code === 'KeyW' ||
+        code === 'KeyE' ||
+        code === 'KeyF' ||
+        code === 'KeyJ' ||
         code === 'ShiftLeft' ||
         code === 'ShiftRight'
       ) {
@@ -603,23 +643,43 @@ export function GameEngine() {
         elapsedSecRef.current += dt
         totalPlayTimeSecRef.current += dt
 
+        // Decay camera shake
+        if (cameraRef.current.shakeIntensity && cameraRef.current.shakeIntensity > 0) {
+          cameraRef.current.shakeIntensity = Math.max(0, cameraRef.current.shakeIntensity - dt * 18)
+        }
+
+        // Check timed escape / timed power restoration limit (Levels 3 & 6)
+        const timeLimit = stageRef.current.challengeTimeLimitSec
+        if (timeLimit && elapsedSecRef.current >= timeLimit) {
+          sound.stopMusic()
+          sound.playDefeat()
+          showAlert('⌛ انتهى الوقت المحدد للتحدي! حاول مرة أخرى بسرعة أكبر.', 'error')
+          setGameState('defeat')
+          return
+        }
+
         const k = keysRef.current
         const t = touchInputRef.current
 
         const leftHeld = !!(k['ArrowLeft'] || k['KeyA'] || t.left)
         const rightHeld = !!(k['ArrowRight'] || k['KeyD'] || t.right)
         const jumpHeld = !!(k['Space'] || k['ArrowUp'] || k['KeyW'] || t.jump)
-        const runHeld = !!(k['ShiftLeft'] || k['ShiftRight'] || t.run)
+        const dashHeld = !!(k['ShiftLeft'] || k['ShiftRight'] || t.dash)
+        const attackHeld = !!(k['KeyE'] || k['KeyF'] || k['KeyJ'] || t.attack)
 
         const inputFrame: PlayerInputFrame = {
           left: leftHeld,
           right: rightHeld,
-          run: runHeld,
+          run: dashHeld,
           jumpPressed: jumpHeld && !prevJumpHeldRef.current,
           jumpHeld,
           jumpReleased: !jumpHeld && prevJumpHeldRef.current,
+          dashPressed: dashHeld && !prevDashHeldRef.current,
+          attackPressed: attackHeld && !prevAttackHeldRef.current,
         }
         prevJumpHeldRef.current = jumpHeld
+        prevDashHeldRef.current = dashHeld
+        prevAttackHeldRef.current = attackHeld
 
         const events = stepPlatformerSimulation(
           heroRef.current,
@@ -628,6 +688,19 @@ export function GameEngine() {
           dt,
           elapsedSecRef.current
         )
+
+        // Transition to Boss Battle music when player enters Boss Arena
+        if (
+          stageRef.current.boss &&
+          stageRef.current.boss.state !== 'defeated' &&
+          !bossMusicActiveRef.current &&
+          heroRef.current.x > stageRef.current.boss.minX - 240
+        ) {
+          bossMusicActiveRef.current = true
+          sound.playBossRoar()
+          sound.startMusic('boss_battle')
+          showAlert(`⚠️ مواجهة الزعيم: ${stageRef.current.boss.nameAr}!`, 'error')
+        }
 
         // Update particles & floating score popups
         for (let i = particlesRef.current.length - 1; i >= 0; i--) {
@@ -655,8 +728,21 @@ export function GameEngine() {
 
         // Process simulation audio & UI events
         if (events.jumped) {
-          sound.playJump(events.highJumped)
-          spawnBurstParticles(heroRef.current.x + heroRef.current.w * 0.5, heroRef.current.y + heroRef.current.h, '#38BDF8', 6)
+          sound.playJump(events.highJumped || events.doubleJumped)
+          spawnBurstParticles(
+            heroRef.current.x + heroRef.current.w * 0.5,
+            heroRef.current.y + heroRef.current.h,
+            events.doubleJumped ? '#FDE047' : '#38BDF8',
+            events.doubleJumped ? 10 : 6
+          )
+        }
+        if (events.dashed) {
+          sound.playDash()
+          spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y + 24, '#38BDF8', 10)
+        }
+        if (events.attacked) {
+          sound.playAttackPulse()
+          spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y + 20, '#FDE047', 12)
         }
         if (events.landed) {
           sound.playLand()
@@ -664,11 +750,31 @@ export function GameEngine() {
         if (events.collectedValue > 0) {
           stageScoreRef.current += events.collectedValue
         }
-        if (events.collectedStarIds.length > 0) {
-          collectedCountRef.current += events.collectedStarIds.length
-          sound.playStarPickup(events.collectedValue >= 200 ? 2 : 1)
-          spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y + 20, '#FBBF24', 10)
-          addScorePopup(heroRef.current.x + 17, heroRef.current.y - 8, `+${events.collectedValue}`)
+        if (events.collectedProductKinds.length > 0) {
+          collectedCountRef.current += events.collectedProductKinds.length
+          collectedKindsRef.current.push(...events.collectedProductKinds)
+          const firstKind = events.collectedProductKinds[0]
+          const meta = PRODUCT_CATALOG_META[firstKind]
+
+          if (firstKind.startsWith('wire_')) {
+            const g = firstKind === 'wire_6mm' ? '6' : firstKind === 'wire_4mm' ? '4' : firstKind === 'wire_2_5mm' ? '2.5' : '1.5'
+            sound.playCollectWire(g)
+          } else if (firstKind === 'led_bulb') {
+            sound.playCollectBulb()
+          } else if (firstKind === 'led_spotlight' || firstKind === 'rechargeable_floodlight') {
+            sound.playCollectSpotlight()
+          } else if (firstKind === 'intercom_device') {
+            sound.playCollectIntercom()
+          } else {
+            sound.playCollectWire('2.5')
+          }
+
+          spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y + 20, meta.color, 11)
+          addScorePopup(heroRef.current.x + 17, heroRef.current.y - 8, `${meta.nameAr} +${events.collectedValue}`, meta.color)
+
+          if (events.abilityActivatedMsg) {
+            showAlert(events.abilityActivatedMsg, 'info')
+          }
         }
         if (events.activatedCheckpointId) {
           sound.playCheckpoint()
@@ -678,7 +784,12 @@ export function GameEngine() {
         if (events.activatedSwitchId || events.openedGateId) {
           sound.playGateOpen()
           spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y, '#38BDF8', 14)
-          showAlert('🔓 تم تفعيل المفتاح الكهربائي وفتح المسار!', 'success')
+          showAlert(
+            events.openedGateId
+              ? '🔓 تم فتح البوابة الرئيسية بنجاح!'
+              : '⚡ تم تفعيل القاطع الكهربائي!',
+            'success'
+          )
         }
         if (events.stompedEnemyId) {
           sound.playEnemyStomp()
@@ -687,13 +798,24 @@ export function GameEngine() {
         }
         if (events.hitBoss) {
           sound.playBossHit()
+          cameraRef.current.shakeIntensity = 7
           spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y, '#F97316', 18)
-          showAlert('⚡ إصابة مباشرة لنواة حارس الطاقة الآلي!', 'success')
+          showAlert('⚡ إصابة مباشرة للزعيم!', 'success')
+        }
+        if (events.bossPhaseChanged) {
+          sound.playBossRoar()
+          cameraRef.current.shakeIntensity = 9
+          showAlert(`🔥 انتقل الزعيم إلى الطور القتالي ${events.bossPhaseChanged}!`, 'error')
         }
         if (events.bossDefeated) {
           sound.playMasterSwitch()
-          spawnBurstParticles(heroRef.current.x + 40, heroRef.current.y, '#FBBF24', 26)
-          showAlert('🏆 تم تحطيم درع حارس الطاقة الآلي وفتح القاطع الرئيسي!', 'success')
+          cameraRef.current.shakeIntensity = 12
+          spawnBurstParticles(heroRef.current.x + 40, heroRef.current.y, '#FBBF24', 28)
+          showAlert('🏆 تم القضاء على الزعيم وفتح البوابة النهائية!', 'success')
+        }
+        if (events.shieldBlocked) {
+          sound.playGateOpen()
+          showAlert('🛡️ درع سلك 4 مم² العازل حمى البطل من الصدمة!', 'info')
         }
         if (events.fellInPit && heroRef.current.hp > 0) {
           sound.playShortCircuit()
@@ -701,15 +823,18 @@ export function GameEngine() {
           showAlert('⚠️ سقوط في الهاوية! تمت إعادتك إلى آخر نقطة حفظ ضوئية.', 'error')
         } else if (events.tookDamage && heroRef.current.hp > 0) {
           sound.playShortCircuit()
+          cameraRef.current.shakeIntensity = 6
           spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y + 24, '#EF4444', 14)
         }
 
         // Check Defeat
         if (events.stageDefeated || heroRef.current.hp <= 0) {
-          sound.playShortCircuit()
+          sound.stopMusic()
+          sound.playDefeat()
           setHudHealth(0)
           setGameState('defeat')
         } else if (events.stageCompleted) {
+          sound.stopMusic()
           sound.playVictory()
           const stage = stageRef.current
           const totalCollectibles = Math.max(1, stage.collectibles.length)
@@ -726,7 +851,9 @@ export function GameEngine() {
             stage.stageIndex,
             finalStageScore,
             starsEarned,
-            collectedCountRef.current
+            collectedCountRef.current,
+            elapsedSecRef.current,
+            collectedKindsRef.current
           )
           setProgression(updatedProg)
           setHudStageScore(finalStageScore)
@@ -755,8 +882,20 @@ export function GameEngine() {
           setHudStageScore(stageScoreRef.current)
           setHudScore(totalCampaignScoreRef.current + stageScoreRef.current)
           setHudElapsedSec(Math.floor(elapsedSecRef.current))
+          if (stageRef.current.challengeTimeLimitSec) {
+            setHudTimeLeftSec(
+              Math.max(0, Math.ceil(stageRef.current.challengeTimeLimitSec - elapsedSecRef.current))
+            )
+          }
+          setHudActiveBuffs({
+            speed: heroRef.current.speedBoostTimer > 0,
+            shield: heroRef.current.shieldTimer > 0,
+            spotlight: heroRef.current.spotlightTimer > 0,
+            floodlight: heroRef.current.floodlightTimer > 0,
+          })
           if (stageRef.current.boss) {
             setHudBossHp(stageRef.current.boss.hp)
+            setHudBossPhase(stageRef.current.boss.phase)
           }
         }
       }
@@ -793,13 +932,13 @@ export function GameEngine() {
 
   // Pointer Handler for Mobile Multi-Touch Controls
   const handleTouchControl = useCallback(
-    (button: 'left' | 'right' | 'jump' | 'run', pressed: boolean) => {
+    (button: 'left' | 'right' | 'jump' | 'dash' | 'attack', pressed: boolean) => {
       touchInputRef.current[button] = pressed
       setTouchVisualState((prev) => {
         if (prev[button] === pressed) return prev
         return { ...prev, [button]: pressed }
       })
-      if (pressed && button === 'jump') {
+      if (pressed && (button === 'jump' || button === 'dash')) {
         try {
           navigator.vibrate?.(8)
         } catch {}
@@ -867,7 +1006,7 @@ export function GameEngine() {
       }`}
     >
       {/* =====================================================================
-          01. MOBILE PORTRAIT ORIENTATION RECOMMENDATION BANNER (SECTION 18)
+          01. MOBILE PORTRAIT ORIENTATION RECOMMENDATION BANNER
           ===================================================================== */}
       {isPortraitMobile && !dismissedOrientationHint && (
         <div className="w-full max-w-[960px] mb-2.5 px-3.5 py-2 rounded-2xl bg-gradient-to-l from-amber-500/15 via-blue-950/80 to-slate-900/90 border border-amber-400/35 flex items-center justify-between gap-2 text-amber-200 text-xs shadow-md">
@@ -888,31 +1027,31 @@ export function GameEngine() {
       )}
 
       {/* =====================================================================
-          02. COMPACT TOP HUD BAR (SECTION 19)
+          02. COMPACT TOP HUD BAR
           ===================================================================== */}
       <div className="w-full max-w-[960px] bg-[#0B1222]/95 border border-slate-800/90 rounded-t-2xl px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-lg backdrop-blur-md">
-        {/* Right Cluster: World & Stage Badge */}
+        {/* Right Cluster: Level & Stage Badge */}
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 border border-blue-400/40 flex items-center justify-center text-white shadow-inner shrink-0">
-            <Compass className="w-5 h-5 text-amber-300" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 border border-amber-200/50 flex items-center justify-center text-slate-950 shadow-inner shrink-0">
+            <Lightbulb className="w-5 h-5 fill-slate-950" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
               <span className="px-2 py-0.5 rounded-md bg-blue-500/20 border border-blue-400/30 text-[10px] font-black text-cyan-300">
-                العالم {activeStage.code}
+                المرحلة {activeStage.worldNumber} / 8
               </span>
               <span className="text-xs sm:text-sm font-extrabold text-white">
                 {activeStage.worldTitleAr}
               </span>
             </div>
             <p className="text-[11px] text-slate-400 hidden sm:block">
-              {activeStage.titleAr}
+              {activeStage.finalChallengeAr}
             </p>
           </div>
         </div>
 
-        {/* Center Cluster: Health (Hearts), Collected Energy Stars, Score */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Center Cluster: Health, Collected Products, Timed Challenge & Active Buffs */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {/* Health Hearts */}
           <div
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800"
@@ -930,20 +1069,52 @@ export function GameEngine() {
             ))}
           </div>
 
-          {/* Collected Energy Stars */}
+          {/* Collected Electrical Products */}
           <div
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-amber-500/30 text-amber-300 text-xs font-extrabold"
-            title="نجوم الطاقة المجمعة"
+            title="المنتجات والأسلاك المجمعة"
           >
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
             <span className="font-mono">
               {hudEnergy} / {hudTotalEnergy}
             </span>
           </div>
 
+          {/* Timed Challenge Countdown (Level 3 & Level 6) */}
+          {hudTimeLeftSec !== null && (
+            <div
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-black font-mono ${
+                hudTimeLeftSec <= 18
+                  ? 'bg-rose-950/90 border-rose-500 text-rose-300 animate-pulse'
+                  : 'bg-slate-900/90 border-cyan-500/35 text-cyan-300'
+              }`}
+              title="الوقت المتبقي للتحدي"
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>{hudTimeLeftSec}s</span>
+            </div>
+          )}
+
+          {/* Active Product Ability Badges */}
+          {hudActiveBuffs.shield && (
+            <span className="px-2 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-[10px] font-black flex items-center gap-1">
+              <Shield className="w-3 h-3" /> درع 4مم
+            </span>
+          )}
+          {hudActiveBuffs.speed && (
+            <span className="px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-black">
+              ⚡ سرعة 2.5مم
+            </span>
+          )}
+          {(hudActiveBuffs.spotlight || hudActiveBuffs.floodlight) && (
+            <span className="px-2 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 text-[10px] font-black">
+              🔦 كشاف نشط
+            </span>
+          )}
+
           {/* Score */}
-          <div className="hidden xs:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-blue-500/25 text-cyan-300 text-xs font-extrabold">
-            <Zap className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-blue-500/25 text-cyan-300 text-xs font-extrabold">
+            <Star className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
             <span className="font-mono">{hudScore}</span>
           </div>
         </div>
@@ -960,7 +1131,7 @@ export function GameEngine() {
             title="اختيار المرحلة"
           >
             <Flag className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden md:inline">اختيار المرحلة</span>
+            <span className="hidden lg:inline">اختيار المرحلة</span>
           </button>
 
           <button
@@ -978,10 +1149,14 @@ export function GameEngine() {
 
           <button
             type="button"
-            onClick={() => setIsMuted((m) => !m)}
+            onClick={() => {
+              const next = !isMuted
+              setIsMuted(next)
+              sound.setMuted(next)
+            }}
             className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white cursor-pointer transition-colors"
-            title={isMuted ? 'تشغيل الصوت' : 'كتم الصوت'}
-            aria-label={isMuted ? 'تشغيل الصوت' : 'كتم الصوت'}
+            title={isMuted ? 'تشغيل الصوت والموسيقى' : 'كتم الصوت'}
+            aria-label={isMuted ? 'تشغيل الصوت والموسيقى' : 'كتم الصوت'}
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
           </button>
@@ -1005,6 +1180,7 @@ export function GameEngine() {
               onClick={() => {
                 sound.playButton()
                 clearAllInputs()
+                sound.stopMusic()
                 setGameState('paused')
               }}
               className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
@@ -1038,11 +1214,13 @@ export function GameEngine() {
           className="w-full h-full block object-contain"
         />
 
-        {/* Boss Health Bar Overlay (World 5) */}
-        {gameState === 'playing' && hudBossHp !== null && hudBossHp > 0 && (
+        {/* Boss Health Bar Overlay */}
+        {gameState === 'playing' && hudBossHp !== null && hudBossHp > 0 && activeStage.boss && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 w-72 sm:w-96 bg-slate-950/90 border border-rose-500/50 rounded-2xl px-4 py-2 shadow-xl backdrop-blur-md">
             <div className="flex items-center justify-between text-xs font-extrabold text-rose-300 mb-1">
-              <span>⚡ حارس الطاقة الآلي</span>
+              <span>
+                ⚡ {activeStage.boss.nameAr} (الطور {hudBossPhase})
+              </span>
               <span>
                 الدرع: {hudBossHp} / {hudBossMaxHp}
               </span>
@@ -1054,7 +1232,7 @@ export function GameEngine() {
               />
             </div>
             <p className="text-[10px] text-slate-300 mt-1 text-center">
-              اقفز فوق النواة المضيئة للحارس أو فعّل قواطع التفريغ الثلاثة!
+              اقفز فوق النواة العلوية للزعيم أو فعّل قواطع التفريغ في الساحة!
             </p>
           </div>
         )}
@@ -1075,29 +1253,28 @@ export function GameEngine() {
         )}
 
         {/* =================================================================
-            START SCREEN OVERLAY (شاشة البداية - بطل الإنارة)
+            START SCREEN OVERLAY (شاشة البداية - بطل الإنارة: مغامرة اللمبة الأسطورية)
             ================================================================= */}
         {gameState === 'start' && (
-          <div className="absolute inset-0 z-20 bg-gradient-to-b from-[#070E20]/85 via-[#0B1528]/90 to-[#070B14]/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-xs font-extrabold mb-3 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>مغامرة منصات تفاعلية 2.5D • 5 عوالم مذهلة</span>
+          <div className="absolute inset-0 z-20 bg-gradient-to-b from-[#070E20]/88 via-[#0B1528]/92 to-[#070B14]/96 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-xs font-extrabold mb-2.5 shadow-sm">
+              <Lightbulb className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <span>مغامرة اللمبة المضيئة 2.5D • 8 مراحل متدرجة الصعوبة</span>
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2 drop-shadow-md">
-              بطل الإنارة <span className="text-amber-400">—</span> مغامرة عالم الضوء
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1.5 drop-shadow-md">
+              بطل الإنارة <span className="text-amber-400">—</span> مغامرة اللمبة الأسطورية
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed mb-5">
-              انطلق مع بطل الإنارة الحديثة عبر <strong className="text-white">5 عوالم ملونة</strong>: من{' '}
-              <span className="text-amber-300">مدينة الأنوار</span> و
-              <span className="text-cyan-300">مصنع الكهرباء</span> و
-              <span className="text-orange-300">عالم الأسلاك النحاسية</span> حتى{' '}
-              <span className="text-rose-300">قلعة الطاقة</span>! اقفز برشاقة، اجمع نجوم الطاقة، واهزم حارس الطاقة الآلي.
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed mb-4">
+              تحكم بشخصية <strong className="text-amber-300">لمبة LED الذكية</strong> واجمع منتجات الإنارة الحديثة الحقيقية:{' '}
+              <span className="text-cyan-300">أسلاك النحاس (1.5 و2.5 و4 و6 مم²)</span>،{' '}
+              <span className="text-yellow-300">السبوت لايت وكشافات الطوارئ</span>، و
+              <span className="text-emerald-300">أجهزة الإنترفون</span> عبر 8 مراحل ملحمية حتى هزيمة «ملك الظلام الكهربائي»!
             </p>
 
-            {/* 5 Worlds Preview Strip */}
-            <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 w-full max-w-2xl mb-6">
+            {/* 8 Levels Preview Grid */}
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2 w-full max-w-3xl mb-5">
               {GAME_STAGES.map((stg, idx) => {
                 const isUnlocked = idx <= progression.unlockedStageIndex
                 const stars = progression.stageStarsEarned[stg.id] || 0
@@ -1109,28 +1286,28 @@ export function GameEngine() {
                       if (isUnlocked) startAdventure(idx)
                     }}
                     disabled={!isUnlocked}
-                    className={`p-2 sm:p-2.5 rounded-xl border text-right transition-all flex flex-col justify-between ${
+                    className={`p-2 rounded-xl border text-right transition-all flex flex-col justify-between ${
                       isUnlocked
                         ? 'bg-slate-900/90 hover:bg-blue-950/80 border-blue-500/40 cursor-pointer hover:-translate-y-0.5 shadow-md'
                         : 'bg-slate-950/60 border-slate-800/80 opacity-55 cursor-not-allowed'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-[10px] font-black text-cyan-400">{stg.code}</span>
+                      <span className="text-[9px] font-black text-cyan-400">{stg.code}</span>
                       {isUnlocked ? (
-                        <Unlock className="w-3 h-3 text-emerald-400" />
+                        <Unlock className="w-2.5 h-2.5 text-emerald-400" />
                       ) : (
-                        <Lock className="w-3 h-3 text-slate-500" />
+                        <Lock className="w-2.5 h-2.5 text-slate-500" />
                       )}
                     </div>
-                    <div className="text-[11px] sm:text-xs font-extrabold text-white truncate w-full">
+                    <div className="text-[10px] font-extrabold text-white truncate w-full">
                       {stg.worldTitleAr}
                     </div>
-                    <div className="flex items-center gap-0.5 mt-1.5">
+                    <div className="flex items-center gap-0.5 mt-1">
                       {[1, 2, 3].map((s) => (
                         <Star
                           key={s}
-                          className={`w-3 h-3 ${
+                          className={`w-2.5 h-2.5 ${
                             s <= stars ? 'text-amber-400 fill-amber-400' : 'text-slate-700'
                           }`}
                         />
@@ -1141,7 +1318,7 @@ export function GameEngine() {
               })}
             </div>
 
-            {/* Primary Menu Buttons with Exact Arabic Labels (Section 20) */}
+            {/* Primary Menu Buttons */}
             <div className="flex flex-wrap items-center justify-center gap-3">
               <button
                 type="button"
@@ -1161,7 +1338,7 @@ export function GameEngine() {
                 className="px-5 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-blue-400/40 text-white font-bold text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all"
               >
                 <Flag className="w-4 h-4 text-cyan-400" />
-                <span>اختيار المرحلة</span>
+                <span>اختيار المرحلة (8 مراحل)</span>
               </button>
 
               <button
@@ -1180,7 +1357,7 @@ export function GameEngine() {
         )}
 
         {/* =================================================================
-            PAUSE MENU OVERLAY (قائمة الإيقاف المؤقت — Section 20)
+            PAUSE MENU OVERLAY (قائمة الإيقاف المؤقت)
             ================================================================= */}
         {gameState === 'paused' && (
           <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
@@ -1231,6 +1408,7 @@ export function GameEngine() {
                 onClick={() => {
                   sound.playButton()
                   clearAllInputs()
+                  sound.stopMusic()
                   setGameState('start')
                 }}
                 className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-900 hover:bg-rose-950/60 border border-slate-800 text-slate-300 hover:text-rose-200 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer"
@@ -1242,16 +1420,16 @@ export function GameEngine() {
         )}
 
         {/* =================================================================
-            DEFEAT / RETRY OVERLAY (شاشة إعادة المحاولة)
+            DEFEAT / RETRY OVERLAY
             ================================================================= */}
         {gameState === 'defeat' && (
           <div className="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
             <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400 mb-3">
               <ShieldAlert className="w-8 h-8" />
             </div>
-            <h3 className="text-2xl font-black text-white mb-1">انقطعت طاقة البدلة الضوئية!</h3>
+            <h3 className="text-2xl font-black text-white mb-1">انطفأت طاقة لمبة البطل!</h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
-              لا تستسلم يا بطل الإنارة! اقفز فوق الأعداء لتعطيلهم واستخدم نقاط الحفظ الضوئية لإكمال المرحلة.
+              اجمع لمبات LED لاستعادة القلوب وأسلاك 4 مم² لتفعيل الدرع العازل، واستخدم القفز المزدوج والاندفاع السريع لتجاوز العوائق!
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -1308,15 +1486,15 @@ export function GameEngine() {
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-black text-white mb-1">
-              اكتمل {activeStage.worldTitleAr} بنجاح!
+              اكتملت مرحلة {activeStage.worldTitleAr} بنجاح!
             </h3>
             <p className="text-xs sm:text-sm text-cyan-300 font-bold mb-4">
-              تم فتح العالم التالي: {GAME_STAGES[currentStageIdx + 1]?.worldTitleAr}
+              تم فتح المرحلة التالية: {GAME_STAGES[currentStageIdx + 1]?.worldTitleAr}
             </p>
 
             <div className="grid grid-cols-3 gap-3 w-full max-w-md mb-6 bg-slate-900/90 border border-slate-800 rounded-2xl p-3">
               <div>
-                <div className="text-[11px] text-slate-400">نجوم الطاقة</div>
+                <div className="text-[11px] text-slate-400">المنتجات المجمعة</div>
                 <div className="text-sm font-black text-amber-400">
                   {hudEnergy} / {hudTotalEnergy}
                 </div>
@@ -1338,7 +1516,7 @@ export function GameEngine() {
                 className="px-7 py-3 rounded-xl bg-gradient-to-l from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-slate-950 font-black text-sm flex items-center gap-2 cursor-pointer shadow-lg"
               >
                 <Play className="w-4 h-4 fill-slate-950" />
-                <span>المرحلة التالية ({GAME_STAGES[currentStageIdx + 1]?.worldTitleAr})</span>
+                <span>متابعة للمرحلة التالية ({GAME_STAGES[currentStageIdx + 1]?.worldTitleAr})</span>
               </button>
 
               <button
@@ -1361,17 +1539,17 @@ export function GameEngine() {
         )}
 
         {/* =================================================================
-            FINAL CAMPAIGN VICTORY + VOUCHER + LEADERBOARD (فوز كامل المغامرة)
+            FINAL CAMPAIGN VICTORY + VOUCHER + LEADERBOARD
             ================================================================= */}
         {gameState === 'game_won' && (
           <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-start sm:justify-center p-4 sm:p-6 text-center overflow-y-auto">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-black mb-2">
               <Trophy className="w-4 h-4 text-amber-400" />
-              <span>بطل الإنارة الأسطوري • تم تحرير العوالم الخمسة!</span>
+              <span>بطل الإنارة الأسطوري • تم تحرير المراحل الثماني كاملة!</span>
             </div>
 
             <h3 className="text-xl sm:text-2xl font-black text-white mb-1">
-              مبارك الفوز! أعدت النور والطاقة إلى المدينة
+              مبارك الفوز! هزمت ملك الظلام الكهربائي وأعدت النور للمدينة
             </h3>
             <p className="text-xs text-slate-300 max-w-lg mb-3">
               {rewardConfig.victoryMsg} — مجموع نقاطك النهائي:{' '}
@@ -1459,7 +1637,7 @@ export function GameEngine() {
               {rewardConfig.isEnabled && rewardConfig.rewardType !== 'no_reward' && (
                 <a
                   href={`https://wa.me/218916580068?text=${encodeURIComponent(
-                    `مرحباً شركة الإنارة الحديثة، أتممت مغامرة بطل الإنارة وحصلت على ${
+                    `مرحباً شركة الإنارة الحديثة، أتممت المراحل الثماني في لعبة بطل الإنارة وحصلت على ${
                       rewardConfig.rewardType === 'coupon'
                         ? `كود الخصم: ${rewardConfig.couponCode}`
                         : `الهدية: ${rewardConfig.giftItemName}`
@@ -1495,17 +1673,17 @@ export function GameEngine() {
       </div>
 
       {/* =====================================================================
-          04. ERGONOMIC MULTI-TOUCH MOBILE CONTROLS DECK (SECTION 17)
+          04. ERGONOMIC MULTI-TOUCH MOBILE CONTROLS DECK (SECTION 12)
           Left side: Left / Right directional buttons
-          Right side: Prominent Jump button + Run boost button
+          Right side: Attack Pulse + Dash + Prominent Jump (with Double Jump)
           ===================================================================== */}
       <div
         dir="ltr"
-        className="w-full max-w-[960px] bg-[#0B1222] border-x border-b border-slate-800 rounded-b-2xl px-3 sm:px-6 py-3 flex items-center justify-between gap-3 shadow-xl select-none touch-none"
+        className="w-full max-w-[960px] bg-[#0B1222] border-x border-b border-slate-800 rounded-b-2xl px-3 sm:px-6 py-3 flex items-center justify-between gap-2 sm:gap-3 shadow-xl select-none touch-none"
         style={{ touchAction: 'none' }}
       >
-        {/* LEFT SIDE OF SCREEN: Left & Right Directional Thumb Buttons */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        {/* LEFT SIDE: Left & Right Directional Thumb Buttons */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             onPointerDown={(e) => {
@@ -1525,8 +1703,8 @@ export function GameEngine() {
             }}
             className={`${
               touchButtonScale === 'large'
-                ? 'w-16 h-14 sm:w-20 sm:h-16'
-                : 'w-14 h-12 sm:w-16 sm:h-14'
+                ? 'w-15 h-14 sm:w-20 sm:h-16'
+                : 'w-13 h-12 sm:w-16 sm:h-14'
             } rounded-2xl border-2 font-black text-sm sm:text-base flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
               touchVisualState.left
                 ? 'bg-blue-600 border-cyan-300 text-white scale-95 shadow-[0_0_18px_rgba(59,130,246,0.75)]'
@@ -1557,8 +1735,8 @@ export function GameEngine() {
             }}
             className={`${
               touchButtonScale === 'large'
-                ? 'w-16 h-14 sm:w-20 sm:h-16'
-                : 'w-14 h-12 sm:w-16 sm:h-14'
+                ? 'w-15 h-14 sm:w-20 sm:h-16'
+                : 'w-13 h-12 sm:w-16 sm:h-14'
             } rounded-2xl border-2 font-black text-sm sm:text-base flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
               touchVisualState.right
                 ? 'bg-blue-600 border-cyan-300 text-white scale-95 shadow-[0_0_18px_rgba(59,130,246,0.75)]'
@@ -1571,22 +1749,23 @@ export function GameEngine() {
           </button>
         </div>
 
-        {/* CENTER HINT (Desktop Keyboard & Mobile Multi-Touch Guide) */}
-        <div dir="rtl" className="hidden md:flex flex-col items-center text-center text-[11px] text-slate-400">
+        {/* CENTER HINT (Desktop Keyboard Guide) */}
+        <div dir="rtl" className="hidden lg:flex flex-col items-center text-center text-[11px] text-slate-400">
           <div className="font-bold text-slate-300">
-            لوحة المفاتيح: الأسهم أو <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono">A</kbd>{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono">D</kbd> للحركة •{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 font-mono">Space</kbd> للقفز •{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono">Shift</kbd> للركض السريع
+            لوحة المفاتيح: <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono">A</kbd>{' '}
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono">D</kbd> أو الأسهم للحركة •{' '}
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 font-mono">Space</kbd> قفز / قفز مزدوج •{' '}
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono">Shift</kbd> اندفاع (Dash) •{' '}
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-yellow-300 font-mono">E</kbd> هجوم ضوئي
           </div>
           <div className="text-[10px] text-slate-500 mt-0.5">
-            ضغطة قصيرة لقفزة منخفضة • ضغطة مطولة لقفزة عالية فوق المنصات
+            اجمع الأسلاك ولمبات LED والسبوت لايت والإنترفون لتفعيل القدرات الخاصة!
           </div>
         </div>
 
-        {/* RIGHT SIDE OF SCREEN: Run Boost + Prominent Jump Button */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Optional Sprint / Run Button */}
+        {/* RIGHT SIDE: Light Pulse Attack + Dash + Prominent Jump Button */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Light Bulb Pulse Attack Button */}
           <button
             type="button"
             onPointerDown={(e) => {
@@ -1594,32 +1773,65 @@ export function GameEngine() {
               try {
                 e.currentTarget.setPointerCapture(e.pointerId)
               } catch {}
-              handleTouchControl('run', true)
+              handleTouchControl('attack', true)
             }}
             onPointerUp={(e) => {
               e.preventDefault()
-              handleTouchControl('run', false)
+              handleTouchControl('attack', false)
             }}
-            onPointerCancel={() => handleTouchControl('run', false)}
+            onPointerCancel={() => handleTouchControl('attack', false)}
             onPointerLeave={(e) => {
-              if (e.buttons === 0) handleTouchControl('run', false)
+              if (e.buttons === 0) handleTouchControl('attack', false)
+            }}
+            className={`${
+              touchButtonScale === 'large'
+                ? 'w-13 h-14 sm:w-15 sm:h-16'
+                : 'w-12 h-12 sm:w-14 sm:h-14'
+            } rounded-2xl border-2 font-black flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
+              touchVisualState.attack
+                ? 'bg-yellow-400 border-white text-slate-950 scale-95 shadow-[0_0_18px_rgba(250,204,21,0.85)]'
+                : 'bg-slate-900/90 hover:bg-slate-800 border-yellow-500/40 text-yellow-300 shadow-md'
+            }`}
+            aria-label="هجوم ومضة اللمبة"
+          >
+            <Lightbulb className="w-4 h-4 fill-current" />
+            <span className="text-[10px] font-bold mt-0.5">ومضة</span>
+          </button>
+
+          {/* Dash Button (Shift / Mobile Dash) */}
+          <button
+            type="button"
+            onPointerDown={(e) => {
+              e.preventDefault()
+              try {
+                e.currentTarget.setPointerCapture(e.pointerId)
+              } catch {}
+              handleTouchControl('dash', true)
+            }}
+            onPointerUp={(e) => {
+              e.preventDefault()
+              handleTouchControl('dash', false)
+            }}
+            onPointerCancel={() => handleTouchControl('dash', false)}
+            onPointerLeave={(e) => {
+              if (e.buttons === 0) handleTouchControl('dash', false)
             }}
             className={`${
               touchButtonScale === 'large'
                 ? 'w-14 h-14 sm:w-16 sm:h-16'
                 : 'w-12 h-12 sm:w-14 sm:h-14'
             } rounded-2xl border-2 font-black flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
-              touchVisualState.run
+              touchVisualState.dash
                 ? 'bg-cyan-500 border-white text-slate-950 scale-95 shadow-[0_0_18px_rgba(6,182,212,0.8)]'
                 : 'bg-slate-900/90 hover:bg-slate-800 border-cyan-500/40 text-cyan-300 shadow-md'
             }`}
-            aria-label="ركض سريع"
+            aria-label="اندفاع سريع"
           >
             <Zap className="w-4 h-4 fill-current" />
-            <span className="text-[10px] font-bold mt-0.5">ركض</span>
+            <span className="text-[10px] font-bold mt-0.5">اندفاع</span>
           </button>
 
-          {/* Primary Prominent Jump Button */}
+          {/* Primary Prominent Jump / Double Jump Button */}
           <button
             type="button"
             onPointerDown={(e) => {
@@ -1639,7 +1851,7 @@ export function GameEngine() {
             }}
             className={`${
               touchButtonScale === 'large'
-                ? 'w-20 h-14 sm:w-24 sm:h-16'
+                ? 'w-18 h-14 sm:w-24 sm:h-16'
                 : 'w-16 h-12 sm:w-20 sm:h-14'
             } rounded-2xl border-2 font-black flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
               touchVisualState.jump
@@ -1649,21 +1861,23 @@ export function GameEngine() {
             aria-label="قفز"
           >
             <span className="text-base sm:text-lg leading-none font-black">▲ قفز</span>
-            <span className="text-[10px] font-extrabold opacity-80 mt-0.5">JUMP</span>
+            <span className="text-[9px] font-extrabold opacity-80 mt-0.5">قفز مزدوج</span>
           </button>
         </div>
       </div>
 
       {/* =====================================================================
-          05. STAGE SELECTION MODAL (نافذة اختيار المرحلة — 5 عوالم)
+          05. STAGE SELECTION & ACHIEVEMENTS MODAL (8 LEVELS + ACHIEVEMENTS)
           ===================================================================== */}
       {showStageSelectModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0E1628] border border-blue-500/40 rounded-3xl w-full max-w-2xl p-5 sm:p-6 shadow-2xl text-right max-h-[88vh] flex flex-col">
+          <div className="bg-[#0E1628] border border-blue-500/40 rounded-3xl w-full max-w-3xl p-5 sm:p-6 shadow-2xl text-right max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
               <div className="flex items-center gap-2">
                 <Flag className="w-5 h-5 text-amber-400" />
-                <h3 className="text-lg font-black text-white">اختيار المرحلة — عوالم بطل الإنارة الخمسة</h3>
+                <h3 className="text-base sm:text-lg font-black text-white">
+                  اختيار المرحلة والإنجازات — المراحل الثماني (1–8)
+                </h3>
               </div>
               <button
                 type="button"
@@ -1679,10 +1893,11 @@ export function GameEngine() {
                 const isUnlocked = idx <= progression.unlockedStageIndex
                 const stars = progression.stageStarsEarned[stg.id] || 0
                 const high = progression.bestStageScores[stg.id] || 0
+                const bestTime = progression.bestStageTimesSec[stg.id]
                 return (
                   <div
                     key={stg.id}
-                    className={`p-4 rounded-2xl border flex flex-col justify-between transition-all ${
+                    className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all ${
                       isUnlocked
                         ? 'bg-slate-900/90 border-blue-500/35 hover:border-amber-400/60'
                         : 'bg-slate-950/60 border-slate-800 opacity-60'
@@ -1690,8 +1905,8 @@ export function GameEngine() {
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded-md bg-blue-500/20 text-cyan-300 text-[11px] font-black">
-                          العالم {stg.code}
+                        <span className="px-2 py-0.5 rounded-md bg-blue-500/20 text-cyan-300 text-[10px] font-black">
+                          المرحلة {stg.worldNumber}: {stg.difficultyAr}
                         </span>
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3].map((s) => (
@@ -1704,21 +1919,31 @@ export function GameEngine() {
                           ))}
                         </div>
                       </div>
-                      <h4 className="text-base font-black text-white mb-0.5">
-                        {stg.worldTitleAr} — {stg.titleAr}
+                      <h4 className="text-sm sm:text-base font-black text-white mb-0.5">
+                        {stg.worldTitleAr}
                       </h4>
-                      <p className="text-xs text-slate-400 leading-relaxed mb-3">{stg.subtitleAr}</p>
+                      <p className="text-[11px] text-amber-300/90 font-semibold mb-1">
+                        🎯 {stg.finalChallengeAr}
+                      </p>
+                      <p className="text-[11px] text-slate-400 leading-relaxed mb-2.5">{stg.subtitleAr}</p>
                     </div>
 
                     <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                      <span className="text-[11px] text-slate-400 font-mono">
-                        أعلى نتيجة: <strong className="text-amber-300">{high}</strong>
-                      </span>
+                      <div className="text-[10px] text-slate-400 font-mono space-x-2 space-x-reverse">
+                        <span>
+                          النقاط: <strong className="text-amber-300">{high}</strong>
+                        </span>
+                        {bestTime && (
+                          <span>
+                            • أسرع زمن: <strong className="text-emerald-300">{bestTime}s</strong>
+                          </span>
+                        )}
+                      </div>
                       {isUnlocked ? (
                         <button
                           type="button"
                           onClick={() => startAdventure(idx)}
-                          className="px-4 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer"
                         >
                           العب الآن
                         </button>
@@ -1732,12 +1957,39 @@ export function GameEngine() {
                 )
               })}
             </div>
+
+            {/* Achievements Strip */}
+            <div className="mt-4 pt-3 border-t border-slate-800">
+              <div className="text-xs font-extrabold text-amber-300 mb-2">
+                🏅 إنجازات بطل الإنارة ({progression.achievements.length} / {GAME_ACHIEVEMENTS.length})
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {GAME_ACHIEVEMENTS.map((ach) => {
+                  const earned = progression.achievements.includes(ach.id)
+                  return (
+                    <div
+                      key={ach.id}
+                      className={`p-2 rounded-xl border text-right ${
+                        earned
+                          ? 'bg-amber-500/15 border-amber-400/50 text-white'
+                          : 'bg-slate-950/60 border-slate-800 text-slate-500'
+                      }`}
+                    >
+                      <div className="text-xs font-black truncate">
+                        {ach.icon} {ach.titleAr}
+                      </div>
+                      <div className="text-[10px] opacity-80 leading-tight mt-0.5">{ach.descAr}</div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* =====================================================================
-          06. SETTINGS MODAL (نافذة الإعدادات — Section 20 & 26)
+          06. SETTINGS MODAL (Separate Music & SFX Volume + Reduced Motion)
           ===================================================================== */}
       {showSettingsModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1745,7 +1997,7 @@ export function GameEngine() {
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
               <div className="flex items-center gap-2">
                 <Settings className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-lg font-black text-white">الإعدادات</h3>
+                <h3 className="text-lg font-black text-white">الإعدادات والصوت</h3>
               </div>
               <button
                 type="button"
@@ -1757,15 +2009,19 @@ export function GameEngine() {
             </div>
 
             <div className="space-y-4">
-              {/* Sound Effects Toggle */}
+              {/* Master Mute Toggle */}
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
                 <div>
-                  <div className="text-sm font-bold text-white">المؤثرات الصوتية</div>
-                  <div className="text-xs text-slate-400">تشغيل أو كتم أصوات القفز وجمع نجوم الطاقة</div>
+                  <div className="text-sm font-bold text-white">تشغيل الصوت العام</div>
+                  <div className="text-xs text-slate-400">تفعيل أو كتم كافة الأصوات والموسيقى</div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setIsMuted((m) => !m)}
+                  onClick={() => {
+                    const next = !isMuted
+                    setIsMuted(next)
+                    sound.setMuted(next)
+                  }}
                   className={`px-4 py-2 rounded-xl font-bold text-xs cursor-pointer ${
                     !isMuted ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
                   }`}
@@ -1774,11 +2030,54 @@ export function GameEngine() {
                 </button>
               </div>
 
+              {/* Separate Music Volume Control (Section 9) */}
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm font-bold text-white">مستوى صوت الموسيقى التصويرية</span>
+                  <span className="text-xs font-mono text-amber-300">{Math.round(musicVolume * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={musicVolume}
+                  onChange={(e) => {
+                    const v = Number(e.target.value)
+                    setMusicVolume(v)
+                    sound.setMusicVolume(v)
+                  }}
+                  className="w-full accent-amber-400 cursor-pointer"
+                />
+              </div>
+
+              {/* Separate SFX Volume Control (Section 9) */}
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm font-bold text-white">مستوى المؤثرات الصوتية (SFX)</span>
+                  <span className="text-xs font-mono text-cyan-300">{Math.round(sfxVolume * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={sfxVolume}
+                  onChange={(e) => {
+                    const v = Number(e.target.value)
+                    setSfxVolume(v)
+                    sound.setSfxVolume(v)
+                    sound.playButton()
+                  }}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+              </div>
+
               {/* Reduced Motion Toggle */}
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
                 <div>
                   <div className="text-sm font-bold text-white">تقليل الحركة والمؤثرات</div>
-                  <div className="text-xs text-slate-400">تخفيف الجزيئات والمؤثرات البصرية لراحة العين</div>
+                  <div className="text-xs text-slate-400">تخفيف اهتزاز الكاميرا والجزيئات</div>
                 </div>
                 <button
                   type="button"
@@ -1801,7 +2100,7 @@ export function GameEngine() {
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
                 <div>
                   <div className="text-sm font-bold text-white">حجم أزرار اللمس للهاتف</div>
-                  <div className="text-xs text-slate-400">تكبير أزرار الحركة والقفز لسهولة التحكم</div>
+                  <div className="text-xs text-slate-400">تكبير أزرار الحركة والقفز والاندفاع</div>
                 </div>
                 <button
                   type="button"
@@ -1833,7 +2132,7 @@ export function GameEngine() {
       )}
 
       {/* =====================================================================
-          07. WEEKLY LEADERBOARD MODAL (لوحة شرف أبطال الإنارة الحديثة)
+          07. WEEKLY LEADERBOARD MODAL
           ===================================================================== */}
       {showLeaderboard && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1866,7 +2165,7 @@ export function GameEngine() {
                 </div>
               </div>
               <p className="text-[11px] text-zinc-400 leading-relaxed">
-                ⚡ اجمع أكبر عدد من نجوم الطاقة وأكمل العوالم الخمسة لتتصدر لوحة الشرف الأسبوعية!
+                ⚡ اجمع المنتجات الكهربائية وأكمل المراحل الثماني لتتصدر لوحة الشرف الأسبوعية!
               </p>
             </div>
 

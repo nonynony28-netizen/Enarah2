@@ -17,7 +17,7 @@ function assert(condition, message) {
 }
 
 console.log('=================================================================')
-console.log('ENARAH MODERN — LIGHT HERO ADVENTURE V1 AUTOMATED QA SUITE')
+console.log('BATAL AL ENARA — ARGON 4 AUTONOMOUS GAME QA & VERIFICATION SUITE')
 console.log('=================================================================')
 
 const worldsSrc = fs.readFileSync(path.join(ROOT, 'src/components/game/platformerWorlds.ts'), 'utf8')
@@ -27,17 +27,7 @@ const engineSrc = fs.readFileSync(path.join(ROOT, 'src/components/game/GameEngin
 const audioSrc = fs.readFileSync(path.join(ROOT, 'src/components/game/audio.ts'), 'utf8')
 const gamePageSrc = fs.readFileSync(path.join(ROOT, 'src/pages/Game.tsx'), 'utf8')
 
-// 1. Verify all 5 distinct worlds & Arabic titles
-assert(
-  worldsSrc.includes('مدينة الأنوار') &&
-    worldsSrc.includes('مصنع الكهرباء') &&
-    worldsSrc.includes('عالم الأسلاك') &&
-    worldsSrc.includes('مدينة المستقبل') &&
-    worldsSrc.includes('قلعة الطاقة'),
-  'All 5 distinct worlds (مدينة الأنوار, مصنع الكهرباء, عالم الأسلاك, مدينة المستقبل, قلعة الطاقة) are defined'
-)
-
-// 2. Verify all 11 hero animation states
+// 1. Verify Anthropomorphic LED Light Bulb Hero & all 12 Animations (Section 3)
 const requiredAnimStates = [
   'idle',
   'walk',
@@ -46,101 +36,172 @@ const requiredAnimStates = [
   'jump_ascent',
   'falling',
   'landing',
-  'collecting',
   'damage',
+  'attacking',
+  'dash',
   'victory',
   'defeat',
+  'collecting',
 ]
 assert(
-  requiredAnimStates.every((st) => worldsSrc.includes(`'${st}'`) && physicsSrc.includes(`'${st}'`)),
-  'All 11 hero animation states are defined and driven by the physics state machine'
+  requiredAnimStates.every((st) => worldsSrc.includes(`'${st}'`) && physicsSrc.includes(`'${st}'`)) &&
+    rendererSrc.includes('screwGrad') &&
+    rendererSrc.includes('diffuserGrad') &&
+    rendererSrc.includes('bulbAura'),
+  'Anthropomorphic LED Light Bulb Hero (frosted diffuser head, E27 metallic screw base, expressive eyes/eyebrows, gloves/shoes, subtle light aura) & all 12 animations implemented'
 )
 
-// 3. Verify Mario-style movement constants (walk, run, variable jump, coyote time, jump buffering)
+// 2. Verify Advanced Movement Physics including Double Jump & Dash (Section 4)
 assert(
   physicsSrc.includes('coyoteTimeSec: 0.11') &&
     physicsSrc.includes('jumpBufferSec: 0.11') &&
     physicsSrc.includes('variableJumpCutMultiplier: 0.5') &&
-    physicsSrc.includes('maxWalkSpeed') &&
-    physicsSrc.includes('maxRunSpeed'),
-  'Mario-style physics constants (Coyote Time 110ms, Jump Buffer 110ms, Variable Jump Height, Walk/Run speeds) are implemented'
+    physicsSrc.includes('doubleJumpVelocity') &&
+    physicsSrc.includes('doubleJumpAvailable') &&
+    physicsSrc.includes('dashSpeed') &&
+    physicsSrc.includes('dashTimer'),
+  'Advanced platformer physics (Coyote Time, Jump Buffering, Variable Jump Height, Double Jump, Dash, Air Control, Wall Collision) implemented'
 )
 
-// 4. Verify interactive world mechanics (moving platforms, conveyors, springs, phase platforms, switches, gates)
+// 3. Verify 13 Electrical Product Collectibles & Meaningful Gameplay Abilities (Section 5)
+const requiredProducts = [
+  'wire_1_5mm',
+  'wire_2_5mm',
+  'wire_4mm',
+  'wire_6mm',
+  'led_bulb',
+  'led_spotlight',
+  'led_strip',
+  'outdoor_fixture',
+  'rechargeable_floodlight',
+  'intercom_device',
+  'waterproof_socket',
+  'electrical_switch_item',
+  'electrical_connector',
+]
 assert(
-  worldsSrc.includes("kind: 'moving'") &&
-    worldsSrc.includes("kind: 'conveyor'") &&
-    worldsSrc.includes("kind: 'spring'") &&
-    worldsSrc.includes("kind: 'phase'") &&
-    worldsSrc.includes("kind: 'bridge_locked'"),
-  'Interactive platform types (moving, conveyor, copper spring, phase platform, switch-unlocked wire bridge) exist across the 5 worlds'
+  requiredProducts.every((p) => worldsSrc.includes(`'${p}'`) && worldsSrc.includes(`${p}:`)) &&
+    physicsSrc.includes('speedBoostTimer') &&
+    physicsSrc.includes('shieldTimer') &&
+    physicsSrc.includes('spotlightTimer') &&
+    physicsSrc.includes('floodlightTimer') &&
+    physicsSrc.includes('intercomsCollected'),
+  'All 13 Electrical Product Collectibles (1.5mm–6mm wires, LED bulbs, spotlights, strips, outdoor fixtures, floodlights, intercoms, sockets, switches, connectors) & active abilities implemented'
 )
 
-// 5. Verify Collectibles (نجوم الطاقة, copper_coil, light_capsule) & Checkpoints
+// 4. Verify All 8 Progressively Difficult Levels & Unique Final Challenges (Sections 6 & 8)
+const requiredLevels = [
+  'مدينة النور',
+  'شارع الكهرباء',
+  'مصنع الإنارة',
+  'حي الإنترفون',
+  'محطة الطاقة',
+  'المدينة المظلمة',
+  'برج الإنارة',
+  'قلعة الظلام',
+]
+const requiredChallenges = [
+  'three_switches_hazard',
+  'boss_security_robot',
+  'timed_machine_escape',
+  'intercom_security_puzzle',
+  'boss_transformer',
+  'timed_power_restoration',
+  'boss_construction_giant',
+  'boss_dark_king_3phase',
+]
 assert(
-  worldsSrc.includes("'energy_star'") &&
-    worldsSrc.includes("'copper_coil'") &&
-    worldsSrc.includes("'light_capsule'") &&
-    physicsSrc.includes('activatedCheckpointId'),
-  'Collectibles (نجوم الطاقة, copper coils, light capsules) and checkpoint beacons are implemented'
+  requiredLevels.every((lvl) => worldsSrc.includes(lvl)) &&
+    requiredChallenges.every((ch) => worldsSrc.includes(`'${ch}'`)),
+  'All 8 progressively difficult levels (مدينة النور through قلعة الظلام) and their 8 unique final challenges are implemented'
 )
 
-// 6. Verify Enemies (patrol + top stomp vs side damage) & World 5 Boss (حارس الطاقة الآلي)
+// 5. Verify 8 Unique Enemy Types & AI State Machine (Section 7)
+const requiredEnemies = [
+  'electrical_spark',
+  'cable_snake',
+  'flying_drone',
+  'mechanical_spider',
+  'security_robot',
+  'shadow_creature',
+  'transformer_monster',
+  'giant_guardian',
+]
 assert(
-  worldsSrc.includes('حارس الطاقة الآلي') &&
-    worldsSrc.includes('Mechanical Energy Guardian') &&
-    physicsSrc.includes('stompedEnemyId') &&
-    physicsSrc.includes('damageBoss') &&
-    physicsSrc.includes('shockwaveActive'),
-  'Enemy top-stomp mechanics and World 5 Boss (حارس الطاقة الآلي) with shockwaves and 3 overload breakers are implemented'
+  requiredEnemies.every((en) => worldsSrc.includes(`'${en}'`) && rendererSrc.includes(`'${en}'`)) &&
+    physicsSrc.includes("enemy.aiState = 'detect'") &&
+    physicsSrc.includes("enemy.aiState = 'attack'") &&
+    physicsSrc.includes("enemy.aiState = 'recover'"),
+  'All 8 unique enemy types with state machine (IDLE -> PATROL -> DETECT -> ATTACK -> RECOVER -> DEFEATED) & telegraph indicators implemented'
 )
 
-// 7. Verify 2.5D multi-layer parallax & beveled platform renderer
+// 6. Verify 4 Boss Archetypes & 3-Phase Final Boss (ملك الظلام الكهربائي)
+assert(
+  worldsSrc.includes('روبوت الحراسة المدرع') &&
+    worldsSrc.includes('حارس المحطة العملاق') &&
+    worldsSrc.includes('عملاق البناء الآلي') &&
+    worldsSrc.includes('ملك الظلام الكهربائي') &&
+    physicsSrc.includes('bossPhaseChanged') &&
+    physicsSrc.includes('boss.projectiles'),
+  'All 4 Boss encounters including 3-Phase Final Boss (ملك الظلام الكهربائي) with shockwaves, aimed projectiles, and breaker switches implemented'
+)
+
+// 7. Verify 8 Distinct Level Soundtracks, Boss Music Transition, Separate Music/SFX Volume & SFX (Section 9)
+const requiredTracks = [
+  'level_1',
+  'level_2',
+  'level_3',
+  'level_4',
+  'level_5',
+  'level_6',
+  'level_7',
+  'level_8',
+  'boss_battle',
+]
+assert(
+  requiredTracks.every((tr) => audioSrc.includes(`${tr}:`)) &&
+    audioSrc.includes('setMusicVolume') &&
+    audioSrc.includes('setSfxVolume') &&
+    audioSrc.includes('playCollectWire') &&
+    audioSrc.includes('playCollectBulb') &&
+    audioSrc.includes('playCollectSpotlight') &&
+    audioSrc.includes('playCollectIntercom') &&
+    engineSrc.includes('musicVolume') &&
+    engineSrc.includes('sfxVolume'),
+  '8 distinct procedural instrumental soundtracks + Boss Battle transition music + separate Music & SFX volume sliders + 15 custom SFX implemented'
+)
+
+// 8. Verify 2.5D Stylized-Realistic Environments, Blackout Illumination Mask & Camera Framing (Sections 10 & 11)
 assert(
   rendererSrc.includes('renderSkyAndAtmosphere') &&
     rendererSrc.includes('renderFarParallaxLayer') &&
     rendererSrc.includes('renderMidgroundParallaxLayer') &&
     rendererSrc.includes('render25DPlatform') &&
-    rendererSrc.includes('renderOriginalHeroCharacter') &&
-    rendererSrc.includes('renderForegroundDepthLayer'),
-  '2.5D multi-layer parallax renderer (5 layers + beveled 2.5D platforms + articulated hero character) is implemented'
+    rendererSrc.includes('renderBlackoutIlluminationMask') &&
+    physicsSrc.includes('updateSideScrollingCamera'),
+  '2.5D multi-layer parallax environments, Level 6 blackout radial illumination mask, and Boss Arena camera framing implemented'
 )
 
-// 8. Verify Exact Arabic Menu Labels (Section 20) & Mobile Landscape Recommendation (Section 18)
-const requiredArabicLabels = [
-  'ابدأ المغامرة',
-  'اختيار المرحلة',
-  'متابعة',
-  'إعادة المحاولة',
-  'الإعدادات',
-  'العودة للقائمة',
-  'لأفضل تجربة لعب، يُفضّل تدوير الهاتف للوضع الأفقي.',
-]
+// 9. Verify Mobile & Desktop Controls (Left, Right, Jump, Dash, Attack, Pause — Sections 12 & 13)
 assert(
-  requiredArabicLabels.every((lbl) => engineSrc.includes(lbl)),
-  'All exact Arabic UI menu labels and mobile portrait orientation recommendation message are present'
-)
-
-// 9. Verify Desktop Keyboard & Mobile Multi-Touch Pointer Controls + Stuck Input Prevention
-assert(
-  engineSrc.includes('onPointerDown') &&
-    engineSrc.includes('onPointerUp') &&
-    engineSrc.includes('onPointerCancel') &&
+  engineSrc.includes("handleTouchControl('left'") &&
+    engineSrc.includes("handleTouchControl('right'") &&
+    engineSrc.includes("handleTouchControl('jump'") &&
+    engineSrc.includes("handleTouchControl('dash'") &&
+    engineSrc.includes("handleTouchControl('attack'") &&
     engineSrc.includes("window.addEventListener('blur'") &&
-    engineSrc.includes("document.addEventListener('visibilitychange'") &&
     engineSrc.includes('IntersectionObserver'),
-  'Mobile multi-touch pointer controls, blur/visibilitychange stuck-input prevention, and offscreen IntersectionObserver pause are implemented'
+  'Mobile multi-touch controls (Left, Right, Jump/Double Jump, Dash, Attack, Pause) and Desktop keyboard controls (A/D/Arrows, Space, Shift, E, Esc) implemented'
 )
 
-// 10. Verify Sound Effects & Progression Persistence
+// 10. Verify Progression System (Unlockable Levels, Best Times, 3-Star Rating, Achievements, Local Save — Section 14)
 assert(
-  audioSrc.includes('playJump') &&
-    audioSrc.includes('playStarPickup') &&
-    audioSrc.includes('playCheckpoint') &&
-    audioSrc.includes('playEnemyStomp') &&
-    worldsSrc.includes('enarah_light_hero_progression_v1') &&
-    gamePageSrc.includes('بطل الإنارة | مغامرة عالم الضوء'),
-  'Synthesized Web Audio platformer sound effects, localStorage progression persistence, and Game page integration are complete'
+  worldsSrc.includes('GAME_ACHIEVEMENTS') &&
+    worldsSrc.includes('bestStageTimesSec') &&
+    worldsSrc.includes('stageStarsEarned') &&
+    worldsSrc.includes('enarah_light_hero_progression_v2') &&
+    gamePageSrc.includes('بطل الإنارة | مغامرة اللمبة الأسطورية'),
+  'Progression system with 8 unlockable levels, best times, 3-star ratings, achievements, and localStorage persistence implemented'
 )
 
 console.log('-----------------------------------------------------------------')

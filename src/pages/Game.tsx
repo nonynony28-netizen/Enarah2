@@ -23,27 +23,27 @@ export default function Game() {
             <div className="max-w-2xl space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>{isAr ? 'مغامرة منصات تفاعلية 2.5D • 5 عوالم' : 'Interactive 2.5D Platformer • 5 Worlds'}</span>
+                <span>{isAr ? 'مغامرة منصات تفاعلية 2.5D • 8 مراحل ملحمية' : 'Interactive 2.5D Platformer • 8 Epic Levels'}</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white">
-                {isAr ? 'بطل الإنارة | مغامرة عالم الضوء' : 'Light Hero | World of Light Adventure'}
+                {isAr ? 'بطل الإنارة | مغامرة اللمبة الأسطورية' : 'Batal Al Enara | Legendary Light Bulb Adventure'}
               </h1>
 
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
                 {isAr
-                  ? 'انطلق في مغامرة منصات شيّقة عبر 5 عوالم فريدة: مدينة الأنوار، مصنع الكهرباء، عالم الأسلاك النحاسية، مدينة المستقبل، وقلعة الطاقة! اقفز برشاقة، اجمع نجوم الطاقة وكابلات النحاس، واهزم حارس الطاقة الآلي للفوز بكوبون خصم فوري.'
-                  : 'Embark on an exciting side-scrolling platform adventure across 5 unique worlds! Jump across moving platforms and copper springs, collect Energy Stars, and defeat the Mechanical Energy Guardian to win an exclusive discount voucher.'}
+                  ? 'تحكم بشخصية لمبة LED المضيئة عبر 8 مراحل متدرجة الصعوبة: من مدينة النور وشارع الكهرباء ومصنع الإنارة وحي الإنترفون حتى قلعة الظلام! اجمع أسلاك النحاس (1.5 و2.5 و4 و6 مم²)، لمبات LED، السبوت لايت، وأجهزة الإنترفون لتفعيل القدرات الخاصة وهزيمة ملك الظلام الكهربائي.'
+                  : 'Guide our anthropomorphic LED Light Bulb Hero across 8 progressively challenging levels! Collect 1.5mm–6mm copper wires, LED spotlights, floodlights, and intercom devices to unlock special powers and defeat the Electric King of Darkness.'}
               </p>
 
               <div className="flex flex-wrap items-center gap-6 pt-1 text-xs text-slate-300">
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  <span>{isAr ? 'قفز متجاوب وتحكم مريح للهاتف والكمبيوتر' : 'Responsive Jumping & Touch/Keyboard Controls'}</span>
+                  <span>{isAr ? 'قفز مزدوج + اندفاع سريع + 8 مقطوعات موسيقية' : 'Double Jump, Dash & 8 Original Soundtracks'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#0062D2]" />
-                  <span>{isAr ? '5 عوالم متنوعة وحفظ تلقائي للتقدم' : '5 Distinct Worlds & Auto-Save Progression'}</span>
+                  <span>{isAr ? '13 منتجاً كهربائياً بقدرات حقيقية داخل اللعب' : '13 Electrical Products with Active Abilities'}</span>
                 </div>
               </div>
             </div>
@@ -56,8 +56,8 @@ export default function Game() {
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
                 {isAr
-                  ? 'كود خصم فوري ومكافآت حصرية عند إتمام العوالم وتسجيل اسمك في لوحة شرف الأبطال.'
-                  : 'Instant discount voucher and exclusive rewards upon completing the worlds.'}
+                  ? 'كود خصم فوري ومكافآت حصرية عند إتمام المراحل الثماني وتسجيل اسمك في لوحة شرف الأبطال.'
+                  : 'Instant discount voucher and exclusive rewards upon completing the 8 levels.'}
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function Game() {
           <GameEngine />
         </div>
 
-        {/* Instructions & Game Worlds Grid */}
+        {/* Instructions & Game Features Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-[#E7EAF0]">
           <div className="p-6 rounded-2xl bg-white border border-[#E7EAF0] shadow-xs flex flex-col justify-between">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mb-4">
@@ -79,12 +79,12 @@ export default function Game() {
             </div>
             <div>
               <h4 className="font-semibold text-sm text-[#15191E] mb-1.5">
-                {isAr ? '1. اجمع نجوم الطاقة' : '1. Collect Energy Stars'}
+                {isAr ? '1. قدرات الأسلاك والمنتجات' : '1. Wire & Product Abilities'}
               </h4>
               <p className="text-[#68717D] text-xs leading-relaxed font-normal">
                 {isAr
-                  ? 'التقط نجوم الطاقة الذهبية وكرات البلازما وبطاريات الشحن المنتشرة فوق المنصات وفي المسارات السرية.'
-                  : 'Gather golden Energy Stars, plasma orbs, and battery cells across platforms and secret upper paths.'}
+                  ? 'سلك 1.5 مم² يجدد الطاقة، سلك 2.5 مم² يمنح سرعة فائقة، سلك 4 مم² يفعّل درع الحماية، ولمبة LED تستعيد الصحة.'
+                  : '1.5mm wire restores energy, 2.5mm boosts speed, 4mm grants a shield, and LED bulbs restore health.'}
               </p>
             </div>
           </div>
@@ -95,12 +95,12 @@ export default function Game() {
             </div>
             <div>
               <h4 className="font-semibold text-sm text-[#15191E] mb-1.5">
-                {isAr ? '2. استكشف 5 عوالم ملونة' : '2. Explore 5 Colorful Worlds'}
+                {isAr ? '2. ثماني مراحل متدرجة الصعوبة' : '2. Eight Progressive Levels'}
               </h4>
               <p className="text-[#68717D] text-xs leading-relaxed font-normal">
                 {isAr
-                  ? 'اعبر مدينة الأنوار، مصنع الكهرباء، عالم الأسلاك النحاسية بنوابضه المرنة، مدينة المستقبل، وقلعة الطاقة.'
-                  : 'Journey through the City of Lights, Electric Factory, Copper Cable World, Future City, and Energy Fortress.'}
+                  ? 'اعبر مدينة النور، شارع الكهرباء، مصنع الإنارة، حي الإنترفون، محطة الطاقة، المدينة المظلمة، برج الإنارة، وقلعة الظلام.'
+                  : 'Journey through 8 distinct levels with unique puzzles, timed escapes, blackout zones, and boss battles.'}
               </p>
             </div>
           </div>
@@ -111,12 +111,12 @@ export default function Game() {
             </div>
             <div>
               <h4 className="font-semibold text-sm text-[#15191E] mb-1.5">
-                {isAr ? '3. قفز احترافي وتحكم سلس' : '3. Responsive Platforming'}
+                {isAr ? '3. قفز مزدوج واندفاع ضوئي' : '3. Double Jump & Light Dash'}
               </h4>
               <p className="text-[#68717D] text-xs leading-relaxed font-normal">
                 {isAr
-                  ? 'اضغط ضغطة قصيرة لقفزة سريعة أو ضغطة مطولة لقفزة عالية، واقفز فوق الروبوتات لتعطيلها وفتح البوابات.'
-                  : 'Tap for a short hop or hold for a high jump. Stomp patrolling bots from above and activate switches.'}
+                  ? 'استخدم القفز المزدوج في الهواء، والاندفاع السريع (Dash)، وومضة الهجوم الضوئي لتجاوز الأعداء والمكابس.'
+                  : 'Perform mid-air double jumps, high-speed dashes, and light pulse attacks to overcome 8 enemy types.'}
               </p>
             </div>
           </div>
@@ -127,12 +127,12 @@ export default function Game() {
             </div>
             <div>
               <h4 className="font-semibold text-sm text-[#15191E] mb-1.5">
-                {isAr ? '4. اهزم حارس الطاقة الآلي' : '4. Defeat the Energy Guardian'}
+                {isAr ? '4. اهزم ملك الظلام الكهربائي' : '4. Defeat the King of Darkness'}
               </h4>
               <p className="text-[#68717D] text-xs leading-relaxed font-normal">
                 {isAr
-                  ? 'في قلعة الطاقة، تفادَ الموجات الكهرومغناطيسية وفعل قواطع التفريغ الثلاثة لتحرير الطاقة والفوز بالجائزة.'
-                  : 'In the Energy Fortress, dodge shockwaves and trigger the 3 overload breakers to claim victory.'}
+                  ? 'واجه زعماء المراحل وصولاً إلى المعركة النهائية ذات الأطوار الثلاثة ضد ملك الظلام الكهربائي.'
+                  : 'Confront unique level bosses culminating in the 3-phase final battle against the Electric King of Darkness.'}
               </p>
             </div>
           </div>
