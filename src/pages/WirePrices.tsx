@@ -665,8 +665,8 @@ export default function WirePrices() {
         setPushVerificationBanner({
           state: 'DEVICE_NOTIFICATION_VERIFIED',
           message: isAr
-            ? 'تم التحقق الفعلي: وصل إشعار السعر وظهر على جهازك بنجاح (DEVICE NOTIFICATION VERIFIED).'
-            : 'Verified: Push notification received and displayed on this device (DEVICE NOTIFICATION VERIFIED).'
+            ? 'تم التحقق الفعلي: وصل إشعار السعر وظهر على جهازك بنجاح.'
+            : 'Verified: Push notification received and displayed on this device.'
         })
         if (wireId) {
           setAlertRules((prev) => {
@@ -1385,8 +1385,8 @@ export default function WirePrices() {
           setPushVerificationBanner({
             state: 'PUSH_REQUEST_ACCEPTED',
             message: isAr
-              ? 'تم إرسال إشعار الدفع من الخادم وقبوله من مزود الخدمة (PUSH REQUEST ACCEPTED). سيظهر الإشعار على جهازك خلال لحظات.'
-              : 'Server dispatched Web Push and push provider accepted delivery (PUSH REQUEST ACCEPTED).'
+              ? 'تم إرسال إشعار الاختبار من الخادم وقبوله بنجاح، وسيظهر على جهازك خلال لحظات.'
+              : 'Server dispatched Web Push and push provider accepted delivery.'
           })
         } else {
           setPushVerificationBanner({
@@ -2123,17 +2123,18 @@ export default function WirePrices() {
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION E — PERSONAL WIRE WATCHLIST & SMART PRICE ALERTS                  */}
+      {/* SECTION E — PERSONAL WIRE WATCHLIST & SMART PRICE ALERTS (DARK NAVY)     */}
       {/* ========================================================================= */}
       <section
         aria-labelledby="personal-watchlist-heading"
         className="py-6 sm:py-8 no-print"
       >
-        <div className="max-w-[1240px] mx-auto px-5 sm:px-8">
-          <div className="bg-white border border-[#E4EAF1] rounded-xl p-5 sm:p-6 shadow-2xs">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-[#E4EAF1]">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8">
+          <div className="bg-[#0B1F36] text-white border border-[#1B3B5C] rounded-2xl p-5 sm:p-7 shadow-md">
+            {/* Organized Header & Action Bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-[#1B3B5C]">
               <div>
-                <div className="inline-flex items-center gap-2 text-[12px] font-semibold text-[#3974C8] mb-1.5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#132F4C] border border-[#234B73] text-[12px] font-medium text-[#7CC4FA] mb-2.5">
                   <BellRing className="w-3.5 h-3.5" />
                   <span>
                     {isAr
@@ -2143,45 +2144,47 @@ export default function WirePrices() {
                 </div>
                 <h2
                   id="personal-watchlist-heading"
-                  className="text-lg sm:text-[22px] font-bold text-[#102A43]"
+                  className="text-xl sm:text-[24px] font-bold text-white"
                 >
                   {isAr
                     ? 'قائمة المتابعة والتنبيهات الشخصية'
                     : 'Personal Wire Watchlist & Alerts'}
                 </h2>
-                <p className="text-[13px] text-[#64748B] mt-1">
+                <p className="text-[13px] sm:text-sm text-slate-300/90 mt-1.5 leading-relaxed">
                   {isAr
                     ? 'تابع المقاسات التي تهمك على هذا الجهاز واضبط شروط التنبيه لتصلك إشعارات فورية عند تغير السعر.'
                     : 'Follow key wire sizes on this device and configure alert conditions to receive notifications when prices change.'}
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="grid grid-cols-2 sm:flex items-center gap-2.5 w-full md:w-auto pt-1 md:pt-0">
                 <button
                   type="button"
-                  onClick={() => handleSendVerificationNotification()}
-                  disabled={isTestingPush}
-                  className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[#E4EAF1] bg-[#F7F9FC] hover:bg-[#EDF3F9] text-[12px] font-medium text-[#172334] transition-colors cursor-pointer disabled:opacity-50"
+                  onClick={() => openAlertModal('2.5')}
+                  className="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl bg-[#3974C8] hover:bg-[#2d62b0] text-white text-[12px] sm:text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
                 >
-                  <Smartphone className="w-3.5 h-3.5 text-[#3974C8]" />
-                  <span>
-                    {isTestingPush
-                      ? isAr
-                        ? 'جارٍ الإرسال…'
-                        : 'Sending…'
-                      : isAr
-                      ? 'اختبار إشعار الدفع من الخادم'
-                      : 'Test Server Push Notification'}
+                  <Bell className="w-3.5 h-3.5 text-white shrink-0" />
+                  <span className="truncate">
+                    {isAr ? '+ إضافة تنبيه سعر' : '+ Add Price Alert'}
                   </span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => openAlertModal('2.5')}
-                  className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[#102A43] hover:bg-[#173B5E] text-white text-[12px] font-semibold transition-colors cursor-pointer"
+                  onClick={() => handleSendVerificationNotification()}
+                  disabled={isTestingPush}
+                  className="inline-flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl border border-[#264F78] bg-[#132F4C] hover:bg-[#1A3B5C] text-[12px] sm:text-[13px] font-medium text-slate-100 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  <Bell className="w-3.5 h-3.5 text-[#7CC4FA]" />
-                  <span>{isAr ? '+ إضافة تنبيه سعر' : '+ Add Price Alert'}</span>
+                  <Smartphone className="w-3.5 h-3.5 text-[#7CC4FA] shrink-0" />
+                  <span className="truncate">
+                    {isTestingPush
+                      ? isAr
+                        ? 'جارٍ الإرسال…'
+                        : 'Sending…'
+                      : isAr
+                      ? 'اختبار إشعار الهاتف'
+                      : 'Test Device Push'}
+                  </span>
                 </button>
               </div>
             </div>
@@ -2189,33 +2192,47 @@ export default function WirePrices() {
             {/* Real-time Push Delivery Verification Status Banner */}
             {pushVerificationBanner && (
               <div
-                className={`mt-4 rounded-xl border p-3.5 flex items-start justify-between gap-3 text-xs ${
+                className={`mt-4 rounded-xl border p-3.5 flex items-start justify-between gap-3 text-xs leading-relaxed ${
                   pushVerificationBanner.state === 'DEVICE_NOTIFICATION_VERIFIED'
-                    ? 'bg-[#16845B]/10 border-[#16845B]/30 text-[#16845B]'
+                    ? 'bg-[#0F382F] border-[#1E6B52] text-emerald-200'
                     : pushVerificationBanner.state === 'PUSH_REQUEST_ACCEPTED'
-                    ? 'bg-[#EDF3F9] border-[#3974C8]/40 text-[#102A43]'
-                    : 'bg-[#C44949]/10 border-[#C44949]/30 text-[#C44949]'
+                    ? 'bg-[#132F4C] border-[#2B5B8C] text-slate-100'
+                    : 'bg-[#3B1822] border-[#7A2E3E] text-rose-200'
                 }`}
               >
                 <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold block mb-0.5">
-                      {pushVerificationBanner.state === 'DEVICE_NOTIFICATION_VERIFIED'
-                        ? 'DEVICE NOTIFICATION VERIFIED'
+                  <CheckCircle2
+                    className={`w-4 h-4 shrink-0 mt-0.5 ${
+                      pushVerificationBanner.state === 'DEVICE_NOTIFICATION_VERIFIED'
+                        ? 'text-emerald-400'
                         : pushVerificationBanner.state === 'PUSH_REQUEST_ACCEPTED'
-                        ? 'PUSH REQUEST ACCEPTED'
+                        ? 'text-[#7CC4FA]'
+                        : 'text-rose-400'
+                    }`}
+                  />
+                  <div>
+                    <span className="font-bold text-white block mb-0.5">
+                      {pushVerificationBanner.state === 'DEVICE_NOTIFICATION_VERIFIED'
+                        ? isAr
+                          ? 'تم التحقق من وصول الإشعار للجهاز'
+                          : 'Device Notification Verified'
+                        : pushVerificationBanner.state === 'PUSH_REQUEST_ACCEPTED'
+                        ? isAr
+                          ? 'تم إرسال إشعار الاختبار بنجاح'
+                          : 'Push Notification Sent'
                         : isAr
-                        ? 'حالة إشعار الاختبار'
-                        : 'Push Test Status'}
+                        ? 'تنبيه حالة الإشعار'
+                        : 'Push Status Notice'}
                     </span>
-                    <span>{pushVerificationBanner.message}</span>
+                    <span className="text-slate-200/95">
+                      {pushVerificationBanner.message}
+                    </span>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setPushVerificationBanner(null)}
-                  className="p-1 opacity-75 hover:opacity-100 cursor-pointer"
+                  className="p-1 rounded-md text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
                   aria-label="Close"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -2226,13 +2243,15 @@ export default function WirePrices() {
             {/* Watchlist Cards Grid */}
             {watchlistWires.length === 0 ? (
               <div className="py-10 text-center">
-                <BellOff className="w-8 h-8 text-[#94A3B8] mx-auto mb-2.5" />
-                <p className="text-sm font-medium text-[#172334]">
+                <div className="w-12 h-12 rounded-full bg-[#132F4C] border border-[#234B73] flex items-center justify-center mx-auto mb-3">
+                  <BellOff className="w-5 h-5 text-[#7CC4FA]" />
+                </div>
+                <p className="text-sm font-semibold text-white">
                   {isAr
-                    ? 'قائمة المتابعة الشخصية فارغة حالياً.'
-                    : 'Your personal wire watchlist is currently empty.'}
+                    ? 'قائمة المتابعة الشخصية فارغة حالياً'
+                    : 'Your personal wire watchlist is currently empty'}
                 </p>
-                <p className="text-xs text-[#64748B] mt-1 mb-4">
+                <p className="text-xs text-slate-300/80 mt-1 mb-4 max-w-md mx-auto">
                   {isAr
                     ? 'اضغط على زر "تابع السعر" بجانب أي مقاس في الجدول لإضافته وضبط شروط الإشعار.'
                     : 'Click "Track Price" next to any wire size in the table to add it and set alert conditions.'}
@@ -2240,7 +2259,7 @@ export default function WirePrices() {
                 <button
                   type="button"
                   onClick={() => openAlertModal('1.5')}
-                  className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#3974C8] text-white text-xs font-semibold cursor-pointer"
+                  className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#3974C8] hover:bg-[#2d62b0] text-white text-xs font-semibold transition-colors cursor-pointer"
                 >
                   <Bell className="w-3.5 h-3.5" />
                   <span>{isAr ? 'تفعيل أول تنبيه سعر' : 'Create First Price Alert'}</span>
@@ -2256,111 +2275,119 @@ export default function WirePrices() {
                   return (
                     <div
                       key={wire.id}
-                      className={`rounded-xl border p-4 transition-colors ${
+                      className={`rounded-xl border p-4 flex flex-col justify-between gap-3.5 transition-colors ${
                         isRuleEnabled
-                          ? 'bg-[#F7F9FC] border-[#C9D8EA]'
-                          : 'bg-white border-[#E4EAF1]'
+                          ? 'bg-[#132F4C] border-[#2E5D8E]'
+                          : 'bg-[#102741] border-[#1F3F60] hover:border-[#2C5682]'
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-2 mb-3">
+                      {/* Row 1: Wire Size & Price Header */}
+                      <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[17px] font-bold text-[#102A43] tabular-nums">
+                            <span className="text-[18px] font-bold text-white tabular-nums">
                               {isAr ? wire.size : wire.sizeEn}
                             </span>
                             {wire.trend === 'down' && wire.changeAmount !== undefined ? (
-                              <span className="text-[11px] font-medium text-[#16845B] bg-[#16845B]/10 px-2 py-0.5 rounded">
+                              <span className="text-[11px] font-medium text-emerald-300 bg-emerald-500/15 border border-emerald-400/25 px-2 py-0.5 rounded-md">
                                 {isAr ? 'انخفاض' : 'Down'} {wire.changeAmount.toFixed(2)}
                               </span>
                             ) : wire.trend === 'up' && wire.changeAmount !== undefined ? (
-                              <span className="text-[11px] font-medium text-[#C44949] bg-[#C44949]/10 px-2 py-0.5 rounded">
+                              <span className="text-[11px] font-medium text-rose-300 bg-rose-500/15 border border-rose-400/25 px-2 py-0.5 rounded-md">
                                 {isAr ? 'ارتفاع' : 'Up'} +{wire.changeAmount.toFixed(2)}
                               </span>
                             ) : (
-                              <span className="text-[11px] font-medium text-[#718096] bg-[#EDF3F9] px-2 py-0.5 rounded">
+                              <span className="text-[11px] font-medium text-slate-200 bg-[#1B3958] border border-[#294E75] px-2 py-0.5 rounded-md">
                                 {isAr ? 'مستقر' : 'Stable'}
                               </span>
                             )}
                           </div>
-                          <span className="text-[12px] text-[#64748B]">
+                          <span className="text-[12px] text-slate-300/80 block mt-0.5">
                             {isAr ? wire.packageType : wire.packageTypeEn}
                           </span>
                         </div>
 
-                        <div className="text-left">
-                          <div className="text-[19px] font-bold text-[#172334] tabular-nums">
+                        <div className="text-left shrink-0">
+                          <div className="text-[20px] font-bold text-white tabular-nums leading-tight">
                             {wire.price.toFixed(2)}{' '}
-                            <span className="text-[12px] font-normal text-[#64748B]">
+                            <span className="text-[12px] font-medium text-[#7CC4FA]">
                               {isAr ? 'د.ل' : 'LYD'}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Alert Condition & Transparent Status Badge */}
-                      <div className="rounded-lg bg-white border border-[#E4EAF1] p-2.5 mb-3 text-[12px]">
+                      {/* Row 2: Organized Condition & Notification Status Strip */}
+                      <div className="rounded-lg bg-[#091728]/90 border border-[#1B3958] px-3 py-2.5 text-[12px]">
                         {hasRule ? (
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[#64748B]">
+                              <span className="text-slate-300/80">
                                 {isAr ? 'شرط التنبيه:' : 'Condition:'}
                               </span>
-                              <strong className="font-semibold text-[#102A43]">
+                              <strong className="font-semibold text-white">
                                 {formatConditionLabel(rule.condition, rule.targetPrice)}
                               </strong>
                             </div>
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[#64748B]">
-                                {isAr ? 'حالة الإشعار:' : 'Notification Status:'}
+                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#152E4A]">
+                              <span className="text-slate-300/80">
+                                {isAr ? 'حالة الإشعار:' : 'Status:'}
                               </span>
                               {!rule.enabled ? (
-                                <span className="inline-flex items-center gap-1 text-amber-700 font-medium">
+                                <span className="inline-flex items-center gap-1 text-amber-300 font-medium">
                                   <PauseCircle className="w-3.5 h-3.5" />
                                   <span>{isAr ? 'متوقف مؤقتاً' : 'Paused'}</span>
                                 </span>
                               ) : rule.deliveryMode === 'push' ? (
-                                <span className="inline-flex items-center gap-1 text-[#16845B] font-medium">
+                                <span className="inline-flex items-center gap-1 text-emerald-300 font-medium">
                                   <CheckCircle2 className="w-3.5 h-3.5" />
                                   <span>
                                     {rule.verificationState === 'DEVICE_NOTIFICATION_VERIFIED'
                                       ? isAr
-                                        ? 'إشعار الهاتف مفعل ومتحقق منه'
+                                        ? 'مفعل ومتحقق منه'
                                         : 'Device Push Verified'
                                       : isAr
-                                      ? 'اشتراك الدفع محفوظ بالخادم'
-                                      : 'Push Subscription Saved'}
+                                      ? 'إشعار الهاتف مفعل'
+                                      : 'Push Active'}
                                   </span>
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 text-[#3974C8] font-medium">
+                                <span className="inline-flex items-center gap-1 text-[#7CC4FA] font-medium">
                                   <Star className="w-3.5 h-3.5" />
                                   <span>
                                     {isAr
-                                      ? 'متابعة داخل القائمة فقط (بدون إشعار هاتف)'
-                                      : 'Watchlist Only (No Push)'}
+                                      ? 'متابعة داخل القائمة فقط'
+                                      : 'Watchlist Only'}
                                   </span>
                                 </span>
                               )}
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-between text-[#64748B]">
-                            <span>
-                              {isAr
-                                ? 'مضاف للمتابعة السريعة بدون تنبيه مشروط'
-                                : 'Pinned to watchlist without alert rule'}
+                          <div className="flex items-center justify-between gap-2 text-slate-300/90">
+                            <span className="inline-flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#7CC4FA]" />
+                              <span>
+                                {isAr
+                                  ? 'مضاف للمتابعة السريعة · بدون تنبيه مشروط'
+                                  : 'Pinned to watchlist · No alert rule set'}
+                              </span>
                             </span>
                           </div>
                         )}
                       </div>
 
-                      {/* Watchlist Item Controls */}
-                      <div className="flex items-center justify-between gap-2">
+                      {/* Row 3: Organized Action Controls */}
+                      <div className="flex items-center justify-between gap-2 pt-0.5">
                         <div className="flex items-center gap-1.5">
                           <button
                             type="button"
                             onClick={() => openAlertModal(wire.id)}
-                            className="inline-flex items-center gap-1 h-8 px-2.5 rounded-lg bg-[#EDF3F9] hover:bg-[#3974C8] text-[#102A43] hover:text-white text-[12px] font-medium transition-colors cursor-pointer"
+                            className={`inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer ${
+                              hasRule
+                                ? 'bg-[#1B3B5C] hover:bg-[#3974C8] text-white border border-[#2B547E]'
+                                : 'bg-[#3974C8] hover:bg-[#2d62b0] text-white'
+                            }`}
                           >
                             <SlidersHorizontal className="w-3.5 h-3.5" />
                             <span>
@@ -2378,17 +2405,17 @@ export default function WirePrices() {
                             <button
                               type="button"
                               onClick={() => handleToggleRuleEnabled(wire.id)}
-                              className="inline-flex items-center gap-1 h-8 px-2.5 rounded-lg border border-[#E4EAF1] bg-white hover:bg-[#F7F9FC] text-[#64748B] hover:text-[#172334] text-[12px] font-medium transition-colors cursor-pointer"
+                              className="inline-flex items-center gap-1 h-8.5 px-2.5 rounded-lg border border-[#23476B] bg-[#0D2138] hover:bg-[#163454] text-slate-200 text-[12px] font-medium transition-colors cursor-pointer"
                             >
                               {rule.enabled ? (
                                 <>
-                                  <PauseCircle className="w-3.5 h-3.5 text-amber-600" />
-                                  <span>{isAr ? 'إيقاف التنبيه' : 'Disable'}</span>
+                                  <PauseCircle className="w-3.5 h-3.5 text-amber-300" />
+                                  <span>{isAr ? 'إيقاف مؤقت' : 'Pause'}</span>
                                 </>
                               ) : (
                                 <>
-                                  <PlayCircle className="w-3.5 h-3.5 text-[#16845B]" />
-                                  <span>{isAr ? 'تفعيل التنبيه' : 'Enable'}</span>
+                                  <PlayCircle className="w-3.5 h-3.5 text-emerald-300" />
+                                  <span>{isAr ? 'تفعيل' : 'Enable'}</span>
                                 </>
                               )}
                             </button>
@@ -2398,7 +2425,7 @@ export default function WirePrices() {
                         <button
                           type="button"
                           onClick={() => handleDeleteAlertRule(wire.id, true)}
-                          className="p-1.5 rounded-lg text-[#94A3B8] hover:text-[#C44949] hover:bg-[#C44949]/10 transition-colors cursor-pointer"
+                          className="h-8.5 w-8.5 rounded-lg bg-[#091728]/80 border border-[#1B3958] text-slate-300 hover:text-rose-300 hover:border-rose-500/40 hover:bg-rose-500/10 flex items-center justify-center transition-colors cursor-pointer shrink-0"
                           title={
                             isAr ? 'إزالة من قائمة المتابعة' : 'Remove from watchlist'
                           }
@@ -2406,7 +2433,7 @@ export default function WirePrices() {
                             isAr ? 'إزالة من قائمة المتابعة' : 'Remove from watchlist'
                           }
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
