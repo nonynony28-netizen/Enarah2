@@ -18,11 +18,18 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-// تسجيل Service Worker للعمل أوفلاين وتسريع التصفح
-if (typeof window !== 'undefined' && 'serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
-      console.warn('SW registration failed:', err)
-    })
-  })
+// تسجيل Service Worker لدعم إشعارات الدفع (Web Push) والعمل أوفلاين
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  const registerSw = () => {
+    navigator.serviceWorker
+      .register('/sw.js', { scope: '/' })
+      .catch((err) => {
+        console.warn('SW registration notice:', err)
+      })
+  }
+  if (document.readyState === 'complete') {
+    registerSw()
+  } else {
+    window.addEventListener('load', registerSw)
+  }
 }

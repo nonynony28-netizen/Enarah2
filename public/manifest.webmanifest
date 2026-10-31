@@ -1,0 +1,27 @@
+{
+  "name": "الإنارة الحديثة — أسعار أسلاك النحاس الإيطالية",
+  "short_name": "الإنارة الحديثة",
+  "description": "المرجع السعري المعتمد لأسعار أسلاك النحاس الإيطالية وتنبيهات الأسعار الفورية في ليبيا",
+  "start_url": "/wire-prices",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#081D35",
+  "theme_color": "#102A43",
+  "icons": [
+    {
+      "src": "/mascot.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/mascot.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

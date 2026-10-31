@@ -1,6 +1,7 @@
 // file name: api/get-users.js
 
 import { MongoClient } from "mongodb";
+import { handleWireAlertsGet } from "../lib/wireAlerts.js";
 
 // =====================================
 // MongoDB Connection Cache
@@ -50,13 +51,10 @@ export default async function handler(req, res) {
   // CORS
   // =====================================
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, OPTIONS"
-  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type, x-admin-password"
+    "Content-Type, x-admin-password, x-subscriber-token"
   );
 
   // Preflight
@@ -73,13 +71,19 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Route Wire Alert GET actions (?action=vapid-public-key or ?action=my-subscriptions)
+    const urlObj = new URL(req.url, "http://localhost");
+    const action = urlObj.searchParams.get("action");
+    if (action === "vapid-public-key" || action === "my-subscriptions") {
+      return await handleWireAlertsGet(req, res, connectToDatabase);
+    }
+
     // الاتصال
-    const { db } =
-      await connectToDatabase();
+    const { db } = await connectToDatabase();
 
     // =====================================
     // جلب جميع البيانات
-    // منتجات + رسائل العملاء
+    // منتجات + رسائل العملاء + أسعار الأسلاك
     // =====================================
     const users = await db
       .collection("users")
@@ -98,7 +102,7 @@ export default async function handler(req, res) {
 
     if (!isAuthenticated) {
       // للزوار العاديين: تصفية وحجب الرسائل والطلبات وإحصائيات الزوار
-      filteredUsers = users.filter(item => {
+      filteredUsers = users.filter((item) => {
         const type = item.type || "product";
         const email = item.email || "";
         const isContact = type === "contact";
@@ -112,35 +116,26 @@ export default async function handler(req, res) {
     // product = المنتجات القديمة
     // contact = الرسائل الجديدة
     // =====================================
-    const formattedUsers =
-      filteredUsers.map((item) => ({
-        ...item,
-        type:
-          item.type ||
-          "product",
-      }));
+    const formattedUsers = filteredUsers.map((item) => ({
+      ...item,
+      type: item.type || "product",
+    }));
 
     // =====================================
     // نجاح
     // =====================================
     return res.status(200).json({
       success: true,
-      count:
-        formattedUsers.length,
+      count: formattedUsers.length,
       data: formattedUsers,
-      isAdmin: isAuthenticated
+      isAdmin: isAuthenticated,
     });
   } catch (error) {
-    console.error(
-      "MongoDB Fetch Error:",
-      error
-    );
+    console.error("MongoDB Fetch Error:", error);
 
     return res.status(500).json({
       success: false,
-      error:
-        error.message ||
-        "Internal Server Error",
+      error: error.message || "Internal Server Error",
     });
   }
 }

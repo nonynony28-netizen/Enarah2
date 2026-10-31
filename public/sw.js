@@ -1,10 +1,11 @@
-// Service Worker لشركة الإنارة الحديثة - Enarah Modern PWA & Smart Wire Price Push Service Worker
-// يوفر تجربة تصفح أوفلاين سريعة وموثوقة وإشعارات فورية لتنبيهات أسعار الأسلاك النحاسية الإيطالية
+// Service Worker لشركة الإنارة الحديثة - Enarah Modern PWA & Smart Wire Price Push Service Worker (V9)
+// يوفر تجربة تصفح أوفلاين سريعة وموثوقة وإشعارات Web Push فورية لتنبيهات أسعار الأسلاك النحاسية الإيطالية
 
-const CACHE_NAME = 'enarah-app-shell-v2';
+const CACHE_NAME = 'enarah-app-shell-v9';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/manifest.webmanifest',
   '/poster.jpg',
   '/hero-poster.jpg',
   '/mascot.png',
@@ -23,7 +24,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. تفعيل وحذف الكاشات القديمة
+// 2. تفعيل وحذف الكاشات القديمة والسيطرة الفورية على الصفحات المفتوحة
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -41,15 +42,17 @@ self.addEventListener('activate', (event) => {
 // 3. اعتراض الطلبات وتوفير إستراتيجية الاستجابة الذكية
 self.addEventListener('fetch', (event) => {
   const request = event.request;
+  if (request.method !== 'GET') return;
+
   const url = new URL(request.url);
 
-  // استبعاد طلبات الفيديو (تدار بواسطة محرك videoCache المخصص)
-  if (url.pathname.endsWith('.mp4') || url.pathname.endsWith('.webm')) {
+  // استبعاد طلبات النطاقات الخارجية (مثل enarah2.vercel.app/api) وطلبات الـ API المحلية
+  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) {
     return;
   }
 
-  // استبعاد طلبات الـ API لعدم تجميد البيانات الحية
-  if (url.pathname.startsWith('/api/')) {
+  // استبعاد طلبات الفيديو (تدار بواسطة محرك videoCache المخصص)
+  if (url.pathname.endsWith('.mp4') || url.pathname.endsWith('.webm')) {
     return;
   }
 
@@ -97,7 +100,7 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-// 4. استقبال إشعارات Web Push الخاصة بأسعار الأسلاك النحاسية الإيطالية
+// 4. استقبال إشعارات Web Push الحقيقية الخاصة بأسعار الأسلاك النحاسية الإيطالية
 self.addEventListener('push', (event) => {
   let payload = {
     title: 'تنبيه أسعار الأسلاك — الإنارة الحديثة',
@@ -117,11 +120,13 @@ self.addEventListener('push', (event) => {
     try {
       const parsed = event.data.json();
       if (parsed && typeof parsed === 'object') {
+        const targetUrl = parsed.url || (parsed.data && parsed.data.url) || '/wire-prices';
         payload = {
           ...payload,
           ...parsed,
           data: {
-            url: '/wire-prices',
+            url: targetUrl,
+            wireId: parsed.wireId || (parsed.data && parsed.data.wireId) || null,
             ...(parsed.data || {})
           }
         };
@@ -142,22 +147,32 @@ self.addEventListener('push', (event) => {
     lang: payload.lang || 'ar',
     tag: payload.tag || 'enarah-wire-price-alert',
     renotify: payload.renotify !== false,
-    vibrate: [180, 90, 180],
+    vibrate: [200, 100, 200],
     data: payload.data || { url: '/wire-prices' },
     actions: [
       {
         action: 'open-wire-prices',
-        title: 'عرض الأسعار الآن'
+        title: 'عرض السعر الآن'
       }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification(payload.title, options)
+    self.registration.showNotification(payload.title, options).then(() => {
+      // إعلام أي نافذة مفتوحة بوصول إشعار دفع فعلي للتحقق الفوري (DEVICE_NOTIFICATION_VERIFIED)
+      return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+        for (const client of clients) {
+          client.postMessage({
+            type: 'PUSH_NOTIFICATION_DISPLAYED',
+            payload
+          });
+        }
+      });
+    })
   );
 });
 
-// 5. التعامل مع النقر على الإشعار وفتح صفحة /wire-prices مباشرة
+// 5. التعامل مع النقر على الإشعار وفتح صفحة /wire-prices على المقاس المعني مباشرة
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const targetUrl = (event.notification.data && event.notification.data.url) || '/wire-prices';
@@ -167,7 +182,10 @@ self.addEventListener('notificationclick', (event) => {
       for (const client of clientList) {
         try {
           const clientUrl = new URL(client.url);
-          if (clientUrl.pathname.includes('/wire-prices') && 'focus' in client) {
+          if (clientUrl.origin === self.location.origin && 'focus' in client) {
+            if ('navigate' in client && clientUrl.pathname + clientUrl.search !== targetUrl) {
+              return client.navigate(targetUrl).then((c) => (c ? c.focus() : null));
+            }
             return client.focus();
           }
         } catch (_) {
@@ -181,7 +199,7 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// 6. دعم إرسال إشعار محلي مباشر من الواجهة عند رصد تغير السعر أو عند اختبار التنبيه
+// 6. دعم إرسال إشعار محلي مباشر من الواجهة عند رصد تغير السعر أو عند التحقق من صلاحية الإشعارات
 self.addEventListener('message', (event) => {
   if (!event.data || typeof event.data !== 'object') return;
 

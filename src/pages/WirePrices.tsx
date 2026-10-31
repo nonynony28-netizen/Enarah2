@@ -22,14 +22,28 @@ import {
   PlayCircle,
   Smartphone,
   AlertTriangle,
-  Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  RefreshCw
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 import WireAnatomy3D from '../components/WireAnatomy3D'
 
 export type TrendType = 'up' | 'down' | 'same' | 'unavailable'
 export type AlertConditionType = 'down' | 'up' | 'any' | 'target'
+export type PushDeliveryVerificationState =
+  | 'IDLE'
+  | 'SUBSCRIPTION_SAVED'
+  | 'PUSH_REQUEST_ACCEPTED'
+  | 'DEVICE_NOTIFICATION_VERIFIED'
+
+export type AlertModalErrorKind =
+  | 'unsupported_browser'
+  | 'permission_denied'
+  | 'subscription_failure'
+  | 'network_error'
+  | 'server_error'
+  | 'missing_iphone_pwa'
+  | 'validation_error'
 
 export interface WirePriceRecord {
   id: string
@@ -52,7 +66,8 @@ export interface WireAlertRule {
   condition: AlertConditionType
   targetPrice: number | null
   enabled: boolean
-  deliveryMode: 'push' | 'local'
+  deliveryMode: 'push' | 'watchlist_only'
+  verificationState: PushDeliveryVerificationState
   createdAt: string
   updatedAt: string
   lastKnownPrice: number
@@ -64,15 +79,15 @@ export interface WireApplicationItem {
   id: string
   size: string
   sizeEn: string
-  categoryAr: string
-  categoryEn: string
+  headingAr: string
+  headingEn: string
   imageSlug: string
   summaryAr: string
   summaryEn: string
-  commonExamplesAr: string[]
-  commonExamplesEn: string[]
-  engineeringNotesAr: string
-  engineeringNotesEn: string
+  examplesAr: [string, string, string]
+  examplesEn: [string, string, string]
+  technicalNoteAr: string
+  technicalNoteEn: string
 }
 
 export interface TriggeredLocalAlert {
@@ -86,8 +101,12 @@ export interface TriggeredLocalAlert {
   triggeredAt: string
 }
 
-// ⚠️ بيانات الأسعار الأساسية المعتمدة رسمياً (تاريخ النشر المعتمد: 10 أكتوبر 2026)
-const DEFAULT_PUBLISHED_DATE = '10 أكتوبر 2026'
+// ⚠️ بيانات الأسعار الأساسية المعتمدة رسمياً
+const DEFAULT_PUBLISHED_DATE = '18 مايو 2026'
+
+// Public VAPID key matching server-side getVapidKeys() in lib/webPush.js (Public key only — private key is strictly server-side)
+const FALLBACK_PUBLIC_VAPID_KEY =
+  'BNkvEMVHQShViwsDNSEWbfOkc_Kmz4T12YD39XUsB18aYfiIjup13_TRDh7BeVy5VVsAv35UzUIUnpA-NqInTQs'
 
 const DEFAULT_WIRES: WirePriceRecord[] = [
   {
@@ -99,7 +118,7 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     manufacturerEn: 'Italian Manufactured · Copper Conductor',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
-    price: 89.0,
+    price: 245.0,
     trend: 'same'
   },
   {
@@ -111,7 +130,7 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     manufacturerEn: 'Italian Manufactured · Copper Conductor',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
-    price: 142.0,
+    price: 375.0,
     trend: 'same'
   },
   {
@@ -123,7 +142,7 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     manufacturerEn: 'Italian Manufactured · Copper Conductor',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
-    price: 219.0,
+    price: 585.0,
     trend: 'same'
   },
   {
@@ -135,7 +154,7 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     manufacturerEn: 'Italian Manufactured · Copper Conductor',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
-    price: 329.0,
+    price: 845.0,
     trend: 'same'
   },
   {
@@ -147,7 +166,7 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     manufacturerEn: 'Italian Manufactured · Copper Conductor',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
-    price: 580.0,
+    price: 1490.0,
     trend: 'same'
   },
   {
@@ -159,7 +178,7 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     manufacturerEn: 'Italian Manufactured · Copper Conductor',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
-    price: 915.0,
+    price: 2320.0,
     trend: 'same'
   },
   {
@@ -171,221 +190,261 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
     manufacturerEn: 'Italian Manufactured · Copper Conductor',
     packageType: 'مفرد (لفة 100 متر)',
     packageTypeEn: 'Single Core (100m Roll)',
-    price: 1410.0,
+    price: 3650.0,
     trend: 'same'
   }
 ]
 
+// PART TWO & THREE — WIRE APPLICATION STUDIO DATA (3 Concise Examples + Technical Note per Size)
 const WIRE_APPLICATIONS: WireApplicationItem[] = [
   {
     id: '1.5',
     size: '1.5 مم²',
     sizeEn: '1.5 mm²',
-    categoryAr: 'دوائر الإنارة والتحكم الخفيف',
-    categoryEn: 'Lighting & Low-Load Control Circuits',
+    headingAr: 'تمديدات الإنارة السقفية ودوائر الإضاءة الداخلية',
+    headingEn: 'Residential Ceiling Lighting & Interior Illumination Circuits',
     imageSlug: 'app-1-5mm',
     summaryAr:
-      'يُستخدم غالباً في تمديدات دوائر الإضاءة الداخلية، والمفاتيح الجدارية، ونقاط الإنارة المعمارية ذات الأحمال الخفيفة.',
+      'يُستخدم هذا المقاس في تغذية نقاط الإضاءة السقفية والمفاتيح الجدارية وخطوط الإنارة المعمارية ذات الأحمال الخفيفة داخل المباني السكنية والتجارية.',
     summaryEn:
-      'Commonly used in indoor lighting circuits, wall switches, and architectural lighting points with light current loads.',
-    commonExamplesAr: [
-      'دوائر الإضاءة السقفية والسبوت لايت (LED) في الغرف والممرات',
-      'توصيلات المفاتيح الجدارية وخطوط الراجع للإنارة',
-      'أنظمة الإضاءة المخفية والإنارة التجميلية منخفضة الاستهلاك',
-      'دوائر أجراس الأبواب ولوحات التحكم والإشارة الخفيفة'
+      'Commonly used for ceiling lighting points, wall switches, and low-load architectural illumination circuits inside residential and commercial buildings.',
+    examplesAr: [
+      'توصيل وحدات الإنارة السقفية الغاطسة (Spotlights / Downlights) في الغرف والممرات',
+      'تغذية خطوط المفاتيح الجدارية ونقاط التحكم في الإضاءة الداخلية',
+      'أنظمة الإضاءة المخفية والإنارة التجميلية منخفضة الاستهلاك الكهربائي'
     ],
-    commonExamplesEn: [
-      'Ceiling LED lighting and spotlight circuits in rooms and corridors',
-      'Wall switch feeds and lighting return lines',
-      'Cove lighting and low-wattage decorative fixtures',
-      'Doorbell circuits and low-power control signaling'
+    examplesEn: [
+      'Recessed ceiling LED downlights and spotlights across rooms and corridors',
+      'Wall switch feeds and interior lighting control lines',
+      'Architectural cove lighting and low-wattage decorative fixtures'
     ],
-    engineeringNotesAr:
-      'يُربط عادةً بقواطع حماية فرعية تتناسب مع تيار دائرة الإنارة وطول المسار داخل المواسير.',
-    engineeringNotesEn:
-      'Typically paired with branch miniature circuit breakers sized for lighting load and conduit run length.'
+    technicalNoteAr:
+      'تُعد هذه الأمثلة توضيحية للاستخدامات الشائعة؛ ويعتمد الاختيار النهائي لمقاس السلك على شدة التيار وطول المسار وطريقة التمديد وقاطع الحماية المناسب.',
+    technicalNoteEn:
+      'These examples illustrate common uses; final wire sizing depends on load current, circuit length, installation method, and breaker rating.'
   },
   {
     id: '2.5',
     size: '2.5 مم²',
     sizeEn: '2.5 mm²',
-    categoryAr: 'المآخذ الكهربائية والأجهزة العامة',
-    categoryEn: 'General Power Outlets & Everyday Appliances',
+    headingAr: 'تأسيس المآخذ الكهربائية والبريزات الجدارية العامة',
+    headingEn: 'Professional Wall Socket & General Power Outlet Installations',
     imageSlug: 'app-2-5mm',
     summaryAr:
-      'شائع الاستخدام في تغذية البريزات والمآخذ الكهربائية الجدارية العامة في المباني السكنية والمكاتب التجارية.',
+      'المقاس الأكثر شيوعاً لتمديدات الأفياش والمآخذ الكهربائية الجدارية المخصصة لتشغيل الأجهزة المنزلية والمكتبية المعتادة في الغرف والصالات.',
     summaryEn:
-      'Widely used for feeding general wall sockets and power outlets across residential and commercial office spaces.',
-    commonExamplesAr: [
-      'دوائر البريزات والأفياش الجدارية في غرف المعيشة والنوم والمكاتب',
-      'تشغيل الأجهزة المنزلية والمكتبية المعتادة (الشاشات، الحواسيب، الثلاجات المنزلية)',
-      'نقاط التغذية الكهربائية العامة ذات الأحمال المتوسطة الموزعة',
-      'خطوط التغذية الفرعية القصيرة للأجهزة الخدمية الخفيفة'
+      'The standard gauge for flush-mounted wall sockets and general power outlets serving everyday household and office appliances.',
+    examplesAr: [
+      'تغذية البريزات والمآخذ الجدارية في غرف المعيشة والنوم والمكاتب',
+      'تشغيل الأجهزة الإلكترونية والمنزلية اليومية ذات الاستهلاك المتوسط',
+      'دوائر القوى الفرعية الموزعة داخل المواسير الجدارية المعتمدة'
     ],
-    commonExamplesEn: [
-      'Wall socket circuits in living rooms, bedrooms, and offices',
-      'Standard household and office electronics (TVs, PCs, refrigerators)',
-      'General-purpose distributed power receptacles',
-      'Short branch feeds for light utility equipment'
+    examplesEn: [
+      'Flush-mounted wall sockets in living areas, bedrooms, and offices',
+      'Everyday household and office electronics with moderate load demand',
+      'Distributed branch power outlets routed inside concealed wall conduits'
     ],
-    engineeringNotesAr:
-      'يُنصح بمراعاة عدد المآخذ المشتركة على نفس الخط وطول المسار لتفادي زيادة الحمل أو هبوط الجهد.',
-    engineeringNotesEn:
-      'Consider the number of outlets sharing the circuit and total run length to avoid overload or voltage drop.'
+    technicalNoteAr:
+      'يُنصح بمراعاة عدد المآخذ المشتركة على نفس الدائرة وطول المسار لتفادي زيادة الحمل أو هبوط الجهد الكهربائي.',
+    technicalNoteEn:
+      'Account for the number of outlets sharing the circuit and total run length to prevent overload or voltage drop.'
   },
   {
     id: '4.0',
     size: '4.0 مم²',
     sizeEn: '4.0 mm²',
-    categoryAr: 'الأحمال المستقلة والتكييف والسخانات',
-    categoryEn: 'Dedicated Appliance Circuits, A/C & Heaters',
+    headingAr: 'دوائر الأحمال المستقلة والتكييف وسخانات المياه',
+    headingEn: 'Dedicated Branch Circuits for A/C Units & Water Heaters',
     imageSlug: 'app-4-0mm',
     summaryAr:
-      'يُستخدم غالباً في الخطوط المستقلة المخصصة للأجهزة ذات الاستهلاك المرتفع نسبياً مثل وحدات التكييف وسخانات المياه.',
+      'يُستخدم في الخطوط الفرعية المستقلة المنطلقة من لوحة التوزيع لتغذية الأجهزة التي تتطلب قدرة تحمل أعلى من دوائر المآخذ العادية.',
     summaryEn:
-      'Frequently selected for dedicated single-appliance circuits such as split air conditioners and water heaters.',
-    commonExamplesAr: [
-      'خطوط تغذية مكيفات الهواء الجدارية (Split Units) ذات القدرات المتوسطة',
+      'Used for dedicated branch circuits from the distribution board serving appliances that require higher current capacity than standard outlets.',
+    examplesAr: [
+      'خطوط التغذية المباشرة لوحدات تكييف الهواء الجدارية (Split Units) المتوسطة',
       'دوائر سخانات المياه الكهربائية المستقلة في الحمامات والمطابخ',
-      'تغذية بعض أجهزة المطبخ الحرارية المستقلة (الأفران الصغيرة أو الغسالات الحرارية)',
-      'خطوط القوى الفرعية التي تتطلب قدرة تحمل أعلى من مقاس 2.5 مم²'
+      'تغذية أجهزة المطبخ الحرارية المفردة المربوطة بقاطع حماية خاص'
     ],
-    commonExamplesEn: [
+    examplesEn: [
       'Dedicated circuits for medium-capacity split air conditioning units',
-      'Independent electric water heater lines in bathrooms and kitchens',
-      'Dedicated kitchen thermal appliances (compact ovens, washer-dryers)',
-      'Heavy-duty power circuits requiring higher ampacity than 2.5 mm²'
+      'Independent electric water heater circuits in bathrooms and kitchens',
+      'Single thermal kitchen appliances protected by dedicated MCBs'
     ],
-    engineeringNotesAr:
-      'يُفضل تخصيص خط مباشر مستقل من اللوحة الفرعية لكل جهاز رئيسي مع قاطع حماية مناسب.',
-    engineeringNotesEn:
-      'Best installed as an independent home-run circuit from the sub-panel with a properly rated breaker.'
+    technicalNoteAr:
+      'يُفضل سحب خط مباشر مستقل من اللوحة الفرعية لكل جهاز رئيسي مع مطابقة سعة القاطع الكهربائي لحمل الجهاز.',
+    technicalNoteEn:
+      'Best installed as an independent home-run circuit from the distribution board with a matched circuit breaker.'
   },
   {
     id: '6.0',
     size: '6.0 مم²',
     sizeEn: '6.0 mm²',
-    categoryAr: 'الأحمال العالية والمطابخ والتغذية الفرعية',
-    categoryEn: 'High-Load Appliances & Sub-Feeder Circuits',
+    headingAr: 'توصيلات الأحمال العالية ومفاتيح الفصل والقوى',
+    headingEn: 'Higher-Load Circuit Installations & Heavy Appliance Isolators',
     imageSlug: 'app-6-0mm',
     summaryAr:
-      'شائع الاستخدام في تغذية الأحمال الحرارية والميكانيكية العالية، ووحدات التكييف الكبيرة، وخطوط الربط الفرعية.',
+      'مناسب للدوائر الكهربائية ذات الاستهلاك المرتفع التي تتطلب موصلية نحاسية عالية وثباتاً حرارياً أثناء التشغيل المستمر لفترات طويلة.',
     summaryEn:
-      'Commonly used for high-demand thermal and mechanical loads, large A/C units, and light sub-panel feeders.',
-    commonExamplesAr: [
-      'وحدات التكييف ذات القدرات الكبيرة أو المكيفات الدولابية والمركزية الصغيرة',
-      'المواقد والأفران الكهربائية الكبيرة في المطابخ الحديثة',
-      'المضخات الكهربائية والسخانات المركزية ذات الاستهلاك المرتفع',
-      'تغذية اللوحات الفرعية الصغيرة للملاحق أو الأدوار ذات الأحمال المحدودة'
+      'Suited for high-demand electrical circuits requiring elevated copper ampacity and thermal stability during continuous operation.',
+    examplesAr: [
+      'تغذية وحدات التكييف ذات القدرات الكبيرة والمكيفات الدولابية أو المركزية المدمجة',
+      'المواقد والأفران الكهربائية الكبيرة ومعدات المطابخ عالية القدرة',
+      'خطوط تشغيل المضخات الكهربائية ومفاتيح العزل (Isolators) للأحمال الميكانيكية'
     ],
-    commonExamplesEn: [
-      'High-capacity split or floor-standing air conditioning systems',
-      'Electric ranges, cooktops, and large built-in kitchen ovens',
-      'Water pumps and high-capacity central water heaters',
-      'Sub-panel feeders for annexes or light-load secondary zones'
+    examplesEn: [
+      'High-capacity split or floor-standing air conditioning installations',
+      'Large electric ranges, cooktops, and heavy-duty kitchen equipment',
+      'Water pump feeds and rotary isolator switches for mechanical loads'
     ],
-    engineeringNotesAr:
-      'تزداد أهمية فحص هبوط الجهد ودرجة حرارة التمديد عند تشغيل أحمال مستمرة لفترات طويلة.',
-    engineeringNotesEn:
-      'Voltage drop and ambient derating calculations are critical when serving continuous heavy loads.'
+    technicalNoteAr:
+      'تزداد أهمية حساب هبوط الجهد ودرجة الحرارة المحيطة وجودة ربط الأطراف النحاسية عند تشغيل الأحمال المستمرة.',
+    technicalNoteEn:
+      'Voltage drop, ambient temperature derating, and terminal torque quality are critical for continuous high loads.'
   },
   {
     id: '10.0',
     size: '10.0 مم²',
     sizeEn: '10.0 mm²',
-    categoryAr: 'خطوط التغذية الرئيسية واللوحات الفرعية',
-    categoryEn: 'Main Sub-Panel Feeders & Distribution Risers',
+    headingAr: 'خطوط التغذية الفرعية والربط بين لوحات التوزيع',
+    headingEn: 'Sub-Distribution Panel Feeders & Riser Connections',
     imageSlug: 'app-10-0mm',
     summaryAr:
-      'يُستخدم غالباً في خطوط التغذية الرئيسية للوحدات السكنية، والربط بين اللوحات الرئيسية ولوحات التوزيع الفرعية.',
+      'يُعتمد غالباً كخط تغذية رئيسي للشقق السكنية أو للربط الكهربائي بين اللوحة الرئيسية ولوحات التوزيع الفرعية داخل المبنى.',
     summaryEn:
-      'Commonly deployed for residential main feeders and interconnections between main and sub-distribution boards.',
-    commonExamplesAr: [
-      'خطوط التغذية بين لوحة العداد أو اللوحة الرئيسية ولوحات التوزيع داخل الشقق',
-      'تغذية لوحات الأدوار المستقلة في الفلل والمباني السكنية',
-      'تشغيل منظومات التكييف المركزي أو المضخات الثلاثية الطور المتوسطة',
-      'مسارات التغذية الطويلة التي تتطلب تقليل الفقد الكهربائي وهبوط الجهد'
+      'Frequently deployed as a residential main feeder or interconnection between primary boards and floor sub-distribution panels.',
+    examplesAr: [
+      'كابلات وأسلاك التغذية بين لوحة العداد ولوحة التوزيع الداخلية للشقة',
+      'تغذية اللوحات الفرعية للأدوار المستقلة أو الملاحق في الفلل السكنية',
+      'توصيل منظومات التكييف المركزي أو الأحمال الثلاثية الطور المتوسطة'
     ],
-    commonExamplesEn: [
-      'Feeder lines between meter cabinets/main boards and apartment sub-panels',
-      'Floor distribution boards in villas and multi-story residences',
-      'Central HVAC condensers and medium three-phase pump systems',
-      'Extended feeder runs sized to minimize voltage drop'
+    examplesEn: [
+      'Feeder lines between meter cabinets and apartment distribution boards',
+      'Sub-panel feeders for individual floors or residential villa annexes',
+      'Central HVAC condensers and medium three-phase distribution loads'
     ],
-    engineeringNotesAr:
-      'يتطلب حساب مجموع الأحمال المتوقعة ومعامل التزامن واختيار أطراف توصيل (كوسات) مكبوسة بإحكام.',
-    engineeringNotesEn:
-      'Requires demand-factor load calculation and properly crimped cable lugs at panel terminations.'
+    technicalNoteAr:
+      'يتطلب استخدام أطراف توصيل نحاسية (كوسات) مكبوسة جيداً ومراجعة إجمالي الأحمال المتزامنة على اللوحة الفرعية.',
+    technicalNoteEn:
+      'Requires properly crimped copper cable lugs and engineering review of total diversified sub-panel load.'
   },
   {
     id: '16.0',
     size: '16.0 مم²',
     sizeEn: '16.0 mm²',
-    categoryAr: 'التغذية الرئيسية للمباني والأحمال التجارية',
-    categoryEn: 'Building Main Feeders & Commercial Distribution',
+    headingAr: 'مسارات التغذية الرئيسية للمباني والمنشآت التجارية',
+    headingEn: 'Larger Electrical Distribution & Commercial Feeder Environments',
     imageSlug: 'app-16-0mm',
     summaryAr:
-      'مخصص غالباً لخطوط التغذية الرئيسية عالية القدرة في الفلل الكبيرة، المحلات التجارية، ولوحات التوزيع الرئيسية.',
+      'مخصص لمسارات التغذية الرئيسية داخل حوامل الكابلات ولوحات التوزيع في الفلل الكبيرة والمعارض والمقار التجارية.',
     summaryEn:
-      'Designed for high-capacity main feeders in large villas, commercial showrooms, and primary distribution panels.',
-    commonExamplesAr: [
-      'الكوابل والأسلاك الرئيسية المغذية للوحات التوزيع العمومية في الفلل والمقار التجارية',
-      'خطوط الربط مع المولدات الاحتياطية ومفاتيح التحويل (ATS) المتوسطة',
-      'تغذية الورش الفنية والمعدات التجارية ثلاثية الطور',
-      'المسارات الرئيسية داخل حوامل الكابلات (Cable Trays) والمواسير الهندسية'
+      'Designed for primary feeder runs along cable trays and main distribution cabinets in large villas and commercial spaces.',
+    examplesAr: [
+      'الخطوط الرئيسية المغذية للوحات التوزيع العمومية في الفلل الكبيرة والمباني',
+      'مسارات التغذية المنظمة على حوامل الكابلات (Cable Trays) في غرف الكهرباء',
+      'الربط الكهربائي مع لوحات التحويل الاحتياطية (ATS) والمولدات المتوسطة'
     ],
-    commonExamplesEn: [
-      'Main incoming feeders for primary distribution boards in villas and commercial spaces',
-      'Standby generator interconnections and medium ATS transfer panels',
-      'Technical workshops and three-phase commercial machinery',
-      'Primary trunk runs inside cable trays and heavy-duty conduits'
+    examplesEn: [
+      'Incoming main feeders for primary distribution cabinets in large villas',
+      'Organized feeder routing on perforated galvanized cable trays',
+      'Interconnections with standby generators and ATS transfer switchboards'
     ],
-    engineeringNotesAr:
-      'يجب تصميم الدائرة وفق حسابات التيار الأقصى وتنسيق القواطع الحرارية المغناطيسية (MCCB / MCB).',
-    engineeringNotesEn:
-      'Must be engineered according to peak load current and coordinated with MCCB/MCB protection.'
+    technicalNoteAr:
+      'يُصمم مسار السلك وفق حسابات التيار الأقصى المسموح به وعوامل التجميع الحراري داخل الحوامل أو المواسير.',
+    technicalNoteEn:
+      'Engineered according to maximum permissible current and thermal grouping factors inside trays or conduits.'
   },
   {
     id: '25.0',
     size: '25.0 مم²',
     sizeEn: '25.0 mm²',
-    categoryAr: 'المشاريع الكبرى ولوحات القوى الرئيسية',
-    categoryEn: 'Heavy Industrial & Primary Project Feeders',
+    headingAr: 'لوحات القوى الرئيسية وتوزيع المشاريع التجارية والصناعية',
+    headingEn: 'Commercial Switchboards & Heavy-Duty Main Power Distribution',
     imageSlug: 'app-25-0mm',
     summaryAr:
-      'يُستخدم في خطوط القوى الرئيسية للمشاريع الكبيرة، واللوحات العمومية، وتغذية المنشآت التجارية والصناعية.',
+      'يُستخدم في لوحات التوزيع الرئيسية والقواطع المقولبة (MCCB) وقضبان التوزيع النحاسية للمشاريع التجارية والمنشآت ذات الأحمال المرتفعة.',
     summaryEn:
-      'Used in heavy-duty primary power feeders, main switchboards, and commercial or industrial facility distribution.',
-    commonExamplesAr: [
-      'خطوط التغذية العمومية بين القواطع الرئيسية ولوحات التوزيع المركزية للمباني',
-      'الربط الكهربائي للمولدات ذات القدرات العالية ومحطات التوزيع الفرعية',
-      'تغذية الأحمال الصناعية والمضخات الكبرى ومنظومات التبريد المركزي الشامل',
-      'المشاريع الإنشائية التي تتطلب موصلية نحاسية عالية ومقاومة منخفضة عبر المسافات'
+      'Used in commercial main switchboards, molded-case circuit breakers (MCCBs), and copper busbar distribution for high-demand facilities.',
+    examplesAr: [
+      'تغذية القواطع الرئيسية (MCCB) وقضبان النحاس العمومية في اللوحات المركزية',
+      'خطوط القوى الرئيسية للمنشآت التجارية والخدمية والمضخات الكبرى',
+      'المشاريع الهندسية التي تتطلب موصلية نحاسية عالية وتقليل الفقد عبر المسافات'
     ],
-    commonExamplesEn: [
-      'Main bus/feeder links between primary circuit breakers and central building switchboards',
-      'High-capacity generator hookups and secondary substation distribution',
-      'Industrial loads, large pumping stations, and chiller plants',
-      'Major construction projects demanding high copper conductivity over long runs'
+    examplesEn: [
+      'Primary MCCB terminations and solid copper busbar connections in main switchboards',
+      'Main power feeders for commercial complexes and large pumping stations',
+      'Engineering projects requiring high copper conductivity and minimal voltage drop'
     ],
-    engineeringNotesAr:
-      'يخضع تركيبه لإشراف هندسي مباشر مع الالتزام بقيم عزم الربط القياسية ومسافات التبريد داخل اللوحات.',
-    engineeringNotesEn:
-      'Requires direct electrical engineering supervision, calibrated terminal torque, and thermal clearance.'
+    technicalNoteAr:
+      'يخضع تركيبه لإشراف هندسي مباشر مع الالتزام بقيم عزم الشد القياسية ومسافات العزل والتبريد داخل اللوحات.',
+    technicalNoteEn:
+      'Requires direct electrical engineering supervision, calibrated bolt torque, and proper busbar thermal clearance.'
   }
 ]
 
-const API_BASE =
-  typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? ''
-    : ''
+// Helper to communicate with the live backend on enarah2.vercel.app (or local serverless dev if available)
+const GET_API_ENDPOINTS = [
+  'https://enarah2.vercel.app/api/get-users',
+  '/api/get-users'
+]
+const POST_API_ENDPOINTS = [
+  'https://enarah2.vercel.app/api/save-user',
+  '/api/save-user'
+]
+
+async function fetchWireApiGet(queryString: string): Promise<any> {
+  let lastErr: Error | null = null
+  for (const base of GET_API_ENDPOINTS) {
+    try {
+      const res = await fetch(`${base}${queryString}`, {
+        method: 'GET',
+        headers: { Accept: 'application/json' }
+      })
+      const contentType = res.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) {
+        continue
+      }
+      const data = await res.json()
+      if (res.ok && data) {
+        return data
+      }
+      lastErr = new Error(data?.error || `HTTP ${res.status}`)
+    } catch (err: any) {
+      lastErr = err
+    }
+  }
+  throw lastErr || new Error('Network error')
+}
+
+async function fetchWireApiPost(payload: Record<string, any>): Promise<{ status: number; data: any }> {
+  let lastErr: Error | null = null
+  for (const url of POST_API_ENDPOINTS) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      const contentType = res.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) {
+        continue
+      }
+      const data = await res.json()
+      return { status: res.status, data }
+    } catch (err: any) {
+      lastErr = err
+    }
+  }
+  throw lastErr || new Error('Network error')
+}
 
 function getOrCreateSubscriberToken(): string {
-  if (typeof window === 'undefined') return 'server-placeholder-token'
+  if (typeof window === 'undefined') return 'server-placeholder-token-000000000000'
   const storageKey = 'enarah_wire_subscriber_token_v1'
   let token = localStorage.getItem(storageKey)
-  if (!token || token.length < 16) {
+  if (!token || token.length < 24) {
     const randomBytes = new Uint8Array(24)
     if (window.crypto && window.crypto.getRandomValues) {
       window.crypto.getRandomValues(randomBytes)
@@ -409,6 +468,24 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
     outputArray[i] = rawData.charCodeAt(i)
   }
   return outputArray
+}
+
+async function ensureServiceWorkerReady(timeoutMs = 8000): Promise<ServiceWorkerRegistration> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+    throw new Error('Service Worker is not supported in this browser')
+  }
+
+  let reg = await navigator.serviceWorker.getRegistration('/')
+  if (!reg) {
+    reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+  }
+
+  const readyPromise = navigator.serviceWorker.ready
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Service Worker activation timed out')), timeoutMs)
+  )
+
+  return Promise.race([readyPromise, timeoutPromise])
 }
 
 function evaluateClientAlertRule(
@@ -483,10 +560,10 @@ export default function WirePrices() {
     return ['1.5', '2.5']
   })
 
-  // Personal Wire Alert Rules (Persisted locally + synced with Web Push backend)
+  // Personal Wire Alert Rules (Synced with Backend MongoDB + local cache)
   const [alertRules, setAlertRules] = useState<Record<string, WireAlertRule>>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('enarah_wire_alert_rules_v1')
+      const saved = localStorage.getItem('enarah_wire_alert_rules_v9')
       if (saved) {
         try {
           return JSON.parse(saved)
@@ -503,12 +580,19 @@ export default function WirePrices() {
   const [alertModalWireId, setAlertModalWireId] = useState<string | null>(null)
   const [modalCondition, setModalCondition] = useState<AlertConditionType>('down')
   const [modalTargetPrice, setModalTargetPrice] = useState<string>('')
-  const [modalError, setModalError] = useState<string | null>(null)
+  const [modalError, setModalError] = useState<{
+    kind: AlertModalErrorKind
+    message: string
+  } | null>(null)
   const [isSavingAlert, setIsSavingAlert] = useState(false)
   const [alertFeedbackMsg, setAlertFeedbackMsg] = useState<string | null>(null)
   const [isTestingPush, setIsTestingPush] = useState(false)
+  const [pushVerificationBanner, setPushVerificationBanner] = useState<{
+    state: PushDeliveryVerificationState
+    message: string
+  } | null>(null)
 
-  // Visual Applications Guide State (Section C + Modal)
+  // Wire Application Studio State (Section C + Modal)
   const [selectedAppSizeId, setSelectedAppSizeId] = useState<string>('1.5')
   const [appModalWireId, setAppModalWireId] = useState<string | null>(null)
 
@@ -522,21 +606,96 @@ export default function WirePrices() {
       : 'default'
   )
 
-  const isIOSRequiresHomeScreen = useMemo(() => {
-    if (typeof window === 'undefined') return false
+  const deviceCapabilities = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        isIOS: false,
+        isStandalone: false,
+        isIOSRequiresHomeScreen: false,
+        supportsServiceWorker: false,
+        supportsPushManager: false,
+        supportsNotifications: false,
+        isHttpsOrLocalhost: true
+      }
+    }
     const ua = window.navigator.userAgent || ''
-    const isIOS = /iPad|iPhone|iPod/.test(ua)
+    const isIOS =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1)
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as any).standalone === true
-    return isIOS && !isStandalone
+    const supportsServiceWorker = 'serviceWorker' in navigator
+    const supportsPushManager = 'PushManager' in window
+    const supportsNotifications = 'Notification' in window
+    const isHttpsOrLocalhost =
+      window.location.protocol === 'https:' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+
+    return {
+      isIOS,
+      isStandalone,
+      isIOSRequiresHomeScreen: isIOS && !isStandalone,
+      supportsServiceWorker,
+      supportsPushManager,
+      supportsNotifications,
+      isHttpsOrLocalhost
+    }
   }, [])
+
+  // Handle URL query param ?wire=X (when user taps a mobile push notification)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const wireParam = params.get('wire')
+    if (wireParam && DEFAULT_WIRES.some((w) => w.id === wireParam)) {
+      setSelectedFilter(wireParam)
+      setSelectedAppSizeId(wireParam)
+    }
+  }, [])
+
+  // Listen for Service Worker PUSH_NOTIFICATION_DISPLAYED message to confirm DEVICE_NOTIFICATION_VERIFIED
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
+
+    const onSwMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'PUSH_NOTIFICATION_DISPLAYED') {
+        const wireId = event.data.payload?.wireId
+        setPushVerificationBanner({
+          state: 'DEVICE_NOTIFICATION_VERIFIED',
+          message: isAr
+            ? 'تم التحقق الفعلي: وصل إشعار السعر وظهر على جهازك بنجاح (DEVICE NOTIFICATION VERIFIED).'
+            : 'Verified: Push notification received and displayed on this device (DEVICE NOTIFICATION VERIFIED).'
+        })
+        if (wireId) {
+          setAlertRules((prev) => {
+            if (!prev[wireId]) return prev
+            const updated: Record<string, WireAlertRule> = {
+              ...prev,
+              [wireId]: {
+                ...prev[wireId],
+                verificationState: 'DEVICE_NOTIFICATION_VERIFIED'
+              }
+            }
+            localStorage.setItem('enarah_wire_alert_rules_v9', JSON.stringify(updated))
+            return updated
+          })
+        }
+      }
+    }
+
+    navigator.serviceWorker.addEventListener('message', onSwMessage)
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', onSwMessage)
+    }
+  }, [isAr])
 
   // Persist alertRules to localStorage helper
   const saveAlertRulesToStorage = useCallback((nextRules: Record<string, WireAlertRule>) => {
     setAlertRules(nextRules)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('enarah_wire_alert_rules_v1', JSON.stringify(nextRules))
+      localStorage.setItem('enarah_wire_alert_rules_v9', JSON.stringify(nextRules))
     }
   }, [])
 
@@ -561,45 +720,52 @@ export default function WirePrices() {
     })
   }, [])
 
-  // 2. Sync Remote Alert Subscriptions on Mount (if user has subscriberToken)
+  // 2. Sync Remote Alert Subscriptions on Mount (using subscriberToken)
   useEffect(() => {
     let isMounted = true
     const syncRemoteSubscriptions = async () => {
       if (typeof window === 'undefined') return
       const subscriberToken = getOrCreateSubscriberToken()
       try {
-        const res = await fetch(
-          `${API_BASE}/api/wire-alerts?action=my-subscriptions&subscriberToken=${encodeURIComponent(
-            subscriberToken
-          )}`
+        const data = await fetchWireApiGet(
+          `?action=my-subscriptions&subscriberToken=${encodeURIComponent(subscriberToken)}`
         )
-        if (!res.ok) return
-        const data = await res.json()
-        if (isMounted && data.success && Array.isArray(data.subscriptions) && data.subscriptions.length > 0) {
+        if (
+          isMounted &&
+          data.success &&
+          Array.isArray(data.subscriptions) &&
+          data.subscriptions.length > 0
+        ) {
           setAlertRules((prev) => {
             const merged = { ...prev }
             for (const sub of data.subscriptions) {
-              if (!sub.wireSize) continue
-              const existing = merged[sub.wireSize]
-              merged[sub.wireSize] = {
-                wireSize: sub.wireSize,
+              const wId = sub.wireSize || sub.wireId
+              if (!wId) continue
+              const existing = merged[wId]
+              merged[wId] = {
+                wireSize: wId,
                 condition: sub.condition || 'any',
                 targetPrice: sub.targetPrice ?? null,
                 enabled: sub.enabled !== false,
-                deliveryMode: sub.hasPushSubscription ? 'push' : existing?.deliveryMode || 'local',
+                deliveryMode: sub.hasPushSubscription || sub.hasPush ? 'push' : 'watchlist_only',
+                verificationState:
+                  sub.hasPushSubscription || sub.hasPush
+                    ? existing?.verificationState || 'SUBSCRIPTION_SAVED'
+                    : 'IDLE',
                 createdAt: existing?.createdAt || new Date().toISOString(),
                 updatedAt: sub.updatedAt || new Date().toISOString(),
                 lastKnownPrice: existing?.lastKnownPrice ?? 0,
-                lastTriggeredPrice: sub.lastTriggeredPrice ?? existing?.lastTriggeredPrice ?? null,
+                lastTriggeredPrice:
+                  sub.lastTriggeredPrice ?? existing?.lastTriggeredPrice ?? null,
                 lastTriggeredAt: sub.lastTriggeredAt ?? existing?.lastTriggeredAt ?? null
               }
             }
-            localStorage.setItem('enarah_wire_alert_rules_v1', JSON.stringify(merged))
+            localStorage.setItem('enarah_wire_alert_rules_v9', JSON.stringify(merged))
             return merged
           })
         }
       } catch {
-        // Offline or local dev without serverless function running — local rules remain intact
+        // Offline or initial load before sync
       }
     }
     syncRemoteSubscriptions()
@@ -613,22 +779,11 @@ export default function WirePrices() {
     let isMounted = true
 
     const fetchWirePrices = async () => {
-      const endpoints = ['/api/get-users', 'https://enarah2.vercel.app/api/get-users']
       let data: any = null
-
-      for (const endpoint of endpoints) {
-        try {
-          const res = await fetch(endpoint)
-          if (res.ok) {
-            const parsed = await res.json()
-            if (parsed && parsed.success && Array.isArray(parsed.data)) {
-              data = parsed
-              break
-            }
-          }
-        } catch {
-          // try next endpoint
-        }
+      try {
+        data = await fetchWireApiGet('')
+      } catch {
+        return
       }
 
       if (!isMounted || !data || !data.success || !Array.isArray(data.data)) return
@@ -709,7 +864,7 @@ export default function WirePrices() {
           )
 
           // Evaluate active user alert rules against newly fetched prices
-          const savedRulesRaw = localStorage.getItem('enarah_wire_alert_rules_v1')
+          const savedRulesRaw = localStorage.getItem('enarah_wire_alert_rules_v9')
           if (savedRulesRaw) {
             try {
               const currentRules: Record<string, WireAlertRule> = JSON.parse(savedRulesRaw)
@@ -753,40 +908,15 @@ export default function WirePrices() {
               }
 
               if (rulesModified) {
-                localStorage.setItem('enarah_wire_alert_rules_v1', JSON.stringify(currentRules))
+                localStorage.setItem(
+                  'enarah_wire_alert_rules_v9',
+                  JSON.stringify(currentRules)
+                )
                 setAlertRules({ ...currentRules })
               }
 
               if (newlyTriggered.length > 0) {
                 setTriggeredAlerts((prev) => [...newlyTriggered, ...prev])
-                // Also trigger Service Worker notification if permission is granted
-                if (
-                  'serviceWorker' in navigator &&
-                  'Notification' in window &&
-                  Notification.permission === 'granted'
-                ) {
-                  navigator.serviceWorker.ready
-                    .then((reg) => {
-                      for (const trig of newlyTriggered) {
-                        const diff = trig.newPrice - trig.oldPrice
-                        const dirWord = diff < 0 ? 'انخفض' : 'ارتفع'
-                        const title = `تنبيه سعر سلك ${trig.sizeLabel} — الإنارة الحديثة`
-                        const body = `${dirWord} سعر سلك ${trig.sizeLabel} من ${trig.oldPrice.toFixed(
-                          2
-                        )} د.ل إلى ${trig.newPrice.toFixed(2)} د.ل.`
-                        if (reg.active) {
-                          reg.active.postMessage({
-                            type: 'SHOW_WIRE_ALERT_NOTIFICATION',
-                            title,
-                            body,
-                            tag: `enarah-wire-alert-${trig.wireSize}`,
-                            url: '/wire-prices'
-                          })
-                        }
-                      }
-                    })
-                    .catch(() => {})
-                }
               }
             } catch {}
           }
@@ -813,7 +943,7 @@ export default function WirePrices() {
       setModalTargetPrice(
         existingRule && existingRule.targetPrice !== null
           ? String(existingRule.targetPrice)
-          : String(Math.max(1, Math.round(wire.price - 5)))
+          : String(Math.max(1, Math.round(wire.price - 10)))
       )
       setModalError(null)
       setAlertFeedbackMsg(null)
@@ -827,72 +957,139 @@ export default function WirePrices() {
     setAlertFeedbackMsg(null)
   }, [])
 
-  // Subscribe to Web Push (Requested ONLY on explicit user action)
-  const requestAndSubscribePush = useCallback(async (): Promise<{
+  // Strict Web Push Subscription Creation (No silent fallback — returns explicit error kind if anything fails)
+  const createVerifiedPushSubscription = useCallback(async (): Promise<{
+    ok: boolean
     subscription: PushSubscriptionJSON | null
-    mode: 'push' | 'local'
+    errorKind?: AlertModalErrorKind
+    errorMessage?: string
   }> => {
-    if (
-      typeof window === 'undefined' ||
-      !('Notification' in window) ||
-      !('serviceWorker' in navigator)
-    ) {
-      return { subscription: null, mode: 'local' }
+    // 1. Check iPhone / iOS missing Home Screen PWA installation
+    if (deviceCapabilities.isIOSRequiresHomeScreen) {
+      return {
+        ok: false,
+        subscription: null,
+        errorKind: 'missing_iphone_pwa',
+        errorMessage: isAr
+          ? 'لتفعيل تنبيهات الأسعار على iPhone، أضف موقع الإنارة الحديثة إلى الشاشة الرئيسية، ثم افتحه من الأيقونة واسمح بالإشعارات.'
+          : 'To enable price alerts on iPhone, add Enarah Modern to your Home Screen, open it from the icon, and allow notifications.'
+      }
     }
 
+    // 2. Check HTTPS, Service Worker, Notification API, and PushManager support
+    if (
+      !deviceCapabilities.isHttpsOrLocalhost ||
+      !deviceCapabilities.supportsServiceWorker ||
+      !deviceCapabilities.supportsNotifications ||
+      !deviceCapabilities.supportsPushManager
+    ) {
+      return {
+        ok: false,
+        subscription: null,
+        errorKind: 'unsupported_browser',
+        errorMessage: isAr
+          ? 'هذا المتصفح أو الوضع الحالي لا يدعم إشعارات الدفع (Web Push). يرجى استخدام متصفح حديث مثل Chrome أو Edge أو فتح تطبيق الشاشة الرئيسية على iPhone.'
+          : 'This browser does not support Web Push notifications. Please use Chrome, Edge, or an installed Home Screen Web App on iPhone.'
+      }
+    }
+
+    // 3. Check & Request Notification Permission ONLY after explicit user interaction
     let permission = Notification.permission
     if (permission === 'default') {
       try {
         permission = await Notification.requestPermission()
         setNotificationPermission(permission)
       } catch {
-        return { subscription: null, mode: 'local' }
+        return {
+          ok: false,
+          subscription: null,
+          errorKind: 'permission_denied',
+          errorMessage: isAr
+            ? 'تعذر طلب صلاحية الإشعارات من المتصفح. يرجى السماح بالإشعارات من إعدادات الموقع ثم إعادة المحاولة.'
+            : 'Could not request notification permission. Please allow notifications in browser settings and retry.'
+        }
       }
     } else {
       setNotificationPermission(permission)
     }
 
     if (permission !== 'granted') {
-      return { subscription: null, mode: 'local' }
+      return {
+        ok: false,
+        subscription: null,
+        errorKind: 'permission_denied',
+        errorMessage: isAr
+          ? 'تم رفض صلاحية الإشعارات في المتصفح. يرجى تفعيل الإشعارات لموقع الإنارة الحديثة من إعدادات المتصفح ثم الضغط على إعادة المحاولة.'
+          : 'Notification permission was denied. Please enable notifications for this site in your browser settings and try again.'
+      }
     }
 
+    // 4. Ensure Service Worker is active and create PushSubscription
     try {
-      const registration = await navigator.serviceWorker.ready
+      const registration = await ensureServiceWorkerReady(8000)
       if (!registration.pushManager) {
-        return { subscription: null, mode: 'local' }
-      }
-
-      // Check existing push subscription first
-      let sub = await registration.pushManager.getSubscription()
-      if (!sub) {
-        // Fetch VAPID public key from backend
-        const vapidRes = await fetch(`${API_BASE}/api/wire-alerts?action=vapid-public-key`)
-        if (vapidRes.ok) {
-          const vapidData = await vapidRes.json()
-          if (vapidData.success && vapidData.publicKey) {
-            const convertedKey = urlBase64ToUint8Array(vapidData.publicKey)
-            sub = await registration.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: convertedKey as BufferSource
-            })
-          }
+        return {
+          ok: false,
+          subscription: null,
+          errorKind: 'unsupported_browser',
+          errorMessage: isAr
+            ? 'خدمة الدفع (PushManager) غير متوفرة في هذا المتصفح.'
+            : 'PushManager is unavailable in this browser.'
         }
       }
 
-      if (sub) {
-        return { subscription: sub.toJSON(), mode: 'push' }
+      let sub = await registration.pushManager.getSubscription()
+      if (!sub) {
+        // Fetch public VAPID key from server (with verified matching public key fallback)
+        let publicKey = FALLBACK_PUBLIC_VAPID_KEY
+        try {
+          const vapidData = await fetchWireApiGet('?action=vapid-public-key')
+          if (vapidData?.success && vapidData?.publicKey) {
+            publicKey = vapidData.publicKey
+          }
+        } catch {
+          // Use verified server public key
+        }
+
+        const convertedKey = urlBase64ToUint8Array(publicKey)
+        sub = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedKey as BufferSource
+        })
       }
-    } catch (err) {
-      console.warn('Web Push subscription notice (falling back to local + SW alerts):', err)
+
+      const subJson = sub.toJSON()
+      if (!subJson || !subJson.endpoint || !subJson.keys?.p256dh || !subJson.keys?.auth) {
+        return {
+          ok: false,
+          subscription: null,
+          errorKind: 'subscription_failure',
+          errorMessage: isAr
+            ? 'لم يقم المتصفح بإرجاع مفاتيح اشتراك صالحة للإشعارات. يرجى إعادة المحاولة.'
+            : 'Browser did not return valid push subscription keys. Please retry.'
+        }
+      }
+
+      return {
+        ok: true,
+        subscription: subJson
+      }
+    } catch (err: any) {
+      return {
+        ok: false,
+        subscription: null,
+        errorKind: 'subscription_failure',
+        errorMessage: isAr
+          ? `تعذر إنشاء اشتراك الإشعارات في المتصفح (${err?.message || 'خطأ في خدمة الدفع'}). يرجى التحقق من اتصال الإنترنت وإعادة المحاولة.`
+          : `Failed to create browser push subscription (${err?.message || 'Push service error'}). Please check your connection and retry.`
+      }
     }
+  }, [deviceCapabilities, isAr])
 
-    return { subscription: null, mode: 'local' }
-  }, [])
-
-  // Handle "تفعيل التنبيه" submission
+  // Handle "تفعيل التنبيه" / "تعديل التنبيه" submission (STRICT: Never show success unless backend confirms persistence)
   const handleSaveAlertRule = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
+    async (e?: React.FormEvent) => {
+      if (e) e.preventDefault()
       if (!alertModalWireId) return
 
       const selectedWire =
@@ -902,58 +1099,84 @@ export default function WirePrices() {
       if (modalCondition === 'target') {
         parsedTarget = parseFloat(modalTargetPrice)
         if (!Number.isFinite(parsedTarget) || parsedTarget <= 0 || parsedTarget > 100000) {
-          setModalError(
-            isAr
+          setModalError({
+            kind: 'validation_error',
+            message: isAr
               ? 'يرجى إدخال سعر مستهدف صحيح أكبر من صفر (بالدينار الليبي).'
               : 'Please enter a valid target price greater than zero (LYD).'
-          )
+          })
           return
         }
       }
 
       setModalError(null)
+      setAlertFeedbackMsg(null)
       setIsSavingAlert(true)
 
       try {
-        // 1. Request permission & register Web Push subscription on explicit user click
-        const { subscription, mode } = await requestAndSubscribePush()
-        const subscriberToken = getOrCreateSubscriberToken()
-        const nowIso = new Date().toISOString()
-
-        let finalDeliveryMode: 'push' | 'local' = mode
-
-        // 2. Sync rule with backend API
-        try {
-          const apiRes = await fetch(`${API_BASE}/api/wire-alerts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'upsert',
-              subscriberToken,
-              wireSize: alertModalWireId,
-              condition: modalCondition,
-              targetPrice: parsedTarget,
-              enabled: true,
-              pushSubscription: subscription
-            })
+        // Steps 4–7: Verify browser support, request permission on click, create real PushSubscription
+        const subResult = await createVerifiedPushSubscription()
+        if (!subResult.ok || !subResult.subscription) {
+          setModalError({
+            kind: subResult.errorKind || 'subscription_failure',
+            message:
+              subResult.errorMessage ||
+              (isAr
+                ? 'تعذر تفعيل اشتراك الإشعارات على هذا الجهاز.'
+                : 'Could not activate push subscription on this device.')
           })
-          if (apiRes.ok) {
-            const apiJson = await apiRes.json()
-            if (apiJson.success && apiJson.subscription?.deliveryMode === 'push') {
-              finalDeliveryMode = 'push'
-            }
-          }
-        } catch {
-          // Offline / local fallback
+          return
         }
 
-        // 3. Save rule locally and ensure wire is in watchlist
+        // Steps 8–9: Save subscription on backend and require backend confirmation
+        const subscriberToken = getOrCreateSubscriberToken()
+        let apiResponse: { status: number; data: any }
+        try {
+          apiResponse = await fetchWireApiPost({
+            type: 'wire_alert',
+            action: 'upsert',
+            requirePush: true,
+            subscriberToken,
+            wireId: alertModalWireId,
+            wireSize: alertModalWireId,
+            condition: modalCondition,
+            targetPrice: parsedTarget,
+            enabled: true,
+            pushSubscription: subResult.subscription
+          })
+        } catch {
+          setModalError({
+            kind: 'network_error',
+            message: isAr
+              ? 'تم إنشاء اشتراك المتصفح ولكن تعذر الاتصال بالخادم لحفظ التنبيه بسبب خطأ في الشبكة. يرجى الضغط على "إعادة المحاولة".'
+              : 'Browser subscription succeeded, but saving to the server failed due to a network error. Please click Retry.'
+          })
+          return
+        }
+
+        if (
+          apiResponse.status < 200 ||
+          apiResponse.status >= 300 ||
+          !apiResponse.data?.success
+        ) {
+          setModalError({
+            kind: 'server_error',
+            message: isAr
+              ? `تعذر حفظ الاشتراك في الخادم (${apiResponse.data?.error || `HTTP ${apiResponse.status}`}). لم يتم تفعيل التنبيه بعد، يرجى إعادة المحاولة.`
+              : `Server failed to save subscription (${apiResponse.data?.error || `HTTP ${apiResponse.status}`}). Please retry.`
+          })
+          return
+        }
+
+        // Step 10: Backend confirmed persistence (SUBSCRIPTION_SAVED) — now update state & display real success
+        const nowIso = new Date().toISOString()
         const newRule: WireAlertRule = {
           wireSize: alertModalWireId,
           condition: modalCondition,
           targetPrice: parsedTarget,
           enabled: true,
-          deliveryMode: finalDeliveryMode,
+          deliveryMode: 'push',
+          verificationState: 'SUBSCRIPTION_SAVED',
           createdAt: alertRules[alertModalWireId]?.createdAt || nowIso,
           updatedAt: nowIso,
           lastKnownPrice: selectedWire.price,
@@ -969,18 +1192,10 @@ export default function WirePrices() {
         ensureInWatchlist(alertModalWireId)
 
         setAlertFeedbackMsg(
-          finalDeliveryMode === 'push'
-            ? isAr
-              ? 'تم تفعيل التنبيه وربطه بإشعارات جهازك بنجاح.'
-              : 'Price alert activated and linked to your device notifications.'
-            : isAr
-            ? 'تم حفظ التنبيه في قائمة المتابعة على هذا الجهاز بنجاح.'
-            : 'Price alert saved to your personal watchlist on this device.'
+          isAr
+            ? 'تم تفعيل التنبيه وحفظ اشتراك الإشعارات في الخادم بنجاح (SUBSCRIPTION SAVED).'
+            : 'Alert activated and subscription confirmed on server (SUBSCRIPTION SAVED).'
         )
-
-        setTimeout(() => {
-          closeAlertModal()
-        }, 1100)
       } finally {
         setIsSavingAlert(false)
       }
@@ -991,48 +1206,120 @@ export default function WirePrices() {
       modalCondition,
       modalTargetPrice,
       isAr,
-      requestAndSubscribePush,
+      createVerifiedPushSubscription,
       alertRules,
       saveAlertRulesToStorage,
-      ensureInWatchlist,
-      closeAlertModal
+      ensureInWatchlist
     ]
   )
 
-  // Pause or Resume an existing alert rule
+  // Follow in on-page watchlist only (Explicitly labeled as Watchlist Only — never claims mobile push is active)
+  const handleSaveWatchlistOnly = useCallback(() => {
+    if (!alertModalWireId) return
+    const selectedWire =
+      wireRecords.find((w) => w.id === alertModalWireId) || DEFAULT_WIRES[0]
+    const parsedTarget =
+      modalCondition === 'target' ? parseFloat(modalTargetPrice) || null : null
+    const nowIso = new Date().toISOString()
+
+    const watchlistRule: WireAlertRule = {
+      wireSize: alertModalWireId,
+      condition: modalCondition,
+      targetPrice: parsedTarget,
+      enabled: true,
+      deliveryMode: 'watchlist_only',
+      verificationState: 'IDLE',
+      createdAt: alertRules[alertModalWireId]?.createdAt || nowIso,
+      updatedAt: nowIso,
+      lastKnownPrice: selectedWire.price,
+      lastTriggeredPrice: null,
+      lastTriggeredAt: null
+    }
+
+    const updatedRules = {
+      ...alertRules,
+      [alertModalWireId]: watchlistRule
+    }
+    saveAlertRulesToStorage(updatedRules)
+    ensureInWatchlist(alertModalWireId)
+    closeAlertModal()
+  }, [
+    alertModalWireId,
+    wireRecords,
+    modalCondition,
+    modalTargetPrice,
+    alertRules,
+    saveAlertRulesToStorage,
+    ensureInWatchlist,
+    closeAlertModal
+  ])
+
+  // Pause or Resume an existing alert rule ("إيقاف التنبيه" / "تفعيل التنبيه")
   const handleToggleRuleEnabled = useCallback(
-    async (wireSize: string) => {
+    async (wireSize: string, forceDisable?: boolean) => {
       const existing = alertRules[wireSize]
       if (!existing) return
-      const nextEnabled = !existing.enabled
-      const updatedRule: WireAlertRule = {
-        ...existing,
-        enabled: nextEnabled,
-        updatedAt: new Date().toISOString()
-      }
-      const nextRules = { ...alertRules, [wireSize]: updatedRule }
-      saveAlertRulesToStorage(nextRules)
+      const nextEnabled = forceDisable !== undefined ? !forceDisable : !existing.enabled
 
+      setIsSavingAlert(true)
       try {
-        const subscriberToken = getOrCreateSubscriberToken()
-        await fetch(`${API_BASE}/api/wire-alerts`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        if (existing.deliveryMode === 'push') {
+          const subscriberToken = getOrCreateSubscriberToken()
+          const res = await fetchWireApiPost({
+            type: 'wire_alert',
             action: 'upsert',
             subscriberToken,
+            wireId: wireSize,
             wireSize,
-            condition: updatedRule.condition,
-            targetPrice: updatedRule.targetPrice,
+            condition: existing.condition,
+            targetPrice: existing.targetPrice,
             enabled: nextEnabled
           })
+          if (!res.data?.success) {
+            setModalError({
+              kind: 'server_error',
+              message: isAr
+                ? 'تعذر تحديث حالة التنبيه على الخادم. يرجى المحاولة مرة أخرى.'
+                : 'Could not update alert state on server. Please retry.'
+            })
+            return
+          }
+        }
+
+        const updatedRule: WireAlertRule = {
+          ...existing,
+          enabled: nextEnabled,
+          updatedAt: new Date().toISOString()
+        }
+        const nextRules = { ...alertRules, [wireSize]: updatedRule }
+        saveAlertRulesToStorage(nextRules)
+
+        if (alertModalWireId === wireSize) {
+          setAlertFeedbackMsg(
+            nextEnabled
+              ? isAr
+                ? 'تمت إعادة تفعيل التنبيه بنجاح.'
+                : 'Alert re-enabled.'
+              : isAr
+              ? 'تم إيقاف التنبيه مؤقتاً بنجاح.'
+              : 'Alert paused.'
+          )
+        }
+      } catch {
+        setModalError({
+          kind: 'network_error',
+          message: isAr
+            ? 'تعذر الاتصال بالخادم لتحديث حالة التنبيه.'
+            : 'Network error while updating alert state.'
         })
-      } catch {}
+      } finally {
+        setIsSavingAlert(false)
+      }
     },
-    [alertRules, saveAlertRulesToStorage]
+    [alertRules, saveAlertRulesToStorage, alertModalWireId, isAr]
   )
 
-  // Delete an alert rule (and optionally unfollow)
+  // Delete an alert rule and unsubscribe
   const handleDeleteAlertRule = useCallback(
     async (wireSize: string, alsoRemoveFromWatchlist = false) => {
       const nextRules = { ...alertRules }
@@ -1049,96 +1336,78 @@ export default function WirePrices() {
 
       try {
         const subscriberToken = getOrCreateSubscriberToken()
-        await fetch(`${API_BASE}/api/wire-alerts`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'delete',
-            subscriberToken,
-            wireSize
-          })
+        await fetchWireApiPost({
+          type: 'wire_alert',
+          action: 'delete',
+          subscriberToken,
+          wireId: wireSize,
+          wireSize
         })
       } catch {}
     },
     [alertRules, saveAlertRulesToStorage]
   )
 
-  // Send a verification / test notification to confirm device delivery
+  // Send a real server-initiated Web Push verification notification
   const handleSendVerificationNotification = useCallback(
     async (wireSize?: string) => {
       setIsTestingPush(true)
+      setPushVerificationBanner(null)
       const targetWire =
         wireRecords.find((w) => w.id === (wireSize || '2.5')) || wireRecords[0]
 
       try {
-        const { subscription } = await requestAndSubscribePush()
-        let deliveredViaPush = false
-
-        if (subscription) {
-          try {
-            const subscriberToken = getOrCreateSubscriberToken()
-            const res = await fetch(`${API_BASE}/api/wire-alerts`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                action: 'test-push',
-                subscriberToken,
-                wireSize: targetWire.id,
-                currentPrice: targetWire.price,
-                pushSubscription: subscription
-              })
-            })
-            if (res.ok) {
-              const data = await res.json()
-              if (data.success) deliveredViaPush = true
-            }
-          } catch {}
+        const subResult = await createVerifiedPushSubscription()
+        if (!subResult.ok || !subResult.subscription) {
+          setPushVerificationBanner({
+            state: 'IDLE',
+            message:
+              subResult.errorMessage ||
+              (isAr
+                ? 'لا يمكن إرسال إشعار دفع قبل تفعيل صلاحية الإشعارات واشتراك المتصفح.'
+                : 'Cannot send push notification before enabling browser push subscription.')
+          })
+          return
         }
 
-        if (
-          !deliveredViaPush &&
-          'serviceWorker' in navigator &&
-          'Notification' in window &&
-          Notification.permission === 'granted'
-        ) {
-          const reg = await navigator.serviceWorker.ready
-          const title = `إشعار تجريبي لسلك ${targetWire.size} — الإنارة الحديثة`
-          const body = `السعر الحالي لسلك ${targetWire.size} هو ${targetWire.price.toFixed(
-            2
-          )} د.ل. تنبيهات الأسعار جاهزة للعمل على جهازك.`
-          if (reg.active) {
-            reg.active.postMessage({
-              type: 'SHOW_WIRE_ALERT_NOTIFICATION',
-              title,
-              body,
-              tag: `enarah-wire-test-${targetWire.id}`,
-              url: '/wire-prices'
-            })
-            deliveredViaPush = true
-          }
-        }
+        const subscriberToken = getOrCreateSubscriberToken()
+        const { status, data } = await fetchWireApiPost({
+          type: 'wire_alert',
+          action: 'test-push',
+          subscriberToken,
+          wireId: targetWire.id,
+          wireSize: targetWire.id,
+          currentPrice: targetWire.price,
+          pushSubscription: subResult.subscription
+        })
 
-        if (!deliveredViaPush) {
-          // Show in-app verification alert banner if browser notifications are blocked
-          setTriggeredAlerts((prev) => [
-            {
-              id: `test-${Date.now()}`,
-              wireSize: targetWire.id,
-              sizeLabel: targetWire.size,
-              oldPrice: targetWire.price,
-              newPrice: targetWire.price,
-              condition: 'any',
-              targetPrice: null,
-              triggeredAt: new Date().toISOString()
-            },
-            ...prev
-          ])
+        if (status >= 200 && status < 300 && data?.success) {
+          setPushVerificationBanner({
+            state: 'PUSH_REQUEST_ACCEPTED',
+            message: isAr
+              ? 'تم إرسال إشعار الدفع من الخادم وقبوله من مزود الخدمة (PUSH REQUEST ACCEPTED). سيظهر الإشعار على جهازك خلال لحظات.'
+              : 'Server dispatched Web Push and push provider accepted delivery (PUSH REQUEST ACCEPTED).'
+          })
+        } else {
+          setPushVerificationBanner({
+            state: 'IDLE',
+            message: isAr
+              ? `تعذر إرسال إشعار الدفع من الخادم (${data?.error || `HTTP ${status}`}).`
+              : `Server push test failed (${data?.error || `HTTP ${status}`}).`
+          })
         }
+      } catch (err: any) {
+        setPushVerificationBanner({
+          state: 'IDLE',
+          message: isAr
+            ? `تعذر الاتصال بالخادم لإرسال إشعار الاختبار (${err?.message || 'خطأ شبكة'}).`
+            : `Network error during server push test (${err?.message || 'Network error'}).`
+        })
       } finally {
         setIsTestingPush(false)
       }
     },
-    [wireRecords, requestAndSubscribePush]
+    [wireRecords, createVerifiedPushSubscription, isAr]
   )
 
   // Format Condition Text in Arabic / English
@@ -1208,7 +1477,7 @@ export default function WirePrices() {
     return result
   }, [wireRecords, favoriteIds, alertRules, selectedFilter, searchQuery])
 
-  // Share Functionality (Native share or clipboard fallback)
+  // Share Functionality
   const handleShare = useCallback(async () => {
     const shareTitle = isAr
       ? 'أسعار أسلاك النحاس الإيطالية | شركة الإنارة الحديثة'
@@ -1250,12 +1519,21 @@ export default function WirePrices() {
     return wireRecords.find((w) => w.id === alertModalWireId) || null
   }, [alertModalWireId, wireRecords])
 
-  // Selected application item for Section C & Application Modal
+  const activeModalExistingRule = useMemo(() => {
+    if (!alertModalWireId) return null
+    return alertRules[alertModalWireId] || null
+  }, [alertModalWireId, alertRules])
+
+  // Selected application item for Section C (Wire Application Studio) & Application Modal
   const activeSectionApplication = useMemo(() => {
     return (
       WIRE_APPLICATIONS.find((item) => item.id === selectedAppSizeId) || WIRE_APPLICATIONS[0]
     )
   }, [selectedAppSizeId])
+
+  const activeSectionWireRecord = useMemo(() => {
+    return wireRecords.find((w) => w.id === selectedAppSizeId) || DEFAULT_WIRES[0]
+  }, [selectedAppSizeId, wireRecords])
 
   const activeModalApplication = useMemo(() => {
     if (!appModalWireId) return null
@@ -1309,7 +1587,7 @@ export default function WirePrices() {
                 <strong className="font-semibold text-white">{lastUpdateDate}</strong>
               </div>
 
-              {/* Action Buttons: One Primary Blue + One Restrained Outlined */}
+              {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto lg:justify-end">
                 <button
                   type="button"
@@ -1353,7 +1631,7 @@ export default function WirePrices() {
         className="pt-8 pb-6 sm:pt-11 sm:pb-8 no-print"
       >
         <div className="max-w-[1240px] mx-auto px-5 sm:px-8">
-          {/* Triggered Alert Notification Banner (if any price alert condition was met) */}
+          {/* Triggered Alert Notification Banner */}
           {triggeredAlerts.length > 0 && (
             <div className="mb-5 bg-[#081D35] text-white border border-[#3974C8] rounded-xl p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
@@ -1371,19 +1649,11 @@ export default function WirePrices() {
                       {triggeredAlerts.map((item) => (
                         <li key={item.id} className="flex flex-wrap items-center gap-1.5">
                           <span className="font-semibold text-[#7CC4FA]">{item.sizeLabel}:</span>
-                          {item.oldPrice === item.newPrice ? (
-                            <span>
-                              {isAr
-                                ? `إشعار تجريبي ناجح — السعر الحالي ${item.newPrice.toFixed(2)} د.ل`
-                                : `Verification alert — Current price ${item.newPrice.toFixed(2)} LYD`}
-                            </span>
-                          ) : (
-                            <span>
-                              {isAr
-                                ? `تغير السعر من ${item.oldPrice.toFixed(2)} د.ل إلى ${item.newPrice.toFixed(2)} د.ل`
-                                : `Price changed from ${item.oldPrice.toFixed(2)} LYD to ${item.newPrice.toFixed(2)} LYD`}
-                            </span>
-                          )}
+                          <span>
+                            {isAr
+                              ? `تغير السعر من ${item.oldPrice.toFixed(2)} د.ل إلى ${item.newPrice.toFixed(2)} د.ل`
+                              : `Price changed from ${item.oldPrice.toFixed(2)} LYD to ${item.newPrice.toFixed(2)} LYD`}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -1703,7 +1973,7 @@ export default function WirePrices() {
               </table>
             </div>
 
-            {/* Mobile Purpose-Built Compact Price Rows (Wire Size → Price → Movement + Compact Actions) */}
+            {/* Mobile Purpose-Built Compact Price Rows */}
             <div className="md:hidden">
               <div className="bg-[#102A43] text-white px-4 py-2.5 flex items-center justify-between text-xs font-medium">
                 <span>{isAr ? 'المقاس والمواصفات' : 'Size & Specs'}</span>
@@ -1731,7 +2001,6 @@ export default function WirePrices() {
                         }`}
                       >
                         <div className="flex items-center justify-between gap-3">
-                          {/* Right: Star + Wire Size + Accessible Spec */}
                           <div className="flex items-center gap-2.5 min-w-0">
                             <button
                               type="button"
@@ -1757,7 +2026,6 @@ export default function WirePrices() {
                             </div>
                           </div>
 
-                          {/* Left: Price + Movement */}
                           <div className="flex items-center gap-3 shrink-0">
                             <div className="text-left">
                               <div className="flex items-baseline gap-1 justify-end">
@@ -1796,7 +2064,6 @@ export default function WirePrices() {
                           </div>
                         </div>
 
-                        {/* Secondary Compact Mobile Action Row: Track Price Bell + Applications */}
                         <div className="mt-2.5 pt-2.5 border-t border-[#E4EAF1]/80 flex items-center justify-between gap-2">
                           <button
                             type="button"
@@ -1870,8 +2137,8 @@ export default function WirePrices() {
                   <BellRing className="w-3.5 h-3.5" />
                   <span>
                     {isAr
-                      ? 'متابعة ذكية وتنبيهات فورية على الهاتف'
-                      : 'Smart Watchlist & Mobile Price Alerts'}
+                      ? 'متابعة ذكية وتنبيهات الأسعار'
+                      : 'Smart Watchlist & Price Alerts'}
                   </span>
                 </div>
                 <h2
@@ -1884,8 +2151,8 @@ export default function WirePrices() {
                 </h2>
                 <p className="text-[13px] text-[#64748B] mt-1">
                   {isAr
-                    ? 'حدد المقاسات التي تهمك واضبط شروط التنبيه لتصلك إشعارات فورية عند تغير السعر أو وصوله إلى السعر المستهدف.'
-                    : 'Follow key wire sizes and configure alert conditions to receive notifications when prices change or reach your target.'}
+                    ? 'تابع المقاسات التي تهمك على هذا الجهاز واضبط شروط التنبيه لتصلك إشعارات فورية عند تغير السعر.'
+                    : 'Follow key wire sizes on this device and configure alert conditions to receive notifications when prices change.'}
                 </p>
               </div>
 
@@ -1903,8 +2170,8 @@ export default function WirePrices() {
                         ? 'جارٍ الإرسال…'
                         : 'Sending…'
                       : isAr
-                      ? 'تجربة إشعار على هذا الجهاز'
-                      : 'Test Device Notification'}
+                      ? 'اختبار إشعار الدفع من الخادم'
+                      : 'Test Server Push Notification'}
                   </span>
                 </button>
 
@@ -1918,6 +2185,43 @@ export default function WirePrices() {
                 </button>
               </div>
             </div>
+
+            {/* Real-time Push Delivery Verification Status Banner */}
+            {pushVerificationBanner && (
+              <div
+                className={`mt-4 rounded-xl border p-3.5 flex items-start justify-between gap-3 text-xs ${
+                  pushVerificationBanner.state === 'DEVICE_NOTIFICATION_VERIFIED'
+                    ? 'bg-[#16845B]/10 border-[#16845B]/30 text-[#16845B]'
+                    : pushVerificationBanner.state === 'PUSH_REQUEST_ACCEPTED'
+                    ? 'bg-[#EDF3F9] border-[#3974C8]/40 text-[#102A43]'
+                    : 'bg-[#C44949]/10 border-[#C44949]/30 text-[#C44949]'
+                }`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold block mb-0.5">
+                      {pushVerificationBanner.state === 'DEVICE_NOTIFICATION_VERIFIED'
+                        ? 'DEVICE NOTIFICATION VERIFIED'
+                        : pushVerificationBanner.state === 'PUSH_REQUEST_ACCEPTED'
+                        ? 'PUSH REQUEST ACCEPTED'
+                        : isAr
+                        ? 'حالة إشعار الاختبار'
+                        : 'Push Test Status'}
+                    </span>
+                    <span>{pushVerificationBanner.message}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPushVerificationBanner(null)}
+                  className="p-1 opacity-75 hover:opacity-100 cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
             {/* Watchlist Cards Grid */}
             {watchlistWires.length === 0 ? (
@@ -1993,7 +2297,7 @@ export default function WirePrices() {
                         </div>
                       </div>
 
-                      {/* Alert Condition & Status Badge */}
+                      {/* Alert Condition & Transparent Status Badge */}
                       <div className="rounded-lg bg-white border border-[#E4EAF1] p-2.5 mb-3 text-[12px]">
                         {hasRule ? (
                           <div className="space-y-1.5">
@@ -2007,7 +2311,7 @@ export default function WirePrices() {
                             </div>
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-[#64748B]">
-                                {isAr ? 'حالة الإشعار:' : 'Status:'}
+                                {isAr ? 'حالة الإشعار:' : 'Notification Status:'}
                               </span>
                               {!rule.enabled ? (
                                 <span className="inline-flex items-center gap-1 text-amber-700 font-medium">
@@ -2018,18 +2322,22 @@ export default function WirePrices() {
                                 <span className="inline-flex items-center gap-1 text-[#16845B] font-medium">
                                   <CheckCircle2 className="w-3.5 h-3.5" />
                                   <span>
-                                    {isAr
-                                      ? 'إشعارات الهاتف مفعلة (Push)'
-                                      : 'Mobile Push Active'}
+                                    {rule.verificationState === 'DEVICE_NOTIFICATION_VERIFIED'
+                                      ? isAr
+                                        ? 'إشعار الهاتف مفعل ومتحقق منه'
+                                        : 'Device Push Verified'
+                                      : isAr
+                                      ? 'اشتراك الدفع محفوظ بالخادم'
+                                      : 'Push Subscription Saved'}
                                   </span>
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 text-[#3974C8] font-medium">
-                                  <Bell className="w-3.5 h-3.5" />
+                                  <Star className="w-3.5 h-3.5" />
                                   <span>
                                     {isAr
-                                      ? 'تنبيه محفوظ محلياً على الجهاز'
-                                      : 'Saved Locally on Device'}
+                                      ? 'متابعة داخل القائمة فقط (بدون إشعار هاتف)'
+                                      : 'Watchlist Only (No Push)'}
                                   </span>
                                 </span>
                               )}
@@ -2058,11 +2366,11 @@ export default function WirePrices() {
                             <span>
                               {hasRule
                                 ? isAr
-                                  ? 'تعديل الشرط'
-                                  : 'Edit Rule'
+                                  ? 'تعديل التنبيه'
+                                  : 'Edit Alert'
                                 : isAr
-                                ? 'تفعيل تنبيه'
-                                : 'Set Alert'}
+                                ? 'تفعيل التنبيه'
+                                : 'Activate Alert'}
                             </span>
                           </button>
 
@@ -2071,25 +2379,16 @@ export default function WirePrices() {
                               type="button"
                               onClick={() => handleToggleRuleEnabled(wire.id)}
                               className="inline-flex items-center gap-1 h-8 px-2.5 rounded-lg border border-[#E4EAF1] bg-white hover:bg-[#F7F9FC] text-[#64748B] hover:text-[#172334] text-[12px] font-medium transition-colors cursor-pointer"
-                              title={
-                                rule.enabled
-                                  ? isAr
-                                    ? 'إيقاف التنبيه مؤقتاً'
-                                    : 'Pause alert'
-                                  : isAr
-                                  ? 'إعادة تفعيل التنبيه'
-                                  : 'Resume alert'
-                              }
                             >
                               {rule.enabled ? (
                                 <>
                                   <PauseCircle className="w-3.5 h-3.5 text-amber-600" />
-                                  <span>{isAr ? 'إيقاف مؤقت' : 'Pause'}</span>
+                                  <span>{isAr ? 'إيقاف التنبيه' : 'Disable'}</span>
                                 </>
                               ) : (
                                 <>
                                   <PlayCircle className="w-3.5 h-3.5 text-[#16845B]" />
-                                  <span>{isAr ? 'تفعيل' : 'Resume'}</span>
+                                  <span>{isAr ? 'تفعيل التنبيه' : 'Enable'}</span>
                                 </>
                               )}
                             </button>
@@ -2120,7 +2419,7 @@ export default function WirePrices() {
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION C — VISUAL WIRE APPLICATIONS GUIDE                                */}
+      {/* SECTION C — WIRE APPLICATION STUDIO (REDESIGNED V9 + NANO BANANA PRO)     */}
       {/* ========================================================================= */}
       <section
         id="wire-applications-guide"
@@ -2128,155 +2427,143 @@ export default function WirePrices() {
         className="py-10 sm:py-14 no-print"
       >
         <div className="max-w-[1240px] mx-auto px-5 sm:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-            <div>
-              <div className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3974C8] mb-2">
-                <ShieldCheck className="w-4 h-4" />
-                <span>
-                  {isAr
-                    ? 'الدليل البصري التوضيحي للاستخدامات'
-                    : 'Visual Wire Applications Reference'}
-                </span>
-              </div>
-              <h2
-                id="visual-applications-heading"
-                className="text-xl sm:text-[28px] font-bold text-[#172334] leading-snug"
-              >
+          {/* 1 & 2. Section Heading & Description (Section 18) */}
+          <div className="max-w-3xl mb-6">
+            <div className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3974C8] mb-2">
+              <ShieldCheck className="w-4 h-4" />
+              <span>
                 {isAr
-                  ? 'الاستخدامات الشائعة لمقاسات الأسلاك النحاسية'
-                  : 'Common Applications by Copper Wire Size'}
-              </h2>
+                  ? 'دليل الاستخدامات الهندسية المصور'
+                  : 'Visual Wire Application Studio'}
+              </span>
             </div>
-            <p className="text-sm text-[#64748B] max-w-md leading-relaxed">
+            <h2
+              id="visual-applications-heading"
+              className="text-2xl sm:text-[30px] font-bold text-[#102A43] leading-snug"
+            >
               {isAr
-                ? 'استعرض أمثلة بصرية واقعية للتطبيقات الكهربائية الشائعة لكل مقاس سلك لمساعدة المختصين والعملاء على الفهم السريع.'
-                : 'Explore realistic visual examples of common electrical applications for each wire size.'}
+                ? 'الاستخدامات الشائعة للأسلاك النحاسية'
+                : 'Common Applications of Copper Wires'}
+            </h2>
+            <p className="text-sm sm:text-[15px] text-[#64748B] mt-2 leading-relaxed">
+              {isAr
+                ? 'اكتشف الاستخدامات الشائعة لمقاسات الأسلاك المختلفة من خلال صور واقعية ومعلومات مبسطة تساعدك على فهم طبيعة كل استخدام.'
+                : 'Discover the common applications of different wire sizes through realistic photography and clear technical summaries.'}
             </p>
           </div>
 
-          {/* Interactive Size Selector Tabs for Visual Guide */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 mb-6">
+          {/* 3. Professional Segmented Wire-Size Selector (Section 19) */}
+          <div
+            role="tablist"
+            aria-label={isAr ? 'اختيار مقاس السلك' : 'Select wire size'}
+            className="bg-white border border-[#E4EAF1] rounded-xl p-1.5 mb-6 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-2xs"
+          >
             {WIRE_APPLICATIONS.map((appItem) => {
               const isSelected = selectedAppSizeId === appItem.id
               return (
                 <button
                   key={appItem.id}
+                  role="tab"
+                  aria-selected={isSelected}
                   type="button"
                   onClick={() => setSelectedAppSizeId(appItem.id)}
-                  className={`px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-150 shrink-0 cursor-pointer flex items-center gap-2 ${
+                  className={`flex-1 min-w-[104px] h-10 px-4 rounded-lg text-[14px] transition-colors duration-150 shrink-0 cursor-pointer tabular-nums flex items-center justify-center ${
                     isSelected
-                      ? 'bg-[#102A43] text-white shadow-xs'
-                      : 'bg-white text-[#172334] hover:bg-[#EDF3F9] border border-[#E4EAF1]'
+                      ? 'bg-[#102A43] text-white font-bold shadow-2xs'
+                      : 'bg-[#F7F9FC] text-[#172334] hover:bg-[#EDF3F9] font-medium'
                   }`}
                 >
-                  <span className="tabular-nums">
-                    {isAr ? appItem.size : appItem.sizeEn}
-                  </span>
-                  <span
-                    className={`text-[11px] px-2 py-0.5 rounded ${
-                      isSelected
-                        ? 'bg-[#3974C8] text-white'
-                        : 'bg-[#F7F9FC] text-[#64748B]'
-                    }`}
-                  >
-                    {isAr ? appItem.categoryAr.split(' ')[0] : appItem.categoryEn.split(' ')[0]}
-                  </span>
+                  {isAr ? appItem.size : appItem.sizeEn}
                 </button>
               )
             })}
           </div>
 
-          {/* Main Featured Visual Application Card (Selected Wire Size) */}
-          <div className="bg-white border border-[#E4EAF1] rounded-2xl overflow-hidden shadow-2xs mb-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12">
-              {/* Optimized Responsive Picture (AVIF + WebP + JPG Fallback, 4:3 Ratio) */}
-              <div className="lg:col-span-5 bg-[#081D35] relative overflow-hidden aspect-4/3 lg:aspect-auto lg:min-h-[340px]">
+          {/* Balanced Two-Column Studio Layout (Desktop: Right 45% Info / Left 55% Image; Mobile: Image First then Info) */}
+          <div className="bg-white border border-[#E4EAF1] rounded-2xl overflow-hidden shadow-2xs">
+            <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+              {/* Left on Desktop (55% -> col-span-7, lg:order-2), First on Mobile (order-1): Application Image */}
+              <div className="order-1 lg:order-2 lg:col-span-7 bg-[#081D35] relative overflow-hidden aspect-4/3 lg:aspect-auto lg:min-h-[420px]">
                 <picture>
                   <source
                     type="image/avif"
                     srcSet={`/images/wire-apps/${activeSectionApplication.imageSlug}-400.avif 400w, /images/wire-apps/${activeSectionApplication.imageSlug}-800.avif 800w`}
-                    sizes="(max-width: 768px) 100vw, 480px"
+                    sizes="(max-width: 1024px) 100vw, 680px"
                   />
                   <source
                     type="image/webp"
                     srcSet={`/images/wire-apps/${activeSectionApplication.imageSlug}-400.webp 400w, /images/wire-apps/${activeSectionApplication.imageSlug}-800.webp 800w`}
-                    sizes="(max-width: 768px) 100vw, 480px"
+                    sizes="(max-width: 1024px) 100vw, 680px"
                   />
                   <img
                     src={`/images/wire-apps/${activeSectionApplication.imageSlug}-800.jpg`}
                     alt={
                       isAr
-                        ? `الاستخدامات الشائعة لسلك ${activeSectionApplication.size} - ${activeSectionApplication.categoryAr}`
-                        : `Common applications for ${activeSectionApplication.sizeEn} wire`
+                        ? `${activeSectionApplication.headingAr} - سلك ${activeSectionApplication.size}`
+                        : `${activeSectionApplication.headingEn} - ${activeSectionApplication.sizeEn}`
                     }
                     width={800}
                     height={600}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-cover object-center transition-opacity duration-300"
+                    className="w-full h-full object-cover object-center transition-opacity duration-200"
                   />
                 </picture>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#081D35]/85 via-[#081D35]/20 to-transparent" />
-                <div className="absolute bottom-4 right-4 left-4 flex items-end justify-between gap-2 text-white">
-                  <div>
-                    <span className="inline-block text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#3974C8] text-white mb-1">
-                      {isAr
-                        ? activeSectionApplication.categoryAr
-                        : activeSectionApplication.categoryEn}
-                    </span>
-                    <div className="text-2xl font-bold tabular-nums">
-                      {isAr
-                        ? `مقاس ${activeSectionApplication.size}`
-                        : `Size ${activeSectionApplication.sizeEn}`}
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              {/* Educational Application Details */}
-              <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
+              {/* Right on Desktop (45% -> col-span-5, lg:order-1), Second on Mobile (order-2): Structured Details */}
+              <div className="order-2 lg:order-1 lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
                 <div>
-                  <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#E4EAF1]">
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-[#102A43]">
-                        {isAr
-                          ? `مجالات الاستخدام الشائعة لسلك ${activeSectionApplication.size}`
-                          : `Common Application Areas for ${activeSectionApplication.sizeEn}`}
-                      </h3>
-                      <p className="text-sm text-[#64748B] mt-1 leading-relaxed">
-                        {isAr
-                          ? activeSectionApplication.summaryAr
-                          : activeSectionApplication.summaryEn}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => openAlertModal(activeSectionApplication.id)}
-                      className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#EDF3F9] hover:bg-[#3974C8] text-[#102A43] hover:text-white text-xs font-semibold transition-colors cursor-pointer shrink-0"
-                    >
-                      <Bell className="w-3.5 h-3.5" />
+                  {/* Selected Wire Size Badge + Current Price */}
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#EDF3F9] text-[#102A43] text-[13px] font-bold tabular-nums">
+                      <span>{isAr ? 'مقاس السلك:' : 'Wire Size:'}</span>
                       <span>
-                        {isAr ? 'تابع سعر هذا المقاس' : 'Track Size Price'}
+                        {isAr
+                          ? activeSectionApplication.size
+                          : activeSectionApplication.sizeEn}
                       </span>
-                    </button>
+                    </span>
+
+                    <span className="text-[14px] font-bold text-[#172334] tabular-nums">
+                      {activeSectionWireRecord.price.toFixed(2)}{' '}
+                      <span className="text-[12px] font-medium text-[#64748B]">
+                        {isAr ? 'د.ل / لفة 100م' : 'LYD / 100m'}
+                      </span>
+                    </span>
                   </div>
 
+                  {/* Application Heading */}
+                  <h3 className="text-xl sm:text-[22px] font-bold text-[#102A43] leading-snug">
+                    {isAr
+                      ? activeSectionApplication.headingAr
+                      : activeSectionApplication.headingEn}
+                  </h3>
+
+                  {/* Short Explanation */}
+                  <p className="text-[14px] text-[#64748B] mt-2.5 leading-relaxed">
+                    {isAr
+                      ? activeSectionApplication.summaryAr
+                      : activeSectionApplication.summaryEn}
+                  </p>
+
+                  {/* Three Concise Application Examples */}
                   <div className="mt-5">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#3974C8] mb-3">
-                      {isAr
-                        ? 'أمثلة استرشادية للتطبيقات الشائعة:'
-                        : 'Indicative Common Examples:'}
+                    <h4 className="text-xs font-bold text-[#172334] mb-2.5">
+                      {isAr ? 'أمثلة الاستخدام الشائعة:' : 'Common Usage Examples:'}
                     </h4>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <ul className="space-y-2">
                       {(isAr
-                        ? activeSectionApplication.commonExamplesAr
-                        : activeSectionApplication.commonExamplesEn
+                        ? activeSectionApplication.examplesAr
+                        : activeSectionApplication.examplesEn
                       ).map((example, idx) => (
                         <li
                           key={idx}
                           className="flex items-start gap-2.5 p-3 rounded-xl bg-[#F7F9FC] border border-[#E4EAF1] text-[13px] text-[#172334] leading-relaxed"
                         >
-                          <span className="w-2 h-2 rounded-full bg-[#3974C8] shrink-0 mt-1.5" />
+                          <span className="w-5 h-5 rounded-md bg-[#102A43] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 tabular-nums">
+                            {idx + 1}
+                          </span>
                           <span>{example}</span>
                         </li>
                       ))}
@@ -2284,87 +2571,32 @@ export default function WirePrices() {
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-[#E4EAF1] flex items-start gap-2.5 text-[13px] text-[#64748B]">
-                  <Info className="w-4 h-4 text-[#3974C8] shrink-0 mt-0.5" />
-                  <p>
-                    <strong className="text-[#102A43]">
-                      {isAr ? 'ملاحظة فنية:' : 'Technical Note:'}
-                    </strong>{' '}
-                    {isAr
-                      ? activeSectionApplication.engineeringNotesAr
-                      : activeSectionApplication.engineeringNotesEn}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+                {/* Technical Note + Alert Action */}
+                <div className="mt-6 pt-5 border-t border-[#E4EAF1] space-y-4">
+                  <div className="rounded-xl bg-[#EDF3F9]/70 border border-[#D8E3F0] p-3 text-[12px] text-[#172334] leading-relaxed flex items-start gap-2">
+                    <Info className="w-4 h-4 text-[#3974C8] shrink-0 mt-0.5" />
+                    <p>
+                      <strong className="font-bold text-[#102A43]">
+                        {isAr ? 'ملاحظة فنية:' : 'Technical Note:'}
+                      </strong>{' '}
+                      {isAr
+                        ? activeSectionApplication.technicalNoteAr
+                        : activeSectionApplication.technicalNoteEn}
+                    </p>
+                  </div>
 
-          {/* Mandatory Engineering & Electrical Safety Disclaimer Box */}
-          <div className="bg-[#102A43] text-white rounded-xl p-5 sm:p-6 border border-[#173B5E]">
-            <div className="flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-lg bg-[#081D35] border border-[#173B5E] flex items-center justify-center shrink-0 mt-0.5">
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
-              </div>
-              <div className="space-y-2 text-[13px] leading-relaxed text-slate-200">
-                <h3 className="text-sm font-bold text-white">
-                  {isAr
-                    ? 'تنويه هندسي هام حول اختيار مقاس السلك الكهربائي'
-                    : 'Important Engineering Disclaimer on Electrical Wire Sizing'}
-                </h3>
-                <p>
-                  {isAr
-                    ? 'الأمثلة المذكورة أعلاه هي أمثلة توضيحية للاستخدامات الشائعة في التمديدات العامة، ولا تُغني عن الحسابات الهندسية الدقيقة. يعتمد الاختيار النهائي لمقاس السلك في أي مشروع على عدة عوامل فنية مترابطة تشمل:'
-                    : 'The examples above are educational illustrations of common applications and do not replace formal electrical design calculations. Final wire gauge selection depends on multiple engineering factors:'}
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-1 text-[12px] text-slate-100">
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    1.{' '}
-                    {isAr
-                      ? 'شدة التيار الكهربائي والحمل الفعلي (الأمبير)'
-                      : 'Electrical load current (Amperes)'}
-                  </div>
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    2.{' '}
-                    {isAr
-                      ? 'طريقة التمديد والتركيب (مواسير، حوامل، دفن)'
-                      : 'Installation method (conduit, tray, buried)'}
-                  </div>
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    3.{' '}
-                    {isAr
-                      ? 'طول مسار الكابل وهبوط الجهد المسموح به'
-                      : 'Cable run length & permissible voltage drop'}
-                  </div>
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    4.{' '}
-                    {isAr
-                      ? 'درجة الحرارة المحيطة وتجاور الأسلاك'
-                      : 'Ambient temperature & grouping derating'}
-                  </div>
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    5.{' '}
-                    {isAr
-                      ? 'تصنيف العزل الحراري والجهد الاسمي للسلك'
-                      : 'Insulation thermal & voltage rating'}
-                  </div>
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    6.{' '}
-                    {isAr
-                      ? 'معايرة القواطع وأجهزة الحماية الكهربائية'
-                      : 'Circuit breaker & protective device rating'}
-                  </div>
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    7.{' '}
-                    {isAr
-                      ? 'المواصفات القياسية الكهربائية المعتمدة'
-                      : 'Applicable electrical codes & standards'}
-                  </div>
-                  <div className="bg-[#081D35]/80 border border-[#173B5E] rounded-lg px-3 py-2">
-                    8.{' '}
-                    {isAr
-                      ? 'مراجعة واعتماد مهندس أو فني كهرباء مختص'
-                      : 'Review by a qualified engineer or electrician'}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openAlertModal(activeSectionApplication.id)}
+                    className="w-full inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-[#102A43] hover:bg-[#173B5E] text-white text-[13px] font-semibold transition-colors cursor-pointer"
+                  >
+                    <Bell className="w-4 h-4 text-[#7CC4FA]" />
+                    <span>
+                      {isAr
+                        ? `تابع سعر سلك ${activeSectionApplication.size}`
+                        : `Track ${activeSectionApplication.sizeEn} Wire Price`}
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -2387,7 +2619,7 @@ export default function WirePrices() {
           aria-modal="true"
           aria-labelledby="smart-alert-dialog-title"
         >
-          <div className="bg-white border border-[#E4EAF1] rounded-2xl max-w-md w-full overflow-hidden shadow-xl animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white border border-[#E4EAF1] rounded-2xl max-w-md w-full max-h-[92vh] overflow-y-auto shadow-xl">
             {/* Modal Navy Header */}
             <div className="bg-[#102A43] text-white px-5 py-4 flex items-center justify-between border-b border-[#173B5E]">
               <div className="flex items-center gap-2.5">
@@ -2400,8 +2632,8 @@ export default function WirePrices() {
                   </h3>
                   <p className="text-[11px] text-slate-300">
                     {isAr
-                      ? 'ضبط إشعارات تغير السعر الفورية'
-                      : 'Configure smart price change notifications'}
+                      ? 'تنبيهات الأسعار الفورية عبر Web Push'
+                      : 'Real-time Web Push price alerts'}
                   </p>
                 </div>
               </div>
@@ -2416,46 +2648,83 @@ export default function WirePrices() {
             </div>
 
             <form onSubmit={handleSaveAlertRule} className="p-5 space-y-4">
-              {/* Wire Size Selector + Current Live Price Summary */}
-              <div className="bg-[#F7F9FC] border border-[#E4EAF1] rounded-xl p-3.5 flex items-center justify-between gap-3">
-                <div>
-                  <label
-                    htmlFor="modal-wire-size-select"
-                    className="block text-[11px] font-medium text-[#64748B] mb-1"
-                  >
-                    {isAr ? 'مقاس السلك المختار' : 'Selected Wire Size'}
-                  </label>
-                  <select
-                    id="modal-wire-size-select"
-                    value={activeModalWire.id}
-                    onChange={(e) => openAlertModal(e.target.value)}
-                    className="bg-white border border-[#CBD5E1] rounded-lg px-2.5 py-1 text-sm font-bold text-[#102A43] focus:outline-none focus:border-[#3974C8]"
-                  >
-                    {wireRecords.map((w) => (
-                      <option key={w.id} value={w.id}>
-                        {isAr ? w.size : w.sizeEn}
-                      </option>
-                    ))}
-                  </select>
+              {/* Selected Wire Size + Current Price + Notification Status */}
+              <div className="bg-[#F7F9FC] border border-[#E4EAF1] rounded-xl p-3.5 space-y-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <label
+                      htmlFor="modal-wire-size-select"
+                      className="block text-[11px] font-medium text-[#64748B] mb-1"
+                    >
+                      {isAr ? 'مقاس السلك المختار' : 'Selected Wire Size'}
+                    </label>
+                    <select
+                      id="modal-wire-size-select"
+                      value={activeModalWire.id}
+                      onChange={(e) => openAlertModal(e.target.value)}
+                      className="bg-white border border-[#CBD5E1] rounded-lg px-2.5 py-1 text-sm font-bold text-[#102A43] focus:outline-none focus:border-[#3974C8]"
+                    >
+                      {wireRecords.map((w) => (
+                        <option key={w.id} value={w.id}>
+                          {isAr ? w.size : w.sizeEn}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="text-left">
+                    <span className="block text-[11px] font-medium text-[#64748B]">
+                      {isAr ? 'السعر الحالي' : 'Current Price'}
+                    </span>
+                    <div className="text-xl font-bold text-[#102A43] tabular-nums">
+                      {activeModalWire.price.toFixed(2)}{' '}
+                      <span className="text-xs font-medium text-[#64748B]">
+                        {isAr ? 'د.ل' : 'LYD'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="text-left">
-                  <span className="block text-[11px] font-medium text-[#64748B]">
-                    {isAr ? 'السعر الحالي' : 'Current Price'}
+                {/* Live Notification Status Row */}
+                <div className="pt-2 border-t border-[#E4EAF1] flex items-center justify-between text-[12px]">
+                  <span className="text-[#64748B]">
+                    {isAr ? 'حالة الإشعار الحالية:' : 'Current Alert Status:'}
                   </span>
-                  <div className="text-xl font-bold text-[#102A43] tabular-nums">
-                    {activeModalWire.price.toFixed(2)}{' '}
-                    <span className="text-xs font-medium text-[#64748B]">
-                      {isAr ? 'د.ل' : 'LYD'}
+                  {activeModalExistingRule ? (
+                    activeModalExistingRule.enabled &&
+                    activeModalExistingRule.deliveryMode === 'push' ? (
+                      <span className="inline-flex items-center gap-1 font-bold text-[#16845B]">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>
+                          {isAr
+                            ? 'مفعل ومحفوظ على الخادم'
+                            : 'Active & Saved on Server'}
+                        </span>
+                      </span>
+                    ) : !activeModalExistingRule.enabled ? (
+                      <span className="inline-flex items-center gap-1 font-bold text-amber-700">
+                        <PauseCircle className="w-3.5 h-3.5" />
+                        <span>{isAr ? 'متوقف مؤقتاً' : 'Paused'}</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 font-semibold text-[#3974C8]">
+                        <span>
+                          {isAr ? 'متابعة في القائمة فقط' : 'Watchlist Only'}
+                        </span>
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-[#64748B]">
+                      {isAr ? 'غير مفعل بعد' : 'Not Activated Yet'}
                     </span>
-                  </div>
+                  )}
                 </div>
               </div>
 
               {/* Alert Conditions Radio Group */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-[#172334]">
-                  {isAr ? 'اختر شرط إرسال التنبيه:' : 'Select Alert Condition:'}
+                  {isAr ? 'شرط التنبيه:' : 'Alert Condition:'}
                 </label>
 
                 {(
@@ -2463,30 +2732,22 @@ export default function WirePrices() {
                     {
                       id: 'down' as AlertConditionType,
                       labelAr: 'عند انخفاض السعر',
-                      labelEn: 'When price decreases',
-                      descAr: 'إشعار فوري عند نزول السعر عن السعر الحالي',
-                      descEn: 'Notify immediately when price drops below current price'
+                      labelEn: 'When price decreases'
                     },
                     {
                       id: 'up' as AlertConditionType,
                       labelAr: 'عند ارتفاع السعر',
-                      labelEn: 'When price increases',
-                      descAr: 'إشعار فوري عند زيادة السعر عن السعر الحالي',
-                      descEn: 'Notify immediately when price rises above current price'
+                      labelEn: 'When price increases'
                     },
                     {
                       id: 'any' as AlertConditionType,
                       labelAr: 'عند أي تغيير في السعر',
-                      labelEn: 'On any price change',
-                      descAr: 'متابعة شاملة لأي تحديث سعري بالارتفاع أو الانخفاض',
-                      descEn: 'Notify on any committed upward or downward price update'
+                      labelEn: 'On any price change'
                     },
                     {
                       id: 'target' as AlertConditionType,
                       labelAr: 'عند وصول السعر إلى مبلغ محدد',
-                      labelEn: 'When price reaches a specific target amount',
-                      descAr: 'حدد السعر المستهدف بالدينار الليبي ليصلك إشعار عند الوصول إليه',
-                      descEn: 'Specify a target price in LYD to trigger your alert'
+                      labelEn: 'When price reaches a specific target amount'
                     }
                   ] as const
                 ).map((option) => {
@@ -2494,7 +2755,7 @@ export default function WirePrices() {
                   return (
                     <label
                       key={option.id}
-                      className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                         isChecked
                           ? 'bg-[#EDF3F9]/80 border-[#3974C8]'
                           : 'bg-white border-[#E4EAF1] hover:bg-[#F7F9FC]'
@@ -2509,22 +2770,17 @@ export default function WirePrices() {
                           setModalCondition(option.id)
                           setModalError(null)
                         }}
-                        className="mt-1 accent-[#3974C8]"
+                        className="accent-[#3974C8]"
                       />
-                      <div className="text-xs">
-                        <div className="font-bold text-[#102A43]">
-                          {isAr ? option.labelAr : option.labelEn}
-                        </div>
-                        <div className="text-[#64748B] mt-0.5">
-                          {isAr ? option.descAr : option.descEn}
-                        </div>
-                      </div>
+                      <span className="text-xs font-bold text-[#102A43]">
+                        {isAr ? option.labelAr : option.labelEn}
+                      </span>
                     </label>
                   )
                 })}
               </div>
 
-              {/* Target Price Numeric Input (when condition === 'target') */}
+              {/* Target Price Numeric Input */}
               {modalCondition === 'target' && (
                 <div className="bg-[#F7F9FC] border border-[#CBD5E1] rounded-xl p-3.5">
                   <label
@@ -2544,7 +2800,7 @@ export default function WirePrices() {
                       max="100000"
                       value={modalTargetPrice}
                       onChange={(e) => setModalTargetPrice(e.target.value)}
-                      placeholder="135.00"
+                      placeholder="350.00"
                       className="w-full h-10 px-3 rounded-lg border border-[#CBD5E1] bg-white text-base font-bold text-[#102A43] tabular-nums focus:outline-none focus:border-[#3974C8]"
                       required
                     />
@@ -2555,67 +2811,122 @@ export default function WirePrices() {
                 </div>
               )}
 
-              {/* iOS / iPhone Home Screen Web Push Guidance */}
-              {isIOSRequiresHomeScreen && (
-                <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-[12px] text-amber-900 leading-relaxed">
-                  <strong className="block font-bold mb-0.5">
-                    {isAr
-                      ? 'ملاحظة لمستخدمي iPhone و iPad:'
-                      : 'Note for iPhone & iPad users:'}
-                  </strong>
-                  {isAr
-                    ? 'لتلقي إشعارات الأسعار مباشرة على شاشة الهاتف في نظام iOS، اضغط على زر المشاركة (Share) في سفاري ثم اختر "إضافة إلى الشاشة الرئيسية" (Add to Home Screen). كما سيتم حفظ التنبيه في قائمة المتابعة الخاصة بك.'
-                    : 'To receive lock-screen Web Push notifications on iOS, tap Share in Safari and select "Add to Home Screen". Your alert is also saved to your watchlist.'}
+              {/* Exact iPhone PWA Guidance (Section 08) */}
+              {deviceCapabilities.isIOSRequiresHomeScreen && (
+                <div className="rounded-xl bg-amber-50 border border-amber-300 p-3.5 text-[12px] text-amber-950 leading-relaxed">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="block font-bold mb-1">
+                        {isAr ? 'إرشاد خاص لمستخدمي iPhone:' : 'iPhone Web Push Setup:'}
+                      </strong>
+                      <p>
+                        {isAr
+                          ? 'لتفعيل تنبيهات الأسعار على iPhone، أضف موقع الإنارة الحديثة إلى الشاشة الرئيسية، ثم افتحه من الأيقونة واسمح بالإشعارات.'
+                          : 'To enable price alerts on iPhone, add Enarah Modern to your Home Screen, open it from the icon, and allow notifications.'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Browser Permission Denied Notice */}
-              {notificationPermission === 'denied' && (
-                <div className="rounded-xl bg-[#EDF3F9] border border-[#CBD5E1] p-3 text-[12px] text-[#172334] leading-relaxed">
-                  {isAr
-                    ? 'إشعارات المتصفح معطلة حالياً في إعدادات جهازك. سيتم حفظ التنبيه وتفعيله داخل قائمة المتابعة بالموقع، ويمكنك السماح بالإشعارات من إعدادات المتصفح في أي وقت.'
-                    : 'Browser notifications are currently blocked in your browser settings. Your alert will remain active inside your on-page watchlist.'}
-                </div>
-              )}
-
+              {/* Clear Error Handling with Retry Option (Section 06 & 12) */}
               {modalError && (
-                <div className="rounded-lg bg-[#C44949]/10 border border-[#C44949]/30 p-2.5 text-xs font-medium text-[#C44949]">
-                  {modalError}
+                <div className="rounded-xl bg-[#C44949]/10 border border-[#C44949]/35 p-3.5 text-xs text-[#C44949] space-y-2.5">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span className="font-medium leading-relaxed">
+                      {modalError.message}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSaveAlertRule()}
+                      disabled={isSavingAlert}
+                      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#C44949] text-white text-[11px] font-bold cursor-pointer"
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                      <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveWatchlistOnly}
+                      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white border border-[#CBD5E1] text-[#172334] text-[11px] font-semibold cursor-pointer"
+                    >
+                      <span>
+                        {isAr
+                          ? 'متابعة في القائمة فقط بدون إشعار هاتف'
+                          : 'Follow in Watchlist Only'}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               )}
 
+              {/* Verified Server Persistence Success Message */}
               {alertFeedbackMsg && (
-                <div className="rounded-lg bg-[#16845B]/10 border border-[#16845B]/30 p-2.5 text-xs font-semibold text-[#16845B] flex items-center gap-2">
+                <div className="rounded-xl bg-[#16845B]/10 border border-[#16845B]/30 p-3 text-xs font-semibold text-[#16845B] flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{alertFeedbackMsg}</span>
                 </div>
               )}
 
-              {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-2.5 pt-2">
-                <button
-                  type="button"
-                  onClick={closeAlertModal}
-                  className="h-10 px-4 rounded-lg border border-[#E4EAF1] bg-white hover:bg-[#F7F9FC] text-xs font-semibold text-[#64748B] cursor-pointer"
-                >
-                  {isAr ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSavingAlert}
-                  className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-[#3974C8] hover:bg-[#2d62b0] text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-60"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>
-                    {isSavingAlert
-                      ? isAr
-                        ? 'جارٍ التفعيل…'
-                        : 'Activating…'
-                      : isAr
-                      ? 'تفعيل التنبيه'
-                      : 'Activate Alert'}
-                  </span>
-                </button>
+              {/* Modal Actions: تفعيل التنبيه / تعديل التنبيه / إيقاف التنبيه (Section 12) */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#E4EAF1]">
+                {activeModalExistingRule && activeModalExistingRule.enabled ? (
+                  <button
+                    type="button"
+                    onClick={() => handleToggleRuleEnabled(activeModalWire.id, true)}
+                    disabled={isSavingAlert}
+                    className="inline-flex items-center gap-1.5 h-10 px-3.5 rounded-lg border border-[#C44949]/30 bg-[#C44949]/5 hover:bg-[#C44949]/15 text-xs font-bold text-[#C44949] cursor-pointer"
+                  >
+                    <PauseCircle className="w-4 h-4" />
+                    <span>{isAr ? 'إيقاف التنبيه' : 'Disable Alert'}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={closeAlertModal}
+                    className="h-10 px-4 rounded-lg border border-[#E4EAF1] bg-white hover:bg-[#F7F9FC] text-xs font-semibold text-[#64748B] cursor-pointer"
+                  >
+                    {isAr ? 'إلغاء' : 'Cancel'}
+                  </button>
+                )}
+
+                <div className="flex items-center gap-2 mr-auto">
+                  {activeModalExistingRule && activeModalExistingRule.enabled && (
+                    <button
+                      type="button"
+                      onClick={closeAlertModal}
+                      className="h-10 px-3.5 rounded-lg border border-[#E4EAF1] bg-white hover:bg-[#F7F9FC] text-xs font-semibold text-[#64748B] cursor-pointer"
+                    >
+                      {isAr ? 'إغلاق' : 'Close'}
+                    </button>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSavingAlert}
+                    className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-[#102A43] hover:bg-[#173B5E] text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-60"
+                  >
+                    <Bell className="w-3.5 h-3.5 text-[#7CC4FA]" />
+                    <span>
+                      {isSavingAlert
+                        ? isAr
+                          ? 'جارٍ الحفظ والتحقق…'
+                          : 'Saving & Verifying…'
+                        : activeModalExistingRule && activeModalExistingRule.enabled
+                        ? isAr
+                          ? 'تعديل التنبيه'
+                          : 'Update Alert'
+                        : isAr
+                        ? 'تفعيل التنبيه'
+                        : 'Activate Alert'}
+                    </span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -2632,9 +2943,8 @@ export default function WirePrices() {
           aria-modal="true"
           aria-labelledby="wire-app-modal-title"
         >
-          <div className="bg-white border border-[#E4EAF1] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl animate-in fade-in zoom-in-95 duration-150">
-            {/* Visual Header with Optimized Picture */}
-            <div className="relative h-56 sm:h-64 bg-[#081D35] overflow-hidden">
+          <div className="bg-white border border-[#E4EAF1] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="relative aspect-4/3 sm:aspect-16/9 bg-[#081D35] overflow-hidden">
               <picture>
                 <source
                   type="image/avif"
@@ -2650,8 +2960,8 @@ export default function WirePrices() {
                   src={`/images/wire-apps/${activeModalApplication.imageSlug}-800.jpg`}
                   alt={
                     isAr
-                      ? `الاستخدامات الشائعة لسلك ${activeModalApplication.size}`
-                      : `Common applications for ${activeModalApplication.sizeEn}`
+                      ? activeModalApplication.headingAr
+                      : activeModalApplication.headingEn
                   }
                   width={800}
                   height={600}
@@ -2660,7 +2970,7 @@ export default function WirePrices() {
                   className="w-full h-full object-cover"
                 />
               </picture>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#081D35] via-[#081D35]/35 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#081D35] via-[#081D35]/30 to-transparent" />
 
               <button
                 type="button"
@@ -2673,15 +2983,15 @@ export default function WirePrices() {
 
               <div className="absolute bottom-4 right-5 left-5 flex items-end justify-between gap-3 text-white">
                 <div>
-                  <span className="inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded bg-[#3974C8] text-white mb-1">
+                  <span className="inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded bg-[#3974C8] text-white mb-1 tabular-nums">
                     {isAr
-                      ? activeModalApplication.categoryAr
-                      : activeModalApplication.categoryEn}
+                      ? `مقاس ${activeModalApplication.size}`
+                      : `Size ${activeModalApplication.sizeEn}`}
                   </span>
-                  <h3 id="wire-app-modal-title" className="text-2xl font-bold">
+                  <h3 id="wire-app-modal-title" className="text-xl sm:text-2xl font-bold">
                     {isAr
-                      ? `الاستخدامات الشائعة لسلك ${activeModalApplication.size}`
-                      : `Common Uses for ${activeModalApplication.sizeEn} Wire`}
+                      ? activeModalApplication.headingAr
+                      : activeModalApplication.headingEn}
                   </h3>
                 </div>
                 {activeModalAppWireRecord && (
@@ -2708,37 +3018,34 @@ export default function WirePrices() {
               </p>
 
               <div>
-                <h4 className="text-xs font-bold text-[#3974C8] mb-2.5">
-                  {isAr
-                    ? 'أمثلة التطبيقات الكهربائية الشائعة:'
-                    : 'Common Electrical Application Examples:'}
+                <h4 className="text-xs font-bold text-[#102A43] mb-2.5">
+                  {isAr ? 'أمثلة الاستخدام الشائعة:' : 'Common Usage Examples:'}
                 </h4>
                 <ul className="space-y-2">
                   {(isAr
-                    ? activeModalApplication.commonExamplesAr
-                    : activeModalApplication.commonExamplesEn
+                    ? activeModalApplication.examplesAr
+                    : activeModalApplication.examplesEn
                   ).map((ex, i) => (
                     <li
                       key={i}
                       className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[#F7F9FC] border border-[#E4EAF1] text-xs text-[#172334]"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#3974C8] shrink-0 mt-1.5" />
+                      <span className="w-5 h-5 rounded bg-[#102A43] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 tabular-nums">
+                        {i + 1}
+                      </span>
                       <span>{ex}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Mandatory Engineering Safety Note inside Modal */}
               <div className="rounded-xl bg-[#EDF3F9] border border-[#CBD5E1] p-3.5 text-[12px] text-[#172334] leading-relaxed">
                 <strong className="font-bold text-[#102A43] block mb-1">
-                  {isAr
-                    ? 'إرشاد هندسي وسلامة كهربائية:'
-                    : 'Engineering & Electrical Safety Guidance:'}
+                  {isAr ? 'ملاحظة فنية:' : 'Technical Note:'}
                 </strong>
                 {isAr
-                  ? 'تُعرض هذه الاستخدامات لأغراض توضيحية استرشادية. يعتمد تحديد مقاس السلك النهائي على شدة التيار الكهربائي (الأمبير)، وطريقة التمديد، وطول المسار، وهبوط الجهد، ودرجة الحرارة المحيطة، وتصنيف العزل، ومعايرة القاطع الكهربائي، ومراجعة مهندس أو فني كهرباء مختص.'
-                  : 'These applications are illustrative examples. Final wire sizing must account for current load, installation method, cable length, voltage drop, ambient temperature, insulation rating, protective breaker sizing, and review by a qualified electrician or engineer.'}
+                  ? activeModalApplication.technicalNoteAr
+                  : activeModalApplication.technicalNoteEn}
               </div>
 
               <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#E4EAF1]">

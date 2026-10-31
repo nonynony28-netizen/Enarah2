@@ -3,7 +3,10 @@
 import { MongoClient } from "mongodb";
 import { uploadSingleImage } from "../lib/multer.js";
 import { processAndUploadImage, uploadVideoToR2 } from "../lib/r2.js";
-import { processCommittedWirePriceUpdate } from "./wire-alerts.js";
+import {
+  processCommittedWirePriceUpdate,
+  handleWireAlertsPost,
+} from "../lib/wireAlerts.js";
 
 // =====================================
 // MongoDB Cache
@@ -12,18 +15,20 @@ let cachedClient = null;
 let cachedDb = null;
 
 const BASELINE_WIRE_PRICES = {
-  "1.5": 89,
-  "2.5": 142,
-  "4.0": 219,
-  "6.0": 329,
-  "10.0": 580,
-  "16.0": 915,
-  "25.0": 1410,
+  "1.5": 245,
+  "2.5": 375,
+  "4.0": 585,
+  "6.0": 845,
+  "10.0": 1490,
+  "16.0": 2320,
+  "25.0": 3650,
 };
 
 function parseWirePricesFromRecord(doc) {
   if (!doc) return null;
-  const candidateStrings = [doc.phone, doc.rawPhone].filter((v) => typeof v === "string" && v.trim());
+  const candidateStrings = [doc.phone, doc.rawPhone].filter(
+    (v) => typeof v === "string" && v.trim()
+  );
   for (const str of candidateStrings) {
     try {
       const parsed = JSON.parse(str);
@@ -84,12 +89,14 @@ export const config = {
 // In-memory rate limiting per IP address (Protects MongoDB Atlas from Spam & Rate-Limit Attacks)
 const ipCache = new Map();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 20;
+const MAX_REQUESTS_PER_WINDOW = 30;
 
 function isRateLimited(clientIp) {
   const now = Date.now();
   const userRequests = ipCache.get(clientIp) || [];
-  const validRequests = userRequests.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW);
+  const validRequests = userRequests.filter(
+    (timestamp) => now - timestamp < RATE_LIMIT_WINDOW
+  );
 
   if (validRequests.length >= MAX_REQUESTS_PER_WINDOW) {
     return true;
@@ -106,9 +113,13 @@ function isRateLimited(clientIp) {
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-admin-password");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, x-admin-password, x-subscriber-token, X-Idempotency-Key"
+  );
 
-  const clientIp = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
+  const clientIp =
+    req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
   if (req.method === "POST" && isRateLimited(clientIp)) {
     return res.status(429).json({
       success: false,
@@ -147,7 +158,11 @@ export default async function handler(req, res) {
       }
     } else if (contentType.includes("application/json")) {
       // Collect raw JSON stream when bodyParser is disabled
-      if (!req.body || typeof req.body !== "object" || Object.keys(req.body).length === 0) {
+      if (
+        !req.body ||
+        typeof req.body !== "object" ||
+        Object.keys(req.body).length === 0
+      ) {
         const rawBody = await new Promise((resolve) => {
           let chunks = [];
           req.on("data", (chunk) => chunks.push(chunk));
@@ -163,28 +178,61 @@ export default async function handler(req, res) {
     }
 
     const body = req.body || {};
+
+    // Route Smart Wire Price Alert POST operations (upsert, delete, test-push)
+    if (
+      body.type === "wire_alert" ||
+      body.action === "upsert" ||
+      body.action === "delete" ||
+      body.action === "test-push"
+    ) {
+      return await handleWireAlertsPost(req, res, body, connectToDatabase);
+    }
+
     const name = typeof body.name === "string" ? body.name.trim() : "";
-    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const type = typeof body.type === "string" ? body.type.trim().toLowerCase() : "user";
-    const rawPhone = typeof body.phone === "string" ? body.phone.trim() : body.phone ? String(body.phone) : "";
-    const description = typeof body.description === "string" ? body.description.trim() : "";
-    const category = typeof body.category === "string" ? body.category.trim() : "";
-    const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl.trim() : "";
+    const email =
+      typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const type =
+      typeof body.type === "string" ? body.type.trim().toLowerCase() : "user";
+    const rawPhone =
+      typeof body.phone === "string"
+        ? body.phone.trim()
+        : body.phone
+        ? String(body.phone)
+        : "";
+    const description =
+      typeof body.description === "string" ? body.description.trim() : "";
+    const category =
+      typeof body.category === "string" ? body.category.trim() : "";
+    const videoUrl =
+      typeof body.videoUrl === "string" ? body.videoUrl.trim() : "";
     const priceStr = typeof body.price === "string" ? body.price.trim() : "";
-    const discountPriceStr = typeof body.discountPrice === "string" ? body.discountPrice.trim() : "";
-    const stockStatus = typeof body.stockStatus === "string" ? body.stockStatus.trim().toLowerCase() : "available";
-    const stockQtyStr = typeof body.stockQty === "string" ? body.stockQty.trim() : "";
+    const discountPriceStr =
+      typeof body.discountPrice === "string" ? body.discountPrice.trim() : "";
+    const stockStatus =
+      typeof body.stockStatus === "string"
+        ? body.stockStatus.trim().toLowerCase()
+        : "available";
+    const stockQtyStr =
+      typeof body.stockQty === "string" ? body.stockQty.trim() : "";
 
     const price = priceStr ? parseFloat(priceStr) : undefined;
-    const discountPrice = discountPriceStr ? parseFloat(discountPriceStr) : undefined;
+    const discountPrice = discountPriceStr
+      ? parseFloat(discountPriceStr)
+      : undefined;
     const stockQty = stockQtyStr ? parseInt(stockQtyStr, 10) : undefined;
 
-    const isWirePriceCommit = email === "admin_wire_prices@app.local" || type === "wire_prices";
-    const isAdminAction = type === "product" || type === "project" || isWirePriceCommit;
+    const isWirePriceCommit =
+      email === "admin_wire_prices@app.local" || type === "wire_prices";
+    const isAdminAction =
+      type === "product" || type === "project" || isWirePriceCommit;
     if (isAdminAction) {
       const adminPassword = process.env.ADMIN_PASSWORD;
       if (!adminPassword) {
-        return res.status(500).json({ success: false, error: "Server error: ADMIN_PASSWORD environment variable is missing" });
+        return res.status(500).json({
+          success: false,
+          error: "Server error: ADMIN_PASSWORD environment variable is missing",
+        });
       }
       const clientPassword = req.headers["x-admin-password"];
       if (clientPassword !== adminPassword) {
@@ -208,10 +256,16 @@ export default async function handler(req, res) {
 
     if (req.files) {
       if (req.files.image && req.files.image[0]) {
-        imageUrl = await processAndUploadImage(req.files.image[0].buffer, "products");
+        imageUrl = await processAndUploadImage(
+          req.files.image[0].buffer,
+          "products"
+        );
       }
       if (req.files.video && req.files.video[0]) {
-        finalVideoUrl = await uploadVideoToR2(req.files.video[0].buffer, req.files.video[0].mimetype);
+        finalVideoUrl = await uploadVideoToR2(
+          req.files.video[0].buffer,
+          req.files.video[0].mimetype
+        );
       }
     }
 
@@ -238,7 +292,9 @@ export default async function handler(req, res) {
         .sort({ createdAt: -1, _id: -1 })
         .limit(1)
         .next();
-      previousWirePrices = parseWirePricesFromRecord(latestWireRecord) || { ...BASELINE_WIRE_PRICES };
+      previousWirePrices = parseWirePricesFromRecord(latestWireRecord) || {
+        ...BASELINE_WIRE_PRICES,
+      };
     }
 
     let phoneField = rawPhone;
@@ -293,7 +349,10 @@ export default async function handler(req, res) {
 
     return res.status(201).json({
       success: true,
-      message: type === "product" ? "Product saved successfully" : "User saved successfully",
+      message:
+        type === "product"
+          ? "Product saved successfully"
+          : "User saved successfully",
       insertedId: result.insertedId,
       imageUrl,
       ...(alertTriggerSummary ? { alertTriggerSummary } : {}),
