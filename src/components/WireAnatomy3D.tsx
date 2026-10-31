@@ -4,74 +4,172 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {
   RotateCcw,
   Layers,
-  Eye,
   Zap,
   Shield,
   CircleDot,
   CheckCircle2,
-  Maximize2,
-  Minimize2,
-  Compass
+  ScanLine,
+  MousePointerClick
 } from 'lucide-react'
 
-// Component selection types
-export type AnatomyComponentId = 'all' | 'conductor' | 'insulation' | 'cross_section'
+export type LabStageId = 'exterior' | 'insulation' | 'copper' | 'cross_section'
 
 interface WireAnatomy3DProps {
   isAr?: boolean
 }
 
-// Technical specifications for Italian FS17 / H07V-K wire
-const SPECS = {
-  conductor: {
-    titleAr: 'القلب الموصل: نحاس أحمر نقي 100%',
-    titleEn: 'Conductor Core: 100% Pure Red Copper',
-    badgeAr: 'نحاس إلكتروليتي مرن - فئة 5',
-    badgeEn: 'Flexible Electrolytic Copper - Class 5',
-    standard: 'CEI EN 60228 / IEC 60228',
-    detailsAr: [
-      'شعيرات دقيقة مجدولة هندسياً من النحاس الإلكتروليتي عالي النقاوة تمنح السلك أقصى مرونة وسهولة أثناء السحب والتمرير داخل الأنابيب.',
-      'مقاومة أومية فائقة الانخفاض تضمن كفاءة تدفق التيار وتحد من الفقد الحراري والجهد، مما يحمي المنشآت من مخاطر ارتفاع الحرارة.',
-      'صلابة متوازنة تمنع التآكل والكسر الداخلي تحت الضغط الميكانيكي المستمر.'
+interface StageSpec {
+  id: LabStageId
+  labelAr: string
+  labelEn: string
+  stepNumber: string
+  titleAr: string
+  titleEn: string
+  subtitleAr: string
+  subtitleEn: string
+  descriptionAr: string
+  descriptionEn: string
+  specsAr: { label: string; value: string }[]
+  specsEn: { label: string; value: string }[]
+  pointsAr: string[]
+  pointsEn: string[]
+}
+
+const STAGE_DATA: Record<LabStageId, StageSpec> = {
+  exterior: {
+    id: 'exterior',
+    labelAr: 'الشكل الخارجي',
+    labelEn: 'Exterior Form',
+    stepNumber: '01',
+    titleAr: 'الشكل الخارجي — بنية السلك المتكاملة',
+    titleEn: 'Exterior Profile — Integrated Wire Structure',
+    subtitleAr: 'حماية ميكانيكية وانسيابية عالية أثناء التمديد',
+    subtitleEn: 'Mechanical protection and smooth conduit pulling',
+    descriptionAr:
+      'يتميز السلك الإيطالي بتصميم أسطواني متجانس يجمع بين المتانة الخارجية والمرونة المدروسة، مما يضمن سهولة سحبه داخل الأنابيب الجدارية واللوحات الكهربائية دون التواء أو تضرر السطح.',
+    descriptionEn:
+      'Engineered with a uniform cylindrical profile combining outer durability with controlled flexibility for effortless installation through conduits and panels.',
+    specsAr: [
+      { label: 'التصميم الهندسي', value: 'أحادي القلب (مفرد)' },
+      { label: 'التعبئة القياسية', value: 'لفة 100 متر' },
+      { label: 'سطح الغلاف', value: 'أملس مقاوم للاحتكاك' }
     ],
-    detailsEn: [
-      'Multi-strand Class 5 flexible electrolytic copper construction for optimal cable pull and bend radius.',
-      'Ultra-low ohmic resistance minimizing voltage drop and preventing heat buildup.',
-      'High tensile fatigue resistance preventing internal wire fracture during conduits pull.'
+    specsEn: [
+      { label: 'Configuration', value: 'Single Core' },
+      { label: 'Standard Roll', value: '100m Factory Coil' },
+      { label: 'Surface Finish', value: 'Low-Friction Smooth PVC' }
+    ],
+    pointsAr: [
+      'قطر خارجي متناسق على طول اللفة يضمن التطابق مع المرابط والقواطع القياسية.',
+      'مقاومة عالية للاحتكاك الميكانيكي أثناء السحب في المسارات الطويلة والمنحنية.',
+      'ثبات لوني ومقاومة للعوامل البيئية والرطوبة داخل المباني والمنشآت.'
+    ],
+    pointsEn: [
+      'Consistent outer diameter ensuring precise fit with standard terminals and breakers.',
+      'High abrasion resistance during pulls through long or curved conduit runs.',
+      'Long-term stability against indoor humidity and environmental aging.'
     ]
   },
   insulation: {
-    titleAr: 'طبقة العزل: مركب PVC إيطالي متطور',
-    titleEn: 'Primary Insulation: Advanced Italian PVC Compound',
-    badgeAr: 'عازل حراري ومثبط للهب',
-    badgeEn: 'Thermal Insulating & Flame Retardant',
-    standard: 'CEI EN 50525-2-31 / TI2 Compound',
-    detailsAr: [
-      'غلاف عازل مصنوع من مركب بولي كلوريد الفينيل (PVC Compound TI2) الإيطالي عالي المتانة بمقاومة كهربائية تفوق 750 فولت.',
-      'خاصية التخميد الذاتي للهب ومقاومة انتشار الحرائق وفق معايير اللائحة الأوروبية لمنتجات البناء (CPR).',
-      'مرونة استثنائية مع مقاومة فائقة للرطوبة، والزيوت الخفيفة، وتغير درجات الحرارة الجوية من -15°C إلى +70°C.'
+    id: 'insulation',
+    labelAr: 'طبقة العزل',
+    labelEn: 'Insulation Layer',
+    stepNumber: '02',
+    titleAr: 'طبقة العزل — حماية كهربائية وحرارية متوازنة',
+    titleEn: 'Insulation Layer — Balanced Dielectric & Thermal Shield',
+    subtitleAr: 'غلاف عازل بسُمك متجانس يحيط بالموصل النحاسي',
+    subtitleEn: 'Uniform concentric insulation jacket surrounding the conductor',
+    descriptionAr:
+      'تعمل طبقة العزل المصنوعة من مركبات البوليمر (PVC) على عزل التيار الكهربائي بأمان، مع الحفاظ على سُمك جداري متساوٍ حول القلب النحاسي لمنع نقاط الضعف الكهربائية أو التسرب.',
+    descriptionEn:
+      'The specialized PVC polymer jacket isolates electrical current safely while maintaining uniform concentric wall thickness around the copper core.',
+    specsAr: [
+      { label: 'مادة العزل', value: 'مركب PVC عالي الجودة' },
+      { label: 'توزيع السُمك', value: 'متمركز متساوي المحيط' },
+      { label: 'الوظيفة الأساسية', value: 'عزل كهربائي وحماية حرارية' }
     ],
-    detailsEn: [
-      'Formulated with Italian high-grade PVC compound TI2 rated for 450/750V applications.',
-      'Self-extinguishing and flame-retardant performance compliant with European CPR regulations.',
-      'High resistance to humidity, mechanical abrasion, and operating temperatures from -15°C to +70°C.'
+    specsEn: [
+      { label: 'Insulation Material', value: 'High-Grade PVC Compound' },
+      { label: 'Wall Geometry', value: 'Concentric Uniform Thickness' },
+      { label: 'Primary Role', value: 'Dielectric & Thermal Isolation' }
+    ],
+    pointsAr: [
+      'سُمك عازل متوازن يحافظ على سلامة التمديدات عند التشغيل المستمر.',
+      'قابلية تقشير نظيفة عند الأطراف تسهل عمل الفنيين دون خدش الشعيرات النحاسية.',
+      'مرونة مدروسة تمنع تشقق الغلاف عند ثني السلك داخل علب التوزيع.'
+    ],
+    pointsEn: [
+      'Balanced wall thickness safeguarding installations under continuous operation.',
+      'Clean stripping characteristics allowing terminal prep without nicking copper strands.',
+      'Controlled elasticity preventing jacket cracking at tight junction box bends.'
+    ]
+  },
+  copper: {
+    id: 'copper',
+    labelAr: 'القلب النحاسي',
+    labelEn: 'Copper Core',
+    stepNumber: '03',
+    titleAr: 'القلب النحاسي — شعيرات نحاسية مجدولة بعناية',
+    titleEn: 'Copper Core — Precision-Stranded Copper Conductor',
+    subtitleAr: 'كفاءة توصيل كهربائي ومرونة ميكانيكية متقدمة',
+    subtitleEn: 'Reliable electrical conductivity and mechanical flexibility',
+    descriptionAr:
+      'يتكون الموصل الداخلي من مجموعة شعيرات نحاسية مجدولة بشكل حلزوني متقن، مما يمنح السلك مرونة عالية مقارنة بالأسلاك الصلبة، مع تأمين مسار مستقر ومتصل للتيار الكهربائي.',
+    descriptionEn:
+      'Composed of helically twisted copper strands that provide superior flexibility while ensuring a stable, continuous path for electrical current.',
+    specsAr: [
+      { label: 'مادة الموصل', value: 'نحاس أحمر موصل' },
+      { label: 'بنية القلب', value: 'شعيرات مجدولة متداخلة' },
+      { label: 'الأداء التشغيلي', value: 'موصلية مستقرة وفقد منخفض' }
+    ],
+    specsEn: [
+      { label: 'Conductor Material', value: 'Conductive Red Copper' },
+      { label: 'Core Structure', value: 'Helically Stranded Bundle' },
+      { label: 'Performance', value: 'Stable Conductivity' }
+    ],
+    pointsAr: [
+      'جدل حلزوني متماسك يحافظ على تماسك الشعيرات عند القص والربط في المرابط.',
+      'توصيل كهربائي مستقر يقلل من السخونة الناتجة عن المقاومة أثناء تحميل الدوائر.',
+      'ليونة ميكانيكية ممتازة تقلل من إجهاد المعدن وتمنع الكسر الداخلي.'
+    ],
+    pointsEn: [
+      'Cohesive helical lay keeps strands bundled cleanly during cutting and termination.',
+      'Consistent electrical conductivity reducing resistive heat under load.',
+      'Mechanical suppleness minimizing metal fatigue and internal strand breakage.'
     ]
   },
   cross_section: {
-    titleAr: 'المقطع العرضي: هندسة التماسك الدائري',
-    titleEn: 'Cross-Section Geometry: Compact Radial Packing',
-    badgeAr: 'معايرة قياسية دقيقة',
-    badgeEn: 'Calibrated Precision Tolerances',
-    standard: 'CEI 20-22 / EN 50575',
-    detailsAr: [
-      'توزيع محكم متجانس للشعيرات النحاسية يلغي الجيوب والفجوات الهوائية الداخلية لضمان كثافة توصيل منتظمة.',
-      'سُمك جدار العازل محكوم بدقة تصنيع ميكرومترية لضمان عزل متوازن على كامل محيط السلك بدون أي نقاط ضعف.',
-      'قطع طرفي هندسي نظيف يسهل ربط الأسلاك في القواطع والأفياش بأمان تام.'
+    id: 'cross_section',
+    labelAr: 'المقطع الداخلي',
+    labelEn: 'Cross-Section',
+    stepNumber: '04',
+    titleAr: 'المقطع الداخلي — هندسة التمركز والتماسك الدائري',
+    titleEn: 'Internal Cross-Section — Concentric Packing Geometry',
+    subtitleAr: 'فحص دقيق للحدود الفاصلة بين الموصل النحاسي وطبقة العزل',
+    subtitleEn: 'Detailed inspection of conductor-to-insulation boundary',
+    descriptionAr:
+      'يُظهر المقطع العرضي للسلك دقة تمركز القلب النحاسي في منتصف الغلاف العازل تماماً، مع تراص الشعيرات النحاسية بتوزيع دائري منتظم يقلل الفراغات البينية ويعزز كفاءة التوصيل.',
+    descriptionEn:
+      'The cross-sectional view reveals the exact concentric centering of the copper bundle within the insulation ring, minimizing air voids.',
+    specsAr: [
+      { label: 'التمركز الهندسي', value: 'محوري متطابق' },
+      { label: 'تراص الشعيرات', value: 'توزيع دائري متعدد الطبقات' },
+      { label: 'حدود الفصل', value: 'حافة عزل منتظمة محكمة' }
     ],
-    detailsEn: [
-      'Homogeneous strand bundle eliminates internal air pockets for uniform electrical density.',
-      'Consistent circular jacket wall thickness eliminating dielectric weak spots.',
-      'Clean terminal shear interface allowing secure terminal screw torque and contact.'
+    specsEn: [
+      { label: 'Concentricity', value: 'Precision Axial Alignment' },
+      { label: 'Strand Packing', value: 'Multi-Ring Circular Array' },
+      { label: 'Interface Boundary', value: 'Tight Dielectric Seal' }
+    ],
+    pointsAr: [
+      'تراص هندسي للشعيرات (طبقة مركزية محاطة بحلقات متداخلة) لضمان مساحة مقطع فعالة.',
+      'إحكام الغلاف العازل حول الشعيرات الخارجية دون ترك جيوب هوائية غير مرغوبة.',
+      'انتظام سُمك الجدار العازل في كافة الاتجاهات حول المحور المركزي.'
+    ],
+    pointsEn: [
+      'Geometric strand packing (central core surrounded by concentric rings) for effective cross-sectional area.',
+      'Snug insulation fit around outer strands eliminating unwanted air pockets.',
+      'Uniform insulation wall thickness across all radial directions.'
     ]
   }
 }
@@ -80,78 +178,134 @@ export default function WireAnatomy3D({ isAr = true }: WireAnatomy3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  // WebGL support state
   const [webGLSupported, setWebGLSupported] = useState<boolean>(true)
-  const [selectedComponent, setSelectedComponent] = useState<AnatomyComponentId>('conductor')
-  const [exploded, setExploded] = useState<boolean>(false)
-  const [explodedAmount, setExplodedAmount] = useState<number>(0)
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
-  const [isRotating, setIsRotating] = useState<boolean>(true)
+  const [activeStage, setActiveStage] = useState<LabStageId>('exterior')
+  const [hasInteracted, setHasInteracted] = useState<boolean>(false)
 
-  // Three.js internal references
+  // Three.js scene state ref
   const threeState = useRef<{
     scene: THREE.Scene | null
     camera: THREE.PerspectiveCamera | null
     renderer: THREE.WebGLRenderer | null
     controls: OrbitControls | null
-    insulationMesh: THREE.Group | null
+    insulationGroup: THREE.Group | null
     copperGroup: THREE.Group | null
     cutFaceMesh: THREE.Mesh | null
-    copperMaterial: THREE.MeshStandardMaterial | null
-    insulationMaterial: THREE.MeshPhysicalMaterial | null
+    copperMat: THREE.MeshStandardMaterial | null
+    copperCapMat: THREE.MeshStandardMaterial | null
+    insulationMat: THREE.MeshPhysicalMaterial | null
+    cutRimMat: THREE.MeshStandardMaterial | null
     raycaster: THREE.Raycaster | null
     mouse: THREE.Vector2 | null
-    targetExploded: number
-    currentExploded: number
+    targetInsulationX: number
+    currentInsulationX: number
+    targetCamPos: THREE.Vector3
+    targetLookAt: THREE.Vector3
+    isCameraAnimating: boolean
     animationFrameId: number | null
   }>({
     scene: null,
     camera: null,
     renderer: null,
     controls: null,
-    insulationMesh: null,
+    insulationGroup: null,
     copperGroup: null,
     cutFaceMesh: null,
-    copperMaterial: null,
-    insulationMaterial: null,
+    copperMat: null,
+    copperCapMat: null,
+    insulationMat: null,
+    cutRimMat: null,
     raycaster: null,
     mouse: null,
-    targetExploded: 0,
-    currentExploded: 0,
+    targetInsulationX: 1.45, // Stage 1 default: covers most of the wire
+    currentInsulationX: 1.45,
+    targetCamPos: new THREE.Vector3(4.5, 2.3, 5.1),
+    targetLookAt: new THREE.Vector3(0.2, 0, 0),
+    isCameraAnimating: true,
     animationFrameId: null
   })
 
-  // Check WebGL availability
+  // Detect WebGL support
   useEffect(() => {
     try {
       const testCanvas = document.createElement('canvas')
-      const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl')
-      if (!gl) {
-        setWebGLSupported(false)
-      }
+      const gl =
+        testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl')
+      if (!gl) setWebGLSupported(false)
     } catch {
       setWebGLSupported(false)
     }
   }, [])
 
-  // Initialize Three.js scene
+  // Build procedural studio lighting environment texture for realistic PBR metallic & polymer response
+  const createStudioEnvironment = (renderer: THREE.WebGLRenderer) => {
+    const pmremGenerator = new THREE.PMREMGenerator(renderer)
+    pmremGenerator.compileEquirectangularShader()
+
+    const envScene = new THREE.Scene()
+    envScene.background = new THREE.Color('#0c1e33')
+
+    // Large soft overhead key softbox
+    const topLightGeo = new THREE.PlaneGeometry(18, 18)
+    const topLightMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff9f2') })
+    const topLight = new THREE.Mesh(topLightGeo, topLightMat)
+    topLight.position.set(3, 9, 4)
+    topLight.lookAt(0, 0, 0)
+    envScene.add(topLight)
+
+    // Side warm-neutral reflection strip for realistic copper highlights
+    const sideStripGeo = new THREE.PlaneGeometry(20, 5)
+    const sideStripMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffeedd') })
+    const sideStrip = new THREE.Mesh(sideStripGeo, sideStripMat)
+    sideStrip.position.set(6, 2, 8)
+    sideStrip.lookAt(0, 0, 0)
+    envScene.add(sideStrip)
+
+    // Cool fill reflection panel on opposite side
+    const fillStripGeo = new THREE.PlaneGeometry(16, 8)
+    const fillStripMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#7aa7d9') })
+    const fillStrip = new THREE.Mesh(fillStripGeo, fillStripMat)
+    fillStrip.position.set(-7, 3, -6)
+    fillStrip.lookAt(0, 0, 0)
+    envScene.add(fillStrip)
+
+    // Subtle rim reflection
+    const rimStripGeo = new THREE.PlaneGeometry(14, 4)
+    const rimStripMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#e2eefc') })
+    const rimStrip = new THREE.Mesh(rimStripGeo, rimStripMat)
+    rimStrip.position.set(0, -5, -7)
+    rimStrip.lookAt(0, 0, 0)
+    envScene.add(rimStrip)
+
+    const envMap = pmremGenerator.fromScene(envScene, 0.04).texture
+    pmremGenerator.dispose()
+    return envMap
+  }
+
+  // Initialize Three.js Laboratory Scene
   useEffect(() => {
     if (!webGLSupported || !canvasRef.current || !containerRef.current) return
 
     const container = containerRef.current
     const canvas = canvasRef.current
-    const width = container.clientWidth || 640
-    const height = container.clientHeight || 420
+    const width = container.clientWidth || 680
+    const height = container.clientHeight || 460
 
-    // 1. Scene
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // 1. Scene with refined laboratory dark studio backdrop
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color('#F8FAFC')
-    scene.fog = new THREE.FogExp2('#F8FAFC', 0.035)
+    scene.background = new THREE.Color('#0B1E33')
 
-    // 2. Camera
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
-    // Isometric 3/4 perspective view showing both the wire side and cut cross-section
-    camera.position.set(4.8, 3.2, 5.8)
+    // 2. Camera (Starts slightly further out for a short, composed introductory glide)
+    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100)
+    if (prefersReducedMotion) {
+      camera.position.set(4.5, 2.3, 5.1)
+    } else {
+      camera.position.set(5.3, 2.8, 6.0)
+    }
 
     // 3. Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -163,642 +317,730 @@ export default function WireAnatomy3D({ isAr = true }: WireAnatomy3DProps) {
     renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.15
+    renderer.toneMappingExposure = 1.08
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-    // 4. Orbit Controls
+    // Studio Environment Map for authentic metallic copper & polymer reflections
+    const envMap = createStudioEnvironment(renderer)
+    scene.environment = envMap
+
+    // 4. OrbitControls
     const controls = new OrbitControls(camera, canvas)
     controls.enableDamping = true
     controls.dampingFactor = 0.06
-    controls.rotateSpeed = 0.8
+    controls.rotateSpeed = 0.75
     controls.enableZoom = true
-    controls.minDistance = 3.5
-    controls.maxDistance = 14
-    controls.maxPolarAngle = Math.PI / 2 + 0.15 // Prevent going under ground plane
-    controls.target.set(0, 0, 0)
+    controls.enablePan = false
+    controls.minDistance = 2.6
+    controls.maxDistance = 10.5
+    controls.maxPolarAngle = Math.PI / 2 + 0.25
+    controls.minPolarAngle = 0.2
+    controls.target.set(0.2, 0, 0)
     controls.touches = {
       ONE: THREE.TOUCH.ROTATE,
       TWO: THREE.TOUCH.DOLLY_PAN
     }
 
-    // 5. Lighting Setup (Photorealistic Studio Lighting)
-    // Soft ambient
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9)
+    // Stop automatic camera transition if user manually grabs the model
+    const onControlStart = () => {
+      threeState.current.isCameraAnimating = false
+      setHasInteracted(true)
+    }
+    controls.addEventListener('start', onControlStart)
+
+    // 5. Studio Lighting Setup
+    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.45)
     scene.add(ambientLight)
 
-    // Key Light (Warm soft directional light)
-    const keyLight = new THREE.DirectionalLight(0xfff5ea, 2.2)
-    keyLight.position.set(6, 8, 7)
+    // Large soft key light
+    const keyLight = new THREE.DirectionalLight(0xfff6ed, 2.0)
+    keyLight.position.set(5, 7, 6)
     keyLight.castShadow = true
     keyLight.shadow.mapSize.width = 1024
     keyLight.shadow.mapSize.height = 1024
-    keyLight.shadow.bias = -0.001
+    keyLight.shadow.bias = -0.0005
     scene.add(keyLight)
 
-    // Fill Light (Cool soft daylight fill)
-    const fillLight = new THREE.DirectionalLight(0xdbebff, 1.4)
-    fillLight.position.set(-7, 4, -4)
+    // Controlled fill light
+    const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.9)
+    fillLight.position.set(-6, 3, -5)
     scene.add(fillLight)
 
-    // Rim / Specular Light (Highlights metallic copper ridges and PVC curvature)
-    const rimLight = new THREE.DirectionalLight(0xffffff, 1.8)
-    rimLight.position.set(0, -4, -6)
+    // Subtle rim light to define cable contour against dark navy
+    const rimLight = new THREE.DirectionalLight(0xe0f2fe, 1.35)
+    rimLight.position.set(-1, 5, -6)
     scene.add(rimLight)
 
-    const topRimLight = new THREE.DirectionalLight(0xffffff, 1.2)
-    topRimLight.position.set(-2, 7, -2)
-    scene.add(topRimLight)
-
-    // Contact Shadow Plane below cable
+    // Soft studio floor / contact shadow plane
     const shadowGeo = new THREE.PlaneGeometry(14, 14)
-    // Canvas texture for natural soft radial shadow
     const shadowCanvas = document.createElement('canvas')
     shadowCanvas.width = 256
     shadowCanvas.height = 256
     const shadowCtx = shadowCanvas.getContext('2d')
     if (shadowCtx) {
-      const gradient = shadowCtx.createRadialGradient(128, 128, 20, 128, 128, 120)
-      gradient.addColorStop(0, 'rgba(23, 35, 52, 0.28)')
-      gradient.addColorStop(0.5, 'rgba(23, 35, 52, 0.10)')
-      gradient.addColorStop(1, 'rgba(248, 250, 252, 0)')
-      shadowCtx.fillStyle = gradient
+      const grad = shadowCtx.createRadialGradient(128, 128, 12, 128, 128, 118)
+      grad.addColorStop(0, 'rgba(3, 10, 20, 0.65)')
+      grad.addColorStop(0.5, 'rgba(3, 10, 20, 0.25)')
+      grad.addColorStop(1, 'rgba(11, 30, 51, 0)')
+      shadowCtx.fillStyle = grad
       shadowCtx.fillRect(0, 0, 256, 256)
     }
-    const shadowTexture = new THREE.CanvasTexture(shadowCanvas)
+    const shadowTex = new THREE.CanvasTexture(shadowCanvas)
     const shadowMat = new THREE.MeshBasicMaterial({
-      map: shadowTexture,
+      map: shadowTex,
       transparent: true,
       depthWrite: false
     })
-    const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat)
-    shadowMesh.rotation.x = -Math.PI / 2
-    shadowMesh.position.y = -1.2
-    scene.add(shadowMesh)
+    const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat)
+    shadowPlane.rotation.x = -Math.PI / 2
+    shadowPlane.position.y = -0.95
+    scene.add(shadowPlane)
 
-    // 6. Materials
-    // Realistic pure electrolytic copper material
-    const copperMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#d97438'),
-      metalness: 0.94,
-      roughness: 0.26,
-      envMapIntensity: 1.2
+    // 6. Physically Based Materials (PBR)
+    // Authentic Industrial Drawn Copper (No neon glow, realistic metallic reflectance)
+    const copperMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#c86d42'),
+      metalness: 0.92,
+      roughness: 0.24,
+      envMapIntensity: 1.35
     })
 
-    // Italian certified PVC jacket material (Italian Blue)
-    const insulationMaterial = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#005bbb'),
-      metalness: 0.04,
-      roughness: 0.38,
-      clearcoat: 0.18,
-      clearcoatRoughness: 0.12,
-      reflectivity: 0.5
+    // Freshly sheared copper end-cap face at the cross-section
+    const copperCapMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#d98254'),
+      metalness: 0.88,
+      roughness: 0.18,
+      envMapIntensity: 1.45
     })
 
-    // 7. Cable Geometry Construction
-    // Total cable model spans along the X-axis from x = -3.5 to x = +3.5
+    // Realistic Non-Metallic PVC Polymer Jacket (Satin industrial blue)
+    const insulationMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#1d63b8'),
+      metalness: 0.02,
+      roughness: 0.36,
+      clearcoat: 0.14,
+      clearcoatRoughness: 0.28,
+      reflectivity: 0.45,
+      envMapIntensity: 0.9
+    })
+
+    // Inner & Cut-edge PVC Cross-Section Material
+    const cutRimMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#154c91'),
+      metalness: 0.02,
+      roughness: 0.48,
+      side: THREE.DoubleSide
+    })
+
+    // 7. Cable Model Geometry
     const rootCableGroup = new THREE.Group()
     scene.add(rootCableGroup)
 
-    // Conductor: 19 twisted Class 5 strands
+    // 7A. Stranded Copper Conductor Core (19 Helical Strands: 1 + 6 + 12)
     const copperGroup = new THREE.Group()
-    copperGroup.name = 'conductor'
+    copperGroup.name = 'copper'
     rootCableGroup.add(copperGroup)
 
-    const strandRadius = 0.062
-    const totalLength = 6.4
-    const xStart = -3.2
-    const xEnd = 3.2
+    const strandRadius = 0.064
+    const totalLength = 6.0
+    const xStart = -3.0
+    const xEnd = 3.0
 
-    // Strand arrangement (1 center + 6 inner ring + 12 outer ring = 19 strands)
-    const strandConfigs: { r: number; count: number; twistRate: number }[] = [
-      { r: 0, count: 1, twistRate: 0 },
-      { r: 0.13, count: 6, twistRate: 0.24 },
-      { r: 0.26, count: 12, twistRate: 0.24 }
+    const strandRings: { r: number; count: number; twist: number }[] = [
+      { r: 0, count: 1, twist: 0 },
+      { r: 0.134, count: 6, twist: 0.26 },
+      { r: 0.268, count: 12, twist: 0.26 }
     ]
 
-    strandConfigs.forEach(({ r, count, twistRate }) => {
+    const capGeo = new THREE.CircleGeometry(strandRadius * 0.98, 16)
+    capGeo.rotateY(Math.PI / 2)
+
+    strandRings.forEach(({ r, count, twist }) => {
       for (let i = 0; i < count; i++) {
         const phi0 = (i / count) * Math.PI * 2
-        const points: THREE.Vector3[] = []
-        const segments = 48
+        const pts: THREE.Vector3[] = []
+        const segs = 48
 
-        for (let s = 0; s <= segments; s++) {
-          const t = s / segments
+        for (let s = 0; s <= segs; s++) {
+          const t = s / segs
           const x = xStart + t * totalLength
-          const angle = phi0 + twistRate * x
+          const angle = phi0 + twist * x
           const y = r * Math.cos(angle)
           const z = r * Math.sin(angle)
-          points.push(new THREE.Vector3(x, y, z))
+          pts.push(new THREE.Vector3(x, y, z))
         }
 
-        const curve = new THREE.CatmullRomCurve3(points)
-        const strandGeo = new THREE.TubeGeometry(curve, 44, strandRadius, 8, false)
-        const strandMesh = new THREE.Mesh(strandGeo, copperMaterial)
+        const curve = new THREE.CatmullRomCurve3(pts)
+        const tubeGeo = new THREE.TubeGeometry(curve, 44, strandRadius, 12, false)
+        const strandMesh = new THREE.Mesh(tubeGeo, copperMat)
         strandMesh.castShadow = true
         strandMesh.receiveShadow = true
         copperGroup.add(strandMesh)
+
+        // Add flat sheared copper end-cap at xEnd (front tip)
+        const endAngle = phi0 + twist * xEnd
+        const endCap = new THREE.Mesh(capGeo, copperCapMat)
+        endCap.position.set(xEnd, r * Math.cos(endAngle), r * Math.sin(endAngle))
+        copperGroup.add(endCap)
       }
     })
 
-    // 8. PVC Insulation Jacket (Sleeve)
-    // When assembled, PVC jacket covers from x = -3.2 to x = 0.6
-    // The exposed copper conductor extends from x = 0.6 to x = 3.2
+    // 7B. PVC Insulation Jacket (Thick-walled hollow cylinder with beveled cut face)
     const insulationGroup = new THREE.Group()
     insulationGroup.name = 'insulation'
-    rootCableGroup.add(insulationGroup)
+    // In local group coordinates, the front cut face is at x = 0, extending back to x = -4.6
+    const jacketOuterR = 0.47
+    const jacketInnerR = 0.34
+    const jacketLen = 4.6
 
-    const jacketOuterRadius = 0.46
-    const jacketLength = 3.8
-    const jacketGeo = new THREE.CylinderGeometry(
-      jacketOuterRadius,
-      jacketOuterRadius,
-      jacketLength,
-      48,
-      1,
-      true // open-ended cylinder
-    )
-    jacketGeo.rotateZ(Math.PI / 2)
-    // Centered so its front cut face aligns exactly at x = 0.6
-    jacketGeo.translate(-1.3, 0, 0)
+    // Lathe profile for a realistic thick PVC sleeve with subtle chamfered cut edge
+    const lathePoints = [
+      new THREE.Vector2(jacketInnerR, -jacketLen),
+      new THREE.Vector2(jacketOuterR, -jacketLen),
+      new THREE.Vector2(jacketOuterR, -0.04),
+      new THREE.Vector2(jacketOuterR - 0.015, 0),
+      new THREE.Vector2(jacketInnerR + 0.01, 0),
+      new THREE.Vector2(jacketInnerR, -0.02),
+      new THREE.Vector2(jacketInnerR, -jacketLen)
+    ]
+    const jacketLatheGeo = new THREE.LatheGeometry(lathePoints, 64)
+    jacketLatheGeo.rotateZ(-Math.PI / 2) // Orient along X axis so front face is at x = 0
 
-    const jacketMesh = new THREE.Mesh(jacketGeo, insulationMaterial)
+    const jacketMesh = new THREE.Mesh(jacketLatheGeo, insulationMat)
     jacketMesh.castShadow = true
     jacketMesh.receiveShadow = true
     insulationGroup.add(jacketMesh)
 
-    // Cut face front rim (Ring geometry showing the insulation wall thickness at x = 0.6)
-    const cutRimGeo = new THREE.RingGeometry(0.33, jacketOuterRadius, 48)
-    cutRimGeo.rotateY(Math.PI / 2)
-    cutRimGeo.translate(0.6, 0, 0)
-
-    const cutRimMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#00479b'),
-      metalness: 0.05,
-      roughness: 0.42,
-      side: THREE.DoubleSide
-    })
-    const cutFaceMesh = new THREE.Mesh(cutRimGeo, cutRimMaterial)
+    // Distinct Annular Cut Face Ring at x = 0.002 for crisp cross-section inspection
+    const cutRingGeo = new THREE.RingGeometry(jacketInnerR, jacketOuterR - 0.012, 64)
+    cutRingGeo.rotateY(Math.PI / 2)
+    cutRingGeo.translate(0.002, 0, 0)
+    const cutFaceMesh = new THREE.Mesh(cutRingGeo, cutRimMat)
     cutFaceMesh.name = 'cross_section'
     insulationGroup.add(cutFaceMesh)
 
-    // Back closed end of jacket
-    const backRimGeo = new THREE.RingGeometry(0.33, jacketOuterRadius, 48)
-    backRimGeo.rotateY(-Math.PI / 2)
-    backRimGeo.translate(-3.2, 0, 0)
-    const backFaceMesh = new THREE.Mesh(backRimGeo, cutRimMaterial)
-    insulationGroup.add(backFaceMesh)
+    // Position insulation initially at Stage 1 (Exterior: covers up to x = 1.45)
+    insulationGroup.position.x = 1.45
+    rootCableGroup.add(insulationGroup)
 
-    // Raycaster for interactive component clicking
     const raycaster = new THREE.Raycaster()
     const mouse = new THREE.Vector2()
 
-    // Store references
     threeState.current = {
       scene,
       camera,
       renderer,
       controls,
-      insulationMesh: insulationGroup,
+      insulationGroup,
       copperGroup,
       cutFaceMesh,
-      copperMaterial,
-      insulationMaterial,
+      copperMat,
+      copperCapMat,
+      insulationMat,
+      cutRimMat,
       raycaster,
       mouse,
-      targetExploded: 0,
-      currentExploded: 0,
+      targetInsulationX: 1.45,
+      currentInsulationX: 1.45,
+      targetCamPos: new THREE.Vector3(4.5, 2.3, 5.1),
+      targetLookAt: new THREE.Vector3(0.2, 0, 0),
+      isCameraAnimating: !prefersReducedMotion,
       animationFrameId: null
     }
 
-    // 9. Animation Loop
-    let idleRotationAngle = 0
+    // 8. Controlled Render Loop (NO continuous spinning)
     const animate = () => {
-      const state = threeState.current
-      if (!state.renderer || !state.scene || !state.camera || !state.controls) return
+      const st = threeState.current
+      if (!st.renderer || !st.scene || !st.camera || !st.controls) return
 
-      // Smoothly interpolate exploded offset
-      state.currentExploded += (state.targetExploded - state.currentExploded) * 0.08
-      if (state.insulationMesh) {
-        // Slide insulation jacket backwards along X axis
-        state.insulationMesh.position.x = -state.currentExploded * 2.8
+      // Smoothly interpolate insulation cutaway position
+      const diffX = st.targetInsulationX - st.currentInsulationX
+      if (Math.abs(diffX) > 0.001) {
+        st.currentInsulationX += diffX * 0.085
+        if (st.insulationGroup) {
+          st.insulationGroup.position.x = st.currentInsulationX
+        }
       }
 
-      // Gentle auto-rotation when user is not dragging
-      if (isRotating && !controls.state) {
-        idleRotationAngle += 0.003
-        rootCableGroup.rotation.y = Math.sin(idleRotationAngle) * 0.18
-        rootCableGroup.rotation.z = Math.cos(idleRotationAngle * 0.7) * 0.05
+      // Smooth camera transition when switching stages
+      if (st.isCameraAnimating) {
+        st.camera.position.lerp(st.targetCamPos, 0.075)
+        st.controls.target.lerp(st.targetLookAt, 0.075)
+
+        if (
+          st.camera.position.distanceTo(st.targetCamPos) < 0.02 &&
+          st.controls.target.distanceTo(st.targetLookAt) < 0.02
+        ) {
+          st.isCameraAnimating = false
+        }
       }
 
-      controls.update()
-      renderer.render(scene, camera)
-      state.animationFrameId = requestAnimationFrame(animate)
+      st.controls.update()
+      st.renderer.render(st.scene, st.camera)
+      st.animationFrameId = requestAnimationFrame(animate)
     }
 
     animate()
 
-    // 10. Responsive Resize Observer
+    // 9. Responsive Resize Observer
     const handleResize = () => {
-      if (!container || !stateRef.current.renderer || !stateRef.current.camera) return
-      const newWidth = container.clientWidth
-      const newHeight = container.clientHeight
-      stateRef.current.camera.aspect = newWidth / newHeight
-      stateRef.current.camera.updateProjectionMatrix()
-      stateRef.current.renderer.setSize(newWidth, newHeight)
+      const st = threeState.current
+      if (!container || !st.renderer || !st.camera) return
+      const w = container.clientWidth
+      const h = container.clientHeight
+      if (w === 0 || h === 0) return
+      st.camera.aspect = w / h
+      st.camera.updateProjectionMatrix()
+      st.renderer.setSize(w, h)
     }
 
     const resizeObserver = new ResizeObserver(handleResize)
     resizeObserver.observe(container)
 
-    const stateRef = threeState
     return () => {
       resizeObserver.disconnect()
-      if (stateRef.current.animationFrameId) {
-        cancelAnimationFrame(stateRef.current.animationFrameId)
+      controls.removeEventListener('start', onControlStart)
+      if (threeState.current.animationFrameId) {
+        cancelAnimationFrame(threeState.current.animationFrameId)
       }
+      envMap.dispose()
       controls.dispose()
       renderer.dispose()
       scene.clear()
     }
-  }, [webGLSupported, isRotating])
+  }, [webGLSupported])
 
-  // Handle Raycasting Pointer Click
+  // Stage transition handler: updates camera, insulation reveal, and subtle material emphasis
+  const selectStage = useCallback((stage: LabStageId) => {
+    setActiveStage(stage)
+    setHasInteracted(true)
+
+    const st = threeState.current
+    if (!st.camera || !st.controls) return
+
+    // Reset material emissive states first
+    if (st.copperMat) st.copperMat.emissive.setHex(0x000000)
+    if (st.insulationMat) st.insulationMat.emissive.setHex(0x000000)
+    if (st.cutRimMat) st.cutRimMat.emissive.setHex(0x000000)
+
+    if (stage === 'exterior') {
+      // Stage 1: Complete wire view with minimal tip exposed
+      st.targetInsulationX = 1.65
+      st.targetCamPos.set(4.5, 2.3, 5.1)
+      st.targetLookAt.set(0.2, 0, 0)
+      if (st.insulationMat) st.insulationMat.emissive.setHex(0x04152d)
+    } else if (stage === 'insulation') {
+      // Stage 2: Controlled cutaway revealing insulation structure & wall
+      st.targetInsulationX = 0.25
+      st.targetCamPos.set(3.6, 1.9, 4.3)
+      st.targetLookAt.set(0.0, 0, 0)
+      if (st.insulationMat) st.insulationMat.emissive.setHex(0x072247)
+      if (st.cutRimMat) st.cutRimMat.emissive.setHex(0x0c356e)
+    } else if (stage === 'copper') {
+      // Stage 3: Retract insulation and move camera closer to the stranded copper core
+      st.targetInsulationX = -1.15
+      st.targetCamPos.set(2.5, 1.25, 3.0)
+      st.targetLookAt.set(0.95, 0, 0)
+      if (st.copperMat) st.copperMat.emissive.setHex(0x1f0c02)
+    } else if (stage === 'cross_section') {
+      // Interactive Cross-Section: Move camera toward wire end to inspect concentric geometry
+      st.targetInsulationX = 0.85
+      st.targetCamPos.set(5.1, 0.55, 1.35)
+      st.targetLookAt.set(1.2, 0, 0)
+      if (st.cutRimMat) st.cutRimMat.emissive.setHex(0x0e3b7a)
+    }
+
+    st.isCameraAnimating = true
+  }, [])
+
+  // Reset View handler (إعادة العرض)
+  const handleResetView = useCallback(() => {
+    selectStage('exterior')
+  }, [selectStage])
+
+  // Raycast click on 3D cable parts
   const handleCanvasClick = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
-      const state = threeState.current
-      if (!state.camera || !state.raycaster || !canvasRef.current) return
+      const st = threeState.current
+      if (!st.camera || !st.raycaster || !canvasRef.current) return
 
       const rect = canvasRef.current.getBoundingClientRect()
-      state.mouse = state.mouse || new THREE.Vector2()
-      state.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-      state.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+      st.mouse = st.mouse || new THREE.Vector2()
+      st.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      st.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
 
-      state.raycaster.setFromCamera(state.mouse, state.camera)
+      st.raycaster.setFromCamera(st.mouse, st.camera)
 
-      const interactables: THREE.Object3D[] = []
-      if (state.copperGroup) interactables.push(state.copperGroup)
-      if (state.insulationMesh) interactables.push(state.insulationMesh)
+      const targets: THREE.Object3D[] = []
+      if (st.copperGroup) targets.push(st.copperGroup)
+      if (st.insulationGroup) targets.push(st.insulationGroup)
 
-      const intersects = state.raycaster.intersectObjects(interactables, true)
-
-      if (intersects.length > 0) {
-        let hitObject: THREE.Object3D | null = intersects[0].object
-        let detectedComponent: AnatomyComponentId = 'conductor'
-
-        while (hitObject && hitObject.parent) {
-          if (hitObject.name === 'cross_section') {
-            detectedComponent = 'cross_section'
-            break
+      const hits = st.raycaster.intersectObjects(targets, true)
+      if (hits.length > 0) {
+        let obj: THREE.Object3D | null = hits[0].object
+        while (obj) {
+          if (obj.name === 'cross_section') {
+            selectStage('cross_section')
+            return
           }
-          if (hitObject.name === 'insulation') {
-            detectedComponent = 'insulation'
-            break
+          if (obj.name === 'insulation') {
+            selectStage(activeStage === 'insulation' ? 'exterior' : 'insulation')
+            return
           }
-          if (hitObject.name === 'conductor') {
-            detectedComponent = 'conductor'
-            break
+          if (obj.name === 'copper') {
+            selectStage('copper')
+            return
           }
-          hitObject = hitObject.parent
+          obj = obj.parent
         }
-
-        setSelectedComponent(detectedComponent)
       }
     },
-    []
+    [activeStage, selectStage]
   )
 
-  // Update exploded state in 3D scene
-  useEffect(() => {
-    threeState.current.targetExploded = exploded ? 1.0 : explodedAmount
-  }, [exploded, explodedAmount])
-
-  // Camera preset handlers
-  const handleViewPreset = (preset: 'isometric' | 'cross_section' | 'copper' | 'reset') => {
-    const controls = threeState.current.controls
-    const camera = threeState.current.camera
-    if (!controls || !camera) return
-
-    if (preset === 'reset' || preset === 'isometric') {
-      camera.position.set(4.8, 3.2, 5.8)
-      controls.target.set(0, 0, 0)
-      setSelectedComponent('all')
-    } else if (preset === 'cross_section') {
-      // Look straight onto the front cut end
-      camera.position.set(6.5, 0.4, 0.2)
-      controls.target.set(0.6, 0, 0)
-      setSelectedComponent('cross_section')
-    } else if (preset === 'copper') {
-      // Zoom close to stripped copper strands
-      camera.position.set(2.8, 1.4, 3.2)
-      controls.target.set(1.6, 0, 0)
-      setSelectedComponent('conductor')
-    }
-    controls.update()
-  }
-
-  // Active specs data
-  const currentSpec =
-    selectedComponent === 'conductor'
-      ? SPECS.conductor
-      : selectedComponent === 'insulation'
-      ? SPECS.insulation
-      : selectedComponent === 'cross_section'
-      ? SPECS.cross_section
-      : SPECS.conductor
+  const currentStage = STAGE_DATA[activeStage]
 
   return (
-    <section className="bg-white border border-[#E5EAF0] rounded-2xl overflow-hidden shadow-xs my-8 transition-all">
-      {/* 01. Section Header */}
-      <div className="px-6 py-6 sm:px-8 sm:py-7 border-b border-[#E5EAF0] bg-gradient-to-b from-white to-[#F8FAFC]">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F0F6FD] border border-[#BFDBFE] text-xs font-semibold text-[#0062D2] mb-2.5">
-              <Compass className="w-3.5 h-3.5" />
-              <span>{isAr ? 'الهندسة والتركيب الفيزيائي' : 'Physical Engineering & Assembly'}</span>
+    <section
+      aria-labelledby="cable-lab-heading"
+      className="bg-[#081D35] text-white py-14 sm:py-20 border-y border-[#173B5E]/60 no-print"
+    >
+      <div className="max-w-[1240px] mx-auto px-5 sm:px-8">
+        
+        {/* ===================================================================== */}
+        {/* LABORATORY HEADER */}
+        {/* ===================================================================== */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 sm:mb-10">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#102A43] border border-[#173B5E] text-[13px] font-medium text-[#7CC4FA] mb-3">
+              <Layers className="w-3.5 h-3.5 text-[#3974C8]" />
+              <span>
+                {isAr ? 'مختبر الفحص الهندسي التفاعلي' : 'Interactive Engineering Laboratory'}
+              </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#172334] tracking-tight">
-              {isAr ? 'اكتشف مكونات السلك الإيطالي' : 'Explore Italian Cable Anatomy'}
+            <h2
+              id="cable-lab-heading"
+              className="text-2xl sm:text-[28px] font-bold text-white leading-snug"
+            >
+              {isAr ? 'اكتشف ما بداخل السلك' : 'Discover Inside the Wire'}
             </h2>
-            <p className="text-xs sm:text-sm text-[#64748B] mt-1 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-300 mt-2 leading-relaxed">
               {isAr
-                ? 'تعرّف على التركيب الداخلي للسلك وخصائص مكوناته من خلال تجربة تفاعلية واضحة وواقعية مبنية على المواصفات القياسية الأوروبية.'
-                : 'Inspect the internal construction and physical properties through an accurate interactive 3D visualization.'}
+                ? 'تجربة تفاعلية تتيح لك استكشاف مكونات السلك الإيطالي والتعرف على تفاصيل تركيبه الداخلي.'
+                : 'An interactive experience allowing you to explore the components of the Italian wire and inspect its internal construction.'}
             </p>
           </div>
 
-          {/* Quick Exploded View Toggle */}
-          <div className="flex items-center gap-2 self-start md:self-auto">
+          {/* Dedicated Cross-Section & Reset Action Bar */}
+          <div className="flex flex-wrap items-center gap-2.5 self-start lg:self-auto">
             <button
-              onClick={() => {
-                setExploded(!exploded)
-                if (!exploded) setExplodedAmount(1)
-                else setExplodedAmount(0)
-              }}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.98] ${
-                exploded
-                  ? 'bg-[#0062D2] text-white border border-[#0062D2]'
-                  : 'bg-white text-[#172334] border border-[#CBD5E1] hover:bg-[#F8FAFC]'
+              type="button"
+              onClick={() =>
+                selectStage(activeStage === 'cross_section' ? 'exterior' : 'cross_section')
+              }
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-all duration-150 cursor-pointer ${
+                activeStage === 'cross_section'
+                  ? 'bg-[#3974C8] text-white border border-[#5A96E8] shadow-sm'
+                  : 'bg-[#102A43] text-slate-100 border border-[#173B5E] hover:bg-[#173B5E]'
               }`}
-              title={isAr ? 'فصل طبقة العزل لإظهار النحاس بالكامل' : 'Separate insulation to reveal full conductor'}
             >
-              <Layers className="w-4 h-4 text-[#0062D2] shrink-0" />
+              <ScanLine className="w-4 h-4 text-[#7CC4FA]" />
               <span>
-                {exploded
-                  ? isAr
-                    ? 'إعادة التجميع (تجميع)'
-                    : 'Assemble Cable'
-                  : isAr
-                  ? 'تفكيك الطبقات (Exploded)'
-                  : 'Exploded View'}
+                {isAr ? 'استكشف المقطع الداخلي' : 'Explore Internal Cross-Section'}
               </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleResetView}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg text-[13px] font-medium bg-[#102A43]/80 text-slate-300 border border-[#173B5E] hover:text-white hover:bg-[#173B5E] transition-colors cursor-pointer"
+              title={isAr ? 'إعادة العرض للوضع الافتراضي' : 'Reset View'}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>{isAr ? 'إعادة العرض' : 'Reset View'}</span>
             </button>
           </div>
         </div>
-      </div>
 
-      {/* 02. Interactive Visualizer + Technical Details Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x lg:divide-x-reverse divide-[#E5EAF0]">
-        
-        {/* Left Column (3D Interactive Canvas) */}
-        <div className="lg:col-span-7 flex flex-col bg-[#F8FAFC] relative">
+        {/* ===================================================================== */}
+        {/* MAIN LABORATORY SPLIT-SCREEN CONTAINER */}
+        {/* ===================================================================== */}
+        <div className="rounded-xl bg-[#102A43] border border-[#173B5E] overflow-hidden shadow-lg">
           
-          {/* Top Canvas Toolbar */}
-          <div className="p-3 sm:p-4 flex items-center justify-between border-b border-[#E5EAF0] bg-white/70 backdrop-blur-xs z-10">
-            {/* Component Selector Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                onClick={() => setSelectedComponent('conductor')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer ${
-                  selectedComponent === 'conductor'
-                    ? 'bg-[#0062D2] text-white shadow-xs'
-                    : 'bg-white text-[#475569] hover:bg-[#F1F5F9] border border-[#E2E8F0]'
-                }`}
-              >
-                {isAr ? 'النحاس الموصل' : 'Copper Core'}
-              </button>
-
-              <button
-                onClick={() => setSelectedComponent('insulation')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer ${
-                  selectedComponent === 'insulation'
-                    ? 'bg-[#0062D2] text-white shadow-xs'
-                    : 'bg-white text-[#475569] hover:bg-[#F1F5F9] border border-[#E2E8F0]'
-                }`}
-              >
-                {isAr ? 'عازل الـ PVC' : 'PVC Insulation'}
-              </button>
-
-              <button
-                onClick={() => {
-                  setSelectedComponent('cross_section')
-                  handleViewPreset('cross_section')
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer ${
-                  selectedComponent === 'cross_section'
-                    ? 'bg-[#0062D2] text-white shadow-xs'
-                    : 'bg-white text-[#475569] hover:bg-[#F1F5F9] border border-[#E2E8F0]'
-                }`}
-              >
-                {isAr ? 'المقطع العرضي' : 'Cross-Section'}
-              </button>
+          {/* Stage Navigation Bar (Three Primary Stages + Cross Section) */}
+          <div className="px-4 sm:px-6 py-3.5 bg-[#0B2138] border-b border-[#173B5E] flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-2 shrink-0" role="tablist">
+              {(
+                [
+                  { id: 'exterior', labelAr: 'الشكل الخارجي', labelEn: 'Exterior', num: '01' },
+                  { id: 'insulation', labelAr: 'طبقة العزل', labelEn: 'Insulation Layer', num: '02' },
+                  { id: 'copper', labelAr: 'القلب النحاسي', labelEn: 'Copper Core', num: '03' }
+                ] as const
+              ).map((tab) => {
+                const isActive = activeStage === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => selectStage(tab.id)}
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-[13px] font-semibold transition-all duration-150 cursor-pointer ${
+                      isActive
+                        ? 'bg-[#3974C8] text-white shadow-xs'
+                        : 'bg-[#102A43] text-slate-300 hover:text-white hover:bg-[#173B5E]/70 border border-[#173B5E]'
+                    }`}
+                  >
+                    <span
+                      className={`text-[11px] font-mono px-1.5 py-0.5 rounded ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-[#081D35] text-slate-400'
+                      }`}
+                    >
+                      {tab.num}
+                    </span>
+                    <span>{isAr ? tab.labelAr : tab.labelEn}</span>
+                  </button>
+                )
+              })}
             </div>
 
-            {/* Camera Angle Presets & Controls */}
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => setIsRotating(!isRotating)}
-                className={`p-1.5 rounded-lg text-xs border transition-colors cursor-pointer ${
-                  isRotating
-                    ? 'bg-[#F0F7FF] text-[#0062D2] border-[#BFDBFE]'
-                    : 'bg-white text-[#64748B] border-[#E2E8F0] hover:bg-slate-50'
-                }`}
-                title={isRotating ? (isAr ? 'إيقاف الدوران التلقائي' : 'Pause Auto-rotate') : (isAr ? 'تشغيل الدوران التلقائي' : 'Start Auto-rotate')}
-                aria-label="Toggle auto rotation"
-              >
-                <Eye className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                onClick={() => handleViewPreset('reset')}
-                className="p-1.5 rounded-lg text-xs bg-white text-[#64748B] border border-[#E2E8F0] hover:bg-slate-50 transition-colors cursor-pointer"
-                title={isAr ? 'إعادة ضبط المنظور' : 'Reset Camera View'}
-                aria-label="Reset Camera"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </button>
+            {/* Interaction Prompt Status */}
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-300 shrink-0">
+              <MousePointerClick className="w-3.5 h-3.5 text-[#7CC4FA]" />
+              <span>
+                {isAr ? 'اضغط لاستكشاف مكونات السلك' : 'Click to explore wire components'}
+              </span>
             </div>
           </div>
 
-          {/* 3D Canvas / WebGL Fallback Container */}
-          <div
-            ref={containerRef}
-            className={`w-full relative transition-all duration-300 ${
-              isFullscreen ? 'fixed inset-0 z-50 bg-[#F8FAFC]' : 'h-[360px] sm:h-[430px]'
-            }`}
-          >
-            {webGLSupported ? (
-              <>
-                <canvas
-                  ref={canvasRef}
-                  onClick={handleCanvasClick}
-                  className="w-full h-full block cursor-grab active:cursor-grabbing outline-none"
-                  style={{ touchAction: 'none' }}
-                />
-
-                {/* Subtle Interactive Instruction Overlay */}
-                <div className="absolute bottom-3 right-3 left-3 sm:left-auto flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/90 border border-[#E5EAF0] shadow-xs text-[11px] text-[#64748B] pointer-events-none backdrop-blur-xs">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                  <span>
-                    {isAr
-                      ? 'اسحب للتدوير · قرّب للتكبير · اضغط على الطبقة لتحديدها'
-                      : 'Drag to rotate · Pinch to zoom · Tap layers to inspect'}
-                  </span>
-                </div>
-              </>
-            ) : (
-              /* Fallback 2D High-Fidelity Technical Visualization */
-              <div className="w-full h-full flex items-center justify-center p-6 bg-white">
-                <div className="max-w-md w-full text-center">
-                  <svg viewBox="0 0 420 180" className="w-full h-auto mb-4">
-                    <defs>
-                      <linearGradient id="fallbackCopper" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#f59e0b" />
-                        <stop offset="50%" stopColor="#d97706" />
-                        <stop offset="100%" stopColor="#92400e" />
-                      </linearGradient>
-                      <linearGradient id="fallbackPVC" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="50%" stopColor="#0062D2" />
-                        <stop offset="100%" stopColor="#1e40af" />
-                      </linearGradient>
-                    </defs>
-                    {/* Exposed Pure Copper Strands */}
-                    <rect x="30" y="65" width="360" height="50" rx="4" fill="url(#fallbackCopper)" />
-                    {/* Cable Strands Texture lines */}
-                    <line x1="30" y1="75" x2="390" y2="75" stroke="#fef3c7" strokeWidth="1" strokeOpacity="0.5" />
-                    <line x1="30" y1="90" x2="390" y2="90" stroke="#78350f" strokeWidth="1.5" strokeOpacity="0.6" />
-                    <line x1="30" y1="102" x2="390" y2="102" stroke="#fef3c7" strokeWidth="1" strokeOpacity="0.5" />
-
-                    {/* PVC Insulation Sleeve */}
-                    <rect
-                      x={exploded ? '10' : '150'}
-                      y="52"
-                      width={exploded ? '140' : '240'}
-                      height="76"
-                      rx="6"
-                      fill="url(#fallbackPVC)"
-                      className="transition-all duration-500"
+          {/* Split Composition: 3D Viewport (7 Cols) + Technical Info (5 Cols) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x lg:divide-x-reverse divide-[#173B5E]">
+            
+            {/* 3D VIEWER AREA */}
+            <div className="lg:col-span-7 flex flex-col bg-[#0B1E33] relative">
+              <div
+                ref={containerRef}
+                className="w-full h-[340px] sm:h-[430px] lg:h-[470px] relative select-none"
+              >
+                {webGLSupported ? (
+                  <>
+                    <canvas
+                      ref={canvasRef}
+                      onClick={handleCanvasClick}
+                      className="w-full h-full block cursor-grab active:cursor-grabbing outline-none"
+                      aria-label={
+                        isAr
+                          ? 'مجسم ثلاثي الأبعاد للسلك الإيطالي'
+                          : 'Interactive 3D model of Italian copper wire'
+                      }
                     />
 
-                    {/* Annotations */}
-                    <circle cx="85" cy="90" r="3" fill="#ffffff" />
-                    <text x="85" y="45" fill="#b45309" fontSize="10" fontWeight="bold" textAnchor="middle">
-                      {isAr ? 'نحاس نقي 100%' : '100% Pure Copper'}
-                    </text>
-                    <line x1="85" y1="50" x2="85" y2="85" stroke="#b45309" strokeWidth="1" strokeDasharray="2 2" />
+                    {/* Engineering Cross-Section Callouts Overlay (Visible in Cross-Section Mode) */}
+                    {activeStage === 'cross_section' && (
+                      <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 sm:p-6">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div className="bg-[#081D35]/90 border border-[#3974C8]/60 rounded-lg px-3 py-2 backdrop-blur-xs">
+                            <div className="flex items-center gap-2 text-xs font-semibold text-[#7CC4FA]">
+                              <span className="w-2 h-2 rounded-full bg-[#3974C8]" />
+                              <span>
+                                {isAr
+                                  ? 'الحد الخارجي: غلاف العزل PVC'
+                                  : 'Outer Boundary: PVC Insulation Wall'}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-300 mt-0.5">
+                              {isAr
+                                ? 'سُمك جداري متجانس يحيط بالموصل بالكامل'
+                                : 'Uniform concentric wall thickness'}
+                            </p>
+                          </div>
 
-                    <circle cx="270" cy="90" r="3" fill="#ffffff" />
-                    <text x="270" y="35" fill="#0062D2" fontSize="10" fontWeight="bold" textAnchor="middle">
-                      {isAr ? 'عازل بولي كلوريد الفينيل (PVC)' : 'PVC Insulation TI2'}
-                    </text>
-                    <line x1="270" y1="40" x2="270" y2="85" stroke="#0062D2" strokeWidth="1" strokeDasharray="2 2" />
-                  </svg>
+                          <div className="bg-[#081D35]/90 border border-[#d98254]/60 rounded-lg px-3 py-2 backdrop-blur-xs">
+                            <div className="flex items-center gap-2 text-xs font-semibold text-[#f3a678]">
+                              <span className="w-2 h-2 rounded-full bg-[#d98254]" />
+                              <span>
+                                {isAr
+                                  ? 'المركز: شعيرات النحاس المجدولة'
+                                  : 'Core: Stranded Copper Bundle'}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-300 mt-0.5">
+                              {isAr
+                                ? 'تراص دائري محكم لتقليل الفراغات البينية'
+                                : 'Compact circular strand packing'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                  <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#64748B]">
-                    {isAr
-                      ? 'مخطط هندسي توضيحي (يعمل الجهاز بوضع التوافق الثنائي للأبعاد)'
-                      : 'Technical 2D Schematic (Operating in Compatibility Mode)'}
+                    {/* Bottom Viewport Instruction Bar */}
+                    <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between gap-2 px-3.5 py-2 rounded-lg bg-[#081D35]/85 border border-[#173B5E] text-xs text-slate-300 pointer-events-none backdrop-blur-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#3974C8] shrink-0" />
+                        <span>
+                          {!hasInteracted
+                            ? isAr
+                              ? 'اضغط لاستكشاف مكونات السلك أو اسحب لتدوير المجسم'
+                              : 'Click to explore wire components or drag to rotate'
+                            : isAr
+                            ? 'اسحب للتدوير الحر · اضغط على أجزاء السلك للفحص'
+                            : 'Drag to orbit · Click cable layers to inspect'}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-mono text-[#7CC4FA] hidden sm:inline">
+                        {isAr ? currentStage.labelAr : currentStage.labelEn}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  /* Accessible Technical SVG Fallback when WebGL is unavailable */
+                  <div className="w-full h-full flex items-center justify-center p-6 bg-[#0B1E33]">
+                    <div className="max-w-md w-full text-center">
+                      <svg viewBox="0 0 440 180" className="w-full h-auto mb-4">
+                        <defs>
+                          <linearGradient id="copperGradV4" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#e08b5c" />
+                            <stop offset="50%" stopColor="#c86d42" />
+                            <stop offset="100%" stopColor="#8c4220" />
+                          </linearGradient>
+                          <linearGradient id="pvcGradV4" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#2b7de0" />
+                            <stop offset="50%" stopColor="#1d63b8" />
+                            <stop offset="100%" stopColor="#123f7a" />
+                          </linearGradient>
+                        </defs>
+                        {/* Copper Strands */}
+                        <rect
+                          x="40"
+                          y="66"
+                          width="360"
+                          height="48"
+                          rx="4"
+                          fill="url(#copperGradV4)"
+                        />
+                        <line
+                          x1="40"
+                          y1="78"
+                          x2="400"
+                          y2="78"
+                          stroke="#f8d3b8"
+                          strokeWidth="1"
+                          strokeOpacity="0.45"
+                        />
+                        <line
+                          x1="40"
+                          y1="90"
+                          x2="400"
+                          y2="90"
+                          stroke="#5c2810"
+                          strokeWidth="1.5"
+                          strokeOpacity="0.55"
+                        />
+                        <line
+                          x1="40"
+                          y1="102"
+                          x2="400"
+                          y2="102"
+                          stroke="#f8d3b8"
+                          strokeWidth="1"
+                          strokeOpacity="0.45"
+                        />
+                        {/* PVC Jacket */}
+                        <rect
+                          x="40"
+                          y="52"
+                          width={
+                            activeStage === 'exterior'
+                              ? '310'
+                              : activeStage === 'insulation'
+                              ? '220'
+                              : '130'
+                          }
+                          height="76"
+                          rx="6"
+                          fill="url(#pvcGradV4)"
+                        />
+                      </svg>
+                      <p className="text-xs text-slate-300">
+                        {isAr
+                          ? 'مخطط هندسي توضيحي لمكونات السلك الإيطالي'
+                          : 'Technical schematic of the Italian copper wire'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* TECHNICAL INFORMATION & STAGE EXPLANATION AREA */}
+            <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-[#102A43] text-right">
+              <div>
+                {/* Active Stage Header Pill */}
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#081D35] border border-[#173B5E] text-xs font-semibold text-[#7CC4FA]">
+                    {activeStage === 'copper' ? (
+                      <Zap className="w-3.5 h-3.5 text-[#e08b5c]" />
+                    ) : activeStage === 'insulation' ? (
+                      <Shield className="w-3.5 h-3.5 text-[#7CC4FA]" />
+                    ) : (
+                      <CircleDot className="w-3.5 h-3.5 text-[#7CC4FA]" />
+                    )}
+                    <span>
+                      {isAr
+                        ? `المرحلة ${currentStage.stepNumber} — ${currentStage.labelAr}`
+                        : `Stage ${currentStage.stepNumber} — ${currentStage.labelEn}`}
+                    </span>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
 
-          {/* Bottom Slider for Continuous Layer Exploration */}
-          <div className="px-5 py-3 border-t border-[#E5EAF0] bg-white flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-[#172334]">
-                {isAr ? 'مستوى كشف الشعيرات:' : 'Strand Exposure Level:'}
-              </span>
-              <span className="text-xs text-[#0062D2] font-bold tabular-nums">
-                {Math.round((exploded ? 1 : explodedAmount) * 100)}%
-              </span>
-            </div>
+                {/* Stage Title & Subtitle */}
+                <h3 className="text-lg sm:text-[21px] font-bold text-white leading-snug">
+                  {isAr ? currentStage.titleAr : currentStage.titleEn}
+                </h3>
+                <p className="text-xs sm:text-[13px] font-medium text-[#7CC4FA] mt-1">
+                  {isAr ? currentStage.subtitleAr : currentStage.subtitleEn}
+                </p>
 
-            <div className="flex-1 max-w-xs">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={exploded ? 1 : explodedAmount}
-                onChange={(e) => {
-                  setExploded(false)
-                  setExplodedAmount(parseFloat(e.target.value))
-                }}
-                className="w-full h-1.5 bg-[#E2E8F0] rounded-lg appearance-none cursor-pointer accent-[#0062D2]"
-                aria-label="Exploded slider"
-              />
-            </div>
-          </div>
-        </div>
+                {/* Main Explanation Paragraph */}
+                <p className="text-xs sm:text-[14px] text-slate-200 leading-relaxed mt-3.5 pb-4 border-b border-[#173B5E]">
+                  {isAr ? currentStage.descriptionAr : currentStage.descriptionEn}
+                </p>
 
-        {/* Right Column (Technical Engineering Documentation) */}
-        <div className="lg:col-span-5 p-6 sm:p-7 flex flex-col justify-between bg-white text-right">
-          <div>
-            {/* Header Badge */}
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#F0F6FD] border border-[#BFDBFE] text-xs font-semibold text-[#0062D2]">
-                {selectedComponent === 'conductor' ? (
-                  <Zap className="w-3.5 h-3.5 text-[#d97438]" />
-                ) : selectedComponent === 'insulation' ? (
-                  <Shield className="w-3.5 h-3.5 text-[#0062D2]" />
-                ) : (
-                  <CircleDot className="w-3.5 h-3.5 text-[#0062D2]" />
-                )}
-                <span>{isAr ? currentSpec.badgeAr : currentSpec.badgeEn}</span>
-              </div>
-
-              <span className="text-[11px] font-mono font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded">
-                {currentSpec.standard}
-              </span>
-            </div>
-
-            {/* Component Title */}
-            <h3 className="text-lg sm:text-xl font-bold text-[#172334] mb-3">
-              {isAr ? currentSpec.titleAr : currentSpec.titleEn}
-            </h3>
-
-            {/* Bullet Points */}
-            <div className="space-y-3 mt-4">
-              {(isAr ? currentSpec.detailsAr : currentSpec.detailsEn).map((point, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-1" />
-                  <p className="text-xs sm:text-sm text-[#475569] leading-relaxed font-normal">
-                    {point}
-                  </p>
+                {/* Key Engineering Observations */}
+                <div className="space-y-2.5 mt-4">
+                  {(isAr ? currentStage.pointsAr : currentStage.pointsEn).map((pt, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-[#3974C8] shrink-0 mt-0.5" />
+                      <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed">
+                        {pt}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Italian Quality Guarantee Strip */}
-          <div className="mt-8 pt-5 border-t border-[#E5EAF0]">
-            <div className="flex items-center justify-between text-xs text-[#64748B]">
-              <span className="font-semibold text-[#172334]">
-                {isAr ? 'بلد المنشأ والاعتماد:' : 'Country of Origin:'}
-              </span>
-              <span className="font-medium text-[#0062D2]">
-                {isAr ? 'إيطاليا 100% (Made in Italy)' : '100% Made in Italy'}
-              </span>
+              {/* Structured Technical Attributes Grid */}
+              <div className="mt-6 pt-4 border-t border-[#173B5E]">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {(isAr ? currentStage.specsAr : currentStage.specsEn).map((spec, i) => (
+                    <div
+                      key={i}
+                      className="p-2.5 rounded-lg bg-[#081D35]/90 border border-[#173B5E]/80"
+                    >
+                      <span className="block text-[11px] text-slate-400">
+                        {spec.label}
+                      </span>
+                      <span className="block text-xs font-semibold text-white mt-0.5">
+                        {spec.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-xs text-[#64748B] mt-2">
-              <span className="font-semibold text-[#172334]">
-                {isAr ? 'الجهد الاسمي المقنن:' : 'Rated Voltage:'}
-              </span>
-              <span className="font-mono font-medium text-[#172334]">450 / 750 V</span>
-            </div>
+
           </div>
         </div>
 
