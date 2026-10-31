@@ -3,12 +3,39 @@
 import { MongoClient } from "mongodb";
 import { uploadSingleImage } from "../lib/multer.js";
 import { processAndUploadImage, uploadVideoToR2 } from "../lib/r2.js";
+import { processCommittedWirePriceUpdate } from "./wire-alerts.js";
 
 // =====================================
 // MongoDB Cache
 // =====================================
 let cachedClient = null;
 let cachedDb = null;
+
+const BASELINE_WIRE_PRICES = {
+  "1.5": 89,
+  "2.5": 142,
+  "4.0": 219,
+  "6.0": 329,
+  "10.0": 580,
+  "16.0": 915,
+  "25.0": 1410,
+};
+
+function parseWirePricesFromRecord(doc) {
+  if (!doc) return null;
+  const candidateStrings = [doc.phone, doc.rawPhone].filter((v) => typeof v === "string" && v.trim());
+  for (const str of candidateStrings) {
+    try {
+      const parsed = JSON.parse(str);
+      if (parsed && parsed.prices && typeof parsed.prices === "object") {
+        return parsed.prices;
+      }
+    } catch (_) {
+      // ignore invalid JSON
+    }
+  }
+  return null;
+}
 
 async function connectToDatabase() {
   if (cachedClient && cachedDb) {
@@ -62,7 +89,7 @@ const MAX_REQUESTS_PER_WINDOW = 20;
 function isRateLimited(clientIp) {
   const now = Date.now();
   const userRequests = ipCache.get(clientIp) || [];
-  const validRequests = userRequests.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+  const validRequests = userRequests.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW);
 
   if (validRequests.length >= MAX_REQUESTS_PER_WINDOW) {
     return true;
@@ -78,20 +105,14 @@ function isRateLimited(clientIp) {
 // =====================================
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, x-admin-password"
-  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-admin-password");
 
-  const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+  const clientIp = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
   if (req.method === "POST" && isRateLimited(clientIp)) {
     return res.status(429).json({
       success: false,
-      error: "Too Many Requests. Please wait a minute before trying again."
+      error: "Too Many Requests. Please wait a minute before trying again.",
     });
   }
 
@@ -145,7 +166,7 @@ export default async function handler(req, res) {
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const type = typeof body.type === "string" ? body.type.trim().toLowerCase() : "user";
-    const rawPhone = typeof body.phone === "string" ? body.phone.trim() : (body.phone ? String(body.phone) : "");
+    const rawPhone = typeof body.phone === "string" ? body.phone.trim() : body.phone ? String(body.phone) : "";
     const description = typeof body.description === "string" ? body.description.trim() : "";
     const category = typeof body.category === "string" ? body.category.trim() : "";
     const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl.trim() : "";
@@ -158,7 +179,8 @@ export default async function handler(req, res) {
     const discountPrice = discountPriceStr ? parseFloat(discountPriceStr) : undefined;
     const stockQty = stockQtyStr ? parseInt(stockQtyStr, 10) : undefined;
 
-    const isAdminAction = type === "product" || type === "project" || email === "admin_wire_prices@app.local";
+    const isWirePriceCommit = email === "admin_wire_prices@app.local" || type === "wire_prices";
+    const isAdminAction = type === "product" || type === "project" || isWirePriceCommit;
     if (isAdminAction) {
       const adminPassword = process.env.ADMIN_PASSWORD;
       if (!adminPassword) {
@@ -168,7 +190,7 @@ export default async function handler(req, res) {
       if (clientPassword !== adminPassword) {
         return res.status(401).json({
           success: false,
-          error: "Unauthorized: Invalid admin password"
+          error: "Unauthorized: Invalid admin password",
         });
       }
     }
@@ -196,14 +218,31 @@ export default async function handler(req, res) {
     const { db } = await connectToDatabase();
 
     // في حال رفع فيديو للواجهة أو الفيديو الثاني: نقوم بحذف السجلات القديمة
-    if (email === "admin_hero_video@app.local" || email === "admin_secondary_video@app.local" || type === "hero_video" || type === "secondary_video") {
+    if (
+      email === "admin_hero_video@app.local" ||
+      email === "admin_secondary_video@app.local" ||
+      type === "hero_video" ||
+      type === "secondary_video"
+    ) {
       await db.collection("users").deleteMany({
-        $or: [{ email }, { type }]
+        $or: [{ email }, { type }],
       });
     }
 
+    // Retrieve previous committed wire prices before inserting a new wire price commit
+    let previousWirePrices = null;
+    if (isWirePriceCommit) {
+      const latestWireRecord = await db
+        .collection("users")
+        .find({ email: "admin_wire_prices@app.local" })
+        .sort({ createdAt: -1, _id: -1 })
+        .limit(1)
+        .next();
+      previousWirePrices = parseWirePricesFromRecord(latestWireRecord) || { ...BASELINE_WIRE_PRICES };
+    }
+
     let phoneField = rawPhone;
-    if (type !== "contact" && type !== "quote_request") {
+    if (type !== "contact" && type !== "quote_request" && !isWirePriceCommit) {
       const phoneData = {
         imageUrl,
         videoUrl: finalVideoUrl,
@@ -219,7 +258,7 @@ export default async function handler(req, res) {
     }
 
     const newUser = {
-      type,
+      type: isWirePriceCommit ? "wire_prices" : type,
       name,
       email,
       phone: phoneField,
@@ -234,11 +273,30 @@ export default async function handler(req, res) {
 
     const result = await db.collection("users").insertOne(newUser);
 
+    // Trigger Smart Wire Price Alert Evaluation on committed wire price updates
+    let alertTriggerSummary = null;
+    if (isWirePriceCommit) {
+      try {
+        const committedPrices = parseWirePricesFromRecord(newUser);
+        if (committedPrices) {
+          alertTriggerSummary = await processCommittedWirePriceUpdate(
+            db,
+            previousWirePrices || BASELINE_WIRE_PRICES,
+            committedPrices,
+            String(result.insertedId)
+          );
+        }
+      } catch (alertErr) {
+        console.error("Wire price alert trigger error:", alertErr);
+      }
+    }
+
     return res.status(201).json({
       success: true,
       message: type === "product" ? "Product saved successfully" : "User saved successfully",
       insertedId: result.insertedId,
       imageUrl,
+      ...(alertTriggerSummary ? { alertTriggerSummary } : {}),
     });
   } catch (error) {
     console.error("MongoDB Save Error:", error);
