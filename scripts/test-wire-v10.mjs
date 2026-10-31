@@ -221,14 +221,14 @@ await (async () => {
     const webPushLib = await import('../lib/webPush.js');
     const keys = webPushLib.getVapidKeys();
     assert.ok(keys.publicKey && keys.publicKey.length > 40, 'Valid public VAPID key required');
-    assert.ok(keys.privateKey && keys.privateKey.length > 20, 'Valid private VAPID key required');
+    assert.ok(keys.privateKeyObject && keys.privateKeyObject.type === 'private', 'Valid server-only private KeyObject required');
 
     // Controlled price change test (without modifying production prices)
     const downSub = { wireId: '1.5', condition: 'down', enabled: true, lastTriggeredPrice: null };
-    assert.equal(webPushLib.shouldTriggerWireAlert(downSub, 245, 235), true, 'Should trigger on price drop');
-    assert.equal(webPushLib.shouldTriggerWireAlert(downSub, 245, 245), false, 'Should not trigger when unchanged');
+    assert.equal(webPushLib.evaluateAlertCondition(downSub, 245, 235), true, 'Should trigger on price drop');
+    assert.equal(webPushLib.evaluateAlertCondition(downSub, 245, 245), false, 'Should not trigger when unchanged');
     assert.equal(
-      webPushLib.shouldTriggerWireAlert({ ...downSub, lastTriggeredPrice: 235 }, 245, 235),
+      webPushLib.evaluateAlertCondition({ ...downSub, lastTriggeredPrice: 235 }, 245, 235),
       false,
       'Should not duplicate trigger for identical price'
     );
