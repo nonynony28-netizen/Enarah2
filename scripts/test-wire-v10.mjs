@@ -224,14 +224,17 @@ await (async () => {
     assert.ok(keys.privateKeyObject && keys.privateKeyObject.type === 'private', 'Valid server-only private KeyObject required');
 
     // Controlled price change test (without modifying production prices)
-    const downSub = { wireId: '1.5', condition: 'down', enabled: true, lastTriggeredPrice: null };
-    assert.equal(webPushLib.evaluateAlertCondition(downSub, 245, 235), true, 'Should trigger on price drop');
-    assert.equal(webPushLib.evaluateAlertCondition(downSub, 245, 245), false, 'Should not trigger when unchanged');
+    const downSub = { wireId: '1.5', condition: 'down', enabled: true, lastNotifiedNewPrice: null };
+    assert.equal(webPushLib.evaluatePriceAlertRule(downSub, 245, 235).shouldNotify, true, 'Should trigger on price drop');
+    assert.equal(webPushLib.evaluatePriceAlertRule(downSub, 245, 245).shouldNotify, false, 'Should not trigger when unchanged');
     assert.equal(
-      webPushLib.evaluateAlertCondition({ ...downSub, lastTriggeredPrice: 235 }, 245, 235),
+      webPushLib.evaluatePriceAlertRule({ ...downSub, lastNotifiedNewPrice: 235 }, 245, 235).shouldNotify,
       false,
       'Should not duplicate trigger for identical price'
     );
+    const payload = webPushLib.buildArabicAlertNotification('1.5 مم²', 245, 235, 'down', null);
+    assert.equal(payload.url, '/wire-prices?wire=1.5');
+    assert.ok(payload.title.includes('1.5 مم²'));
   });
 
   // 10. Existing pricing table, watchlist, and 3D anatomy regression protection
