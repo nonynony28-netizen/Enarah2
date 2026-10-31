@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Calendar,
   TrendingUp,
@@ -27,6 +27,25 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
 import WireAnatomy3D from '../components/WireAnatomy3D'
+import {
+  type WireApplication,
+  WIRE_APPLICATIONS_V10,
+  IPHONE_HOME_SCREEN_MESSAGE_AR,
+  IPHONE_HOME_SCREEN_MESSAGE_EN,
+  IPHONE_HOME_SCREEN_STEPS_AR,
+  IPHONE_HOME_SCREEN_STEPS_EN,
+  ANDROID_HOME_SCREEN_MESSAGE_AR,
+  ANDROID_HOME_SCREEN_MESSAGE_EN,
+  ANDROID_HOME_SCREEN_BUTTON_AR,
+  ANDROID_HOME_SCREEN_BUTTON_EN,
+  ANDROID_HOME_SCREEN_STEPS_AR,
+  ANDROID_HOME_SCREEN_STEPS_EN,
+  NOTIFICATION_ACTIVATION_SUCCESS_AR,
+  NOTIFICATION_ACTIVATION_SUCCESS_EN,
+  NOTIFICATION_ACTIVATION_FAILURE_AR,
+  NOTIFICATION_ACTIVATION_FAILURE_EN,
+  evaluateMobileNotificationCapabilities
+} from '../utils/wirePricesV10'
 
 export type TrendType = 'up' | 'down' | 'same' | 'unavailable'
 export type AlertConditionType = 'down' | 'up' | 'any' | 'target'
@@ -195,191 +214,8 @@ const DEFAULT_WIRES: WirePriceRecord[] = [
   }
 ]
 
-// PART TWO & THREE — WIRE APPLICATION STUDIO DATA (3 Concise Examples + Technical Note per Size)
-const WIRE_APPLICATIONS: WireApplicationItem[] = [
-  {
-    id: '1.5',
-    size: '1.5 مم²',
-    sizeEn: '1.5 mm²',
-    headingAr: 'تمديدات الإنارة السقفية ودوائر الإضاءة الداخلية',
-    headingEn: 'Residential Ceiling Lighting & Interior Illumination Circuits',
-    imageSlug: 'app-1-5mm',
-    summaryAr:
-      'يُستخدم هذا المقاس في تغذية نقاط الإضاءة السقفية والمفاتيح الجدارية وخطوط الإنارة المعمارية ذات الأحمال الخفيفة داخل المباني السكنية والتجارية.',
-    summaryEn:
-      'Commonly used for ceiling lighting points, wall switches, and low-load architectural illumination circuits inside residential and commercial buildings.',
-    examplesAr: [
-      'توصيل وحدات الإنارة السقفية الغاطسة (Spotlights / Downlights) في الغرف والممرات',
-      'تغذية خطوط المفاتيح الجدارية ونقاط التحكم في الإضاءة الداخلية',
-      'أنظمة الإضاءة المخفية والإنارة التجميلية منخفضة الاستهلاك الكهربائي'
-    ],
-    examplesEn: [
-      'Recessed ceiling LED downlights and spotlights across rooms and corridors',
-      'Wall switch feeds and interior lighting control lines',
-      'Architectural cove lighting and low-wattage decorative fixtures'
-    ],
-    technicalNoteAr:
-      'تُعد هذه الأمثلة توضيحية للاستخدامات الشائعة؛ ويعتمد الاختيار النهائي لمقاس السلك على شدة التيار وطول المسار وطريقة التمديد وقاطع الحماية المناسب.',
-    technicalNoteEn:
-      'These examples illustrate common uses; final wire sizing depends on load current, circuit length, installation method, and breaker rating.'
-  },
-  {
-    id: '2.5',
-    size: '2.5 مم²',
-    sizeEn: '2.5 mm²',
-    headingAr: 'تأسيس المآخذ الكهربائية والبريزات الجدارية العامة',
-    headingEn: 'Professional Wall Socket & General Power Outlet Installations',
-    imageSlug: 'app-2-5mm',
-    summaryAr:
-      'المقاس الأكثر شيوعاً لتمديدات الأفياش والمآخذ الكهربائية الجدارية المخصصة لتشغيل الأجهزة المنزلية والمكتبية المعتادة في الغرف والصالات.',
-    summaryEn:
-      'The standard gauge for flush-mounted wall sockets and general power outlets serving everyday household and office appliances.',
-    examplesAr: [
-      'تغذية البريزات والمآخذ الجدارية في غرف المعيشة والنوم والمكاتب',
-      'تشغيل الأجهزة الإلكترونية والمنزلية اليومية ذات الاستهلاك المتوسط',
-      'دوائر القوى الفرعية الموزعة داخل المواسير الجدارية المعتمدة'
-    ],
-    examplesEn: [
-      'Flush-mounted wall sockets in living areas, bedrooms, and offices',
-      'Everyday household and office electronics with moderate load demand',
-      'Distributed branch power outlets routed inside concealed wall conduits'
-    ],
-    technicalNoteAr:
-      'يُنصح بمراعاة عدد المآخذ المشتركة على نفس الدائرة وطول المسار لتفادي زيادة الحمل أو هبوط الجهد الكهربائي.',
-    technicalNoteEn:
-      'Account for the number of outlets sharing the circuit and total run length to prevent overload or voltage drop.'
-  },
-  {
-    id: '4.0',
-    size: '4.0 مم²',
-    sizeEn: '4.0 mm²',
-    headingAr: 'دوائر الأحمال المستقلة والتكييف وسخانات المياه',
-    headingEn: 'Dedicated Branch Circuits for A/C Units & Water Heaters',
-    imageSlug: 'app-4-0mm',
-    summaryAr:
-      'يُستخدم في الخطوط الفرعية المستقلة المنطلقة من لوحة التوزيع لتغذية الأجهزة التي تتطلب قدرة تحمل أعلى من دوائر المآخذ العادية.',
-    summaryEn:
-      'Used for dedicated branch circuits from the distribution board serving appliances that require higher current capacity than standard outlets.',
-    examplesAr: [
-      'خطوط التغذية المباشرة لوحدات تكييف الهواء الجدارية (Split Units) المتوسطة',
-      'دوائر سخانات المياه الكهربائية المستقلة في الحمامات والمطابخ',
-      'تغذية أجهزة المطبخ الحرارية المفردة المربوطة بقاطع حماية خاص'
-    ],
-    examplesEn: [
-      'Dedicated circuits for medium-capacity split air conditioning units',
-      'Independent electric water heater circuits in bathrooms and kitchens',
-      'Single thermal kitchen appliances protected by dedicated MCBs'
-    ],
-    technicalNoteAr:
-      'يُفضل سحب خط مباشر مستقل من اللوحة الفرعية لكل جهاز رئيسي مع مطابقة سعة القاطع الكهربائي لحمل الجهاز.',
-    technicalNoteEn:
-      'Best installed as an independent home-run circuit from the distribution board with a matched circuit breaker.'
-  },
-  {
-    id: '6.0',
-    size: '6.0 مم²',
-    sizeEn: '6.0 mm²',
-    headingAr: 'توصيلات الأحمال العالية ومفاتيح الفصل والقوى',
-    headingEn: 'Higher-Load Circuit Installations & Heavy Appliance Isolators',
-    imageSlug: 'app-6-0mm',
-    summaryAr:
-      'مناسب للدوائر الكهربائية ذات الاستهلاك المرتفع التي تتطلب موصلية نحاسية عالية وثباتاً حرارياً أثناء التشغيل المستمر لفترات طويلة.',
-    summaryEn:
-      'Suited for high-demand electrical circuits requiring elevated copper ampacity and thermal stability during continuous operation.',
-    examplesAr: [
-      'تغذية وحدات التكييف ذات القدرات الكبيرة والمكيفات الدولابية أو المركزية المدمجة',
-      'المواقد والأفران الكهربائية الكبيرة ومعدات المطابخ عالية القدرة',
-      'خطوط تشغيل المضخات الكهربائية ومفاتيح العزل (Isolators) للأحمال الميكانيكية'
-    ],
-    examplesEn: [
-      'High-capacity split or floor-standing air conditioning installations',
-      'Large electric ranges, cooktops, and heavy-duty kitchen equipment',
-      'Water pump feeds and rotary isolator switches for mechanical loads'
-    ],
-    technicalNoteAr:
-      'تزداد أهمية حساب هبوط الجهد ودرجة الحرارة المحيطة وجودة ربط الأطراف النحاسية عند تشغيل الأحمال المستمرة.',
-    technicalNoteEn:
-      'Voltage drop, ambient temperature derating, and terminal torque quality are critical for continuous high loads.'
-  },
-  {
-    id: '10.0',
-    size: '10.0 مم²',
-    sizeEn: '10.0 mm²',
-    headingAr: 'خطوط التغذية الفرعية والربط بين لوحات التوزيع',
-    headingEn: 'Sub-Distribution Panel Feeders & Riser Connections',
-    imageSlug: 'app-10-0mm',
-    summaryAr:
-      'يُعتمد غالباً كخط تغذية رئيسي للشقق السكنية أو للربط الكهربائي بين اللوحة الرئيسية ولوحات التوزيع الفرعية داخل المبنى.',
-    summaryEn:
-      'Frequently deployed as a residential main feeder or interconnection between primary boards and floor sub-distribution panels.',
-    examplesAr: [
-      'كابلات وأسلاك التغذية بين لوحة العداد ولوحة التوزيع الداخلية للشقة',
-      'تغذية اللوحات الفرعية للأدوار المستقلة أو الملاحق في الفلل السكنية',
-      'توصيل منظومات التكييف المركزي أو الأحمال الثلاثية الطور المتوسطة'
-    ],
-    examplesEn: [
-      'Feeder lines between meter cabinets and apartment distribution boards',
-      'Sub-panel feeders for individual floors or residential villa annexes',
-      'Central HVAC condensers and medium three-phase distribution loads'
-    ],
-    technicalNoteAr:
-      'يتطلب استخدام أطراف توصيل نحاسية (كوسات) مكبوسة جيداً ومراجعة إجمالي الأحمال المتزامنة على اللوحة الفرعية.',
-    technicalNoteEn:
-      'Requires properly crimped copper cable lugs and engineering review of total diversified sub-panel load.'
-  },
-  {
-    id: '16.0',
-    size: '16.0 مم²',
-    sizeEn: '16.0 mm²',
-    headingAr: 'مسارات التغذية الرئيسية للمباني والمنشآت التجارية',
-    headingEn: 'Larger Electrical Distribution & Commercial Feeder Environments',
-    imageSlug: 'app-16-0mm',
-    summaryAr:
-      'مخصص لمسارات التغذية الرئيسية داخل حوامل الكابلات ولوحات التوزيع في الفلل الكبيرة والمعارض والمقار التجارية.',
-    summaryEn:
-      'Designed for primary feeder runs along cable trays and main distribution cabinets in large villas and commercial spaces.',
-    examplesAr: [
-      'الخطوط الرئيسية المغذية للوحات التوزيع العمومية في الفلل الكبيرة والمباني',
-      'مسارات التغذية المنظمة على حوامل الكابلات (Cable Trays) في غرف الكهرباء',
-      'الربط الكهربائي مع لوحات التحويل الاحتياطية (ATS) والمولدات المتوسطة'
-    ],
-    examplesEn: [
-      'Incoming main feeders for primary distribution cabinets in large villas',
-      'Organized feeder routing on perforated galvanized cable trays',
-      'Interconnections with standby generators and ATS transfer switchboards'
-    ],
-    technicalNoteAr:
-      'يُصمم مسار السلك وفق حسابات التيار الأقصى المسموح به وعوامل التجميع الحراري داخل الحوامل أو المواسير.',
-    technicalNoteEn:
-      'Engineered according to maximum permissible current and thermal grouping factors inside trays or conduits.'
-  },
-  {
-    id: '25.0',
-    size: '25.0 مم²',
-    sizeEn: '25.0 mm²',
-    headingAr: 'لوحات القوى الرئيسية وتوزيع المشاريع التجارية والصناعية',
-    headingEn: 'Commercial Switchboards & Heavy-Duty Main Power Distribution',
-    imageSlug: 'app-25-0mm',
-    summaryAr:
-      'يُستخدم في لوحات التوزيع الرئيسية والقواطع المقولبة (MCCB) وقضبان التوزيع النحاسية للمشاريع التجارية والمنشآت ذات الأحمال المرتفعة.',
-    summaryEn:
-      'Used in commercial main switchboards, molded-case circuit breakers (MCCBs), and copper busbar distribution for high-demand facilities.',
-    examplesAr: [
-      'تغذية القواطع الرئيسية (MCCB) وقضبان النحاس العمومية في اللوحات المركزية',
-      'خطوط القوى الرئيسية للمنشآت التجارية والخدمية والمضخات الكبرى',
-      'المشاريع الهندسية التي تتطلب موصلية نحاسية عالية وتقليل الفقد عبر المسافات'
-    ],
-    examplesEn: [
-      'Primary MCCB terminations and solid copper busbar connections in main switchboards',
-      'Main power feeders for commercial complexes and large pumping stations',
-      'Engineering projects requiring high copper conductivity and minimal voltage drop'
-    ],
-    technicalNoteAr:
-      'يخضع تركيبه لإشراف هندسي مباشر مع الالتزام بقيم عزم الشد القياسية ومسافات العزل والتبريد داخل اللوحات.',
-    technicalNoteEn:
-      'Requires direct electrical engineering supervision, calibrated bolt torque, and proper busbar thermal clearance.'
-  }
-]
+// PART 1, 6, 7 — EXPLICIT VERSIONED WIRE APPLICATION STUDIO DATA (V10 + NANO BANANA PRO)
+const WIRE_APPLICATIONS: WireApplication[] = WIRE_APPLICATIONS_V10
 
 // Helper to communicate with the live backend on enarah2.vercel.app (or local serverless dev if available)
 const GET_API_ENDPOINTS = [
@@ -592,14 +428,26 @@ export default function WirePrices() {
     message: string
   } | null>(null)
 
-  // Wire Application Studio State (Section C + Modal)
+  // Wire Application Studio State (Section C + Modal + Instant Image Preloading & Decoded Cache)
   const [selectedAppSizeId, setSelectedAppSizeId] = useState<string>('1.5')
   const [appModalWireId, setAppModalWireId] = useState<string | null>(null)
+  const [decodedWireIds, setDecodedWireIds] = useState<Record<string, boolean>>({})
+  const [failedWireIds, setFailedWireIds] = useState<Record<string, boolean>>({})
+  const [mountedWireIds, setMountedWireIds] = useState<Record<string, boolean>>({
+    '1.5': true,
+    '2.5': true
+  })
+  const preloadedImagesRef = useRef<Record<string, HTMLImageElement>>({})
+  const latestSwitchReqIdRef = useRef<number>(0)
 
   // Sharing Feedback State
   const [copyFeedback, setCopyFeedback] = useState(false)
 
-  // Device & Notification Capability Detection
+  // Android PWA Install Prompt & Step-by-Step Guidance State
+  const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null)
+  const [showAndroidInstallSteps, setShowAndroidInstallSteps] = useState(false)
+
+  // Device & Notification Capability Detection (V10 Device-Aware Engine)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
     typeof window !== 'undefined' && 'Notification' in window
       ? Notification.permission
@@ -608,20 +456,11 @@ export default function WirePrices() {
 
   const deviceCapabilities = useMemo(() => {
     if (typeof window === 'undefined') {
-      return {
-        isIOS: false,
-        isStandalone: false,
-        isIOSRequiresHomeScreen: false,
-        supportsServiceWorker: false,
-        supportsPushManager: false,
-        supportsNotifications: false,
+      return evaluateMobileNotificationCapabilities({
         isHttpsOrLocalhost: true
-      }
+      })
     }
     const ua = window.navigator.userAgent || ''
-    const isIOS =
-      /iPad|iPhone|iPod/.test(ua) ||
-      (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1)
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as any).standalone === true
@@ -633,16 +472,152 @@ export default function WirePrices() {
       window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1'
 
-    return {
-      isIOS,
+    return evaluateMobileNotificationCapabilities({
+      userAgent: ua,
+      platform: window.navigator.platform || '',
+      maxTouchPoints: window.navigator.maxTouchPoints || 0,
       isStandalone,
-      isIOSRequiresHomeScreen: isIOS && !isStandalone,
       supportsServiceWorker,
       supportsPushManager,
       supportsNotifications,
       isHttpsOrLocalhost
+    })
+  }, [])
+
+  // Capture Android Chrome beforeinstallprompt for optional Home Screen installation
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault()
+      setDeferredInstallPrompt(e)
+    }
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
     }
   }, [])
+
+  // Preload & Decode a specific wire size image into memory cache so switching is immediate (0ms)
+  const preloadAndDecodeWireImage = useCallback((wireId: string): Promise<boolean> => {
+    if (typeof window === 'undefined') return Promise.resolve(true)
+    const appItem = WIRE_APPLICATIONS.find((item) => item.wireId === wireId)
+    if (!appItem) return Promise.resolve(false)
+
+    if (preloadedImagesRef.current[wireId]?.complete) {
+      setDecodedWireIds((prev) => (prev[wireId] ? prev : { ...prev, [wireId]: true }))
+      setMountedWireIds((prev) => (prev[wireId] ? prev : { ...prev, [wireId]: true }))
+      return Promise.resolve(true)
+    }
+
+    return new Promise((resolve) => {
+      const img = new window.Image()
+      img.decoding = 'async'
+      const dpr = window.devicePixelRatio || 1
+      const viewportW = window.innerWidth || 1024
+      const targetWidth =
+        viewportW <= 640 && dpr <= 2 ? 480 : viewportW <= 1280 ? 800 : 1080
+
+      // Preload modern WebP/AVIF or JPG matching current viewport
+      img.srcset = appItem.webpSrcSet
+      img.sizes = '(max-width: 1024px) 100vw, 680px'
+      img.src = `/images/wire-apps/${appItem.imageSlug}-${targetWidth}.webp`
+
+      const markDecoded = () => {
+        preloadedImagesRef.current[wireId] = img
+        setFailedWireIds((prev) => {
+          if (!prev[wireId]) return prev
+          const next = { ...prev }
+          delete next[wireId]
+          return next
+        })
+        setDecodedWireIds((prev) => (prev[wireId] ? prev : { ...prev, [wireId]: true }))
+        setMountedWireIds((prev) => (prev[wireId] ? prev : { ...prev, [wireId]: true }))
+        resolve(true)
+      }
+
+      img.onload = () => {
+        if (typeof img.decode === 'function') {
+          img.decode().then(markDecoded).catch(markDecoded)
+        } else {
+          markDecoded()
+        }
+      }
+
+      img.onerror = () => {
+        // Fallback to JPG if WebP is unsupported
+        const fallbackImg = new window.Image()
+        fallbackImg.src = appItem.imageUrl
+        fallbackImg.onload = () => {
+          preloadedImagesRef.current[wireId] = fallbackImg
+          setDecodedWireIds((prev) => (prev[wireId] ? prev : { ...prev, [wireId]: true }))
+          setMountedWireIds((prev) => (prev[wireId] ? prev : { ...prev, [wireId]: true }))
+          resolve(true)
+        }
+        fallbackImg.onerror = () => {
+          setFailedWireIds((prev) => ({ ...prev, [wireId]: true }))
+          resolve(false)
+        }
+      }
+    })
+  }, [])
+
+  // High-priority initial decode + intelligent progressive preloading of likely next wire sizes
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    let cancelled = false
+
+    const runProgressivePreload = async () => {
+      // 1. Decode initial selected wire image first with highest priority
+      await preloadAndDecodeWireImage(selectedAppSizeId)
+      if (cancelled) return
+
+      // 2. Respect Data Saver if enabled, otherwise progressively preload adjacent wire sizes 2 at a time
+      const conn = (navigator as any).connection
+      const isSaveData = Boolean(conn && conn.saveData)
+      const allIds = WIRE_APPLICATIONS.map((w) => w.wireId)
+      const currentIdx = Math.max(0, allIds.indexOf(selectedAppSizeId))
+
+      // Order by proximity to currently selected wire size
+      const orderedIds = allIds
+        .filter((id) => id !== selectedAppSizeId)
+        .sort((a, b) => {
+          const distA = Math.abs(allIds.indexOf(a) - currentIdx)
+          const distB = Math.abs(allIds.indexOf(b) - currentIdx)
+          return distA - distB
+        })
+
+      const idsToPreload = isSaveData ? orderedIds.slice(0, 2) : orderedIds
+
+      for (let i = 0; i < idsToPreload.length; i += 2) {
+        if (cancelled) break
+        const batch = idsToPreload.slice(i, i + 2)
+        await Promise.all(batch.map((id) => preloadAndDecodeWireImage(id)))
+      }
+    }
+
+    runProgressivePreload()
+    return () => {
+      cancelled = true
+    }
+  }, [preloadAndDecodeWireImage])
+
+  // Immediate Wire Application Size Selection Handler (Cancels outdated requests & preloads neighbors)
+  const handleSelectAppSize = useCallback(
+    (wireId: string) => {
+      const reqId = ++latestSwitchReqIdRef.current
+      setSelectedAppSizeId(wireId)
+      setMountedWireIds((prev) => (prev[wireId] ? prev : { ...prev, [wireId]: true }))
+
+      preloadAndDecodeWireImage(wireId).then(() => {
+        if (latestSwitchReqIdRef.current !== reqId) return
+        const allIds = WIRE_APPLICATIONS.map((w) => w.wireId)
+        const idx = allIds.indexOf(wireId)
+        if (idx > 0) preloadAndDecodeWireImage(allIds[idx - 1])
+        if (idx >= 0 && idx < allIds.length - 1) preloadAndDecodeWireImage(allIds[idx + 1])
+      })
+    },
+    [preloadAndDecodeWireImage]
+  )
 
   // Handle URL query param ?wire=X (when user taps a mobile push notification)
   useEffect(() => {
@@ -970,9 +945,7 @@ export default function WirePrices() {
         ok: false,
         subscription: null,
         errorKind: 'missing_iphone_pwa',
-        errorMessage: isAr
-          ? 'لتفعيل تنبيهات الأسعار على iPhone، أضف موقع الإنارة الحديثة إلى الشاشة الرئيسية، ثم افتحه من الأيقونة واسمح بالإشعارات.'
-          : 'To enable price alerts on iPhone, add Enarah Modern to your Home Screen, open it from the icon, and allow notifications.'
+        errorMessage: isAr ? IPHONE_HOME_SCREEN_MESSAGE_AR : IPHONE_HOME_SCREEN_MESSAGE_EN
       }
     }
 
@@ -1192,9 +1165,7 @@ export default function WirePrices() {
         ensureInWatchlist(alertModalWireId)
 
         setAlertFeedbackMsg(
-          isAr
-            ? 'تم تفعيل التنبيه وحفظ اشتراك الإشعارات في الخادم بنجاح (SUBSCRIPTION SAVED).'
-            : 'Alert activated and subscription confirmed on server (SUBSCRIPTION SAVED).'
+          isAr ? NOTIFICATION_ACTIVATION_SUCCESS_AR : NOTIFICATION_ACTIVATION_SUCCESS_EN
         )
       } finally {
         setIsSavingAlert(false)
@@ -2446,7 +2417,8 @@ export default function WirePrices() {
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION C — WIRE APPLICATION STUDIO (REDESIGNED V9 + NANO BANANA PRO)     */}
+      {/* ========================================================================= */}
+      {/* SECTION C — WIRE APPLICATION STUDIO (V10 INSTANT PRELOAD + NANO BANANA)   */}
       {/* ========================================================================= */}
       <section
         id="wire-applications-guide"
@@ -2454,7 +2426,7 @@ export default function WirePrices() {
         className="py-10 sm:py-14 no-print"
       >
         <div className="max-w-[1240px] mx-auto px-5 sm:px-8">
-          {/* 1 & 2. Section Heading & Description (Section 18) */}
+          {/* 1 & 2. Section Heading & Description */}
           <div className="max-w-3xl mb-6">
             <div className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3974C8] mb-2">
               <ShieldCheck className="w-4 h-4" />
@@ -2479,7 +2451,7 @@ export default function WirePrices() {
             </p>
           </div>
 
-          {/* 3. Professional Segmented Wire-Size Selector (Section 19) */}
+          {/* 3. Professional Segmented Wire-Size Selector (With Hover/Touch Instant Preload) */}
           <div
             role="tablist"
             aria-label={isAr ? 'اختيار مقاس السلك' : 'Select wire size'}
@@ -2493,8 +2465,26 @@ export default function WirePrices() {
                   role="tab"
                   aria-selected={isSelected}
                   type="button"
-                  onClick={() => setSelectedAppSizeId(appItem.id)}
-                  className={`flex-1 min-w-[104px] h-10 px-4 rounded-lg text-[14px] transition-colors duration-150 shrink-0 cursor-pointer tabular-nums flex items-center justify-center ${
+                  onMouseEnter={() => {
+                    setMountedWireIds((prev) =>
+                      prev[appItem.id] ? prev : { ...prev, [appItem.id]: true }
+                    )
+                    preloadAndDecodeWireImage(appItem.id)
+                  }}
+                  onTouchStart={() => {
+                    setMountedWireIds((prev) =>
+                      prev[appItem.id] ? prev : { ...prev, [appItem.id]: true }
+                    )
+                    preloadAndDecodeWireImage(appItem.id)
+                  }}
+                  onFocus={() => {
+                    setMountedWireIds((prev) =>
+                      prev[appItem.id] ? prev : { ...prev, [appItem.id]: true }
+                    )
+                    preloadAndDecodeWireImage(appItem.id)
+                  }}
+                  onClick={() => handleSelectAppSize(appItem.id)}
+                  className={`flex-1 min-w-[104px] h-10 px-4 rounded-lg text-[14px] transition-colors duration-100 shrink-0 cursor-pointer tabular-nums flex items-center justify-center ${
                     isSelected
                       ? 'bg-[#102A43] text-white font-bold shadow-2xs'
                       : 'bg-[#F7F9FC] text-[#172334] hover:bg-[#EDF3F9] font-medium'
@@ -2509,33 +2499,108 @@ export default function WirePrices() {
           {/* Balanced Two-Column Studio Layout (Desktop: Right 45% Info / Left 55% Image; Mobile: Image First then Info) */}
           <div className="bg-white border border-[#E4EAF1] rounded-2xl overflow-hidden shadow-2xs">
             <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-              {/* Left on Desktop (55% -> col-span-7, lg:order-2), First on Mobile (order-1): Application Image */}
-              <div className="order-1 lg:order-2 lg:col-span-7 bg-[#081D35] relative overflow-hidden aspect-4/3 lg:aspect-auto lg:min-h-[420px]">
-                <picture>
-                  <source
-                    type="image/avif"
-                    srcSet={`/images/wire-apps/${activeSectionApplication.imageSlug}-400.avif 400w, /images/wire-apps/${activeSectionApplication.imageSlug}-800.avif 800w`}
-                    sizes="(max-width: 1024px) 100vw, 680px"
-                  />
-                  <source
-                    type="image/webp"
-                    srcSet={`/images/wire-apps/${activeSectionApplication.imageSlug}-400.webp 400w, /images/wire-apps/${activeSectionApplication.imageSlug}-800.webp 800w`}
-                    sizes="(max-width: 1024px) 100vw, 680px"
-                  />
-                  <img
-                    src={`/images/wire-apps/${activeSectionApplication.imageSlug}-800.jpg`}
-                    alt={
-                      isAr
-                        ? `${activeSectionApplication.headingAr} - سلك ${activeSectionApplication.size}`
-                        : `${activeSectionApplication.headingEn} - ${activeSectionApplication.sizeEn}`
-                    }
-                    width={800}
-                    height={600}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover object-center transition-opacity duration-200"
-                  />
-                </picture>
+              {/* Left on Desktop (55% -> col-span-7, lg:order-2), First on Mobile (order-1): Stable 4:3 Application Image Container */}
+              <div className="order-1 lg:order-2 lg:col-span-7 bg-[#081D35] relative overflow-hidden aspect-4/3 w-full select-none">
+                {/* Lightweight Matching Placeholder / Error State (Zero White Flash, Zero Stale Image) */}
+                {!decodedWireIds[selectedAppSizeId] && (
+                  <div className="absolute inset-0 z-0 flex flex-col items-center justify-center bg-[#0B1F36] text-white p-6 text-center">
+                    {failedWireIds[selectedAppSizeId] ? (
+                      <div className="space-y-3">
+                        <span className="inline-flex items-center px-3 py-1 rounded-md bg-[#132F4C] border border-[#234B73] text-xs font-bold text-[#7CC4FA] tabular-nums">
+                          {isAr
+                            ? activeSectionApplication.size
+                            : activeSectionApplication.sizeEn}
+                        </span>
+                        <p className="text-xs text-slate-300">
+                          {isAr
+                            ? 'تعذر تحميل الصورة بسبب ضعف الاتصال.'
+                            : 'Could not load image due to connection issue.'}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFailedWireIds((prev) => {
+                              const next = { ...prev }
+                              delete next[selectedAppSizeId]
+                              return next
+                            })
+                            preloadAndDecodeWireImage(selectedAppSizeId)
+                          }}
+                          className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#3974C8] text-white text-xs font-semibold cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        <span className="inline-flex items-center px-3.5 py-1 rounded-lg bg-[#132F4C] border border-[#234B73] text-sm font-bold text-[#7CC4FA] tabular-nums">
+                          {isAr
+                            ? activeSectionApplication.size
+                            : activeSectionApplication.sizeEn}
+                        </span>
+                        <p className="text-xs text-slate-300 font-medium">
+                          {isAr
+                            ? activeSectionApplication.headingAr
+                            : activeSectionApplication.headingEn}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Stacked Pre-Decoded Image Layers for Instant 0ms Switching & Zero Flicker */}
+                {WIRE_APPLICATIONS.map((appItem) => {
+                  const isCurrent = appItem.wireId === selectedAppSizeId
+                  const shouldRenderLayer =
+                    isCurrent ||
+                    Boolean(mountedWireIds[appItem.wireId]) ||
+                    Boolean(decodedWireIds[appItem.wireId])
+
+                  if (!shouldRenderLayer) return null
+
+                  return (
+                    <picture
+                      key={appItem.wireId}
+                      className={`absolute inset-0 w-full h-full block transition-opacity duration-120 ease-out ${
+                        isCurrent && !failedWireIds[appItem.wireId]
+                          ? 'opacity-100 z-10'
+                          : 'opacity-0 z-0 pointer-events-none'
+                      }`}
+                    >
+                      <source
+                        type="image/avif"
+                        srcSet={appItem.avifSrcSet}
+                        sizes="(max-width: 640px) 480px, (max-width: 1024px) 800px, 680px"
+                      />
+                      <source
+                        type="image/webp"
+                        srcSet={appItem.webpSrcSet}
+                        sizes="(max-width: 640px) 480px, (max-width: 1024px) 800px, 680px"
+                      />
+                      <img
+                        src={appItem.imageUrl}
+                        srcSet={appItem.jpgSrcSet}
+                        sizes="(max-width: 640px) 480px, (max-width: 1024px) 800px, 680px"
+                        alt={isAr ? appItem.imageAlt : appItem.imageAltEn}
+                        width={800}
+                        height={600}
+                        loading={isCurrent ? 'eager' : 'eager'}
+                        fetchPriority={isCurrent ? 'high' : 'auto'}
+                        decoding="async"
+                        onLoad={() => {
+                          setDecodedWireIds((prev) =>
+                            prev[appItem.wireId] ? prev : { ...prev, [appItem.wireId]: true }
+                          )
+                        }}
+                        onError={() => {
+                          setFailedWireIds((prev) => ({ ...prev, [appItem.wireId]: true }))
+                        }}
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </picture>
+                  )
+                })}
               </div>
 
               {/* Right on Desktop (45% -> col-span-5, lg:order-1), Second on Mobile (order-2): Structured Details */}
@@ -2838,44 +2903,124 @@ export default function WirePrices() {
                 </div>
               )}
 
-              {/* Exact iPhone PWA Guidance (Section 08) */}
+              {/* PART 8 — IPHONE HOME SCREEN INSTALLATION GUIDANCE (Shown when iPhone is not in standalone mode) */}
               {deviceCapabilities.isIOSRequiresHomeScreen && (
-                <div className="rounded-xl bg-amber-50 border border-amber-300 p-3.5 text-[12px] text-amber-950 leading-relaxed">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div
+                  data-testid="iphone-pwa-guidance"
+                  className="rounded-xl bg-[#0B1F36] border border-[#234B73] p-4 text-[12px] text-white leading-relaxed space-y-3"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <Smartphone className="w-4 h-4 text-[#7CC4FA] shrink-0 mt-0.5" />
                     <div>
-                      <strong className="block font-bold mb-1">
-                        {isAr ? 'إرشاد خاص لمستخدمي iPhone:' : 'iPhone Web Push Setup:'}
-                      </strong>
-                      <p>
+                      <strong className="block font-bold text-[#7CC4FA] mb-1">
                         {isAr
-                          ? 'لتفعيل تنبيهات الأسعار على iPhone، أضف موقع الإنارة الحديثة إلى الشاشة الرئيسية، ثم افتحه من الأيقونة واسمح بالإشعارات.'
-                          : 'To enable price alerts on iPhone, add Enarah Modern to your Home Screen, open it from the icon, and allow notifications.'}
+                          ? 'إعداد إشعارات الأسعار على هاتف iPhone'
+                          : 'iPhone Notification Setup Required'}
+                      </strong>
+                      <p className="text-slate-100 font-medium">
+                        {isAr ? IPHONE_HOME_SCREEN_MESSAGE_AR : IPHONE_HOME_SCREEN_MESSAGE_EN}
                       </p>
                     </div>
                   </div>
+
+                  <ol className="space-y-1.5 bg-[#132F4C] border border-[#234B73] rounded-lg p-3 text-slate-100">
+                    {(isAr ? IPHONE_HOME_SCREEN_STEPS_AR : IPHONE_HOME_SCREEN_STEPS_EN).map(
+                      (step, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="w-4.5 h-4.5 rounded-full bg-[#3974C8] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 tabular-nums">
+                            {idx + 1}
+                          </span>
+                          <span>{step}</span>
+                        </li>
+                      )
+                    )}
+                  </ol>
+
+                  <p className="text-[11px] text-slate-300">
+                    {isAr
+                      ? 'ملاحظة: يظهر زر المشاركة في متصفح Safari أسفل الشاشة أو أعلاها حسب إصدار نظام iOS في هاتفك.'
+                      : 'Note: The Share button in Safari appears in the bottom toolbar or top address bar depending on your iOS version.'}
+                  </p>
                 </div>
               )}
 
-              {/* Clear Error Handling with Retry Option (Section 06 & 12) */}
+              {/* PART 9 — ANDROID OPTIONAL HOME SCREEN GUIDANCE (Non-blocking recommendation) */}
+              {deviceCapabilities.showAndroidOptionalInstallGuidance && (
+                <div
+                  data-testid="android-pwa-guidance"
+                  className="rounded-xl bg-[#F7F9FC] border border-[#CBD5E1] p-3.5 text-[12px] text-[#172334] leading-relaxed space-y-2.5"
+                >
+                  <div className="flex items-start gap-2">
+                    <Smartphone className="w-4 h-4 text-[#3974C8] shrink-0 mt-0.5" />
+                    <p className="font-medium text-[#102A43]">
+                      {isAr ? ANDROID_HOME_SCREEN_MESSAGE_AR : ANDROID_HOME_SCREEN_MESSAGE_EN}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (deferredInstallPrompt && typeof deferredInstallPrompt.prompt === 'function') {
+                        try {
+                          await deferredInstallPrompt.prompt()
+                          setDeferredInstallPrompt(null)
+                          return
+                        } catch {}
+                      }
+                      setShowAndroidInstallSteps((prev) => !prev)
+                    }}
+                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#EDF3F9] hover:bg-[#DCE7F5] text-[#102A43] text-[11px] font-bold transition-colors cursor-pointer"
+                  >
+                    <span>
+                      {isAr ? ANDROID_HOME_SCREEN_BUTTON_AR : ANDROID_HOME_SCREEN_BUTTON_EN}
+                    </span>
+                  </button>
+
+                  {showAndroidInstallSteps && (
+                    <ol className="space-y-1.5 bg-white border border-[#E4EAF1] rounded-lg p-2.5 text-[11px] text-[#172334]">
+                      {(isAr ? ANDROID_HOME_SCREEN_STEPS_AR : ANDROID_HOME_SCREEN_STEPS_EN).map(
+                        (step, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="w-4 h-4 rounded-full bg-[#102A43] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5 tabular-nums">
+                              {idx + 1}
+                            </span>
+                            <span>{step}</span>
+                          </li>
+                        )
+                      )}
+                    </ol>
+                  )}
+                </div>
+              )}
+
+              {/* PART 10 — Clear Error Handling with Standard Failure Headline + Specific Explanation + Retry */}
               {modalError && (
                 <div className="rounded-xl bg-[#C44949]/10 border border-[#C44949]/35 p-3.5 text-xs text-[#C44949] space-y-2.5">
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <span className="font-medium leading-relaxed">
-                      {modalError.message}
-                    </span>
+                    <div className="space-y-1">
+                      <strong className="block font-bold">
+                        {isAr
+                          ? NOTIFICATION_ACTIVATION_FAILURE_AR
+                          : NOTIFICATION_ACTIVATION_FAILURE_EN}
+                      </strong>
+                      <span className="block font-medium leading-relaxed text-[#9E2F2F]">
+                        {modalError.message}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => handleSaveAlertRule()}
-                      disabled={isSavingAlert}
-                      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#C44949] text-white text-[11px] font-bold cursor-pointer"
-                    >
-                      <RefreshCw className="w-3 h-3" />
-                      <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
-                    </button>
+                    {!deviceCapabilities.isIOSRequiresHomeScreen && (
+                      <button
+                        type="button"
+                        onClick={() => handleSaveAlertRule()}
+                        disabled={isSavingAlert}
+                        className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#C44949] text-white text-[11px] font-bold cursor-pointer"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+                      </button>
+                    )}
 
                     <button
                       type="button"
@@ -2900,7 +3045,7 @@ export default function WirePrices() {
                 </div>
               )}
 
-              {/* Modal Actions: تفعيل التنبيه / تعديل التنبيه / إيقاف التنبيه (Section 12) */}
+              {/* Modal Actions: تفعيل التنبيه / تعديل التنبيه / إيقاف التنبيه */}
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#E4EAF1]">
                 {activeModalExistingRule && activeModalExistingRule.enabled ? (
                   <button
@@ -2971,30 +3116,33 @@ export default function WirePrices() {
           aria-labelledby="wire-app-modal-title"
         >
           <div className="bg-white border border-[#E4EAF1] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
-            <div className="relative aspect-4/3 sm:aspect-16/9 bg-[#081D35] overflow-hidden">
+            <div className="relative aspect-4/3 bg-[#081D35] overflow-hidden">
               <picture>
                 <source
                   type="image/avif"
-                  srcSet={`/images/wire-apps/${activeModalApplication.imageSlug}-400.avif 400w, /images/wire-apps/${activeModalApplication.imageSlug}-800.avif 800w`}
-                  sizes="(max-width: 640px) 100vw, 672px"
+                  srcSet={activeModalApplication.avifSrcSet}
+                  sizes="(max-width: 640px) 480px, 672px"
                 />
                 <source
                   type="image/webp"
-                  srcSet={`/images/wire-apps/${activeModalApplication.imageSlug}-400.webp 400w, /images/wire-apps/${activeModalApplication.imageSlug}-800.webp 800w`}
-                  sizes="(max-width: 640px) 100vw, 672px"
+                  srcSet={activeModalApplication.webpSrcSet}
+                  sizes="(max-width: 640px) 480px, 672px"
                 />
                 <img
-                  src={`/images/wire-apps/${activeModalApplication.imageSlug}-800.jpg`}
+                  src={activeModalApplication.imageUrl}
+                  srcSet={activeModalApplication.jpgSrcSet}
+                  sizes="(max-width: 640px) 480px, 672px"
                   alt={
                     isAr
-                      ? activeModalApplication.headingAr
-                      : activeModalApplication.headingEn
+                      ? activeModalApplication.imageAlt
+                      : activeModalApplication.imageAltEn
                   }
                   width={800}
                   height={600}
-                  loading="lazy"
+                  loading="eager"
+                  fetchPriority="high"
                   decoding="async"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
                 />
               </picture>
               <div className="absolute inset-0 bg-gradient-to-t from-[#081D35] via-[#081D35]/30 to-transparent" />

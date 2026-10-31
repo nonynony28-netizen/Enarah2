@@ -1,7 +1,7 @@
-// Service Worker لشركة الإنارة الحديثة - Enarah Modern PWA & Smart Wire Price Push Service Worker (V9)
+// Service Worker لشركة الإنارة الحديثة - Enarah Modern PWA & Smart Wire Price Push Service Worker (V10)
 // يوفر تجربة تصفح أوفلاين سريعة وموثوقة وإشعارات Web Push فورية لتنبيهات أسعار الأسلاك النحاسية الإيطالية
 
-const CACHE_NAME = 'enarah-app-shell-v9';
+const CACHE_NAME = 'enarah-app-shell-v10';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -9,7 +9,9 @@ const STATIC_ASSETS = [
   '/poster.jpg',
   '/hero-poster.jpg',
   '/mascot.png',
-  '/robots.txt'
+  '/robots.txt',
+  '/images/wire-apps/v10-app-1-5mm-480.avif',
+  '/images/wire-apps/v10-app-1-5mm-800.avif'
 ];
 
 // 1. التثبيت والتخزين الأولي لغلاف التطبيق الأساسي (App Shell)
