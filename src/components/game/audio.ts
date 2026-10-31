@@ -6,7 +6,9 @@ class SoundEngine {
 
   private initCtx() {
     if (!this.ctx && typeof window !== 'undefined') {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
       if (AudioContextClass) {
         this.ctx = new AudioContextClass()
       }
@@ -16,8 +18,8 @@ class SoundEngine {
     }
   }
 
-  // صوت التقاط شرارة الطاقة
-  public playSpark() {
+  // صوت القفز الكلاسيكي السلس (Mario-inspired original jump sound)
+  public playJump(isHigh = false) {
     if (this.isMuted) return
     this.initCtx()
     if (!this.ctx) return
@@ -27,10 +29,60 @@ class SoundEngine {
     const gain = this.ctx.createGain()
 
     osc.type = 'sine'
-    osc.frequency.setValueAtTime(587.33, now) // D5
-    osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.15) // D6
+    const startFreq = isHigh ? 290 : 250
+    const endFreq = isHigh ? 660 : 540
+    osc.frequency.setValueAtTime(startFreq, now)
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.14)
 
-    gain.gain.setValueAtTime(0.25, now)
+    gain.gain.setValueAtTime(0.22, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16)
+
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.16)
+  }
+
+  // صوت الهبوط الخفيف على المنصة
+  public playLand() {
+    if (this.isMuted) return
+    this.initCtx()
+    if (!this.ctx) return
+
+    const now = this.ctx.currentTime
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+
+    osc.type = 'triangle'
+    osc.frequency.setValueAtTime(140, now)
+    osc.frequency.exponentialRampToValueAtTime(65, now + 0.06)
+
+    gain.gain.setValueAtTime(0.14, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07)
+
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.07)
+  }
+
+  // صوت جمع نجوم الطاقة (نجوم الطاقة)
+  public playStarPickup() {
+    if (this.isMuted) return
+    this.initCtx()
+    if (!this.ctx) return
+
+    const now = this.ctx.currentTime
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(783.99, now) // G5
+    osc.frequency.setValueAtTime(1046.5, now + 0.06) // C6
+
+    gain.gain.setValueAtTime(0.22, now)
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2)
 
     osc.connect(gain)
@@ -38,6 +90,81 @@ class SoundEngine {
 
     osc.start(now)
     osc.stop(now + 0.2)
+  }
+
+  // صوت تفعيل نقطة الحفظ (Checkpoint)
+  public playCheckpoint() {
+    if (this.isMuted) return
+    this.initCtx()
+    if (!this.ctx) return
+
+    const now = this.ctx.currentTime
+    const freqs = [440, 554.37, 659.25]
+    freqs.forEach((f, idx) => {
+      const osc = this.ctx!.createOscillator()
+      const gain = this.ctx!.createGain()
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(f, now + idx * 0.06)
+      gain.gain.setValueAtTime(0.2, now + idx * 0.06)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.18)
+      osc.connect(gain)
+      gain.connect(this.ctx!.destination)
+      osc.start(now + idx * 0.06)
+      osc.stop(now + idx * 0.06 + 0.18)
+    })
+  }
+
+  // صوت القفز فوق الروبوت أو الزنبرك النحاسي
+  public playEnemyStomp() {
+    if (this.isMuted) return
+    this.initCtx()
+    if (!this.ctx) return
+
+    const now = this.ctx.currentTime
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(220, now)
+    osc.frequency.exponentialRampToValueAtTime(520, now + 0.12)
+
+    gain.gain.setValueAtTime(0.28, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14)
+
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.14)
+  }
+
+  // صوت النقر على أزرار القوائم
+  public playButton() {
+    if (this.isMuted) return
+    this.initCtx()
+    if (!this.ctx) return
+
+    const now = this.ctx.currentTime
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(520, now)
+    osc.frequency.exponentialRampToValueAtTime(680, now + 0.04)
+
+    gain.gain.setValueAtTime(0.12, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05)
+
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.05)
+  }
+
+  // صوت التقاط شرارة الطاقة
+  public playSpark() {
+    this.playStarPickup()
   }
 
   // صوت التقاط لفة السلك الإيطالي
@@ -73,28 +200,7 @@ class SoundEngine {
 
   // صوت إنارة مصباح أو ثريا
   public playLampOn() {
-    if (this.isMuted) return
-    this.initCtx()
-    if (!this.ctx) return
-
-    const now = this.ctx.currentTime
-    const osc = this.ctx.createOscillator()
-    const gain = this.ctx.createGain()
-
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(329.63, now) // E4
-    osc.frequency.setValueAtTime(493.88, now + 0.08) // B4
-    osc.frequency.setValueAtTime(659.25, now + 0.16) // E5
-    osc.frequency.setValueAtTime(987.77, now + 0.24) // B5
-
-    gain.gain.setValueAtTime(0.2, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
-
-    osc.connect(gain)
-    gain.connect(this.ctx.destination)
-
-    osc.start(now)
-    osc.stop(now + 0.45)
+    this.playCheckpoint()
   }
 
   // صوت تشغيل القاطع الكهربائي الرئيسي
@@ -105,13 +211,12 @@ class SoundEngine {
 
     const now = this.ctx.currentTime
 
-    // Click / Clack sound
     const noiseOsc = this.ctx.createOscillator()
     const noiseGain = this.ctx.createGain()
     noiseOsc.type = 'sawtooth'
     noiseOsc.frequency.setValueAtTime(120, now)
     noiseOsc.frequency.exponentialRampToValueAtTime(40, now + 0.08)
-    noiseGain.gain.setValueAtTime(0.4, now)
+    noiseGain.gain.setValueAtTime(0.35, now)
     noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
 
     noiseOsc.connect(noiseGain)
@@ -119,14 +224,13 @@ class SoundEngine {
     noiseOsc.start(now)
     noiseOsc.stop(now + 0.09)
 
-    // Power surge hum
     const humOsc = this.ctx.createOscillator()
     const humGain = this.ctx.createGain()
     humOsc.type = 'sine'
     humOsc.frequency.setValueAtTime(110, now + 0.1)
     humOsc.frequency.exponentialRampToValueAtTime(440, now + 0.5)
     humGain.gain.setValueAtTime(0.01, now)
-    humGain.gain.linearRampToValueAtTime(0.3, now + 0.15)
+    humGain.gain.linearRampToValueAtTime(0.28, now + 0.15)
     humGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6)
 
     humOsc.connect(humGain)
@@ -143,10 +247,10 @@ class SoundEngine {
 
     const now = this.ctx.currentTime
     const notes = [
-      { freq: 523.25, time: 0, dur: 0.15 }, // C5
-      { freq: 659.25, time: 0.15, dur: 0.15 }, // E5
-      { freq: 783.99, time: 0.3, dur: 0.15 }, // G5
-      { freq: 1046.5, time: 0.45, dur: 0.45 }, // C6
+      { freq: 523.25, time: 0, dur: 0.14 }, // C5
+      { freq: 659.25, time: 0.14, dur: 0.14 }, // E5
+      { freq: 783.99, time: 0.28, dur: 0.14 }, // G5
+      { freq: 1046.5, time: 0.42, dur: 0.42 } // C6
     ]
 
     notes.forEach((note) => {
@@ -156,7 +260,7 @@ class SoundEngine {
       osc.type = 'triangle'
       osc.frequency.setValueAtTime(note.freq, now + note.time)
 
-      gain.gain.setValueAtTime(0.3, now + note.time)
+      gain.gain.setValueAtTime(0.28, now + note.time)
       gain.gain.exponentialRampToValueAtTime(0.001, now + note.time + note.dur)
 
       osc.connect(gain)
@@ -167,7 +271,7 @@ class SoundEngine {
     })
   }
 
-  // صوت فتح بوابة الليزر / الباب الكهربائي
+  // صوت فتح بوابة الطاقة
   public playGateOpen() {
     if (this.isMuted) return
     this.initCtx()
@@ -179,19 +283,19 @@ class SoundEngine {
 
     osc.type = 'sawtooth'
     osc.frequency.setValueAtTime(220, now)
-    osc.frequency.exponentialRampToValueAtTime(880, now + 0.3)
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.28)
 
-    gain.gain.setValueAtTime(0.2, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35)
+    gain.gain.setValueAtTime(0.18, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32)
 
     osc.connect(gain)
     gain.connect(this.ctx.destination)
 
     osc.start(now)
-    osc.stop(now + 0.35)
+    osc.stop(now + 0.32)
   }
 
-  // صوت التماس الكهربائي / ملامسة العائق
+  // صوت التماس الكهربائي / تلقي الضرر
   public playShock() {
     if (this.isMuted) return
     this.initCtx()
@@ -202,11 +306,11 @@ class SoundEngine {
     const gain = this.ctx.createGain()
 
     osc.type = 'sawtooth'
-    osc.frequency.setValueAtTime(150, now)
-    osc.frequency.setValueAtTime(80, now + 0.05)
-    osc.frequency.setValueAtTime(200, now + 0.1)
+    osc.frequency.setValueAtTime(160, now)
+    osc.frequency.setValueAtTime(85, now + 0.05)
+    osc.frequency.setValueAtTime(190, now + 0.1)
 
-    gain.gain.setValueAtTime(0.3, now)
+    gain.gain.setValueAtTime(0.28, now)
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25)
 
     osc.connect(gain)
@@ -216,7 +320,7 @@ class SoundEngine {
     osc.stop(now + 0.25)
   }
 
-  // صوت انقطاع التيار والاحتراق عند الخسارة
+  // صوت الخسارة (Defeat)
   public playShortCircuit() {
     if (this.isMuted) return
     this.initCtx()
@@ -227,20 +331,19 @@ class SoundEngine {
     const gain = this.ctx.createGain()
 
     osc.type = 'sawtooth'
-    osc.frequency.setValueAtTime(300, now)
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.4)
+    osc.frequency.setValueAtTime(280, now)
+    osc.frequency.exponentialRampToValueAtTime(45, now + 0.38)
 
-    gain.gain.setValueAtTime(0.4, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
+    gain.gain.setValueAtTime(0.32, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42)
 
     osc.connect(gain)
     gain.connect(this.ctx.destination)
 
     osc.start(now)
-    osc.stop(now + 0.45)
+    osc.stop(now + 0.42)
   }
 
-  // صوت القاطع المقفل عند عدم جمع كافة العناصر
   public playLockedBuzz() {
     if (this.isMuted) return
     this.initCtx()
@@ -251,10 +354,10 @@ class SoundEngine {
     const gain = this.ctx.createGain()
 
     osc.type = 'square'
-    osc.frequency.setValueAtTime(100, now)
-    osc.frequency.setValueAtTime(80, now + 0.08)
+    osc.frequency.setValueAtTime(110, now)
+    osc.frequency.setValueAtTime(85, now + 0.08)
 
-    gain.gain.setValueAtTime(0.2, now)
+    gain.gain.setValueAtTime(0.18, now)
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18)
 
     osc.connect(gain)
@@ -264,33 +367,10 @@ class SoundEngine {
     osc.stop(now + 0.18)
   }
 
-  // صوت إضافة وقت إضافي
   public playBonusTime() {
-    if (this.isMuted) return
-    this.initCtx()
-    if (!this.ctx) return
-
-    const now = this.ctx.currentTime
-    const osc = this.ctx.createOscillator()
-    const gain = this.ctx.createGain()
-
-    osc.type = 'triangle'
-    osc.frequency.setValueAtTime(523.25, now) // C5
-    osc.frequency.setValueAtTime(659.25, now + 0.08) // E5
-    osc.frequency.setValueAtTime(783.99, now + 0.16) // G5
-    osc.frequency.setValueAtTime(1046.5, now + 0.24) // C6
-
-    gain.gain.setValueAtTime(0.25, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35)
-
-    osc.connect(gain)
-    gain.connect(this.ctx.destination)
-
-    osc.start(now)
-    osc.stop(now + 0.35)
+    this.playCheckpoint()
   }
 
-  // صوت زمجرة وحش الحمل الزائد الكهربائي
   public playBossRoar() {
     if (this.isMuted) return
     this.initCtx()
@@ -301,20 +381,19 @@ class SoundEngine {
     const gain = this.ctx.createGain()
 
     osc.type = 'sawtooth'
-    osc.frequency.setValueAtTime(90, now)
-    osc.frequency.linearRampToValueAtTime(45, now + 0.6)
+    osc.frequency.setValueAtTime(95, now)
+    osc.frequency.linearRampToValueAtTime(48, now + 0.55)
 
-    gain.gain.setValueAtTime(0.35, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65)
+    gain.gain.setValueAtTime(0.3, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6)
 
     osc.connect(gain)
     gain.connect(this.ctx.destination)
 
     osc.start(now)
-    osc.stop(now + 0.65)
+    osc.stop(now + 0.6)
   }
 
-  // صوت إصابة وحش الحمل الزائد وتفريغ الطاقة
   public playBossHit() {
     if (this.isMuted) return
     this.initCtx()
@@ -326,64 +405,24 @@ class SoundEngine {
 
     osc.type = 'square'
     osc.frequency.setValueAtTime(440, now)
-    osc.frequency.exponentialRampToValueAtTime(110, now + 0.3)
-
-    gain.gain.setValueAtTime(0.4, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35)
-
-    osc.connect(gain)
-    gain.connect(this.ctx.destination)
-
-    osc.start(now)
-    osc.stop(now + 0.35)
-  }
-
-  // صوت النبضة السريعة والتيربو (Turbo Boost)
-  public playTurbo() {
-    if (this.isMuted) return
-    this.initCtx()
-    if (!this.ctx) return
-
-    const now = this.ctx.currentTime
-    const osc = this.ctx.createOscillator()
-    const gain = this.ctx.createGain()
-
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(300, now)
-    osc.frequency.exponentialRampToValueAtTime(800, now + 0.25)
-
-    gain.gain.setValueAtTime(0.2, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25)
-
-    osc.connect(gain)
-    gain.connect(this.ctx.destination)
-
-    osc.start(now)
-    osc.stop(now + 0.25)
-  }
-
-  // صوت وميض النور الخارق (Flash Stun)
-  public playFlashStun() {
-    if (this.isMuted) return
-    this.initCtx()
-    if (!this.ctx) return
-
-    const now = this.ctx.currentTime
-    const osc = this.ctx.createOscillator()
-    const gain = this.ctx.createGain()
-
-    osc.type = 'triangle'
-    osc.frequency.setValueAtTime(880, now)
-    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.3)
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.28)
 
     gain.gain.setValueAtTime(0.35, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32)
 
     osc.connect(gain)
     gain.connect(this.ctx.destination)
 
     osc.start(now)
-    osc.stop(now + 0.4)
+    osc.stop(now + 0.32)
+  }
+
+  public playTurbo() {
+    this.playJump(true)
+  }
+
+  public playFlashStun() {
+    this.playCheckpoint()
   }
 }
 
