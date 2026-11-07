@@ -95,6 +95,10 @@ export interface CameraState {
   viewportW: number
   viewportH: number
   shakeIntensity?: number
+  lookAheadX?: number
+  focusX?: number
+  focusY?: number
+  bossBlend?: number
 }
 
 export interface PlayerInputFrame {
@@ -1106,8 +1110,13 @@ function damageBoss(boss: NonNullable<StageDefinition['boss']>, events: StepSimu
 }
 
 /**
-  * Updates the side-scrolling camera with mobile-aware look-ahead, dead-zone,
-  * stable vertical framing, boss arena framing, and world bounds (Sections 2, 10, 11).
+  * V9 Professional Wide Camera System:
+  * - Adaptive horizontal framing (character at ~38% of screen width when moving right)
+  * - Horizontal dead-zone (cam.focusX) preventing camera oscillation on minor movements
+  * - Gradual frame-rate-independent directional look-ahead (cam.lookAheadX)
+  * - Controlled Dash camera tracking without overshoot or shake
+  * - Dedicated Boss Combat camera mode (cam.bossBlend) keeping Hero + Boss + Hazards visible
+  * - Generous Vertical Dead-Zone & Platform-Lock (cam.focusY) so normal jumps never move the camera
   */
 export function updateSideScrollingCamera(
   cam: CameraState,
@@ -1115,51 +1124,131 @@ export function updateSideScrollingCamera(
   stage: StageDefinition,
   dt: number
 ): void {
+  const safeDt = Math.max(0.001, Math.min(0.05, dt))
+  const isPortraitView = cam.viewportH > cam.viewportW
   const isCompactViewport = cam.viewportW < 760
-  const lookAheadScale = isCompactViewport ? 0.58 : 1.0
-  const lookAheadX = (hero.facing === 'right' ? 88 : -58) * lookAheadScale
-  const anchorRatioX = isCompactViewport ? 0.38 : 0.42
 
   const heroCenterX = hero.x + hero.w * 0.5
-  let desiredCamX = heroCenterX + lookAheadX - cam.viewportW * anchorRatioX
+  const heroBottom = hero.y + hero.h
 
-  // Subtle horizontal dead-zone when standing still to eliminate micro-jitter
-  const deadZoneHalfW = isCompactViewport ? 14 : 22
-  if (Math.abs(hero.vx) < 15 && Math.abs(desiredCamX - cam.x) < deadZoneHalfW) {
-    desiredCamX = cam.x
+  // 1. Horizontal Dead Zone (cam.focusX)
+  // Within the dead zone, small movements or brief taps do not move the camera
+  if (cam.focusX === undefined || Number.isNaN(cam.focusX)) {
+    cam.focusX = heroCenterX
+  }
+  const deadZoneHalfW = isPortraitView ? 22 : 28
+  if (heroCenterX > cam.focusX + deadZoneHalfW) {
+    cam.focusX = heroCenterX - deadZoneHalfW
+  } else if (heroCenterX < cam.focusX - deadZoneHalfW) {
+    cam.focusX = heroCenterX + deadZoneHalfW
   }
 
-  // Boss Arena Framing when player enters Boss zone
-  if (stage.boss && stage.boss.state !== 'defeated' && hero.x > stage.boss.minX - 220) {
-    const arenaCenter = (stage.boss.minX + stage.boss.maxX) * 0.5
-    const bossFrameX = arenaCenter - cam.viewportW * 0.5
-    desiredCamX = desiredCamX * 0.7 + bossFrameX * 0.3
+  // 2. Smooth Directional Look-Ahead (cam.lookAheadX)
+  // Places character around ~38% from left edge when moving right, smoothly shifting when moving left
+  if (cam.lookAheadX === undefined || Number.isNaN(cam.lookAheadX)) {
+    cam.lookAheadX = cam.viewportW * 0.1
+  }
+  const maxRightOffset = Math.min(135, cam.viewportW * 0.13)
+  const maxLeftOffset = -Math.min(85, cam.viewportW * 0.08)
+
+  let targetLookAhead = cam.lookAheadX
+  if (hero.vx > 35) {
+    targetLookAhead = maxRightOffset
+  } else if (hero.vx < -35) {
+    targetLookAhead = maxLeftOffset
+  } else if (Math.abs(hero.vx) < 8) {
+    // Hold steady when standing still so tapping turn does not oscillate
+    targetLookAhead = cam.lookAheadX
   }
 
+  // Smooth exponential transition for look-ahead (prevents snapping on direction change)
+  const lookAheadAlpha = 1 - Math.exp(-3.2 * safeDt)
+  cam.lookAheadX += (targetLookAhead - cam.lookAheadX) * lookAheadAlpha
+
+  // Base horizontal target places focusX around 45% of viewport, plus directional lookAheadX
+  // When moving right, hero sits around ~37-40% from the left edge, revealing ~60% ahead
+  const baseAnchorRatio = 0.46
+  let desiredCamX = cam.focusX + cam.lookAheadX - cam.viewportW * baseAnchorRatio
+
+  // 3. Dedicated Boss Fight Camera Mode (Section 13)
+  if (cam.bossBlend === undefined || Number.isNaN(cam.bossBlend)) {
+    cam.bossBlend = 0
+  }
+  const inBossEncounter = Boolean(
+    stage.boss && stage.boss.state !== 'defeated' && hero.x > stage.boss.minX - 260
+  )
+  const targetBossBlend = inBossEncounter ? 1 : 0
+  cam.bossBlend += (targetBossBlend - cam.bossBlend) * (1 - Math.exp(-3.5 * safeDt))
+
+  if (cam.bossBlend > 0.01 && stage.boss) {
+    const bossCenterX = stage.boss.x + stage.boss.w * 0.5
+    const arenaMidX = ( stage.boss.minX + stage.boss.maxX ) * 0.5
+    // Frame the combat midpoint between Hero, Boss, and Arena so both Hero & Boss remain visible
+    const combatCenter = heroCenterX * 0.45 + bossCenterX * 0.35 + arenaMidX * 0.2
+    const bossCamX = combatCenter - cam.viewportW * 0.5
+    desiredCamX = desiredCamX * (1 - cam.bossBlend * 0.65) + bossCamX * (cam.bossBlend * 0.65)
+  }
+
+  // 4. Hard Character Visibility Guarantee (Section 10 & 13)
+  // Never allow the camera to leave the character near or outside screen edges
+  const minHeroScreenMargin = cam.viewportW * 0.18
+  const maxHeroScreenMargin = cam.viewportW * 0.82
+  if (heroCenterX - desiredCamX < minHeroScreenMargin) {
+    desiredCamX = heroCenterX - minHeroScreenMargin
+  } else if (heroCenterX - desiredCamX > maxHeroScreenMargin) {
+    desiredCamX = heroCenterX - maxHeroScreenMargin
+  }
+
+  // 5. World Boundary Clamping (Section 10)
   const maxCamX = Math.max(0, stage.width - cam.viewportW)
   const clampedTargetX = Math.max(0, Math.min(maxCamX, desiredCamX))
 
-  const lerpX = Math.min(1, dt * 9.5)
-  cam.x += (clampedTargetX - cam.x) * lerpX
+  // Controlled horizontal follow speed (prevents overshoot during dash while remaining responsive)
+  const followRateX = hero.dashTimer > 0 ? 6.8 : 8.5
+  const alphaX = 1 - Math.exp(-followRateX * safeDt)
+  cam.x += (clampedTargetX - cam.x) * alphaX
+  cam.x = Math.max(0, Math.min(maxCamX, cam.x))
 
-  // Stable Vertical Framing:
-  // Anchor the stage road surface to the bottom of the viewport on mobile
-  // and smoothly track upward when the hero climbs elevated platforms.
-  const effectiveBottomY = isCompactViewport ? stage.groundY + 28 : stage.height
-  const bottomAnchoredCamY = effectiveBottomY - cam.viewportH
-  if (bottomAnchoredCamY <= 0) {
-    cam.y = bottomAnchoredCamY
-  } else {
-    const maxCamY = bottomAnchoredCamY
-    const heroBottom = hero.y + hero.h
-    const idealGroundCamY = Math.max(0, Math.min(maxCamY, effectiveBottomY - cam.viewportH))
-    const heroTargetCamY = heroBottom - cam.viewportH * 0.68
-    const desiredCamY =
-      heroBottom < stage.groundY - 75
-        ? Math.max(0, Math.min(maxCamY, heroTargetCamY))
-        : idealGroundCamY
-
-    const lerpY = Math.min(1, dt * 7.5)
-    cam.y += (desiredCamY - cam.y) * lerpY
+  // 6. Stable Vertical Framing & Jump Dead Zone (Sections 3, 4, 8, 11)
+  // Do NOT follow normal jumps or double jumps! Only update vertical focus when grounded on a high platform
+  if (cam.focusY === undefined || Number.isNaN(cam.focusY)) {
+    cam.focusY = stage.groundY
   }
+  if (hero.onGround) {
+    cam.focusY = heroBottom
+  } else {
+    // Generous vertical dead zone in mid-air: only adjust if falling below ground or super high
+    if (heroBottom > stage.groundY) {
+      cam.focusY = stage.groundY
+    } else if (heroBottom < cam.focusY - 220) {
+      cam.focusY = heroBottom + 220
+    }
+  }
+
+  if (isPortraitView) {
+    // Portrait Mode: Position stage ground comfortably at ~84% of viewport height
+    // so elevated platforms sit in the middle of the screen and underground foundation fills bottom 16%
+    const subGroundPadding = Math.min(110, Math.max(44, Math.round(cam.viewportH * 0.14)))
+    const effectiveBottomY = stage.groundY + subGroundPadding
+    cam.y = effectiveBottomY - cam.viewportH
+  } else {
+    // Landscape / Desktop Mode: Keep vertical camera rock-steady on ground + normal jumps,
+    // smoothly panning up only if standing on a very high platform
+    const effectiveBottomY = isCompactViewport ? stage.groundY + 34 : stage.height
+    const baseGroundCamY = effectiveBottomY - cam.viewportH
+    if (baseGroundCamY <= 0) {
+      cam.y = baseGroundCamY
+    } else {
+      const highPlatformThreshold = stage.groundY - 145
+      const desiredCamY =
+        cam.focusY < highPlatformThreshold
+          ? Math.max(0, Math.min(baseGroundCamY, cam.focusY - cam.viewportH * 0.62))
+          : baseGroundCamY
+      const alphaY = 1 - Math.exp(-5.2 * safeDt)
+      cam.y += (desiredCamY - cam.y) * alphaY
+    }
+  }
+
+  // Eliminate artificial camera shake during normal gameplay (Sections 3 & 12)
+  cam.shakeIntensity = 0
 }

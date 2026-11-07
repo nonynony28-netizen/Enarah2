@@ -352,6 +352,17 @@ function renderFarParallaxLayer(
   const scrollX = cam.x * 0.18
   const baseHorizonY = Math.round(stage.groundY - cam.y + 2)
 
+  // Fill below-horizon subterranean band so tall portrait viewports never show sky beneath the ground plane
+  if (baseHorizonY < H) {
+    ctx.fillStyle =
+      theme === 'city_of_light'
+        ? '#1E293B'
+        : theme === 'electricity_street'
+          ? '#451A03'
+          : '#0F172A'
+    ctx.fillRect(0, baseHorizonY, W, H - baseHorizonY + 4)
+  }
+
   // --------------------------------------------------------------------------
   // STAGE 1: THE LIVING CITY (مدينة النور) — Modern Skyline + Distant Moving Traffic
   // --------------------------------------------------------------------------
@@ -826,20 +837,20 @@ function renderMidgroundParallaxLayer(
         ctx.fillStyle = '#451A03'
         ctx.fillRect(sX + sW, sY + 6, 14, sH - 6)
 
-        // Animated commercial rooftop billboard
-        const signGlow = 0.75 + 0.25 * Math.sin(elapsedSec * 5 + idx)
-        ctx.fillStyle = '#0F172A'
-        ctx.fillRect(sX + 18, sY - 26, sW - 36, 22)
-        ctx.fillStyle = `rgba(250, 204, 21, ${signGlow.toFixed(2)})`
-        ctx.font = 'bold 10px Cairo, sans-serif'
-        ctx.textAlign = 'center'
-        ctx.fillText('✨ معرض الإنارة والسبوت لايت ✨', sX + sW * 0.5, sY - 11)
-
         // Showroom display windows with hanging chandeliers
         ctx.fillStyle = '#FEF3C7'
         ctx.fillRect(sX + 16, groundLine - 58, sW - 32, 52)
         ctx.fillStyle = '#EA580C'
         ctx.fillRect(sX + 10, groundLine - 66, sW - 20, 10)
+
+        // Ground-floor storefront fascia sign (positioned below elevated platforms so it never overlaps foreground switches/labels)
+        const signGlow = 0.72 + 0.25 * Math.sin(elapsedSec * 5 + idx)
+        ctx.fillStyle = '#0F172A'
+        ctx.fillRect(sX + 14, groundLine - 88, sW - 28, 19)
+        ctx.fillStyle = `rgba(250, 204, 21, ${signGlow.toFixed(2)})`
+        ctx.font = 'bold 9.5px Cairo, sans-serif'
+        ctx.textAlign = 'center'
+        ctx.fillText('✨ معرض الإنارة والسبوت لايت ✨', sX + sW * 0.5, groundLine - 75)
       }
     }
     return
@@ -1291,19 +1302,35 @@ function render25DPlatform(
     }
   }
 
+  // Extend ground slab foundation downward for tall portrait viewports so no sky shows beneath the road
+  const renderH = isGroundSlab ? Math.max(h, 240) : h
+
   // 2.5D Right-side depth plane
   ctx.fillStyle = sideColor
   ctx.beginPath()
   ctx.moveTo(x + w, y)
   ctx.lineTo(x + w + depthSide, y + 4)
-  ctx.lineTo(x + w + depthSide, y + h)
-  ctx.lineTo(x + w, y + h)
+  ctx.lineTo(x + w + depthSide, y + renderH)
+  ctx.lineTo(x + w, y + renderH)
   ctx.closePath()
   ctx.fill()
 
   // Main front face
   ctx.fillStyle = frontColor
-  ctx.fillRect(x, y + bevelTop, w, h - bevelTop)
+  ctx.fillRect(x, y + bevelTop, w, renderH - bevelTop)
+  if (isGroundSlab && renderH > h) {
+    // Subterranean electrical conduit foundation layer beneath the road slab
+    ctx.fillStyle = sideColor
+    ctx.fillRect(x, y + h, w, renderH - h)
+    ctx.strokeStyle = trimColor
+    ctx.globalAlpha = alpha * 0.35
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.moveTo(x, y + h + 14)
+    ctx.lineTo(x + w, y + h + 14)
+    ctx.stroke()
+    ctx.globalAlpha = alpha
+  }
 
   // Top walk surface
   ctx.fillStyle = topColor
@@ -1539,8 +1566,15 @@ function renderCheckpointBeacon(
   if (activated) {
     ctx.font = 'bold 10px Cairo, sans-serif'
     ctx.textAlign = 'center'
+    const text = `✓ ${labelAr}`
+    const tw = Math.max(64, ctx.measureText(text).width + 14)
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
+    ctx.fillRect(x - tw * 0.5, y - 101, tw, 18)
+    ctx.strokeStyle = 'rgba(250, 204, 21, 0.55)'
+    ctx.lineWidth = 1
+    ctx.strokeRect(x - tw * 0.5, y - 101, tw, 18)
     ctx.fillStyle = '#FDE047'
-    ctx.fillText(`✓ ${labelAr}`, x, y - 88)
+    ctx.fillText(text, x, y - 88)
   }
   ctx.restore()
 }
@@ -1563,11 +1597,23 @@ function renderStageSwitch(
   ctx.fillStyle = activated ? '#10B981' : '#EF4444'
   ctx.fillRect(x - 8, activated ? y - 32 : y - 18, 16, 10)
 
-  const bob = Math.sin(elapsedSec * 4) * 2
-  ctx.font = 'bold 10px Cairo, sans-serif'
+  const bob = Math.sin(elapsedSec * 4) * 1.5
+  ctx.font = 'bold 9.5px Cairo, sans-serif'
   ctx.textAlign = 'center'
+  const shortLabel = activated
+    ? 'مفعّل ⚡'
+    : labelAr.length > 18
+      ? labelAr.replace('قاطع تعطيل ', 'قاطع ')
+      : labelAr
+  const tw = Math.max(58, ctx.measureText(shortLabel).width + 14)
+  const badgeY = y - 59 + bob
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
+  ctx.fillRect(x - tw * 0.5, badgeY, tw, 18)
+  ctx.strokeStyle = activated ? '#10B981' : '#F59E0B'
+  ctx.lineWidth = 1.2
+  ctx.strokeRect(x - tw * 0.5, badgeY, tw, 18)
   ctx.fillStyle = activated ? '#6EE7B7' : '#FDE68A'
-  ctx.fillText(activated ? 'مفعّل ⚡' : labelAr, x, y - 45 + bob)
+  ctx.fillText(shortLabel, x, badgeY + 13)
   ctx.restore()
 }
 
@@ -1591,10 +1637,17 @@ function renderEnergyGate(
     ctx.fillStyle = `rgba(239, 68, 68, ${pulse.toFixed(2)})`
     ctx.fillRect(x + 4, y + 10, w - 8, h - 18)
 
-    ctx.font = 'bold 10px Cairo, sans-serif'
+    ctx.font = 'bold 9.5px Cairo, sans-serif'
     ctx.textAlign = 'center'
+    const cx = x + w * 0.5
+    const tw = Math.max(64, ctx.measureText(labelAr).width + 14)
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
+    ctx.fillRect(cx - tw * 0.5, y - 22, tw, 18)
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.65)'
+    ctx.lineWidth = 1
+    ctx.strokeRect(cx - tw * 0.5, y - 22, tw, 18)
     ctx.fillStyle = '#FCA5A5'
-    ctx.fillText(labelAr, x + w * 0.5, y - 8)
+    ctx.fillText(labelAr, cx, y - 9)
   }
   ctx.restore()
 }
@@ -1687,10 +1740,17 @@ function renderGoalPortal(
   ctx.fillStyle = locked ? '#7F1D1D' : '#FEF08A'
   ctx.fillRect(x - 18, y - 64, 36, 62)
 
-  ctx.font = 'bold 11px Cairo, sans-serif'
+  ctx.font = 'bold 10px Cairo, sans-serif'
   ctx.textAlign = 'center'
+  const portalText = locked ? 'البوابة مقفلة 🔒' : `🏁 ${labelAr}`
+  const ptw = Math.max(76, ctx.measureText(portalText).width + 16)
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
+  ctx.fillRect(x - ptw * 0.5, y - 98, ptw, 19)
+  ctx.strokeStyle = locked ? '#EF4444' : '#FACC15'
+  ctx.lineWidth = 1.2
+  ctx.strokeRect(x - ptw * 0.5, y - 98, ptw, 19)
   ctx.fillStyle = locked ? '#FCA5A5' : '#FDE047'
-  ctx.fillText(locked ? 'اهزم الزعيم لفتح البوابة 🔒' : `🏁 ${labelAr}`, x, y - 84)
+  ctx.fillText(portalText, x, y - 85)
   ctx.restore()
 }
 
@@ -1930,14 +1990,18 @@ function renderBossEncounter(
   ctx.fillStyle = boss.state === 'telegraph' ? '#EF4444' : '#FDE047'
   ctx.fillRect(x + 14, y + 28, w - 28, 12)
 
-  ctx.font = 'bold 12px Cairo, sans-serif'
+  // Compact world-space shield/phase badge (Boss name & health bar are in the top screen-space HUD pill)
+  const bossBadgeText = `⚡ ${boss.hp}/${boss.maxHp}`
+  ctx.font = 'bold 10px Cairo, sans-serif'
   ctx.textAlign = 'center'
+  const btw = Math.max(46, ctx.measureText(bossBadgeText).width + 12)
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
+  ctx.fillRect(cx - btw * 0.5, y - 24, btw, 17)
+  ctx.strokeStyle = boss.state === 'vulnerable' ? '#38BDF8' : '#EF4444'
+  ctx.lineWidth = 1.2
+  ctx.strokeRect(cx - btw * 0.5, y - 24, btw, 17)
   ctx.fillStyle = '#FDE047'
-  ctx.fillText(
-    `${boss.nameAr} (الطور ${boss.phase}) — الدرع ${boss.hp}/${boss.maxHp}`,
-    cx,
-    y - 12
-  )
+  ctx.fillText(bossBadgeText, cx, y - 12)
 
   ctx.restore()
 }
@@ -1962,9 +2026,9 @@ function renderOriginalHeroCharacter(
   const centerX = hero.x + hero.w * 0.5
   const bottomY = hero.y + hero.h
 
-  // Anchor 1.22x visual sprite scale at hero's feet (centerX, bottomY) while preserving exact collision box
+  // Anchor 1.08x visual sprite scale at hero's feet (centerX, bottomY) while preserving exact collision box
   ctx.translate(centerX, bottomY)
-  ctx.scale(1.22, 1.22)
+  ctx.scale(1.08, 1.08)
   ctx.translate(-centerX, -bottomY)
 
   // 1. Controlled Internal & External Light Illumination (Modulated by lightEnergy & floodlight)

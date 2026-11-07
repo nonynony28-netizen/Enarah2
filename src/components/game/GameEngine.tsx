@@ -451,26 +451,30 @@ export function GameEngine() {
     let logicalH = VIEWPORT_HEIGHT
 
     if (isPort) {
-      // Mobile Portrait: Strong camera zoom (~3.2x larger than 960 world width)
-      // Keep logicalH <= 495 (< stage.height = 540) so zero empty sky is wasted above the stage
-      logicalW = cssW <= 345 ? 290 : cssW <= 395 ? 310 : 330
+      // V9 Adaptive Wide Camera (Portrait Mode):
+      // Show a comfortable horizontal span (500–570 world units) so the player clearly sees:
+      // - Their character (~8% of viewport width)
+      // - Current platform + next 2–3 platforms + upcoming obstacles + boss arena
+      // Never clamp logicalH down to 495 (which previously crushed logicalW to ~275 on tall phones!)
+      logicalW = cssW <= 345 ? 500 : cssW <= 395 ? 540 : 570
       logicalH = Math.round(logicalW / aspect)
-      if (logicalH < 330) {
-        logicalH = 330
+      if (logicalH < 440) {
+        logicalH = 440
         logicalW = Math.round(logicalH * aspect)
-      } else if (logicalH > 495) {
-        logicalH = 495
+      } else if (logicalH > 1080) {
+        logicalH = 1080
         logicalW = Math.round(logicalH * aspect)
       }
     } else if (isLand) {
-      // Mobile Landscape: Strong camera zoom (~1.66x) filling 100% of landscape width without distortion
-      logicalH = 325
+      // V9 Adaptive Wide Camera (Landscape Mode):
+      // Balanced wide horizontal framing (~720–880 world units) with generous vertical headroom
+      logicalH = 440
       logicalW = Math.round(logicalH * aspect)
-      if (logicalW < 480) {
-        logicalW = 480
+      if (logicalW < 660) {
+        logicalW = 660
         logicalH = Math.round(logicalW / aspect)
-      } else if (logicalW > 740) {
-        logicalW = 740
+      } else if (logicalW > 960) {
+        logicalW = 960
         logicalH = Math.round(logicalW / aspect)
       }
     } else {
@@ -552,6 +556,13 @@ export function GameEngine() {
         body[data-enarah-mobile-game="1"] > *:not(#enarah-mobile-game-portal):not(script):not(style) {
           display: none !important;
           pointer-events: none !important;
+        }
+        #enarah-mobile-game-portal,
+        #enarah-mobile-game-portal * {
+          -webkit-touch-callout: none !important;
+          -webkit-user-select: none !important;
+          user-select: none !important;
+          -webkit-tap-highlight-color: transparent !important;
         }
       `
       if (!styleEl.parentNode) {
