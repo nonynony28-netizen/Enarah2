@@ -60,16 +60,20 @@ import {
 
 export interface LeaderboardEntry {
   id: string
+  playerId?: string
   name: string
   city: string
   score: number
   timeTakenSec: number
   date: string
   weekKey?: string
+  rank?: number
+  createdAt?: number
 }
 
 export interface WeeklyChallengeInfo {
   weekId: string
+  prevWeekId: string
   weekTitle: string
   daysLeft: number
   hoursLeft: number
@@ -78,33 +82,108 @@ export interface WeeklyChallengeInfo {
 }
 
 export const getWeeklyChallengeInfo = (date = new Date()): WeeklyChallengeInfo => {
-  const day = date.getDay()
+  // Libya (Africa/Tripoli) is permanently UTC+2 (no DST).
+  const TRIPOLI_OFFSET_MS = 2 * 60 * 60 * 1000
+  const tripoliShifted = new Date(date.getTime() + TRIPOLI_OFFSET_MS)
+
+  const day = tripoliShifted.getUTCDay()
   const diffToSaturday = (day + 1) % 7
-  const saturday = new Date(date)
-  saturday.setDate(date.getDate() - diffToSaturday)
-  saturday.setHours(0, 0, 0, 0)
 
-  const nextFriday = new Date(saturday)
-  nextFriday.setDate(saturday.getDate() + 6)
-  nextFriday.setHours(23, 59, 59, 999)
+  const saturday = new Date(
+    Date.UTC(
+      tripoliShifted.getUTCFullYear(),
+      tripoliShifted.getUTCMonth(),
+      tripoliShifted.getUTCDate() - diffToSaturday,
+      0,
+      0,
+      0,
+      0
+    )
+  )
 
-  const msLeft = Math.max(0, nextFriday.getTime() - date.getTime())
+  const prevSaturday = new Date(saturday.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+  const nextFriday = new Date(
+    Date.UTC(
+      saturday.getUTCFullYear(),
+      saturday.getUTCMonth(),
+      saturday.getUTCDate() + 6,
+      23,
+      59,
+      59,
+      999
+    )
+  )
+
+  const msLeft = Math.max(0, nextFriday.getTime() - tripoliShifted.getTime())
   const daysLeft = Math.floor(msLeft / (1000 * 60 * 60 * 24))
   const hoursLeft = Math.floor((msLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
 
-  const weekId = `${saturday.getFullYear()}-${String(saturday.getMonth() + 1).padStart(2, '0')}-${String(saturday.getDate()).padStart(2, '0')}`
+  const formatYMD = (d: Date) =>
+    `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+
+  const weekId = formatYMD(saturday)
+  const prevWeekId = formatYMD(prevSaturday)
   const arMonths = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
-  const startDateStr = `${saturday.getDate()} ${arMonths[saturday.getMonth()]}`
-  const endDateStr = `${nextFriday.getDate()} ${arMonths[nextFriday.getMonth()]}`
+  const startDateStr = `${saturday.getUTCDate()} ${arMonths[saturday.getUTCMonth()]}`
+  const endDateStr = `${nextFriday.getUTCDate()} ${arMonths[nextFriday.getUTCMonth()]}`
 
   return {
     weekId,
+    prevWeekId,
     weekTitle: `بطولة الأسبوع (${startDateStr} - ${endDateStr})`,
     daysLeft,
     hoursLeft,
     startDateStr,
     endDateStr,
   }
+}
+
+export function dedupeAndRankLeaderboard(entries: LeaderboardEntry[], limit = 10): LeaderboardEntry[] {
+  const bestByPlayer = new Map<string, LeaderboardEntry>()
+  for (const raw of entries) {
+    if (!raw || typeof raw.name !== 'string') continue
+    const cleanName = raw.name.trim()
+    if (cleanName.length < 2) continue
+    const score = Number(raw.score)
+    const timeTakenSec = Number(raw.timeTakenSec)
+    if (!Number.isFinite(score) || score < 100 || score > 45000) continue
+    const safeTime = Number.isFinite(timeTakenSec) && timeTakenSec >= 20 ? Math.round(timeTakenSec) : 60
+    const cleanCity = typeof raw.city === 'string' && raw.city.trim() ? raw.city.trim() : 'بنغازي'
+    const key =
+      typeof raw.playerId === 'string' && raw.playerId.trim().length >= 4
+        ? `pid:${raw.playerId.trim().toLowerCase()}`
+        : `nc:${cleanName.toLowerCase()}_${cleanCity.toLowerCase()}`
+
+    const candidate: LeaderboardEntry = {
+      ...raw,
+      name: cleanName,
+      city: cleanCity,
+      score: Math.round(score),
+      timeTakenSec: safeTime,
+    }
+
+    const existing = bestByPlayer.get(key)
+    if (
+      !existing ||
+      candidate.score > existing.score ||
+      (candidate.score === existing.score && candidate.timeTakenSec < existing.timeTakenSec)
+    ) {
+      bestByPlayer.set(key, candidate)
+    }
+  }
+
+  return Array.from(bestByPlayer.values())
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score
+      if (a.timeTakenSec !== b.timeTakenSec) return a.timeTakenSec - b.timeTakenSec
+      return (a.createdAt || 0) - (b.createdAt || 0)
+    })
+    .slice(0, limit)
+    .map((entry, idx) => ({
+      ...entry,
+      rank: idx + 1,
+    }))
 }
 
 function cloneStageDefinition(stage: StageDefinition): StageDefinition {
@@ -156,7 +235,9 @@ export function GameEngine() {
   })
   const [touchButtonScale, setTouchButtonScale] = useState<'normal' | 'large'>(() => {
     try {
-      return (localStorage.getItem('enarah_platformer_touch_scale') as 'normal' | 'large') || 'large'
+      const saved = localStorage.getItem('enarah_platformer_touch_scale')
+      if (saved === 'normal' || saved === 'large') return saved
+      return 'large'
     } catch {
       return 'large'
     }
@@ -164,7 +245,8 @@ export function GameEngine() {
   const [touchOpacity, setTouchOpacity] = useState<number>(() => {
     try {
       const saved = localStorage.getItem('enarah_platformer_touch_opacity')
-      if (saved !== null) return Math.max(0.4, Math.min(1, Number(saved)))
+      const num = saved !== null ? Number(saved) : NaN
+      if (Number.isFinite(num)) return Math.max(0.4, Math.min(1, num))
       return 0.9
     } catch {
       return 0.9
@@ -255,8 +337,31 @@ export function GameEngine() {
 
   // Weekly Leaderboard & Cloud Reward state
   const weeklyInfo = useMemo(() => getWeeklyChallengeInfo(), [])
-  const [playerNameInput, setPlayerNameInput] = useState('')
-  const [playerCityInput, setPlayerCityInput] = useState('بنغازي')
+  const [playerId] = useState<string>(() => {
+    try {
+      const existing = localStorage.getItem('enarah_player_id')
+      if (existing && existing.length >= 8) return existing
+      const generated = `plr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
+      localStorage.setItem('enarah_player_id', generated)
+      return generated
+    } catch {
+      return `plr_${Date.now().toString(36)}`
+    }
+  })
+  const [playerNameInput, setPlayerNameInput] = useState<string>(() => {
+    try {
+      return localStorage.getItem('enarah_player_name') || ''
+    } catch {
+      return ''
+    }
+  })
+  const [playerCityInput, setPlayerCityInput] = useState<string>(() => {
+    try {
+      return localStorage.getItem('enarah_player_city') || 'بنغازي'
+    } catch {
+      return 'بنغازي'
+    }
+  })
   const [hasSubmittedScore, setHasSubmittedScore] = useState(false)
   const [leaderboardTab, setLeaderboardTab] = useState<'current' | 'previous'>('current')
 
@@ -265,13 +370,10 @@ export function GameEngine() {
       const info = getWeeklyChallengeInfo()
       const currentWeekKey = `enarah_weekly_leaderboard_${info.weekId}`
       const savedWeek = localStorage.getItem(currentWeekKey)
-      if (savedWeek) return JSON.parse(savedWeek)
-      const legacy = localStorage.getItem('enarah_hero_leaderboard')
-      if (legacy) {
-        const parsed = JSON.parse(legacy)
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          localStorage.setItem(currentWeekKey, JSON.stringify(parsed))
-          return parsed
+      if (savedWeek) {
+        const parsed = JSON.parse(savedWeek)
+        if (Array.isArray(parsed)) {
+          return dedupeAndRankLeaderboard(parsed, 10)
         }
       }
       return []
@@ -280,10 +382,18 @@ export function GameEngine() {
     }
   })
 
-  const [previousWeekBoard] = useState<LeaderboardEntry[]>(() => {
+  const [previousWeekBoard, setPreviousWeekBoard] = useState<LeaderboardEntry[]>(() => {
     try {
-      const prev = localStorage.getItem('enarah_last_week_champions')
-      return prev ? JSON.parse(prev) : []
+      const info = getWeeklyChallengeInfo()
+      const prevWeekKey = `enarah_weekly_leaderboard_${info.prevWeekId}`
+      const savedPrev = localStorage.getItem(prevWeekKey) || localStorage.getItem('enarah_last_week_champions')
+      if (savedPrev) {
+        const parsed = JSON.parse(savedPrev)
+        if (Array.isArray(parsed)) {
+          return dedupeAndRankLeaderboard(parsed, 10)
+        }
+      }
+      return []
     } catch {
       return []
     }
@@ -293,16 +403,9 @@ export function GameEngine() {
     fetch(`/api/leaderboard?week=${weeklyInfo.weekId}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && Array.isArray(data.entries) && data.entries.length > 0) {
+        if (data && data.success && Array.isArray(data.entries)) {
           setLeaderboard((prev) => {
-            const map = new Map<string, LeaderboardEntry>()
-            prev.forEach((item) => map.set(`${item.name}_${item.score}`, item))
-            data.entries.forEach((remote: LeaderboardEntry) => {
-              map.set(`${remote.name}_${remote.score}`, remote)
-            })
-            const merged = Array.from(map.values())
-              .sort((a, b) => b.score - a.score || a.timeTakenSec - b.timeTakenSec)
-              .slice(0, 10)
+            const merged = dedupeAndRankLeaderboard([...prev, ...data.entries], 10)
             try {
               localStorage.setItem(`enarah_weekly_leaderboard_${weeklyInfo.weekId}`, JSON.stringify(merged))
             } catch {}
@@ -311,7 +414,23 @@ export function GameEngine() {
         }
       })
       .catch(() => {})
-  }, [weeklyInfo.weekId])
+
+    fetch(`/api/leaderboard?week=${weeklyInfo.prevWeekId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.entries) && data.entries.length > 0) {
+          setPreviousWeekBoard((prev) => {
+            const merged = dedupeAndRankLeaderboard([...prev, ...data.entries], 10)
+            try {
+              localStorage.setItem(`enarah_weekly_leaderboard_${weeklyInfo.prevWeekId}`, JSON.stringify(merged))
+              localStorage.setItem('enarah_last_week_champions', JSON.stringify(merged))
+            } catch {}
+            return merged
+          })
+        }
+      })
+      .catch(() => {})
+  }, [weeklyInfo.weekId, weeklyInfo.prevWeekId])
 
   // Section 12 & V8 Problem 4: Keep the coupon system hidden by default (OFF).
   // Only enable when administrator-controlled setting explicitly has isEnabled === true && v8AdminConfigured === true.
@@ -509,6 +628,8 @@ export function GameEngine() {
     }
   }, [clearAllInputs, syncViewportAndCameraZoom, gameState, isFullscreen, isDedicatedMobileGameplay])
 
+  const isAnyGameModalOpen = showStageSelectModal || showSettingsModal || showLeaderboard
+
   useEffect(() => {
     if (typeof document === 'undefined') return
     if (isDedicatedMobileGameplay || isFullscreen) {
@@ -530,12 +651,14 @@ export function GameEngine() {
           max-width: 100vw !important;
           overscroll-behavior: none !important;
         }
-        body[data-enarah-mobile-game="1"] > *:not(#enarah-mobile-game-portal):not(script):not(style) {
+        body[data-enarah-mobile-game="1"] > *:not(#enarah-mobile-game-portal):not(#enarah-game-modal-portal):not(script):not(style) {
           display: none !important;
           pointer-events: none !important;
         }
         #enarah-mobile-game-portal,
-        #enarah-mobile-game-portal * {
+        #enarah-mobile-game-portal *,
+        #enarah-game-modal-portal,
+        #enarah-game-modal-portal * {
           -webkit-touch-callout: none !important;
           -webkit-user-select: none !important;
           user-select: none !important;
@@ -555,6 +678,23 @@ export function GameEngine() {
       document.body.removeAttribute('data-enarah-mobile-game')
     }
   }, [isDedicatedMobileGameplay, isFullscreen])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (isAnyGameModalOpen) {
+      const prevOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      document.body.setAttribute('data-enarah-modal-open', '1')
+      return () => {
+        if (!isDedicatedMobileGameplay && !isFullscreen) {
+          document.body.style.overflow = prevOverflow
+        }
+        document.body.removeAttribute('data-enarah-modal-open')
+      }
+    } else {
+      document.body.removeAttribute('data-enarah-modal-open')
+    }
+  }, [isAnyGameModalOpen, isDedicatedMobileGameplay, isFullscreen])
 
   // IntersectionObserver to pause rendering & music when scrolled offscreen
   useEffect(() => {
@@ -700,18 +840,25 @@ export function GameEngine() {
         typeof stageIndex === 'number'
           ? stageIndex
           : Math.min(progression.unlockedStageIndex, GAME_STAGES.length - 1)
+      const targetStage = GAME_STAGES[targetIdx] || GAME_STAGES[0]
+      // Sum best stage scores for all OTHER stages so replaying a stage never multiplies rewards
+      const otherStagesBestSum = Object.entries(progression.bestStageScores).reduce(
+        (sum, [stgId, val]) => (stgId === targetStage.id ? sum : sum + (Number.isFinite(val) ? val : 0)),
+        0
+      )
+      totalCampaignScoreRef.current = otherStagesBestSum
       if (targetIdx === 0) {
-        totalCampaignScoreRef.current = 0
         totalPlayTimeSecRef.current = 0
-        setHudScore(0)
         setHasSubmittedScore(false)
       }
+      setHudScore(otherStagesBestSum)
       initStage(targetIdx)
       setShowStageSelectModal(false)
       setShowSettingsModal(false)
+      setShowLeaderboard(false)
       setGameState('playing')
     },
-    [initStage, progression.unlockedStageIndex]
+    [initStage, progression.bestStageScores, progression.unlockedStageIndex]
   )
 
   const retryCurrentStage = useCallback(() => {
@@ -739,6 +886,23 @@ export function GameEngine() {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return
 
       const code = e.code
+      if (code === 'Escape') {
+        if (showSettingsModal) {
+          e.preventDefault()
+          setShowSettingsModal(false)
+          return
+        }
+        if (showStageSelectModal) {
+          e.preventDefault()
+          setShowStageSelectModal(false)
+          return
+        }
+        if (showLeaderboard) {
+          e.preventDefault()
+          setShowLeaderboard(false)
+          return
+        }
+      }
       if (code === 'Escape' || code === 'KeyP') {
         if (gameState === 'playing') {
           e.preventDefault()
@@ -793,7 +957,7 @@ export function GameEngine() {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [clearAllInputs, gameState, retryCurrentStage])
+  }, [clearAllInputs, gameState, retryCurrentStage, showLeaderboard, showSettingsModal, showStageSelectModal])
 
   // Fullscreen Toggle
   const toggleFullscreen = useCallback(() => {
@@ -1121,7 +1285,6 @@ export function GameEngine() {
           const timeBonus = Math.max(0, Math.round((120 - elapsedSecRef.current) * 6))
           const finalStageScore = stageScoreRef.current + healthBonus + timeBonus
 
-          totalCampaignScoreRef.current += finalStageScore
           const updatedProg = recordStageCompletion(
             progression,
             stage.id,
@@ -1132,9 +1295,14 @@ export function GameEngine() {
             elapsedSecRef.current,
             collectedKindsRef.current
           )
+          const nonFarmedCampaignScore = Object.values(updatedProg.bestStageScores).reduce(
+            (sum, s) => sum + (Number.isFinite(s) ? s : 0),
+            0
+          )
+          totalCampaignScoreRef.current = nonFarmedCampaignScore
           setProgression(updatedProg)
           setHudStageScore(finalStageScore)
-          setHudScore(totalCampaignScoreRef.current)
+          setHudScore(nonFarmedCampaignScore)
           setHudStarsEarned(starsEarned)
           setHudEnergy(collectedCountRef.current)
 
@@ -1290,27 +1458,40 @@ export function GameEngine() {
   // Submit Weekly Leaderboard Score
   const handleSubmitLeaderboard = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!playerNameInput.trim()) return
+    const cleanName = playerNameInput.replace(/[<>]/g, '').trim().slice(0, 36)
+    if (cleanName.length < 2) {
+      showAlert('⚠️ يرجى إدخال اسم صحيح لا يقل عن حرفين للتسجيل في لوحة الشرف.', 'error')
+      return
+    }
+    const cleanCity = (playerCityInput.replace(/[<>]/g, '').trim() || 'بنغازي').slice(0, 28)
 
-    const bestSum = Object.values(progression.bestStageScores).reduce((a, b) => a + b, 0)
-    const finalScore = Math.max(hudScore, bestSum, 500)
+    const bestSum = Object.values(progression.bestStageScores).reduce(
+      (a, b) => a + (Number.isFinite(b) ? b : 0),
+      0
+    )
+    const rawCandidateScore = Math.max(hudScore, bestSum, 500)
+    const finalScore = Math.max(100, Math.min(45000, Math.round(rawCandidateScore)))
+    const safeTimeSec = Math.max(35, Math.min(36000, Math.round(totalPlayTimeSecRef.current || 120)))
+
     const newEntry: LeaderboardEntry = {
-      id: Date.now().toString(),
-      name: playerNameInput.trim(),
-      city: playerCityInput.trim() || 'بنغازي',
+      id: `${playerId}_${weeklyInfo.weekId}`,
+      playerId,
+      name: cleanName,
+      city: cleanCity,
       score: finalScore,
-      timeTakenSec: Math.max(Math.round(totalPlayTimeSecRef.current), 35),
+      timeTakenSec: safeTimeSec,
       date: 'هذا الأسبوع',
       weekKey: weeklyInfo.weekId,
+      createdAt: Date.now(),
     }
 
-    const updated = [newEntry, ...leaderboard]
-      .sort((a, b) => b.score - a.score || a.timeTakenSec - b.timeTakenSec)
-      .slice(0, 10)
+    const updated = dedupeAndRankLeaderboard([newEntry, ...leaderboard], 10)
 
     setLeaderboard(updated)
     setHasSubmittedScore(true)
     try {
+      localStorage.setItem('enarah_player_name', cleanName)
+      localStorage.setItem('enarah_player_city', cleanCity)
       localStorage.setItem(`enarah_weekly_leaderboard_${weeklyInfo.weekId}`, JSON.stringify(updated))
       localStorage.setItem('enarah_hero_leaderboard', JSON.stringify(updated))
     } catch {}
@@ -1320,13 +1501,27 @@ export function GameEngine() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          playerId,
           name: newEntry.name,
           city: newEntry.city,
           score: newEntry.score,
           timeTakenSec: newEntry.timeTakenSec,
           weekId: weeklyInfo.weekId,
         }),
-      }).catch(() => {})
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.success && Array.isArray(data.entries)) {
+            setLeaderboard((prev) => {
+              const synced = dedupeAndRankLeaderboard([...prev, ...data.entries], 10)
+              try {
+                localStorage.setItem(`enarah_weekly_leaderboard_${weeklyInfo.weekId}`, JSON.stringify(synced))
+              } catch {}
+              return synced
+            })
+          }
+        })
+        .catch(() => {})
     } catch {}
 
     sound.playBonusTime()
@@ -1586,10 +1781,12 @@ export function GameEngine() {
                       sound.playButton()
                       setShowLeaderboard(true)
                     }}
-                    className="text-slate-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer transition-colors"
+                    className="px-2 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-amber-500/30 text-amber-300 flex items-center gap-1 cursor-pointer transition-colors"
                     title="لوحة الشرف"
+                    aria-label="لوحة الشرف"
                   >
                     <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                    <span>لوحة الشرف</span>
                   </button>
                 </div>
               </div>
@@ -2125,487 +2322,523 @@ export function GameEngine() {
       </div>
 
       {/* =====================================================================
-          05. STAGE SELECTION UI (SECTION 07)
-          Displays ONLY:
-          - Stage number
-          - Short stage name
-          - Small environment preview
-          - Locked/unlocked state
-          - Completion status
-          (No long descriptions inside stage cards!)
+          05–07. PORTALED MODALS (Stage Select, Settings, Weekly Leaderboard)
+          Rendered via createPortal(..., document.body) at z-[100020] to escape
+          any parent CSS transform/backdrop-filter stacking contexts (V11 Section 1).
           ===================================================================== */}
-      {showStageSelectModal && (
-        <div className="fixed inset-0 z-[10010] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0E1628] border border-slate-700 rounded-3xl w-full max-w-3xl p-5 sm:p-6 shadow-2xl text-right max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-              <div className="flex items-center gap-2">
-                <Flag className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base sm:text-lg font-black text-white">
-                  اختيار المرحلة
-                </h3>
-              </div>
-              <button
-                type="button"
+      {isAnyGameModalOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div id="enarah-game-modal-portal" dir="rtl" className="select-none">
+            {/* 05. STAGE SELECTION MODAL */}
+            {showStageSelectModal && (
+              <div
                 onClick={() => setShowStageSelectModal(false)}
-                className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
-                aria-label="إغلاق"
+                className="fixed inset-0 z-[100020] bg-slate-950/92 backdrop-blur-md flex items-center justify-center p-4"
               >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Mobile horizontal carousel / Desktop 4-column responsive grid */}
-            <div className="flex sm:grid sm:grid-cols-4 gap-3 overflow-x-auto sm:overflow-y-auto pb-2 sm:pb-0 snap-x snap-mandatory">
-              {GAME_STAGES.map((stg, idx) => {
-                const isUnlocked = idx <= progression.unlockedStageIndex
-                const isCompleted = progression.completedStageIds.includes(stg.id)
-                const isCurrent = idx === currentStageIdx
-                const stars = progression.stageStarsEarned[stg.id] || 0
-
-                return (
-                  <button
-                    key={stg.id}
-                    type="button"
-                    disabled={!isUnlocked}
-                    onClick={() => {
-                      if (isUnlocked) startAdventure(idx)
-                    }}
-                    className={`min-w-[190px] sm:min-w-0 snap-center rounded-2xl border p-3 text-right flex flex-col justify-between transition-all ${
-                      isUnlocked
-                        ? isCurrent
-                          ? 'bg-slate-900 border-amber-400 cursor-pointer shadow-md'
-                          : 'bg-slate-900/90 hover:bg-slate-800 border-slate-700/90 cursor-pointer'
-                        : 'bg-slate-950/70 border-slate-800/80 opacity-60 cursor-not-allowed'
-                    }`}
-                  >
-                    {/* Small Environment Preview — Unique per Stage World */}
-                    <div
-                      className="w-full h-16 rounded-xl mb-2.5 relative overflow-hidden border border-white/10"
-                      style={{
-                        background: `linear-gradient(to bottom, ${stg.skyTop}, ${stg.skyBottom})`,
-                      }}
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#0E1628] border border-slate-700 rounded-3xl w-full max-w-3xl p-5 sm:p-6 shadow-2xl text-right max-h-[90dvh] flex flex-col"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Flag className="w-5 h-5 text-amber-400" />
+                      <h3 className="text-base sm:text-lg font-black text-white">
+                        اختيار المرحلة
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowStageSelectModal(false)}
+                      className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
+                      aria-label="إغلاق"
                     >
-                      {/* Stage-Authentic Miniature Environment Silhouette */}
-                      {stg.theme === 'city_of_light' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                          <div className="w-4 h-7 bg-sky-900/80 border-t-2 border-amber-300 rounded-t-xs" />
-                          <div className="w-3 h-4 bg-emerald-500 rounded-full mb-1" />
-                          <div className="w-6 h-9 bg-blue-950/85 border-t-2 border-cyan-300 rounded-t-xs" />
-                          <div className="w-3 h-4 bg-emerald-500 rounded-full mb-1" />
-                          <div className="w-5 h-6 bg-indigo-950/80 rounded-t-xs" />
-                        </div>
-                      )}
-                      {stg.theme === 'electricity_street' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                          <div className="w-6 h-6 bg-amber-900/85 border-t-2 border-amber-300 rounded-t-xs" />
-                          <div className="w-7 h-7 bg-orange-950/90 border-t-2 border-yellow-300 rounded-t-sm" />
-                          <div className="w-5 h-5 bg-amber-800/80 border-t-2 border-cyan-300 rounded-t-xs" />
-                        </div>
-                      )}
-                      {stg.theme === 'lighting_factory' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                          <div className="w-3 h-9 bg-slate-700 border-t-2 border-orange-400" />
-                          <div className="w-5 h-5 rounded-full border-2 border-amber-400/80 mb-1" />
-                          <div className="w-7 h-7 bg-slate-800 border-t-2 border-yellow-400" />
-                          <div className="w-3 h-8 bg-slate-700 border-t-2 border-orange-400" />
-                        </div>
-                      )}
-                      {stg.theme === 'intercom_district' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                          <div className="w-3 h-4 bg-emerald-500 rounded-full mb-0.5" />
-                          <div className="w-7 h-6 bg-teal-950 border-t-2 border-emerald-300 rounded-t-sm" />
-                          <div className="w-6 h-1.5 bg-orange-500 mb-3 rounded-full" />
-                          <div className="w-6 h-7 bg-slate-900 border-t-2 border-amber-300 rounded-t-sm" />
-                        </div>
-                      )}
-                      {stg.theme === 'power_station' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                          <div className="w-5 h-8 bg-slate-800 border border-orange-400/70 rounded-t-xs" />
-                          <div className="w-8 h-3 bg-orange-500/90 mb-3 rounded-xs" />
-                          <div className="w-6 h-9 bg-slate-900 border border-cyan-400/70 rounded-t-xs" />
-                        </div>
-                      )}
-                      {stg.theme === 'dark_city' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                          <div className="w-4 h-9 bg-indigo-950 border-t border-cyan-400 rounded-t-sm" />
-                          <div className="w-6 h-1 bg-cyan-400 mb-4 shadow-sm" />
-                          <div className="w-5 h-10 bg-purple-950 border-t border-fuchsia-400 rounded-t-sm" />
-                          <div className="w-4 h-7 bg-slate-900 border-t border-cyan-300 rounded-t-sm" />
-                        </div>
-                      )}
-                      {stg.theme === 'lighting_tower' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-center gap-2 px-2">
-                          <div className="w-4 h-6 border-r border-cyan-300/60" />
-                          <div className="w-5 h-11 bg-sky-950/90 border-x border-t border-amber-300 rounded-t-md" />
-                          <div className="w-4 h-6 border-l border-cyan-300/60" />
-                        </div>
-                      )}
-                      {stg.theme === 'darkness_fortress' && (
-                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                          <div className="w-4 h-8 bg-slate-900 border-t-2 border-rose-500" />
-                          <div className="w-8 h-10 bg-slate-950 border-t-2 border-orange-500 rounded-t-xs" />
-                          <div className="w-4 h-8 bg-slate-900 border-t-2 border-rose-500" />
-                        </div>
-                      )}
-                      {/* Ground line with stage accent color */}
-                      <div
-                        className="absolute bottom-0 inset-x-0 h-1.5"
-                        style={{ backgroundColor: stg.accentColor }}
-                      />
-                      {/* Stage Number Badge */}
-                      <span className="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-md bg-slate-950/80 text-[10px] font-black text-white">
-                        المرحلة {stg.worldNumber}
-                      </span>
-                      {/* Locked / Unlocked State Icon */}
-                      <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-slate-950/80 text-[10px] font-bold flex items-center gap-1">
-                        {isUnlocked ? (
-                          <Unlock className="w-3 h-3 text-emerald-400" />
-                        ) : (
-                          <Lock className="w-3 h-3 text-slate-400" />
-                        )}
-                      </span>
-                    </div>
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
 
-                    {/* Short Stage Name */}
-                    <div className="text-sm font-black text-white truncate mb-2">
-                      {stg.worldTitleAr}
-                    </div>
+                  {/* Mobile horizontal carousel / Desktop 4-column responsive grid */}
+                  <div className="flex sm:grid sm:grid-cols-4 gap-3 overflow-x-auto sm:overflow-y-auto pb-2 sm:pb-0 snap-x snap-mandatory">
+                    {GAME_STAGES.map((stg, idx) => {
+                      const isUnlocked = idx <= progression.unlockedStageIndex
+                      const isCompleted = progression.completedStageIds.includes(stg.id)
+                      const isCurrent = idx === currentStageIdx
+                      const stars = progression.stageStarsEarned[stg.id] || 0
 
-                    {/* Completion Status & Stars */}
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 w-full">
-                      <span
-                        className={`text-[10px] font-bold ${
-                          isCompleted
-                            ? 'text-emerald-400'
-                            : isUnlocked
-                            ? 'text-amber-300'
-                            : 'text-slate-500'
+                      return (
+                        <button
+                          key={stg.id}
+                          type="button"
+                          disabled={!isUnlocked}
+                          onClick={() => {
+                            if (isUnlocked) startAdventure(idx)
+                          }}
+                          className={`min-w-[190px] sm:min-w-0 snap-center rounded-2xl border p-3 text-right flex flex-col justify-between transition-all ${
+                            isUnlocked
+                              ? isCurrent
+                                ? 'bg-slate-900 border-amber-400 cursor-pointer shadow-md'
+                                : 'bg-slate-900/90 hover:bg-slate-800 border-slate-700/90 cursor-pointer'
+                              : 'bg-slate-950/70 border-slate-800/80 opacity-60 cursor-not-allowed'
+                          }`}
+                        >
+                          {/* Small Environment Preview — Unique per Stage World */}
+                          <div
+                            className="w-full h-16 rounded-xl mb-2.5 relative overflow-hidden border border-white/10"
+                            style={{
+                              background: `linear-gradient(to bottom, ${stg.skyTop}, ${stg.skyBottom})`,
+                            }}
+                          >
+                            {/* Stage-Authentic Miniature Environment Silhouette */}
+                            {stg.theme === 'city_of_light' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                                <div className="w-4 h-7 bg-sky-900/80 border-t-2 border-amber-300 rounded-t-xs" />
+                                <div className="w-3 h-4 bg-emerald-500 rounded-full mb-1" />
+                                <div className="w-6 h-9 bg-blue-950/85 border-t-2 border-cyan-300 rounded-t-xs" />
+                                <div className="w-3 h-4 bg-emerald-500 rounded-full mb-1" />
+                                <div className="w-5 h-6 bg-indigo-950/80 rounded-t-xs" />
+                              </div>
+                            )}
+                            {stg.theme === 'electricity_street' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                                <div className="w-6 h-6 bg-amber-900/85 border-t-2 border-amber-300 rounded-t-xs" />
+                                <div className="w-7 h-7 bg-orange-950/90 border-t-2 border-yellow-300 rounded-t-sm" />
+                                <div className="w-5 h-5 bg-amber-800/80 border-t-2 border-cyan-300 rounded-t-xs" />
+                              </div>
+                            )}
+                            {stg.theme === 'lighting_factory' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                                <div className="w-3 h-9 bg-slate-700 border-t-2 border-orange-400" />
+                                <div className="w-5 h-5 rounded-full border-2 border-amber-400/80 mb-1" />
+                                <div className="w-7 h-7 bg-slate-800 border-t-2 border-yellow-400" />
+                                <div className="w-3 h-8 bg-slate-700 border-t-2 border-orange-400" />
+                              </div>
+                            )}
+                            {stg.theme === 'intercom_district' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                                <div className="w-3 h-4 bg-emerald-500 rounded-full mb-0.5" />
+                                <div className="w-7 h-6 bg-teal-950 border-t-2 border-emerald-300 rounded-t-sm" />
+                                <div className="w-6 h-1.5 bg-orange-500 mb-3 rounded-full" />
+                                <div className="w-6 h-7 bg-slate-900 border-t-2 border-amber-300 rounded-t-sm" />
+                              </div>
+                            )}
+                            {stg.theme === 'power_station' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                                <div className="w-5 h-8 bg-slate-800 border border-orange-400/70 rounded-t-xs" />
+                                <div className="w-8 h-3 bg-orange-500/90 mb-3 rounded-xs" />
+                                <div className="w-6 h-9 bg-slate-900 border border-cyan-400/70 rounded-t-xs" />
+                              </div>
+                            )}
+                            {stg.theme === 'dark_city' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                                <div className="w-4 h-9 bg-indigo-950 border-t border-cyan-400 rounded-t-sm" />
+                                <div className="w-6 h-1 bg-cyan-400 mb-4 shadow-sm" />
+                                <div className="w-5 h-10 bg-purple-950 border-t border-fuchsia-400 rounded-t-sm" />
+                                <div className="w-4 h-7 bg-slate-900 border-t border-cyan-300 rounded-t-sm" />
+                              </div>
+                            )}
+                            {stg.theme === 'lighting_tower' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-center gap-2 px-2">
+                                <div className="w-4 h-6 border-r border-cyan-300/60" />
+                                <div className="w-5 h-11 bg-sky-950/90 border-x border-t border-amber-300 rounded-t-md" />
+                                <div className="w-4 h-6 border-l border-cyan-300/60" />
+                              </div>
+                            )}
+                            {stg.theme === 'darkness_fortress' && (
+                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                                <div className="w-4 h-8 bg-slate-900 border-t-2 border-rose-500" />
+                                <div className="w-8 h-10 bg-slate-950 border-t-2 border-orange-500 rounded-t-xs" />
+                                <div className="w-4 h-8 bg-slate-900 border-t-2 border-rose-500" />
+                              </div>
+                            )}
+                            {/* Ground line with stage accent color */}
+                            <div
+                              className="absolute bottom-0 inset-x-0 h-1.5"
+                              style={{ backgroundColor: stg.accentColor }}
+                            />
+                            {/* Stage Number Badge */}
+                            <span className="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-md bg-slate-950/80 text-[10px] font-black text-white">
+                              المرحلة {stg.worldNumber}
+                            </span>
+                            {/* Locked / Unlocked State Icon */}
+                            <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-slate-950/80 text-[10px] font-bold flex items-center gap-1">
+                              {isUnlocked ? (
+                                <Unlock className="w-3 h-3 text-emerald-400" />
+                              ) : (
+                                <Lock className="w-3 h-3 text-slate-400" />
+                              )}
+                            </span>
+                          </div>
+
+                          {/* Short Stage Name */}
+                          <div className="text-sm font-black text-white truncate mb-2">
+                            {stg.worldTitleAr}
+                          </div>
+
+                          {/* Completion Status & Stars */}
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 w-full">
+                            <span
+                              className={`text-[10px] font-bold ${
+                                isCompleted
+                                  ? 'text-emerald-400'
+                                  : isUnlocked
+                                  ? 'text-amber-300'
+                                  : 'text-slate-500'
+                              }`}
+                            >
+                              {isCompleted ? 'مكتملة ✓' : isUnlocked ? 'متاحة' : 'مغلقة'}
+                            </span>
+
+                            <div className="flex items-center gap-0.5">
+                              {[1, 2, 3].map((s) => (
+                                <Star
+                                  key={s}
+                                  className={`w-3 h-3 ${
+                                    s <= stars ? 'text-amber-400 fill-amber-400' : 'text-slate-700'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 06. SETTINGS MODAL (Audio, Graphics Quality, Reduced Motion, Touch Opacity) */}
+            {showSettingsModal && (
+              <div
+                onClick={() => setShowSettingsModal(false)}
+                className="fixed inset-0 z-[100020] bg-slate-950/92 backdrop-blur-md flex items-center justify-center p-4"
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#0E1628] border border-slate-700 rounded-3xl w-full max-w-md p-5 sm:p-6 shadow-2xl text-right max-h-[90dvh] overflow-y-auto"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-cyan-400" />
+                      <h3 className="text-lg font-black text-white">الإعدادات</h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowSettingsModal(false)}
+                      className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
+                      aria-label="إغلاق"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-3.5">
+                    {/* Master Mute Toggle */}
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                      <div>
+                        <div className="text-sm font-bold text-white">تشغيل الصوت العام</div>
+                        <div className="text-xs text-slate-400">تفعيل أو كتم كافة الأصوات</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = !isMuted
+                          setIsMuted(next)
+                          sound.setMuted(next)
+                        }}
+                        className={`px-4 py-1.5 rounded-xl font-bold text-xs cursor-pointer ${
+                          !isMuted ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
                         }`}
                       >
-                        {isCompleted ? 'مكتملة ✓' : isUnlocked ? 'متاحة' : 'مغلقة'}
-                      </span>
+                        {!isMuted ? 'مفعّل' : 'مكتوم'}
+                      </button>
+                    </div>
 
-                      <div className="flex items-center gap-0.5">
-                        {[1, 2, 3].map((s) => (
-                          <Star
-                            key={s}
-                            className={`w-3 h-3 ${
-                              s <= stars ? 'text-amber-400 fill-amber-400' : 'text-slate-700'
+                    {/* Separate Music Volume Control */}
+                    <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-bold text-white">صوت الموسيقى</span>
+                        <span className="text-xs font-mono text-amber-300">{Math.round(musicVolume * 100)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={musicVolume}
+                        onChange={(e) => {
+                          const v = Number(e.target.value)
+                          setMusicVolume(v)
+                          sound.setMusicVolume(v)
+                        }}
+                        className="w-full accent-amber-400 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Separate SFX Volume Control */}
+                    <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-bold text-white">صوت المؤثرات (SFX)</span>
+                        <span className="text-xs font-mono text-cyan-300">{Math.round(sfxVolume * 100)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={sfxVolume}
+                        onChange={(e) => {
+                          const v = Number(e.target.value)
+                          setSfxVolume(v)
+                          sound.setSfxVolume(v)
+                          sound.playButton()
+                        }}
+                        className="w-full accent-cyan-400 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Graphics Quality Presets (High / Balanced / Low — Section 16) */}
+                    <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                      <div className="text-xs font-bold text-white mb-2">جودة الرسوميات</div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(
+                          [
+                            { id: 'high', label: 'عالية' },
+                            { id: 'balanced', label: 'متوازنة' },
+                            { id: 'low', label: 'خفيفة' },
+                          ] as const
+                        ).map((opt) => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              setGraphicsQuality(opt.id)
+                              try {
+                                localStorage.setItem('enarah_platformer_graphics_quality', opt.id)
+                              } catch {}
+                            }}
+                            className={`py-1.5 rounded-xl text-xs font-bold cursor-pointer border ${
+                              graphicsQuality === opt.id
+                                ? 'bg-amber-400 border-amber-300 text-slate-950'
+                                : 'bg-slate-950 border-slate-800 text-slate-300'
                             }`}
-                          />
+                          >
+                            {opt.label}
+                          </button>
                         ))}
                       </div>
                     </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* =====================================================================
-          06. SETTINGS MODAL (Audio, Graphics Quality, Reduced Motion, Touch Opacity)
-          ===================================================================== */}
-      {showSettingsModal && (
-        <div className="fixed inset-0 z-[10010] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0E1628] border border-slate-700 rounded-3xl w-full max-w-md p-5 sm:p-6 shadow-2xl text-right max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-              <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-lg font-black text-white">الإعدادات</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSettingsModal(false)}
-                className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
-                aria-label="إغلاق"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3.5">
-              {/* Master Mute Toggle */}
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <div>
-                  <div className="text-sm font-bold text-white">تشغيل الصوت العام</div>
-                  <div className="text-xs text-slate-400">تفعيل أو كتم كافة الأصوات</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = !isMuted
-                    setIsMuted(next)
-                    sound.setMuted(next)
-                  }}
-                  className={`px-4 py-1.5 rounded-xl font-bold text-xs cursor-pointer ${
-                    !isMuted ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
-                  }`}
-                >
-                  {!isMuted ? 'مفعّل' : 'مكتوم'}
-                </button>
-              </div>
-
-              {/* Separate Music Volume Control */}
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-white">صوت الموسيقى</span>
-                  <span className="text-xs font-mono text-amber-300">{Math.round(musicVolume * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={musicVolume}
-                  onChange={(e) => {
-                    const v = Number(e.target.value)
-                    setMusicVolume(v)
-                    sound.setMusicVolume(v)
-                  }}
-                  className="w-full accent-amber-400 cursor-pointer"
-                />
-              </div>
-
-              {/* Separate SFX Volume Control */}
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-white">صوت المؤثرات (SFX)</span>
-                  <span className="text-xs font-mono text-cyan-300">{Math.round(sfxVolume * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={sfxVolume}
-                  onChange={(e) => {
-                    const v = Number(e.target.value)
-                    setSfxVolume(v)
-                    sound.setSfxVolume(v)
-                    sound.playButton()
-                  }}
-                  className="w-full accent-cyan-400 cursor-pointer"
-                />
-              </div>
-
-              {/* Graphics Quality Presets (High / Balanced / Low — Section 16) */}
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <div className="text-xs font-bold text-white mb-2">جودة الرسوميات</div>
-                <div className="grid grid-cols-3 gap-2">
-                  {(
-                    [
-                      { id: 'high', label: 'عالية' },
-                      { id: 'balanced', label: 'متوازنة' },
-                      { id: 'low', label: 'خفيفة' },
-                    ] as const
-                  ).map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => {
-                        setGraphicsQuality(opt.id)
-                        try {
-                          localStorage.setItem('enarah_platformer_graphics_quality', opt.id)
-                        } catch {}
-                      }}
-                      className={`py-1.5 rounded-xl text-xs font-bold cursor-pointer border ${
-                        graphicsQuality === opt.id
-                          ? 'bg-amber-400 border-amber-300 text-slate-950'
-                          : 'bg-slate-950 border-slate-800 text-slate-300'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Mobile Controls Opacity & Size (Section 09) */}
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">شفافية أزرار اللمس</span>
-                  <span className="text-xs font-mono text-cyan-300">{Math.round(touchOpacity * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0.4}
-                  max={1}
-                  step={0.05}
-                  value={touchOpacity}
-                  onChange={(e) => {
-                    const v = Number(e.target.value)
-                    setTouchOpacity(v)
-                    try {
-                      localStorage.setItem('enarah_platformer_touch_opacity', String(v))
-                    } catch {}
-                  }}
-                  className="w-full accent-cyan-400 cursor-pointer"
-                />
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-xs font-bold text-white">حجم أزرار اللمس</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = touchButtonScale === 'large' ? 'normal' : 'large'
-                      setTouchButtonScale(next)
-                      try {
-                        localStorage.setItem('enarah_platformer_touch_scale', next)
-                      } catch {}
-                    }}
-                    className="px-3 py-1 rounded-xl bg-slate-800 text-white font-bold text-xs cursor-pointer"
-                  >
-                    {touchButtonScale === 'large' ? 'كبير' : 'قياسي'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Reduced Motion Toggle */}
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <div>
-                  <div className="text-xs font-bold text-white">تقليل الحركة والمؤثرات</div>
-                  <div className="text-[11px] text-slate-400">تخفيف اهتزاز الكاميرا والجزيئات</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = !reducedMotion
-                    setReducedMotion(next)
-                    try {
-                      localStorage.setItem('enarah_platformer_reduced_motion', String(next))
-                    } catch {}
-                  }}
-                  className={`px-3.5 py-1.5 rounded-xl font-bold text-xs cursor-pointer ${
-                    reducedMotion ? 'bg-cyan-400 text-slate-950' : 'bg-slate-800 text-slate-300'
-                  }`}
-                >
-                  {reducedMotion ? 'مفعّل' : 'عادي'}
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-5 pt-3 border-t border-slate-800">
-              <button
-                type="button"
-                onClick={() => setShowSettingsModal(false)}
-                className="w-full py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer"
-              >
-                حفظ وإغلاق
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================================
-          07. WEEKLY LEADERBOARD MODAL
-          ===================================================================== */}
-      {showLeaderboard && (
-        <div className="fixed inset-0 z-[10010] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#121316] border border-amber-500/40 rounded-3xl w-full max-w-lg p-5 shadow-2xl relative text-right flex flex-col max-h-[88vh]">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-3">
-              <button
-                type="button"
-                onClick={() => setShowLeaderboard(false)}
-                className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-white">لوحة شرف أبطال الإنارة الحديثة</h3>
-                <Trophy className="w-5 h-5 text-amber-400" />
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-amber-950/40 via-zinc-900 to-blue-950/40 border border-amber-500/30 rounded-2xl p-3 mb-3 text-right shadow-md">
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>{weeklyInfo.weekTitle}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-black/50 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-                  <Clock className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>
-                    ينتهي خلال {weeklyInfo.daysLeft} يوم و {weeklyInfo.hoursLeft} ساعة
-                  </span>
-                </div>
-              </div>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
-                ⚡ اجمع المنتجات الكهربائية وأكمل المراحل الثماني لتتصدر لوحة الشرف الأسبوعية!
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 mb-3">
-              <button
-                type="button"
-                onClick={() => setLeaderboardTab('current')}
-                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                  leaderboardTab === 'current'
-                    ? 'bg-amber-500 text-black shadow-lg'
-                    : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
-                }`}
-              >
-                <Trophy className="w-3.5 h-3.5" />
-                <span>أبطال هذا الأسبوع ({leaderboard.length})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setLeaderboardTab('previous')}
-                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                  leaderboardTab === 'previous'
-                    ? 'bg-amber-500 text-black shadow-lg'
-                    : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
-                }`}
-              >
-                <Medal className="w-3.5 h-3.5" />
-                <span>الأسبوع الماضي ({previousWeekBoard.length})</span>
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[160px]">
-              {(leaderboardTab === 'current' ? leaderboard : previousWeekBoard).length === 0 ? (
-                <div className="py-8 px-4 text-center flex flex-col items-center justify-center">
-                  <Trophy className="w-8 h-8 text-amber-400 mb-2" />
-                  <h4 className="text-sm font-bold text-white mb-1">كن أول بطل يسجل اسمه هذا الأسبوع!</h4>
-                  <p className="text-xs text-zinc-400">أكمل المغامرة وسجل اسمك في المركز الأول.</p>
-                </div>
-              ) : (
-                (leaderboardTab === 'current' ? leaderboard : previousWeekBoard).map((item, idx) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-3 rounded-2xl border bg-zinc-900/70 border-zinc-800"
-                  >
-                    <div className="text-left">
-                      <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
-                      <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
+                    {/* Mobile Controls Opacity & Size (Section 09) */}
+                    <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-white">شفافية أزرار اللمس</span>
+                        <span className="text-xs font-mono text-cyan-300">{Math.round(touchOpacity * 100)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0.4}
+                        max={1}
+                        step={0.05}
+                        value={touchOpacity}
+                        onChange={(e) => {
+                          const v = Number(e.target.value)
+                          setTouchOpacity(v)
+                          try {
+                            localStorage.setItem('enarah_platformer_touch_opacity', String(v))
+                          } catch {}
+                        }}
+                        className="w-full accent-cyan-400 cursor-pointer"
+                      />
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-xs font-bold text-white">حجم أزرار اللمس</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = touchButtonScale === 'large' ? 'normal' : 'large'
+                            setTouchButtonScale(next)
+                            try {
+                              localStorage.setItem('enarah_platformer_touch_scale', next)
+                            } catch {}
+                          }}
+                          className="px-3 py-1 rounded-xl bg-slate-800 text-white font-bold text-xs cursor-pointer"
+                        >
+                          {touchButtonScale === 'large' ? 'كبير' : 'قياسي'}
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-white">{item.name}</div>
-                        <div className="text-[10px] text-zinc-400">{item.city}</div>
+
+                    {/* Reduced Motion Toggle */}
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                      <div>
+                        <div className="text-xs font-bold text-white">تقليل الحركة والمؤثرات</div>
+                        <div className="text-[11px] text-slate-400">تخفيف اهتزاز الكاميرا والجزيئات</div>
                       </div>
-                      <div className="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs bg-amber-500 text-black">
-                        {idx + 1}
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = !reducedMotion
+                          setReducedMotion(next)
+                          try {
+                            localStorage.setItem('enarah_platformer_reduced_motion', String(next))
+                          } catch {}
+                        }}
+                        className={`px-3.5 py-1.5 rounded-xl font-bold text-xs cursor-pointer ${
+                          reducedMotion ? 'bg-cyan-400 text-slate-950' : 'bg-slate-800 text-slate-300'
+                        }`}
+                      >
+                        {reducedMotion ? 'مفعّل' : 'عادي'}
+                      </button>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
 
-            <div className="pt-4 mt-2 border-t border-zinc-800">
-              <button
-                type="button"
+                  <div className="mt-5 pt-3 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setShowSettingsModal(false)}
+                      className="w-full py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer"
+                    >
+                      حفظ وإغلاق
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 07. WEEKLY LEADERBOARD MODAL */}
+            {showLeaderboard && (
+              <div
                 onClick={() => setShowLeaderboard(false)}
-                className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white rounded-xl font-bold text-xs cursor-pointer"
+                className="fixed inset-0 z-[100020] bg-slate-950/92 backdrop-blur-md flex items-center justify-center p-4"
               >
-                إغلاق والعودة للعبة
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#121316] border border-amber-500/40 rounded-3xl w-full max-w-lg p-5 shadow-2xl relative text-right flex flex-col max-h-[88dvh]"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowLeaderboard(false)}
+                      className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer"
+                      aria-label="إغلاق"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-bold text-white">لوحة شرف أبطال الإنارة الحديثة</h3>
+                      <Trophy className="w-5 h-5 text-amber-400" />
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-amber-950/40 via-zinc-900 to-blue-950/40 border border-amber-500/30 rounded-2xl p-3 mb-3 text-right shadow-md">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span>{weeklyInfo.weekTitle}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-black/50 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                        <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>
+                          ينتهي خلال {weeklyInfo.daysLeft} يوم و {weeklyInfo.hoursLeft} ساعة
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                      ⚡ اجمع المنتجات الكهربائية وأكمل المراحل الثماني لتتصدر لوحة الشرف الأسبوعية!
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => setLeaderboardTab('current')}
+                      className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        leaderboardTab === 'current'
+                          ? 'bg-amber-500 text-black shadow-lg'
+                          : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                      }`}
+                    >
+                      <Trophy className="w-3.5 h-3.5" />
+                      <span>أبطال هذا الأسبوع ({leaderboard.length})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLeaderboardTab('previous')}
+                      className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        leaderboardTab === 'previous'
+                          ? 'bg-amber-500 text-black shadow-lg'
+                          : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                      }`}
+                    >
+                      <Medal className="w-3.5 h-3.5" />
+                      <span>الأسبوع الماضي ({previousWeekBoard.length})</span>
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[160px]">
+                    {(leaderboardTab === 'current' ? leaderboard : previousWeekBoard).length === 0 ? (
+                      <div className="py-8 px-4 text-center flex flex-col items-center justify-center">
+                        <Trophy className="w-8 h-8 text-amber-400 mb-2" />
+                        <h4 className="text-sm font-bold text-white mb-1">كن أول بطل يسجل اسمه هذا الأسبوع!</h4>
+                        <p className="text-xs text-zinc-400">أكمل المغامرة وسجل اسمك في المركز الأول.</p>
+                      </div>
+                    ) : (
+                      (leaderboardTab === 'current' ? leaderboard : previousWeekBoard).map((item, idx) => {
+                        const isCurrentPlayer =
+                          (item.playerId && item.playerId === playerId) ||
+                          (playerNameInput.trim().length >= 2 &&
+                            item.name.trim().toLowerCase() === playerNameInput.trim().toLowerCase())
+
+                        return (
+                          <div
+                            key={item.id || `${item.name}_${idx}`}
+                            className={`flex items-center justify-between p-3 rounded-2xl border ${
+                              isCurrentPlayer
+                                ? 'bg-amber-500/15 border-amber-400/70'
+                                : 'bg-zinc-900/70 border-zinc-800'
+                            }`}
+                          >
+                            <div className="text-left">
+                              <div className="text-xs font-black text-amber-400">{item.score} نقطة</div>
+                              <div className="text-[10px] text-zinc-400 font-mono">{item.timeTakenSec} ثانية</div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="text-right">
+                                <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                                  <span>{item.name}</span>
+                                  {isCurrentPlayer && (
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-400 text-black text-[9px] font-black">
+                                      أنت
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-[10px] text-zinc-400">{item.city}</div>
+                              </div>
+                              <div className="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs bg-amber-500 text-black">
+                                {idx + 1}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+
+                  <div className="pt-4 mt-2 border-t border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={() => setShowLeaderboard(false)}
+                      className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white rounded-xl font-bold text-xs cursor-pointer"
+                    >
+                      إغلاق والعودة للعبة
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>,
+          document.body
+        )}
     </div>
   )
 

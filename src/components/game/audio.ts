@@ -174,9 +174,21 @@ class SoundEngine {
         const savedMute = localStorage.getItem('enarah_platformer_muted')
         const savedMusicVol = localStorage.getItem('enarah_platformer_music_vol')
         const savedSfxVol = localStorage.getItem('enarah_platformer_sfx_vol')
-        if (savedMute !== null) this.isMuted = savedMute === 'true'
-        if (savedMusicVol !== null) this.musicVolume = Math.max(0, Math.min(1, Number(savedMusicVol)))
-        if (savedSfxVol !== null) this.sfxVolume = Math.max(0, Math.min(1, Number(savedSfxVol)))
+        if (savedMute === 'true' || savedMute === 'false') {
+          this.isMuted = savedMute === 'true'
+        }
+        if (savedMusicVol !== null) {
+          const parsedM = Number(savedMusicVol)
+          if (Number.isFinite(parsedM)) {
+            this.musicVolume = Math.max(0, Math.min(1, parsedM))
+          }
+        }
+        if (savedSfxVol !== null) {
+          const parsedS = Number(savedSfxVol)
+          if (Number.isFinite(parsedS)) {
+            this.sfxVolume = Math.max(0, Math.min(1, parsedS))
+          }
+        }
       } catch {}
     }
   }
@@ -228,6 +240,7 @@ class SoundEngine {
   }
 
   public setMusicVolume(vol: number) {
+    if (!Number.isFinite(vol)) return
     this.musicVolume = Math.max(0, Math.min(1, vol))
     this.syncGains()
     try {
@@ -236,6 +249,7 @@ class SoundEngine {
   }
 
   public setSfxVolume(vol: number) {
+    if (!Number.isFinite(vol)) return
     this.sfxVolume = Math.max(0, Math.min(1, vol))
     this.syncGains()
     try {

@@ -1639,22 +1639,9 @@ export const GAME_STAGES: StageDefinition[] = [
         material: 'copper',
         springBoostVy: -780,
       },
-      // Boss Arena Tactical Platforms (include moving center platform for Phase 2 & 3)
+      // Boss Arena Tactical Platforms
       { id: 'l8-b1', x: 1680, y: 360, w: 175, h: 22, kind: 'solid', material: 'copper' },
-      {
-        id: 'l8-b2',
-        x: 2020,
-        y: 295,
-        w: 190,
-        h: 22,
-        kind: 'moving',
-        material: 'neon_glass',
-        startX: 1960,
-        startY: 295,
-        endX: 2180,
-        endY: 295,
-        speed: 95,
-      },
+      { id: 'l8-b2', x: 2020, y: 295, w: 190, h: 22, kind: 'solid', material: 'neon_glass' },
       { id: 'l8-b3', x: 2390, y: 360, w: 175, h: 22, kind: 'solid', material: 'copper' },
     ],
     collectibles: [
@@ -1853,15 +1840,43 @@ export function loadPlayerProgression(): PlayerProgressionState {
       localStorage.getItem('enarah_light_hero_progression_v1')
     if (raw) {
       const parsed = JSON.parse(raw)
+      if (!parsed || typeof parsed !== 'object') return getDefaultProgression()
+      const defaults = getDefaultProgression()
+      const rawUnlocked = Number(parsed.unlockedStageIndex)
       return {
-        ...getDefaultProgression(),
-        ...parsed,
+        ...defaults,
         unlockedStageIndex: Math.min(
           GAME_STAGES.length - 1,
-          Math.max(0, Number(parsed.unlockedStageIndex) || 0)
+          Math.max(0, Number.isFinite(rawUnlocked) ? Math.floor(rawUnlocked) : 0)
         ),
+        completedStageIds: Array.isArray(parsed.completedStageIds)
+          ? parsed.completedStageIds.filter((id: unknown) => typeof id === 'string')
+          : [],
+        bestStageScores:
+          parsed.bestStageScores && typeof parsed.bestStageScores === 'object' && !Array.isArray(parsed.bestStageScores)
+            ? parsed.bestStageScores
+            : {},
+        bestStageTimesSec:
+          parsed.bestStageTimesSec && typeof parsed.bestStageTimesSec === 'object' && !Array.isArray(parsed.bestStageTimesSec)
+            ? parsed.bestStageTimesSec
+            : {},
+        stageStarsEarned:
+          parsed.stageStarsEarned && typeof parsed.stageStarsEarned === 'object' && !Array.isArray(parsed.stageStarsEarned)
+            ? parsed.stageStarsEarned
+            : {},
+        totalCollectedEnergy: Number.isFinite(Number(parsed.totalCollectedEnergy))
+          ? Math.max(0, Math.floor(Number(parsed.totalCollectedEnergy)))
+          : 0,
+        productCounts:
+          parsed.productCounts && typeof parsed.productCounts === 'object' && !Array.isArray(parsed.productCounts)
+            ? parsed.productCounts
+            : {},
+        achievements: Array.isArray(parsed.achievements)
+          ? parsed.achievements.filter((a: unknown) => typeof a === 'string')
+          : [],
         doubleJumpUnlocked: true,
         dashUnlocked: true,
+        reducedMotion: Boolean(parsed.reducedMotion),
       }
     }
   } catch {}
