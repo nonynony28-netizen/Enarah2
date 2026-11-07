@@ -686,12 +686,12 @@
        <div style="margin-top:15px;">
          <div style="background:#06152b; padding:15px; border-radius:12px; border:1px solid #1e3a8a; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
            <div>
-             <div style="font-weight:bold; font-size:14px; color:white;">تفعيل نظام الجوائز بعد الفوز:</div>
+             <div style="font-weight:bold; font-size:14px; color:white;">تفعيل كوبونات اللعبة:</div>
              <div style="font-size:11px; color:#94a3b8; margin-top:2px;">إذا تم الإيقاف، يلعب الزبائن للتسلية والتنافس بالصدارة فقط.</div>
            </div>
            <select id="gr_isEnabled" onchange="toggleRewardTypeVisibility()" style="padding:8px 12px; border-radius:8px; border:1px solid #3b82f6; background:#0d2342; color:white; font-weight:bold; cursor:pointer;">
              <option value="true">مفعل ✅</option>
-             <option value="false">معطل ❌ (بدون جوائز)</option>
+             <option value="false" selected>معطل ❌ (بدون جوائز)</option>
            </select>
          </div>
 
@@ -1571,7 +1571,7 @@
       if (gameUpdates.length > 0) {
         try {
           const latest = JSON.parse(gameUpdates[0].phone).config;
-          document.getElementById("gr_isEnabled").value = latest.isEnabled ? "true" : "false";
+          document.getElementById("gr_isEnabled").value = (latest.isEnabled === true && latest.v8AdminConfigured === true) ? "true" : "false";
           document.getElementById("gr_couponCode").value = latest.couponCode || "ENARAH-HERO";
           document.getElementById("gr_discountTitle").value = latest.discountTitle || "كوبون أبطال الإنارة الذهبي";
           document.getElementById("gr_discountDetails").value = latest.discountDetails || "خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!";
@@ -1585,7 +1585,7 @@
           console.error(e);
         }
       }
-      document.getElementById("gr_isEnabled").value = "true";
+      document.getElementById("gr_isEnabled").value = "false";
       document.getElementById("gr_couponCode").value = "ENARAH-HERO";
       document.getElementById("gr_discountTitle").value = "كوبون أبطال الإنارة الذهبي";
       document.getElementById("gr_discountDetails").value = "خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!";
@@ -1607,7 +1607,7 @@
 
       const isEnabled = document.getElementById("gr_isEnabled").value === "true";
       const config = {
-        isEnabled: isEnabled,
+        isEnabled: isEnabled, v8AdminConfigured: true,
         rewardType: currentRewardType,
         couponCode: document.getElementById("gr_couponCode").value.trim().toUpperCase() || "ENARAH-HERO",
         discountTitle: document.getElementById("gr_discountTitle").value.trim() || "كوبون أبطال الإنارة الذهبي",

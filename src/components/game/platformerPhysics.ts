@@ -11,32 +11,33 @@ import {
 // ============================================================================
 
 export const PHYSICS_CONFIG = {
-  // Horizontal movement
-  accelGround: 1850,
-  accelAir: 1350,
-  decelGround: 2300,
-  decelAir: 520,
-  skidDecel: 3500,
-  maxWalkSpeed: 250,
+  // Horizontal movement — tuned for immediate mobile response & controlled stopping without foot sliding
+  accelGround: 2650,
+  accelAir: 2150,
+  decelGround: 3250,
+  decelAir: 1180,
+  skidDecel: 4200,
+  maxWalkSpeed: 260,
   maxRunSpeed: 345,
   dashSpeed: 560,
   dashDurationSec: 0.2,
-  dashCooldownSec: 0.95,
+  dashCooldownSec: 0.85,
 
   // Jumping, Double Jump & Gravity
-  jumpVelocity: -600,
+  jumpVelocity: -605,
   doubleJumpVelocity: -545,
   springDefaultBoost: -775,
-  stompBounceVelocity: -440,
-  gravityUp: 1320,
-  gravityFall: 2020,
+  stompBounceVelocity: -445,
+  gravityUp: 1300,
+  gravityFall: 2040,
   maxFallSpeed: 760,
-  variableJumpCutMultiplier: 0.5,
-  variableJumpMinVy: -175,
+  variableJumpCutMultiplier: 0.45,
+  variableJumpMinVy: -165,
 
-  // Advanced Game Feel (Coyote Time & Jump Buffering: 110ms)
-  coyoteTimeSec: 0.11,
-  jumpBufferSec: 0.11,
+  // Advanced Game Feel (Coyote Time & Jump Buffering: 140ms for mobile touch comfort)
+  coyoteTimeSec: 0.14,
+  jumpBufferSec: 0.14,
+  minAirTimeForDoubleJumpSec: 0.13,
 
   // Hero collision box
   heroWidth: 34,
@@ -407,8 +408,14 @@ export function stepPlatformerSimulation(
     hero.scaleX = 0.84
     hero.scaleY = 1.18
     events.jumped = true
-  } else if (input.jumpPressed && !hero.onGround && hero.coyoteTimer <= 0 && hero.doubleJumpAvailable) {
-    // Execute Mid-Air Double Jump!
+  } else if (
+    input.jumpPressed &&
+    !hero.onGround &&
+    hero.coyoteTimer <= 0 &&
+    hero.doubleJumpAvailable &&
+    hero.vy > -440
+  ) {
+    // Execute Mid-Air Double Jump (guarded against accidental double-tap on initial jump takeoff)
     hero.vy = PHYSICS_CONFIG.doubleJumpVelocity
     hero.doubleJumpAvailable = false
     hero.jumpBufferTimer = 0
@@ -420,8 +427,15 @@ export function stepPlatformerSimulation(
   }
 
   // Variable Jump Height: cut upward velocity when jump button is released early
-  if (input.jumpReleased && hero.vy < PHYSICS_CONFIG.variableJumpMinVy) {
+  if (
+    (input.jumpReleased || (!input.jumpHeld && hero.jumpHeld)) &&
+    hero.vy < PHYSICS_CONFIG.variableJumpMinVy &&
+    hero.vy > -690
+  ) {
     hero.vy *= PHYSICS_CONFIG.variableJumpCutMultiplier
+    hero.jumpHeld = false
+  }
+  if (!input.jumpHeld) {
     hero.jumpHeld = false
   }
 
@@ -435,6 +449,7 @@ export function stepPlatformerSimulation(
   // --------------------------------------------------------------------------
   // 5. HORIZONTAL MOVEMENT & SOLID WALL / GATE COLLISIONS
   // --------------------------------------------------------------------------
+  const prevX = hero.x
   hero.x += hero.vx * dt
   if (hero.x < 12) {
     hero.x = 12
@@ -443,6 +458,23 @@ export function stepPlatformerSimulation(
   if (hero.x + hero.w > stage.width - 12) {
     hero.x = stage.width - 12 - hero.w
     hero.vx = 0
+  }
+
+  // Prevent clipping horizontally into thick solid ground blocks when below top surface
+  for (const p of stage.platforms) {
+    if (p.kind !== 'solid' || p.h < 50) continue
+    if (
+      hero.y + hero.h > p.y + 14 &&
+      aabbOverlap(hero.x, hero.y, hero.w, hero.h, p.x, p.y, p.w, p.h)
+    ) {
+      if (prevX + hero.w <= p.x + 8 && hero.vx > 0) {
+        hero.x = p.x - hero.w
+        hero.vx = 0
+      } else if (prevX >= p.x + p.w - 8 && hero.vx < 0) {
+        hero.x = p.x + p.w
+        hero.vx = 0
+      }
+    }
   }
 
   // Check closed Energy Gates
@@ -1018,13 +1050,13 @@ export function stepPlatformerSimulation(
     hero.animState = 'landing'
   } else if (Math.abs(hero.vx) > 255) {
     hero.animState = 'run'
-    hero.walkCycle += dt * 14
-  } else if (Math.abs(hero.vx) > 15) {
+    hero.walkCycle += Math.abs(hero.vx) * dt * 0.052
+  } else if (Math.abs(hero.vx) > 14) {
     hero.animState = 'walk'
-    hero.walkCycle += dt * 9
+    hero.walkCycle += Math.abs(hero.vx) * dt * 0.048
   } else {
     hero.animState = 'idle'
-    hero.walkCycle += dt * 3
+    hero.walkCycle += dt * 3.2
   }
 
   return events
@@ -1074,28 +1106,60 @@ function damageBoss(boss: NonNullable<StageDefinition['boss']>, events: StepSimu
 }
 
 /**
- * Updates the side-scrolling camera with look-ahead, boss arena framing, and world bounds (Section 11).
- */
+  * Updates the side-scrolling camera with mobile-aware look-ahead, dead-zone,
+  * stable vertical framing, boss arena framing, and world bounds (Sections 2, 10, 11).
+  */
 export function updateSideScrollingCamera(
   cam: CameraState,
   hero: HeroPhysicsState,
   stage: StageDefinition,
   dt: number
 ): void {
-  const lookAheadX = hero.facing === 'right' ? 95 : -65
-  let desiredCamX = hero.x + hero.w * 0.5 + lookAheadX - cam.viewportW * 0.42
+  const isCompactViewport = cam.viewportW < 760
+  const lookAheadScale = isCompactViewport ? 0.58 : 1.0
+  const lookAheadX = (hero.facing === 'right' ? 88 : -58) * lookAheadScale
+  const anchorRatioX = isCompactViewport ? 0.38 : 0.42
+
+  const heroCenterX = hero.x + hero.w * 0.5
+  let desiredCamX = heroCenterX + lookAheadX - cam.viewportW * anchorRatioX
+
+  // Subtle horizontal dead-zone when standing still to eliminate micro-jitter
+  const deadZoneHalfW = isCompactViewport ? 14 : 22
+  if (Math.abs(hero.vx) < 15 && Math.abs(desiredCamX - cam.x) < deadZoneHalfW) {
+    desiredCamX = cam.x
+  }
 
   // Boss Arena Framing when player enters Boss zone
-  if (stage.boss && stage.boss.state !== 'defeated' && hero.x > stage.boss.minX - 240) {
+  if (stage.boss && stage.boss.state !== 'defeated' && hero.x > stage.boss.minX - 220) {
     const arenaCenter = (stage.boss.minX + stage.boss.maxX) * 0.5
     const bossFrameX = arenaCenter - cam.viewportW * 0.5
-    desiredCamX = desiredCamX * 0.65 + bossFrameX * 0.35
+    desiredCamX = desiredCamX * 0.7 + bossFrameX * 0.3
   }
 
   const maxCamX = Math.max(0, stage.width - cam.viewportW)
   const clampedTargetX = Math.max(0, Math.min(maxCamX, desiredCamX))
 
-  const lerpFactor = Math.min(1, dt * 8.5)
-  cam.x += (clampedTargetX - cam.x) * lerpFactor
-  cam.y = 0
+  const lerpX = Math.min(1, dt * 9.5)
+  cam.x += (clampedTargetX - cam.x) * lerpX
+
+  // Stable Vertical Framing:
+  // Anchor the stage road surface to the bottom of the viewport on mobile
+  // and smoothly track upward when the hero climbs elevated platforms.
+  const effectiveBottomY = isCompactViewport ? stage.groundY + 28 : stage.height
+  const bottomAnchoredCamY = effectiveBottomY - cam.viewportH
+  if (bottomAnchoredCamY <= 0) {
+    cam.y = bottomAnchoredCamY
+  } else {
+    const maxCamY = bottomAnchoredCamY
+    const heroBottom = hero.y + hero.h
+    const idealGroundCamY = Math.max(0, Math.min(maxCamY, effectiveBottomY - cam.viewportH))
+    const heroTargetCamY = heroBottom - cam.viewportH * 0.68
+    const desiredCamY =
+      heroBottom < stage.groundY - 75
+        ? Math.max(0, Math.min(maxCamY, heroTargetCamY))
+        : idealGroundCamY
+
+    const lerpY = Math.min(1, dt * 7.5)
+    cam.y += (desiredCamY - cam.y) * lerpY
+  }
 }

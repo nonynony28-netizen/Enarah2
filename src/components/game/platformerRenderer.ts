@@ -5,9 +5,12 @@ import {
   type PlatformEnemy,
   type BossGuardian,
   type StageHazard,
+  type WorldThemeId,
   PRODUCT_CATALOG_META,
 } from './platformerWorlds'
 import { type HeroPhysicsState, type CameraState, isPlatformSolid } from './platformerPhysics'
+
+export type GraphicsQuality = 'high' | 'balanced' | 'low'
 
 export interface FloatingScorePopup {
   id: number
@@ -42,7 +45,8 @@ export function renderPlatformerFrame(
   elapsedSec: number,
   particles: LightParticle[],
   popups: FloatingScorePopup[],
-  reducedMotion = false
+  reducedMotion = false,
+  graphicsQuality: GraphicsQuality = 'high'
 ): void {
   const W = cam.viewportW
   const H = cam.viewportH
@@ -51,20 +55,20 @@ export function renderPlatformerFrame(
   ctx.clearRect(0, 0, W, H)
 
   // Subtle camera impact shake when boss hits or damage occurs
-  if (!reducedMotion && cam.shakeIntensity && cam.shakeIntensity > 0.2) {
+  if (!reducedMotion && graphicsQuality !== 'low' && cam.shakeIntensity && cam.shakeIntensity > 0.2) {
     const sx = (Math.random() - 0.5) * cam.shakeIntensity
     const sy = (Math.random() - 0.5) * cam.shakeIntensity
     ctx.translate(sx, sy)
   }
 
   // LAYER 1 — DISTANT SKY & ATMOSPHERIC ILLUMINATION (0.05x Parallax)
-  renderSkyAndAtmosphere(ctx, stage, cam, elapsedSec, W, H)
+  renderSkyAndAtmosphere(ctx, stage, cam, elapsedSec, W, H, graphicsQuality)
 
   // LAYER 2 — FAR HORIZON SKYLINE / INDUSTRIAL SILHOUETTE (0.18x Parallax)
-  renderFarParallaxLayer(ctx, stage, cam, elapsedSec, W, H, reducedMotion)
+  renderFarParallaxLayer(ctx, stage, cam, elapsedSec, W, H, reducedMotion, graphicsQuality)
 
-  // LAYER 3 — MIDGROUND ARCHITECTURE, ELECTRICAL SHOPS & DETAILS (0.42x Parallax)
-  renderMidgroundParallaxLayer(ctx, stage, cam, elapsedSec, W, H, reducedMotion)
+  // LAYER 3 — MIDGROUND ARCHITECTURE, ELECTRICAL INFRASTRUCTURE & DETAILS (0.42x Parallax)
+  renderMidgroundParallaxLayer(ctx, stage, cam, elapsedSec, W, H, reducedMotion, graphicsQuality)
 
   // LAYER 4 — GAMEPLAY LAYER (2.5D Platforms, Products, Enemies, Boss & LED Bulb Hero)
   ctx.save()
@@ -82,10 +86,10 @@ export function renderPlatformerFrame(
     renderStageSwitch(ctx, sw.x, sw.y, sw.activated, sw.labelAr, elapsedSec)
   }
 
-  // 4C. 2.5D Platforms (Beveled top/front/side depth planes + material textures)
+  // 4C. 2.5D Platforms (Stage-authentic architecture, materials & depth planes)
   for (const plat of stage.platforms) {
     if (plat.x + plat.w < cam.x - 40 || plat.x > cam.x + W + 40) continue
-    render25DPlatform(ctx, plat, hero, elapsedSec)
+    render25DPlatform(ctx, plat, hero, elapsedSec, stage.theme)
   }
 
   // 4D. Energy Gates & Security Doors
@@ -162,13 +166,15 @@ export function renderPlatformerFrame(
   if (stage.darknessLevel && stage.darknessLevel > 0) {
     renderBlackoutIlluminationMask(ctx, stage, hero, cam, W, H)
   }
-  renderForegroundDepthLayer(ctx, stage, cam, elapsedSec, W, H, reducedMotion)
+  if (graphicsQuality !== 'low') {
+    renderForegroundDepthLayer(ctx, stage, cam, elapsedSec, W, H, reducedMotion)
+  }
 
   ctx.restore()
 }
 
 // ============================================================================
-// PARALLAX ENVIRONMENT LAYERS (STYLIZED-REALISTIC 2.5D DEPTH — SECTION 10)
+// V5 — 8 UNIQUE LIVING ELECTRICAL WORLDS (LAYERED 2.5D ENVIRONMENTS)
 // ============================================================================
 
 function renderSkyAndAtmosphere(
@@ -177,50 +183,157 @@ function renderSkyAndAtmosphere(
   cam: CameraState,
   elapsedSec: number,
   W: number,
-  H: number
+  H: number,
+  graphicsQuality: GraphicsQuality
 ) {
+  const theme = stage.theme
   const skyGrad = ctx.createLinearGradient(0, 0, 0, H)
-  skyGrad.addColorStop(0, stage.skyTop)
-  skyGrad.addColorStop(1, stage.skyBottom)
+
+  if (theme === 'city_of_light') {
+    // Stage 1: Bright welcoming daytime blue sky
+    skyGrad.addColorStop(0, '#0284C7')
+    skyGrad.addColorStop(0.55, '#38BDF8')
+    skyGrad.addColorStop(1, '#E0F2FE')
+  } else if (theme === 'electricity_street') {
+    // Stage 2: Warm golden morning / commercial boulevard sky
+    skyGrad.addColorStop(0, '#D97706')
+    skyGrad.addColorStop(0.48, '#F59E0B')
+    skyGrad.addColorStop(1, '#FEF3C7')
+  } else if (theme === 'lighting_factory') {
+    // Stage 3: Steel-blue & slate industrial factory hall interior
+    skyGrad.addColorStop(0, '#0F172A')
+    skyGrad.addColorStop(0.55, '#1E293B')
+    skyGrad.addColorStop(1, '#334155')
+  } else if (theme === 'intercom_district') {
+    // Stage 4: Fresh residential morning with copper-warm horizon
+    skyGrad.addColorStop(0, '#0F766E')
+    skyGrad.addColorStop(0.55, '#2DD4BF')
+    skyGrad.addColorStop(1, '#FEF3C7')
+  } else if (theme === 'power_station') {
+    // Stage 5: Deep high-voltage industrial blue with copper horizon glow
+    skyGrad.addColorStop(0, '#06101E')
+    skyGrad.addColorStop(0.65, '#132A4A')
+    skyGrad.addColorStop(1, '#2B2D42')
+  } else if (theme === 'dark_city') {
+    // Stage 6: Futuristic twilight / blackout city (blue, purple & cyan)
+    skyGrad.addColorStop(0, '#070B1E')
+    skyGrad.addColorStop(0.55, '#1E1B4B')
+    skyGrad.addColorStop(1, '#311042')
+  } else if (theme === 'lighting_tower') {
+    // Stage 7: High-altitude stratosphere sky above the clouds
+    skyGrad.addColorStop(0, '#0369A1')
+    skyGrad.addColorStop(0.55, '#38BDF8')
+    skyGrad.addColorStop(1, '#F0F9FF')
+  } else {
+    // Stage 8: Final Energy Fortress (deep navy, steel & crimson-orange core glow)
+    skyGrad.addColorStop(0, '#070A12')
+    skyGrad.addColorStop(0.6, '#1B1429')
+    skyGrad.addColorStop(1, '#3B1219')
+  }
+
   ctx.fillStyle = skyGrad
   ctx.fillRect(0, 0, W, H)
 
-  const sunX = W * 0.76 - cam.x * 0.04
-  const sunY = H * 0.2
-  const glowGrad = ctx.createRadialGradient(sunX, sunY, 8, sunX, sunY, 150)
+  // Stage-specific celestial bodies, factory skylights, or atmospheric lighting
+  if (graphicsQuality !== 'low') {
+    if (theme === 'city_of_light' || theme === 'electricity_street' || theme === 'intercom_district') {
+      const sunX = W * 0.78 - cam.x * 0.03
+      const sunY = theme === 'electricity_street' ? H * 0.26 : H * 0.18
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 150)
+      sunGlow.addColorStop(0, 'rgba(255, 255, 240, 0.95)')
+      sunGlow.addColorStop(0.3, 'rgba(253, 224, 71, 0.42)')
+      sunGlow.addColorStop(1, 'rgba(253, 224, 71, 0)')
+      ctx.fillStyle = sunGlow
+      ctx.beginPath()
+      ctx.arc(sunX, sunY, 150, 0, Math.PI * 2)
+      ctx.fill()
 
-  if (stage.theme === 'city_of_light') {
-    glowGrad.addColorStop(0, 'rgba(255, 251, 235, 0.92)')
-    glowGrad.addColorStop(0.35, 'rgba(253, 224, 71, 0.35)')
-    glowGrad.addColorStop(1, 'rgba(253, 224, 71, 0)')
-  } else {
-    glowGrad.addColorStop(0, 'rgba(248, 250, 252, 0.35)')
-    glowGrad.addColorStop(1, 'rgba(15, 23, 42, 0)')
+      ctx.fillStyle = '#FFFBEB'
+      ctx.beginPath()
+      ctx.arc(sunX, sunY, 26, 0, Math.PI * 2)
+      ctx.fill()
+    } else if (theme === 'lighting_factory') {
+      // Industrial roof trusses & angled daylight skylight shafts
+      const trussOffset = (cam.x * 0.08) % 180
+      ctx.fillStyle = '#090D16'
+      ctx.fillRect(0, 0, W, 34)
+      for (let tx = -trussOffset; tx < W + 180; tx += 180) {
+        // Skylight window pane in factory roof
+        ctx.fillStyle = 'rgba(125, 211, 252, 0.22)'
+        ctx.fillRect(tx + 30, 6, 90, 20)
+        // Diagonal light beam into factory
+        ctx.fillStyle = 'rgba(186, 230, 253, 0.06)'
+        ctx.beginPath()
+        ctx.moveTo(tx + 30, 26)
+        ctx.lineTo(tx + 120, 26)
+        ctx.lineTo(tx + 190, H - 80)
+        ctx.lineTo(tx + 60, H - 80)
+        ctx.closePath()
+        ctx.fill()
+
+        // Steel roof truss triangles
+        ctx.strokeStyle = '#334155'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.moveTo(tx, 34)
+        ctx.lineTo(tx + 45, 6)
+        ctx.lineTo(tx + 90, 34)
+        ctx.lineTo(tx + 135, 6)
+        ctx.lineTo(tx + 180, 34)
+        ctx.stroke()
+      }
+    } else if (theme === 'dark_city' || theme === 'power_station' || theme === 'darkness_fortress') {
+      // Stars & distant energy core / moon
+      const starCount = graphicsQuality === 'high' ? 18 : 10
+      for (let i = 0; i < starCount; i++) {
+        const sx = ((i * 97 - cam.x * 0.02) % W + W) % W
+        const sy = 18 + ((i * 41) % 165)
+        const pulse = 0.3 + 0.35 * Math.sin(elapsedSec * 2.2 + i)
+        ctx.fillStyle =
+          theme === 'darkness_fortress'
+            ? `rgba(251, 146, 60, ${pulse.toFixed(2)})`
+            : `rgba(224, 242, 254, ${pulse.toFixed(2)})`
+        ctx.fillRect(sx, sy, 2, 2)
+      }
+    }
   }
-  ctx.fillStyle = glowGrad
-  ctx.beginPath()
-  ctx.arc(sunX, sunY, 150, 0, Math.PI * 2)
-  ctx.fill()
 
-  // Soft clouds for daytime city, subtle stars for night/industrial levels
-  if (stage.theme === 'city_of_light') {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
-    for (let i = 0; i < 5; i++) {
-      const cx = ((i * 270 - cam.x * 0.07 + elapsedSec * 7) % (W + 240)) - 120
-      const cy = 58 + (i % 3) * 32
+  // Drifting clouds (Stages 1, 2, 4, 7) & distant flying birds (Stages 2 & 4)
+  if (
+    theme === 'city_of_light' ||
+    theme === 'electricity_street' ||
+    theme === 'intercom_district' ||
+    theme === 'lighting_tower'
+  ) {
+    const cloudCount = graphicsQuality === 'low' ? 3 : 5
+    ctx.fillStyle =
+      theme === 'electricity_street'
+        ? 'rgba(255, 251, 235, 0.55)'
+        : 'rgba(255, 255, 255, 0.72)'
+    for (let i = 0; i < cloudCount; i++) {
+      const cx = ((i * 260 - cam.x * 0.06 + elapsedSec * 9) % (W + 240)) - 120
+      const cy = theme === 'lighting_tower' ? H - 105 + (i % 2) * 18 : 54 + (i % 3) * 28
       ctx.beginPath()
       ctx.arc(cx, cy, 24, 0, Math.PI * 2)
-      ctx.arc(cx + 20, cy - 6, 30, 0, Math.PI * 2)
-      ctx.arc(cx + 42, cy, 22, 0, Math.PI * 2)
+      ctx.arc(cx + 22, cy - 7, 30, 0, Math.PI * 2)
+      ctx.arc(cx + 46, cy, 22, 0, Math.PI * 2)
       ctx.fill()
     }
-  } else {
-    for (let i = 0; i < 18; i++) {
-      const sx = ((i * 97 - cam.x * 0.03) % W + W) % W
-      const sy = 24 + ((i * 43) % 180)
-      const pulse = 0.25 + 0.35 * Math.sin(elapsedSec * 2 + i)
-      ctx.fillStyle = `rgba(255, 255, 255, ${pulse.toFixed(2)})`
-      ctx.fillRect(sx, sy, 2, 2)
+  }
+
+  // Animated birds in the distant sky for Residential & Commercial stages (Stages 2 & 4)
+  if ((theme === 'electricity_street' || theme === 'intercom_district') && graphicsQuality !== 'low') {
+    ctx.strokeStyle = 'rgba(30, 41, 59, 0.55)'
+    ctx.lineWidth = 1.6
+    for (let b = 0; b < 4; b++) {
+      const bx = ((b * 210 + elapsedSec * 28 - cam.x * 0.05) % (W + 120)) - 60
+      const by = 68 + (b % 2) * 24 + Math.sin(elapsedSec * 3 + b) * 4
+      const wingY = Math.sin(elapsedSec * 9 + b * 1.4) * 4
+      ctx.beginPath()
+      ctx.moveTo(bx - 7, by + wingY)
+      ctx.quadraticCurveTo(bx - 3, by - 4, bx, by)
+      ctx.quadraticCurveTo(bx + 3, by - 4, bx + 7, by + wingY)
+      ctx.stroke()
     }
   }
 }
@@ -232,56 +345,319 @@ function renderFarParallaxLayer(
   elapsedSec: number,
   W: number,
   H: number,
-  reducedMotion: boolean
+  reducedMotion: boolean,
+  graphicsQuality: GraphicsQuality
 ) {
+  const theme = stage.theme
   const scrollX = cam.x * 0.18
-  const baseHorizonY = H - 60
+  const baseHorizonY = Math.round(stage.groundY - cam.y + 2)
 
-  for (let i = -1; i < 11; i++) {
-    const bx = i * 170 - (scrollX % 170)
-    const seed = Math.abs(i + Math.floor(scrollX / 170))
-    const bw = 115 + (seed % 3) * 22
-    const bh = 130 + (seed % 5) * 36
-    const by = baseHorizonY - bh
+  // --------------------------------------------------------------------------
+  // STAGE 1: THE LIVING CITY (مدينة النور) — Modern Skyline + Distant Moving Traffic
+  // --------------------------------------------------------------------------
+  if (theme === 'city_of_light') {
+    for (let i = -1; i < 8; i++) {
+      const bx = i * 165 - (scrollX % 165)
+      const seed = Math.abs(i + Math.floor(scrollX / 165))
+      const bw = 110 + (seed % 3) * 20
+      const bh = 135 + (seed % 4) * 32
+      const by = baseHorizonY - bh
 
-    ctx.fillStyle =
-      stage.theme === 'city_of_light'
-        ? '#94A3B8'
-        : stage.theme === 'dark_city'
-        ? '#090D16'
-        : '#1E293B'
-    ctx.fillRect(bx, by, bw, bh)
+      // Colorful pastel-modern skyline towers
+      const towerColors = ['#60A5FA', '#38BDF8', '#818CF8', '#34D399']
+      ctx.fillStyle = towerColors[seed % towerColors.length]
+      ctx.fillRect(bx, by, bw, bh)
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.18)'
+      ctx.fillRect(bx + bw - 14, by, 14, bh)
 
-    // Subtle 2.5D side bevel on background buildings
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.22)'
-    ctx.fillRect(bx + bw - 14, by, 14, bh)
-
-    // Lit architectural windows (off during Dark City blackout!)
-    if (stage.theme !== 'dark_city') {
-      ctx.fillStyle =
-        stage.theme === 'city_of_light'
-          ? 'rgba(255, 255, 255, 0.5)'
-          : 'rgba(253, 224, 71, 0.22)'
-      for (let wy = by + 18; wy < baseHorizonY - 24; wy += 26) {
-        for (let wx = bx + 14; wx < bx + bw - 26; wx += 24) {
-          ctx.fillRect(wx, wy, 10, 14)
+      // Stepped crown & glass curtain lines
+      ctx.fillStyle = '#E0F2FE'
+      ctx.fillRect(bx + 16, by - 10, bw - 32, 10)
+      if (graphicsQuality !== 'low') {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.55)'
+        for (let wy = by + 16; wy < baseHorizonY - 38; wy += 24) {
+          for (let wx = bx + 12; wx < bx + bw - 24; wx += 22) {
+            ctx.fillRect(wx, wy, 10, 12)
+          }
         }
       }
     }
+
+    // Distant Highway Overpass with Slowly Moving Background Traffic
+    const bridgeY = baseHorizonY - 28
+    ctx.fillStyle = '#64748B'
+    ctx.fillRect(0, bridgeY, W, 10)
+    ctx.fillStyle = '#475569'
+    for (let px = -(scrollX % 140); px < W; px += 140) {
+      ctx.fillRect(px + 20, bridgeY + 10, 12, 18)
+    }
+    if (!reducedMotion) {
+      for (let c = 0; c < 4; c++) {
+        const carX = ((c * 260 + elapsedSec * 42 - scrollX * 0.5) % (W + 120)) - 60
+        ctx.fillStyle = c % 2 === 0 ? '#F43F5E' : '#FACC15'
+        ctx.fillRect(carX, bridgeY - 7, 18, 7)
+        ctx.fillStyle = '#E0F2FE'
+        ctx.fillRect(carX + 4, bridgeY - 11, 10, 4)
+      }
+    }
+    return
   }
 
-  // Wind streamlines in Level 7 (برج الإنارة)
-  if (stage.windForce && !reducedMotion) {
-    ctx.strokeStyle = 'rgba(186, 230, 253, 0.22)'
-    ctx.lineWidth = 1.5
-    for (let i = 0; i < 8; i++) {
-      const wx = ((W - ((elapsedSec * 220 + i * 140) % (W + 160)))) - 80
-      const wy = 70 + (i * 53) % (H - 140)
+  // --------------------------------------------------------------------------
+  // STAGE 2: COMMERCIAL & RESIDENTIAL AVENUE (شارع الكهرباء)
+  // --------------------------------------------------------------------------
+  if (theme === 'electricity_street') {
+    // Warm distant hills
+    ctx.fillStyle = '#FCD34D'
+    ctx.beginPath()
+    ctx.moveTo(0, baseHorizonY)
+    for (let x = 0; x <= W + 80; x += 80) {
+      const hy = baseHorizonY - 48 - Math.sin((x + scrollX) * 0.008) * 22
+      ctx.lineTo(x, hy)
+    }
+    ctx.lineTo(W, baseHorizonY)
+    ctx.closePath()
+    ctx.fill()
+
+    // Distant pitched-roof neighborhood houses & commercial plazas
+    for (let i = -1; i < 8; i++) {
+      const hx = i * 160 - (scrollX % 160)
+      const seed = Math.abs(i + Math.floor(scrollX / 160))
+      const hw = 96
+      const hh = 64 + (seed % 3) * 18
+      const hy = baseHorizonY - hh
+      ctx.fillStyle = seed % 2 === 0 ? '#FEF3C7' : '#FDE68A'
+      ctx.fillRect(hx, hy, hw, hh)
+      // Terracotta pitched roof
+      ctx.fillStyle = '#EA580C'
       ctx.beginPath()
-      ctx.moveTo(wx, wy)
-      ctx.lineTo(wx + 55, wy)
+      ctx.moveTo(hx - 6, hy)
+      ctx.lineTo(hx + hw * 0.5, hy - 24)
+      ctx.lineTo(hx + hw + 6, hy)
+      ctx.closePath()
+      ctx.fill()
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 3: THE LIGHTING FACTORY (مصنع الإنارة) — Giant Gears, Silos & Pipes
+  // --------------------------------------------------------------------------
+  if (theme === 'lighting_factory') {
+    for (let i = -1; i < 7; i++) {
+      const fx = i * 200 - (scrollX % 200)
+      const seed = Math.abs(i + Math.floor(scrollX / 200))
+
+      // Industrial storage silo & pipework
+      ctx.fillStyle = '#1E293B'
+      ctx.fillRect(fx + 20, baseHorizonY - 170, 74, 170)
+      ctx.fillStyle = '#334155'
+      ctx.beginPath()
+      ctx.arc(fx + 57, baseHorizonY - 170, 37, Math.PI, 0)
+      ctx.fill()
+
+      // Horizontal overhead factory pipe
+      ctx.fillStyle = '#475569'
+      ctx.fillRect(fx, baseHorizonY - 135, 200, 12)
+
+      // Giant slowly rotating background gear
+      const gx = fx + 145
+      const gy = baseHorizonY - 95
+      ctx.save()
+      ctx.translate(gx, gy)
+      if (!reducedMotion) ctx.rotate(elapsedSec * (seed % 2 === 0 ? 0.35 : -0.35))
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.35)'
+      ctx.lineWidth = 8
+      ctx.beginPath()
+      ctx.arc(0, 0, 36, 0, Math.PI * 2)
+      ctx.stroke()
+      for (let t = 0; t < 8; t++) {
+        const ang = (t * Math.PI) / 4
+        ctx.fillStyle = 'rgba(249, 115, 22, 0.35)'
+        ctx.fillRect(Math.cos(ang) * 36 - 4, Math.sin(ang) * 36 - 4, 8, 8)
+      }
+      ctx.restore()
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 4: RESIDENTIAL & COPPER WORLD (حي الإنترفون) — Green Hills & Villas
+  // --------------------------------------------------------------------------
+  if (theme === 'intercom_district') {
+    // Lush green garden hills
+    ctx.fillStyle = '#5EEAD4'
+    ctx.beginPath()
+    ctx.moveTo(0, baseHorizonY)
+    for (let x = 0; x <= W + 60; x += 60) {
+      ctx.lineTo(x, baseHorizonY - 52 - Math.cos((x + scrollX) * 0.009) * 18)
+    }
+    ctx.lineTo(W, baseHorizonY)
+    ctx.closePath()
+    ctx.fill()
+
+    // Giant insulated copper cable arches in the distance
+    ctx.strokeStyle = '#EA580C'
+    ctx.lineWidth = 5
+    for (let i = -1; i < 6; i++) {
+      const cx = i * 220 - (scrollX % 220)
+      ctx.beginPath()
+      ctx.moveTo(cx, baseHorizonY - 30)
+      ctx.quadraticCurveTo(cx + 110, baseHorizonY - 140, cx + 220, baseHorizonY - 30)
       ctx.stroke()
     }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 5: THE POWER STATION (محطة الطاقة) — High-Voltage Pylons & Grid
+  // --------------------------------------------------------------------------
+  if (theme === 'power_station') {
+    for (let i = -1; i < 6; i++) {
+      const px = i * 240 - (scrollX % 240)
+      const topY = baseHorizonY - 210
+
+      // Lattice High-Voltage Transmission Tower
+      ctx.strokeStyle = '#475569'
+      ctx.lineWidth = 2.2
+      ctx.beginPath()
+      ctx.moveTo(px + 40, baseHorizonY)
+      ctx.lineTo(px + 65, topY)
+      ctx.lineTo(px + 90, baseHorizonY)
+      // Cross arms
+      ctx.moveTo(px + 25, topY + 35)
+      ctx.lineTo(px + 105, topY + 35)
+      ctx.moveTo(px + 15, topY + 75)
+      ctx.lineTo(px + 115, topY + 75)
+      ctx.stroke()
+
+      // Sagging copper HV lines between pylons
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)'
+      ctx.lineWidth = 1.8
+      ctx.beginPath()
+      ctx.moveTo(px + 105, topY + 35)
+      ctx.quadraticCurveTo(px + 185, topY + 75, px + 265, topY + 35)
+      ctx.stroke()
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 6: THE FUTURISTIC / DARK CITY (المدينة المظلمة) — Neon Skybridges & Hover Traffic
+  // --------------------------------------------------------------------------
+  if (theme === 'dark_city') {
+    for (let i = -1; i < 8; i++) {
+      const bx = i * 175 - (scrollX % 175)
+      const seed = Math.abs(i + Math.floor(scrollX / 175))
+      const bw = 115
+      const bh = 160 + (seed % 4) * 30
+      const by = baseHorizonY - bh
+
+      ctx.fillStyle = '#0F172A'
+      ctx.fillRect(bx, by, bw, bh)
+
+      // Cyan / Purple futuristic vertical neon trim
+      ctx.fillStyle = seed % 2 === 0 ? '#22D3EE' : '#A855F7'
+      ctx.fillRect(bx + 6, by + 10, 3, bh - 20)
+      ctx.fillRect(bx + bw - 9, by + 10, 3, bh - 20)
+
+      // Elevated glowing energy skybridge between towers
+      if (seed % 2 === 0) {
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.28)'
+        ctx.fillRect(bx + bw, by + 65, 60, 8)
+      }
+    }
+
+    // Slow-moving background futuristic hover vehicles
+    if (!reducedMotion && graphicsQuality !== 'low') {
+      for (let v = 0; v < 3; v++) {
+        const vx = ((v * 310 + elapsedSec * 55 - scrollX * 0.4) % (W + 140)) - 70
+        const vy = 115 + v * 42
+        ctx.fillStyle = '#22D3EE'
+        ctx.fillRect(vx, vy, 22, 5)
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.35)'
+        ctx.fillRect(vx - 18, vy + 1, 18, 3)
+      }
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 7: THE LIGHTING TOWER (برج الإنارة) — High-Altitude Wind Turbines & Cables
+  // --------------------------------------------------------------------------
+  if (theme === 'lighting_tower') {
+    // Diagonal suspension cables anchoring the megatower
+    ctx.strokeStyle = 'rgba(15, 23, 42, 0.25)'
+    ctx.lineWidth = 2
+    for (let c = -1; c < 6; c++) {
+      const cx = c * 240 - (scrollX % 240)
+      ctx.beginPath()
+      ctx.moveTo(cx, baseHorizonY)
+      ctx.lineTo(cx + 140, 0)
+      ctx.stroke()
+    }
+
+    // Giant rotating high-altitude wind turbines poking above the cloud deck
+    for (let i = -1; i < 6; i++) {
+      const tx = i * 230 - (scrollX % 230) + 80
+      const ty = baseHorizonY - 150
+      ctx.fillStyle = '#E2E8F0'
+      ctx.fillRect(tx - 3, ty, 6, 150)
+
+      ctx.save()
+      ctx.translate(tx, ty)
+      if (!reducedMotion) ctx.rotate(elapsedSec * 1.1 + i)
+      ctx.fillStyle = '#F8FAFC'
+      for (let b = 0; b < 3; b++) {
+        ctx.rotate((Math.PI * 2) / 3)
+        ctx.fillRect(-2, -48, 4, 48)
+      }
+      ctx.restore()
+    }
+
+    // Wind streamlines in Level 7
+    if (!reducedMotion && graphicsQuality !== 'low') {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)'
+      ctx.lineWidth = 1.6
+      for (let i = 0; i < 6; i++) {
+        const wx = W - ((elapsedSec * 220 + i * 160) % (W + 160)) - 80
+        const wy = 70 + ((i * 53) % (H - 160))
+        ctx.beginPath()
+        ctx.moveTo(wx, wy)
+        ctx.lineTo(wx + 56, wy)
+        ctx.stroke()
+      }
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 8: THE FINAL ENERGY FORTRESS (قلعة الظلام) — Armored Citadel Spires
+  // --------------------------------------------------------------------------
+  for (let i = -1; i < 7; i++) {
+    const fx = i * 195 - (scrollX % 195)
+    const seed = Math.abs(i + Math.floor(scrollX / 195))
+    const fw = 135
+    const fh = 175 + (seed % 3) * 32
+    const fy = baseHorizonY - fh
+
+    // Armored citadel monolith
+    ctx.fillStyle = '#111827'
+    ctx.fillRect(fx, fy, fw, fh)
+    // Battlement horns on top
+    ctx.beginPath()
+    ctx.moveTo(fx, fy)
+    ctx.lineTo(fx + 22, fy - 24)
+    ctx.lineTo(fx + 40, fy)
+    ctx.moveTo(fx + fw - 40, fy)
+    ctx.lineTo(fx + fw - 22, fy - 24)
+    ctx.lineTo(fx + fw, fy)
+    ctx.fill()
+
+    // Pulsing plasma conduit column
+    const pulse = 0.45 + 0.35 * Math.sin(elapsedSec * 3.5 + i)
+    ctx.fillStyle = `rgba(249, 115, 22, ${pulse.toFixed(2)})`
+    ctx.fillRect(fx + fw * 0.5 - 5, fy + 24, 10, fh - 40)
   }
 }
 
@@ -292,69 +668,512 @@ function renderMidgroundParallaxLayer(
   elapsedSec: number,
   W: number,
   H: number,
-  reducedMotion: boolean
+  reducedMotion: boolean,
+  graphicsQuality: GraphicsQuality
 ) {
+  const theme = stage.theme
   const scrollX = cam.x * 0.42
-  const groundLine = H - 55
+  const groundLine = Math.round(stage.groundY - cam.y + 4)
 
-  for (let i = -1; i < 8; i++) {
-    const mx = i * 260 - (scrollX % 260)
-    const idx = Math.abs(i + Math.floor(scrollX / 260))
+  // --------------------------------------------------------------------------
+  // STAGE 1: THE LIVING CITY (مدينة النور)
+  // Colorful buildings, shops, balconies, streetlights, swaying trees, road signs & parked cars
+  // --------------------------------------------------------------------------
+  if (theme === 'city_of_light') {
+    const facadePalette = ['#F8FAFC', '#FEF3C7', '#E0F2FE', '#FCE7F3']
+    const accentPalette = ['#0284C7', '#EA580C', '#0D9488', '#4F46E5']
 
-    if (stage.theme === 'city_of_light' || stage.theme === 'electricity_street') {
-      // Realistic ENARAH MODERN electrical & lighting store facades
-      const bH = 145 + (idx % 2) * 30
+    for (let i = -1; i < 7; i++) {
+      const mx = i * 270 - (scrollX % 270)
+      const idx = Math.abs(i + Math.floor(scrollX / 270))
+      const bW = 168
+      const bH = 152 + (idx % 3) * 24
       const bY = groundLine - bH
-      ctx.fillStyle = stage.theme === 'city_of_light' ? '#E2E8F0' : '#1E293B'
-      ctx.fillRect(mx + 20, bY, 175, bH)
-      // 2.5D side depth wall
-      ctx.fillStyle = stage.theme === 'city_of_light' ? '#CBD5E1' : '#0F172A'
-      ctx.fillRect(mx + 195, bY + 6, 18, bH - 6)
 
-      // Storefront signboard
+      // Building main facade + 2.5D side wall
+      ctx.fillStyle = facadePalette[idx % facadePalette.length]
+      ctx.fillRect(mx + 16, bY, bW, bH)
+      ctx.fillStyle = '#CBD5E1'
+      ctx.fillRect(mx + 16 + bW, bY + 6, 14, bH - 6)
+
+      // Colorful roof cornice
+      ctx.fillStyle = accentPalette[idx % accentPalette.length]
+      ctx.fillRect(mx + 12, bY, bW + 8, 8)
+
+      // Upper floor windows & wrought-iron balconies
+      for (let row = 0; row < 2; row++) {
+        const wy = bY + 22 + row * 38
+        for (let col = 0; col < 3; col++) {
+          const wx = mx + 30 + col * 48
+          ctx.fillStyle = '#38BDF8'
+          ctx.fillRect(wx, wy, 26, 24)
+          ctx.fillStyle = '#0F172A'
+          ctx.fillRect(wx - 3, wy + 20, 32, 5) // Balcony railing
+        }
+      }
+
+      // Ground-floor ENARAH showroom & striped awning
       ctx.fillStyle = '#0F172A'
-      ctx.fillRect(mx + 28, groundLine - 68, 158, 22)
-      ctx.fillStyle = '#38BDF8'
-      ctx.font = 'bold 10px Cairo, sans-serif'
+      ctx.fillRect(mx + 24, groundLine - 62, 152, 18)
+      ctx.fillStyle = '#FACC15'
+      ctx.font = 'bold 9.5px Cairo, sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText('الإنارة الحديثة • ENARAH', mx + 107, groundLine - 53)
+      ctx.fillText('الإنارة الحديثة • ENARAH', mx + 100, groundLine - 50)
 
-      // Illuminated shop window displaying warm hanging pendant lights
-      ctx.fillStyle = 'rgba(254, 243, 199, 0.35)'
-      ctx.fillRect(mx + 34, groundLine - 44, 146, 38)
-    } else if (stage.theme === 'lighting_factory' || stage.theme === 'power_station') {
-      // Industrial rotating gears & copper busbars
-      const gearX = mx + 120
-      const gearY = groundLine - 115
-      ctx.save()
-      ctx.translate(gearX, gearY)
-      if (!reducedMotion) ctx.rotate(elapsedSec * (idx % 2 === 0 ? 0.5 : -0.5))
-      ctx.strokeStyle = 'rgba(217, 119, 6, 0.28)'
-      ctx.lineWidth = 8
+      // Glowing shop window with warm pendant lights
+      ctx.fillStyle = '#FEF9C3'
+      ctx.fillRect(mx + 28, groundLine - 42, 144, 38)
+      ctx.fillStyle = '#F59E0B'
       ctx.beginPath()
-      ctx.arc(0, 0, 38, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.restore()
-    } else {
-      // Smart residential villas / futuristic towers
-      const vH = 135 + (idx % 3) * 25
-      ctx.fillStyle = 'rgba(30, 41, 59, 0.65)'
-      ctx.fillRect(mx + 30, groundLine - vH, 150, vH)
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)'
-      ctx.strokeRect(mx + 30, groundLine - vH, 150, vH)
+      ctx.arc(mx + 65, groundLine - 30, 5, 0, Math.PI * 2)
+      ctx.arc(mx + 100, groundLine - 28, 5, 0, Math.PI * 2)
+      ctx.arc(mx + 135, groundLine - 30, 5, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Gentle swaying street tree beside building
+      const treeX = mx + 222
+      const sway = reducedMotion ? 0 : Math.sin(elapsedSec * 2.2 + idx) * 3.5
+      ctx.fillStyle = '#78350F'
+      ctx.fillRect(treeX - 4, groundLine - 44, 8, 44)
+      ctx.fillStyle = '#10B981'
+      ctx.beginPath()
+      ctx.arc(treeX + sway, groundLine - 58, 22, 0, Math.PI * 2)
+      ctx.arc(treeX - 12 + sway, groundLine - 48, 16, 0, Math.PI * 2)
+      ctx.arc(treeX + 12 + sway, groundLine - 48, 16, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Streetlight pole & road sign or parked car
+      const poleX = mx + 254
+      ctx.fillStyle = '#475569'
+      ctx.fillRect(poleX - 2, groundLine - 115, 4, 115)
+      ctx.fillStyle = '#FEF08A'
+      ctx.beginPath()
+      ctx.arc(poleX - 10, groundLine - 112, 5, 0, Math.PI * 2)
+      ctx.fill()
+
+      if (idx % 2 === 0) {
+        // Parked compact car on street curb
+        ctx.fillStyle = '#0284C7'
+        ctx.fillRect(mx + 198, groundLine - 16, 42, 12)
+        ctx.fillStyle = '#BAE6FD'
+        ctx.fillRect(mx + 206, groundLine - 24, 24, 9)
+        ctx.fillStyle = '#0F172A'
+        ctx.beginPath()
+        ctx.arc(mx + 207, groundLine - 4, 5, 0, Math.PI * 2)
+        ctx.arc(mx + 231, groundLine - 4, 5, 0, Math.PI * 2)
+        ctx.fill()
+      }
     }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 2: COMMERCIAL & RESIDENTIAL STREET (شارع الكهرباء)
+  // Houses with pitched roofs, gardens, fences, garages + lively commercial showrooms
+  // --------------------------------------------------------------------------
+  if (theme === 'electricity_street') {
+    for (let i = -1; i < 7; i++) {
+      const mx = i * 280 - (scrollX % 280)
+      const idx = Math.abs(i + Math.floor(scrollX / 280))
+
+      if (idx % 2 === 0) {
+        // Warm Residential House with Pitched Roof, Garage & Garden Fence
+        const hX = mx + 20
+        const hW = 155
+        const hH = 115
+        const hY = groundLine - hH
+        ctx.fillStyle = '#FFFBEB'
+        ctx.fillRect(hX, hY, hW, hH)
+        // Pitched terracotta roof
+        ctx.fillStyle = '#C2410C'
+        ctx.beginPath()
+        ctx.moveTo(hX - 10, hY)
+        ctx.lineTo(hX + hW * 0.5, hY - 38)
+        ctx.lineTo(hX + hW + 10, hY)
+        ctx.closePath()
+        ctx.fill()
+
+        // Garage door with horizontal slats
+        ctx.fillStyle = '#CBD5E1'
+        ctx.fillRect(hX + 14, groundLine - 48, 56, 48)
+        ctx.strokeStyle = '#64748B'
+        ctx.lineWidth = 1.5
+        for (let gy = groundLine - 40; gy < groundLine - 6; gy += 10) {
+          ctx.beginPath()
+          ctx.moveTo(hX + 16, gy)
+          ctx.lineTo(hX + 68, gy)
+          ctx.stroke()
+        }
+
+        // Warm lit house window
+        ctx.fillStyle = '#FDE047'
+        ctx.fillRect(hX + 90, hY + 26, 42, 30)
+
+        // Garden fence & bushes next to house
+        ctx.fillStyle = '#D97706'
+        for (let fx = hX + hW + 8; fx < mx + 265; fx += 12) {
+          ctx.fillRect(fx, groundLine - 28, 6, 28)
+        }
+        ctx.fillRect(hX + hW + 6, groundLine - 20, 82, 4)
+      } else {
+        // Lively Commercial Lighting Showroom with Animated Signboard
+        const sX = mx + 18
+        const sW = 185
+        const sH = 148
+        const sY = groundLine - sH
+        ctx.fillStyle = '#78350F'
+        ctx.fillRect(sX, sY, sW, sH)
+        ctx.fillStyle = '#451A03'
+        ctx.fillRect(sX + sW, sY + 6, 14, sH - 6)
+
+        // Animated commercial rooftop billboard
+        const signGlow = 0.75 + 0.25 * Math.sin(elapsedSec * 5 + idx)
+        ctx.fillStyle = '#0F172A'
+        ctx.fillRect(sX + 18, sY - 26, sW - 36, 22)
+        ctx.fillStyle = `rgba(250, 204, 21, ${signGlow.toFixed(2)})`
+        ctx.font = 'bold 10px Cairo, sans-serif'
+        ctx.textAlign = 'center'
+        ctx.fillText('✨ معرض الإنارة والسبوت لايت ✨', sX + sW * 0.5, sY - 11)
+
+        // Showroom display windows with hanging chandeliers
+        ctx.fillStyle = '#FEF3C7'
+        ctx.fillRect(sX + 16, groundLine - 58, sW - 32, 52)
+        ctx.fillStyle = '#EA580C'
+        ctx.fillRect(sX + 10, groundLine - 66, sW - 20, 10)
+      }
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 3: THE LIGHTING FACTORY (مصنع الإنارة)
+  // Industrial machinery, rotating gears, pipes with rising steam, electrical panels & warning lights
+  // --------------------------------------------------------------------------
+  if (theme === 'lighting_factory') {
+    for (let i = -1; i < 7; i++) {
+      const mx = i * 260 - (scrollX % 260)
+      const idx = Math.abs(i + Math.floor(scrollX / 260))
+
+      // Heavy steel H-beam column
+      ctx.fillStyle = '#334155'
+      ctx.fillRect(mx + 14, 34, 18, groundLine - 34)
+      ctx.fillStyle = '#1E293B'
+      ctx.fillRect(mx + 18, 34, 10, groundLine - 34)
+
+      // Industrial Machinery Housing & Electrical Panel
+      const mX = mx + 52
+      const mY = groundLine - 132
+      ctx.fillStyle = '#1E293B'
+      ctx.fillRect(mX, mY, 148, 132)
+      ctx.strokeStyle = '#EA580C'
+      ctx.lineWidth = 2
+      ctx.strokeRect(mX, mY, 148, 132)
+
+      // Yellow/Black hazard stripe header on machine
+      ctx.fillStyle = '#FACC15'
+      ctx.fillRect(mX, mY, 148, 10)
+
+      // Rotating Ventilation Fan inside machine housing
+      const fanX = mX + 46
+      const fanY = mY + 58
+      ctx.fillStyle = '#0F172A'
+      ctx.beginPath()
+      ctx.arc(fanX, fanY, 26, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.save()
+      ctx.translate(fanX, fanY)
+      if (!reducedMotion) ctx.rotate(elapsedSec * 3.2 * (idx % 2 === 0 ? 1 : -1))
+      ctx.fillStyle = '#94A3B8'
+      for (let b = 0; b < 4; b++) {
+        ctx.rotate(Math.PI / 2)
+        ctx.fillRect(-4, -22, 8, 22)
+      }
+      ctx.restore()
+
+      // Electrical Control Panel LEDs
+      ctx.fillStyle = '#0F172A'
+      ctx.fillRect(mX + 90, mY + 32, 44, 62)
+      const blink = Math.floor(elapsedSec * 4 + idx) % 2 === 0
+      ctx.fillStyle = blink ? '#22C55E' : '#EF4444'
+      ctx.beginPath()
+      ctx.arc(mX + 104, mY + 46, 4, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = '#38BDF8'
+      ctx.fillRect(mX + 98, mY + 60, 28, 14)
+
+      // Animated Warning Beacon on top of machinery
+      const beaconPulse = 0.4 + 0.6 * Math.abs(Math.sin(elapsedSec * 6 + idx))
+      ctx.fillStyle = `rgba(249, 115, 22, ${beaconPulse.toFixed(2)})`
+      ctx.beginPath()
+      ctx.arc(mX + 74, mY - 8, 9, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Vertical steam pipe + periodic rising steam puffs
+      const pipeX = mx + 224
+      ctx.fillStyle = '#64748B'
+      ctx.fillRect(pipeX, groundLine - 150, 14, 150)
+      if (!reducedMotion && graphicsQuality !== 'low') {
+        const steamCycle = (elapsedSec * 28 + idx * 19) % 55
+        const steamAlpha = Math.max(0, 0.45 - steamCycle / 120)
+        ctx.fillStyle = `rgba(226, 232, 240, ${steamAlpha.toFixed(2)})`
+        ctx.beginPath()
+        ctx.arc(pipeX + 7, groundLine - 155 - steamCycle, 8 + steamCycle * 0.22, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 4: SMART RESIDENTIAL & COPPER WORLD (حي الإنترفون)
+  // Modern smart villas, gardens, fences, intercom pillars & giant insulated copper cables
+  // --------------------------------------------------------------------------
+  if (theme === 'intercom_district') {
+    for (let i = -1; i < 7; i++) {
+      const mx = i * 270 - (scrollX % 270)
+      const idx = Math.abs(i + Math.floor(scrollX / 270))
+
+      // Modern Smart Villa
+      const vX = mx + 24
+      const vW = 162
+      const vH = 136
+      const vY = groundLine - vH
+      ctx.fillStyle = '#F8FAFC'
+      ctx.fillRect(vX, vY, vW, vH)
+      ctx.fillStyle = '#0F766E'
+      ctx.fillRect(vX, vY, vW, 12)
+      // Panoramic smart glass balcony
+      ctx.fillStyle = '#38BDF8'
+      ctx.fillRect(vX + 20, vY + 26, 122, 36)
+      // Villa automatic garage & wood door
+      ctx.fillStyle = '#334155'
+      ctx.fillRect(vX + 18, groundLine - 52, 68, 52)
+      ctx.fillStyle = '#B45309'
+      ctx.fillRect(vX + 106, groundLine - 48, 34, 48)
+
+      // Smart Intercom Gate Pillar with Glowing Screen
+      const pillarX = vX + vW + 16
+      ctx.fillStyle = '#1E293B'
+      ctx.fillRect(pillarX, groundLine - 64, 18, 64)
+      ctx.fillStyle = '#10B981'
+      ctx.fillRect(pillarX + 3, groundLine - 50, 12, 16)
+
+      // Giant Insulated Copper Cable Conduit connecting villas
+      ctx.strokeStyle = '#C2410C'
+      ctx.lineWidth = 9
+      ctx.beginPath()
+      ctx.moveTo(vX + vW, vY + 45)
+      ctx.quadraticCurveTo(vX + vW + 54, vY + 78, mx + 294, vY + 45)
+      ctx.stroke()
+      ctx.strokeStyle = '#FDBA74'
+      ctx.lineWidth = 3
+      ctx.stroke()
+
+      // Swaying garden tree
+      const treeX = mx + 242
+      const sway = reducedMotion ? 0 : Math.sin(elapsedSec * 2.4 + idx) * 4
+      ctx.fillStyle = '#78350F'
+      ctx.fillRect(treeX - 4, groundLine - 42, 8, 42)
+      ctx.fillStyle = '#059669'
+      ctx.beginPath()
+      ctx.arc(treeX + sway, groundLine - 56, 20, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 5: THE POWER STATION (محطة الطاقة)
+  // Giant transformers with radiator fins, rotating cooling fans, voltage meters & busbars
+  // --------------------------------------------------------------------------
+  if (theme === 'power_station') {
+    for (let i = -1; i < 7; i++) {
+      const mx = i * 265 - (scrollX % 265)
+      const idx = Math.abs(i + Math.floor(scrollX / 265))
+      const tX = mx + 28
+      const tW = 165
+      const tH = 142
+      const tY = groundLine - tH
+
+      // Heavy High-Voltage Transformer Tank
+      ctx.fillStyle = '#1E293B'
+      ctx.fillRect(tX, tY, tW, tH)
+      ctx.strokeStyle = '#EA580C'
+      ctx.lineWidth = 2.5
+      ctx.strokeRect(tX, tY, tW, tH)
+
+      // Vertical Radiator Cooling Fins
+      ctx.fillStyle = '#0F172A'
+      for (let finX = tX + 14; finX < tX + 86; finX += 12) {
+        ctx.fillRect(finX, tY + 18, 6, tH - 36)
+      }
+
+      // Ceramic High-Voltage Bushings on Transformer Roof
+      for (let b = 0; b < 3; b++) {
+        const bx = tX + 32 + b * 48
+        ctx.fillStyle = '#9A3412'
+        ctx.fillRect(bx - 6, tY - 28, 12, 28)
+        ctx.fillStyle = '#38BDF8'
+        ctx.beginPath()
+        ctx.arc(bx, tY - 32, 5, 0, Math.PI * 2)
+        ctx.fill()
+      }
+
+      // Rotating Cooling Fan & Voltage Gauge
+      const fanX = tX + 125
+      const fanY = tY + 75
+      ctx.fillStyle = '#090D16'
+      ctx.beginPath()
+      ctx.arc(fanX, fanY, 24, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.save()
+      ctx.translate(fanX, fanY)
+      if (!reducedMotion) ctx.rotate(elapsedSec * 4 * (idx % 2 === 0 ? 1 : -1))
+      ctx.fillStyle = '#FB923C'
+      for (let b = 0; b < 4; b++) {
+        ctx.rotate(Math.PI / 2)
+        ctx.fillRect(-3, -20, 6, 20)
+      }
+      ctx.restore()
+
+      // Analog Voltage Meter
+      ctx.fillStyle = '#FEF3C7'
+      ctx.fillRect(tX + 105, tY + 20, 40, 20)
+      ctx.strokeStyle = '#EF4444'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(tX + 125, tY + 38)
+      ctx.lineTo(tX + 125 + Math.sin(elapsedSec * 3 + idx) * 12, tY + 24)
+      ctx.stroke()
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 6: THE FUTURISTIC / DARK CITY (المدينة المظلمة)
+  // Futuristic towers, elevated walkways, energy bridges & animated architectural lights
+  // --------------------------------------------------------------------------
+  if (theme === 'dark_city') {
+    for (let i = -1; i < 7; i++) {
+      const mx = i * 260 - (scrollX % 260)
+      const idx = Math.abs(i + Math.floor(scrollX / 260))
+      const bX = mx + 24
+      const bW = 160
+      const bH = 165 + (idx % 2) * 28
+      const bY = groundLine - bH
+
+      // Sleek futuristic building body
+      ctx.fillStyle = '#0F172A'
+      ctx.fillRect(bX, bY, bW, bH)
+      ctx.strokeStyle = idx % 2 === 0 ? '#22D3EE' : '#A855F7'
+      ctx.lineWidth = 2
+      ctx.strokeRect(bX, bY, bW, bH)
+
+      // Animated horizontal light bands
+      const bandPulse = 0.45 + 0.45 * Math.sin(elapsedSec * 3 + idx)
+      ctx.fillStyle =
+        idx % 2 === 0
+          ? `rgba(34, 211, 238, ${bandPulse.toFixed(2)})`
+          : `rgba(168, 85, 247, ${bandPulse.toFixed(2)})`
+      for (let ly = bY + 24; ly < groundLine - 30; ly += 32) {
+        ctx.fillRect(bX + 14, ly, bW - 28, 4)
+      }
+
+      // Elevated Energy Walkway connecting buildings
+      ctx.fillStyle = 'rgba(34, 211, 238, 0.25)'
+      ctx.fillRect(bX + bW, groundLine - 88, 100, 10)
+      ctx.fillStyle = '#22D3EE'
+      ctx.fillRect(bX + bW, groundLine - 88, 100, 2)
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 7: THE LIGHTING TOWER (برج الإنارة)
+  // Skyscraper diagrid glass structure, tower cranes & high-altitude turbines
+  // --------------------------------------------------------------------------
+  if (theme === 'lighting_tower') {
+    for (let i = -1; i < 7; i++) {
+      const mx = i * 260 - (scrollX % 260)
+      const tX = mx + 30
+      const tW = 150
+      const tH = 190
+      const tY = groundLine - tH
+
+      // Skyscraper reflective blue glass curtain wall
+      ctx.fillStyle = 'rgba(14, 116, 144, 0.55)'
+      ctx.fillRect(tX, tY, tW, tH)
+
+      // Diagrid structural steel cross-bracing
+      ctx.strokeStyle = '#E2E8F0'
+      ctx.lineWidth = 2
+      ctx.strokeRect(tX, tY, tW, tH)
+      ctx.beginPath()
+      ctx.moveTo(tX, tY)
+      ctx.lineTo(tX + tW, tY + 95)
+      ctx.lineTo(tX, tY + 190)
+      ctx.moveTo(tX + tW, tY)
+      ctx.lineTo(tX, tY + 95)
+      ctx.lineTo(tX + tW, tY + 190)
+      ctx.stroke()
+
+      // High-altitude horizontal crane jib
+      ctx.fillStyle = '#F59E0B'
+      ctx.fillRect(tX + tW, tY + 35, 110, 8)
+    }
+    return
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 8: THE FINAL ENERGY FORTRESS (قلعة الظلام)
+  // Massive mechanical fortress architecture, energy chambers, plasma conduits & gates
+  // --------------------------------------------------------------------------
+  for (let i = -1; i < 7; i++) {
+    const mx = i * 265 - (scrollX % 265)
+    const idx = Math.abs(i + Math.floor(scrollX / 265))
+    const fX = mx + 22
+    const fW = 175
+    const fH = 165
+    const fY = groundLine - fH
+
+    // Heavy armored fortress bulkhead
+    ctx.fillStyle = '#1E293B'
+    ctx.fillRect(fX, fY, fW, fH)
+    ctx.strokeStyle = '#F43F5E'
+    ctx.lineWidth = 2
+    ctx.strokeRect(fX, fY, fW, fH)
+
+    // Glowing Plasma Reactor Chamber inside fortress wall
+    const chX = fX + 55
+    const chY = fY + 24
+    ctx.fillStyle = '#090D16'
+    ctx.fillRect(chX, chY, 65, 115)
+    const ringY = chY + 15 + ((elapsedSec * 45 + idx * 20) % 85)
+    ctx.fillStyle = '#F97316'
+    ctx.fillRect(chX + 6, ringY, 53, 8)
+    ctx.fillStyle = 'rgba(244, 63, 94, 0.35)'
+    ctx.fillRect(chX + 14, chY + 6, 37, 103)
+
+    // Controlled red/orange warning beacons
+    const warn = Math.floor(elapsedSec * 5 + idx) % 2 === 0
+    ctx.fillStyle = warn ? '#EF4444' : '#F97316'
+    ctx.beginPath()
+    ctx.arc(fX + 24, fY + 24, 6, 0, Math.PI * 2)
+    ctx.arc(fX + fW - 24, fY + 24, 6, 0, Math.PI * 2)
+    ctx.fill()
   }
 }
 
 // ============================================================================
-// 2.5D BEVELED PLATFORMS (SECTION 10)
+// SECTION 8 — STAGE-AUTHENTIC 2.5D PLATFORMS (BELONG TO THEIR WORLDS)
 // ============================================================================
 
 function render25DPlatform(
   ctx: CanvasRenderingContext2D,
   plat: PlatformData,
   hero: HeroPhysicsState,
-  elapsedSec: number
+  elapsedSec: number,
+  stageTheme: WorldThemeId = 'city_of_light'
 ) {
   if (plat.kind === 'bridge_locked' && !plat.unlocked) {
     ctx.save()
@@ -366,7 +1185,6 @@ function render25DPlatform(
     return
   }
 
-  // Secret Spotlight Platform visibility
   let alpha = 1
   if (plat.kind === 'secret_spotlight') {
     const solid = isPlatformSolid(plat, hero)
@@ -380,46 +1198,9 @@ function render25DPlatform(
   ctx.globalAlpha = alpha
 
   const { x, y, w, h, material, kind } = plat
-  const bevelTop = 7
+  const isGroundSlab = h >= 45
+  const bevelTop = isGroundSlab ? 10 : 7
   const depthSide = 8
-
-  let topColor = '#E2E8F0'
-  let frontColor = '#475569'
-  let sideColor = '#1E293B'
-  let trimColor = '#38BDF8'
-
-  if (material === 'brick') {
-    topColor = '#FDE68A'
-    frontColor = '#B45309'
-    sideColor = '#78350F'
-    trimColor = '#F59E0B'
-  } else if (material === 'steel') {
-    topColor = '#CBD5E1'
-    frontColor = '#334155'
-    sideColor = '#0F172A'
-    trimColor = '#38BDF8'
-  } else if (material === 'copper') {
-    topColor = '#FDBA74'
-    frontColor = '#C2410C'
-    sideColor = '#7C2D12'
-    trimColor = '#FB923C'
-  } else if (material === 'neon_glass') {
-    topColor = '#A5F3FC'
-    frontColor = '#0E7490'
-    sideColor = '#164E63'
-    trimColor = '#22D3EE'
-  } else if (material === 'fortress_stone') {
-    topColor = '#94A3B8'
-    frontColor = '#1E293B'
-    sideColor = '#090D16'
-    trimColor = '#F97316'
-  }
-
-  // Soft drop shadow under floating platforms
-  if (h < 45) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.26)'
-    ctx.fillRect(x + 6, y + h, w, 7)
-  }
 
   if (kind === 'spring') {
     const comp = (plat.springCompress || 0) * 8
@@ -437,6 +1218,77 @@ function render25DPlatform(
     ctx.fillRect(x, y + comp, w, 7)
     ctx.restore()
     return
+  }
+
+  // Choose world-authentic colors & surface treatments
+  let topColor = '#E2E8F0'
+  let frontColor = '#475569'
+  let sideColor = '#1E293B'
+  let trimColor = '#38BDF8'
+
+  if (stageTheme === 'city_of_light') {
+    topColor = isGroundSlab ? '#F1F5F9' : '#FDE68A'
+    frontColor = isGroundSlab ? '#64748B' : '#0284C7'
+    sideColor = '#334155'
+    trimColor = '#FACC15'
+  } else if (stageTheme === 'electricity_street') {
+    topColor = isGroundSlab ? '#FEF3C7' : '#FDBA74'
+    frontColor = isGroundSlab ? '#92400E' : '#B45309'
+    sideColor = '#451A03'
+    trimColor = '#F59E0B'
+  } else if (stageTheme === 'lighting_factory') {
+    topColor = '#CBD5E1'
+    frontColor = '#334155'
+    sideColor = '#0F172A'
+    trimColor = '#F97316'
+  } else if (stageTheme === 'intercom_district') {
+    topColor = isGroundSlab ? '#34D399' : material === 'neon_glass' ? '#A5F3FC' : '#FDBA74'
+    frontColor = isGroundSlab ? '#475569' : '#C2410C'
+    sideColor = '#1E293B'
+    trimColor = isGroundSlab ? '#10B981' : '#EA580C'
+  } else if (stageTheme === 'power_station') {
+    topColor = material === 'copper' ? '#FDBA74' : '#94A3B8'
+    frontColor = material === 'copper' ? '#9A3412' : '#1E293B'
+    sideColor = '#090D16'
+    trimColor = '#FB923C'
+  } else if (stageTheme === 'dark_city') {
+    topColor = '#67E8F9'
+    frontColor = '#1E1B4B'
+    sideColor = '#090D16'
+    trimColor = '#22D3EE'
+  } else if (stageTheme === 'lighting_tower') {
+    topColor = '#E0F2FE'
+    frontColor = '#0369A1'
+    sideColor = '#0C4A6E'
+    trimColor = '#38BDF8'
+  } else if (stageTheme === 'darkness_fortress') {
+    topColor = '#94A3B8'
+    frontColor = '#1F2937'
+    sideColor = '#090D16'
+    trimColor = '#F43F5E'
+  }
+
+  // Soft drop shadow + structural support brackets under elevated platforms
+  if (!isGroundSlab) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.26)'
+    ctx.fillRect(x + 6, y + h, w, 6)
+
+    // Under-platform architectural truss / cable / bracket detail
+    if (
+      stageTheme === 'lighting_factory' ||
+      stageTheme === 'power_station' ||
+      stageTheme === 'lighting_tower'
+    ) {
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.45)'
+      ctx.lineWidth = 1.6
+      ctx.beginPath()
+      for (let tx = x + 12; tx < x + w - 20; tx += 28) {
+        ctx.moveTo(tx, y + h)
+        ctx.lineTo(tx + 14, y + h + 8)
+        ctx.lineTo(tx + 28, y + h)
+      }
+      ctx.stroke()
+    }
   }
 
   // 2.5D Right-side depth plane
@@ -461,13 +1313,43 @@ function render25DPlatform(
   ctx.fillStyle = trimColor
   ctx.fillRect(x, y + bevelTop - 2, w, 2)
 
-  // Conveyor belt directional chevrons
+  // Stage-Authentic Surface & Architectural Details
   if (kind === 'conveyor') {
+    // Industrial Conveyor Belt with end rollers & moving directional chevrons
     const dir = (plat.conveyorSpeed || 0) >= 0 ? 1 : -1
     const offset = ((elapsedSec * 60 * dir) % 24 + 24) % 24
     ctx.fillStyle = '#FACC15'
-    for (let cx = x + offset; cx < x + w - 10; cx += 24) {
-      ctx.fillRect(cx, y + bevelTop + 5, 8, 4)
+    for (let cx = x + 12 + offset; cx < x + w - 16; cx += 24) {
+      ctx.fillRect(cx, y + bevelTop + 5, 8, 5)
+    }
+    // End mechanical rollers
+    ctx.fillStyle = '#94A3B8'
+    ctx.beginPath()
+    ctx.arc(x + 10, y + h * 0.5, 6, 0, Math.PI * 2)
+    ctx.arc(x + w - 10, y + h * 0.5, 6, 0, Math.PI * 2)
+    ctx.fill()
+  } else if (isGroundSlab && (stageTheme === 'city_of_light' || stageTheme === 'electricity_street')) {
+    // Alternating sidewalk curb stones (أحجار رصيف الشارع) & pavement joints
+    for (let cx = x; cx < x + w - 24; cx += 48) {
+      ctx.fillStyle = stageTheme === 'city_of_light' ? '#FACC15' : '#F59E0B'
+      ctx.fillRect(cx, y + bevelTop, 24, 6)
+      ctx.fillStyle = '#E2E8F0'
+      ctx.fillRect(cx + 24, y + bevelTop, 24, 6)
+      // Vertical masonry joint line
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.2)'
+      ctx.fillRect(cx, y + bevelTop + 6, 2, h - bevelTop - 6)
+    }
+  } else if (material === 'copper' || stageTheme === 'intercom_district') {
+    // Copper Cable Bridge / Busbar ribs
+    ctx.fillStyle = 'rgba(254, 215, 170, 0.45)'
+    for (let rx = x + 16; rx < x + w - 16; rx += 32) {
+      ctx.fillRect(rx, y + bevelTop + 2, 6, h - bevelTop - 4)
+    }
+  } else if (stageTheme === 'lighting_factory' || stageTheme === 'darkness_fortress') {
+    // Riveted steel plates & hazard markings
+    ctx.fillStyle = 'rgba(250, 204, 21, 0.65)'
+    for (let hx = x + 14; hx < x + w - 18; hx += 36) {
+      ctx.fillRect(hx, y + bevelTop + 3, 12, 3)
     }
   }
 
@@ -1080,12 +1962,18 @@ function renderOriginalHeroCharacter(
   const centerX = hero.x + hero.w * 0.5
   const bottomY = hero.y + hero.h
 
-  // 1. Subtle Physically Believable White Light Aura (Modulated by lightEnergy & floodlight)
-  const energyRatio = Math.max(0.4, Math.min(1.3, hero.lightEnergy / 85))
-  const auraRadius = (hero.floodlightTimer > 0 ? 95 : 54) * energyRatio
+  // Anchor 1.22x visual sprite scale at hero's feet (centerX, bottomY) while preserving exact collision box
+  ctx.translate(centerX, bottomY)
+  ctx.scale(1.22, 1.22)
+  ctx.translate(-centerX, -bottomY)
+
+  // 1. Controlled Internal & External Light Illumination (Modulated by lightEnergy & floodlight)
+  const isDefeated = hero.animState === 'defeat' || hero.hp <= 0
+  const energyRatio = isDefeated ? 0.15 : Math.max(0.45, Math.min(1.25, hero.lightEnergy / 85))
+  const auraRadius = (hero.floodlightTimer > 0 ? 92 : 48) * energyRatio
   const bulbAura = ctx.createRadialGradient(centerX, bottomY - 30, 4, centerX, bottomY - 30, auraRadius)
-  bulbAura.addColorStop(0, `rgba(255, 253, 240, ${(0.34 * energyRatio).toFixed(2)})`)
-  bulbAura.addColorStop(0.55, `rgba(254, 240, 138, ${(0.14 * energyRatio).toFixed(2)})`)
+  bulbAura.addColorStop(0, `rgba(255, 253, 240, ${(0.3 * energyRatio).toFixed(2)})`)
+  bulbAura.addColorStop(0.55, `rgba(254, 240, 138, ${(0.12 * energyRatio).toFixed(2)})`)
   bulbAura.addColorStop(1, 'rgba(255, 255, 255, 0)')
   ctx.fillStyle = bulbAura
   ctx.beginPath()
@@ -1101,7 +1989,7 @@ function renderOriginalHeroCharacter(
     ctx.stroke()
   }
 
-  // 3. Light Pulse Attack Ring (when attacking State #8 is active)
+  // 3. Light Pulse Special Ability Ring (when attacking State is active)
   if (hero.animState === 'attacking' || hero.attackTimer > 0) {
     const pulseR = 26 + (0.28 - hero.attackTimer) * 160
     ctx.strokeStyle = 'rgba(253, 224, 71, 0.85)'
@@ -1111,7 +1999,16 @@ function renderOriginalHeroCharacter(
     ctx.stroke()
   }
 
-  // 4. Dash Afterimage Trail (when Dash State #9 is active)
+  // 4. Collect Shimmer Ring (when collecting state is active)
+  if (hero.animState === 'collecting' || hero.collectAnimTimer > 0) {
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.arc(centerX, bottomY - 28, 24 + (0.35 - hero.collectAnimTimer) * 28, 0, Math.PI * 2)
+    ctx.stroke()
+  }
+
+  // 5. Dash Afterimage Trail (when Dash Special Ability is active)
   if (hero.animState === 'dash' || hero.dashTimer > 0) {
     const dir = hero.facing === 'right' ? -1 : 1
     ctx.fillStyle = 'rgba(56, 189, 248, 0.28)'
@@ -1133,43 +2030,60 @@ function renderOriginalHeroCharacter(
   ctx.scale((hero.facing === 'left' ? -1 : 1) * hero.scaleX, hero.scaleY)
 
   const isRunning = hero.animState === 'run' || hero.animState === 'dash'
-  const isWalking = hero.animState === 'walk' || isRunning
-  const stride = isWalking ? Math.sin(hero.walkCycle) * (isRunning ? 7.5 : 5) : 0
-  const breath = hero.animState === 'idle' ? Math.sin(hero.walkCycle) * 1.3 : 0
+  const isWalking = (hero.animState === 'walk' || isRunning) && Math.abs(hero.vx) > 12
+  const stride = isWalking ? Math.sin(hero.walkCycle) * (isRunning ? 7.5 : 5.2) : 0
+  const backFootLift = isWalking ? Math.max(0, -Math.cos(hero.walkCycle)) * 3.2 : 0
+  const frontFootLift = isWalking ? Math.max(0, Math.cos(hero.walkCycle)) * 3.2 : 0
+  const breath =
+    hero.animState === 'idle'
+      ? Math.sin(hero.walkCycle) * 1.3
+      : hero.animState === 'landing'
+      ? 2.2
+      : 0
+
+  // Subtle forward body lean when running/dashing
+  const bodyLean = isRunning ? 0.08 : hero.animState === 'walk' ? 0.03 : 0
+  if (bodyLean !== 0) {
+    ctx.rotate(bodyLean)
+  }
 
   // --------------------------------------------------------------------------
-  // A. SMALL ANIMATED LEGS & DISTINCTIVE SHOES
+  // A. SMALL ANIMATED LEGS & DISTINCTIVE SHOES (Natural step lift, zero sliding)
   // --------------------------------------------------------------------------
   ctx.strokeStyle = '#1E293B'
   ctx.lineWidth = 3.5
   ctx.lineCap = 'round'
 
+  const backFootX = -4 - stride * 0.65
+  const backFootY = -4 - backFootLift + (hero.onGround ? 0 : -2)
   // Back leg
   ctx.beginPath()
-  ctx.moveTo(-3, -12)
-  ctx.lineTo(-4 - stride * 0.6, -4)
+  ctx.moveTo(-3, -12 + breath * 0.5)
+  ctx.lineTo(backFootX, backFootY)
   ctx.stroke()
   // Back shoe (Royal Blue & Amber sole)
   ctx.fillStyle = '#0284C7'
-  ctx.fillRect(-9 - stride * 0.6, -5, 9, 5)
+  ctx.fillRect(backFootX - 5, backFootY - 1, 9, 5)
   ctx.fillStyle = '#FACC15'
-  ctx.fillRect(-9 - stride * 0.6, -1.5, 9, 1.5)
+  ctx.fillRect(backFootX - 5, backFootY + 2.5, 9, 1.5)
 
+  const frontFootX = 4 + stride * 0.65
+  const frontFootY = -4 - frontFootLift + (hero.onGround ? 0 : 1)
   // Front leg
   ctx.beginPath()
-  ctx.moveTo(3, -12)
-  ctx.lineTo(4 + stride * 0.6, -4)
+  ctx.moveTo(3, -12 + breath * 0.5)
+  ctx.lineTo(frontFootX, frontFootY)
   ctx.stroke()
   // Front shoe
   ctx.fillStyle = '#0369A1'
-  ctx.fillRect(-1 + stride * 0.6, -5, 10, 5)
+  ctx.fillRect(frontFootX - 5, frontFootY - 1, 10, 5)
   ctx.fillStyle = '#FACC15'
-  ctx.fillRect(-1 + stride * 0.6, -1.5, 10, 1.5)
+  ctx.fillRect(frontFootX - 5, frontFootY + 2.5, 10, 1.5)
 
   // --------------------------------------------------------------------------
   // B. VISIBLE METALLIC E27 SCREW BASE (Unmistakable Light Bulb Base!)
   // --------------------------------------------------------------------------
-  // Dark bottom electrical contact foot
+  // Dark bottom ceramic electrical contact foot
   ctx.fillStyle = '#0F172A'
   ctx.beginPath()
   ctx.arc(0, -11 + breath, 5.5, 0, Math.PI)
@@ -1208,37 +2122,44 @@ function renderOriginalHeroCharacter(
   // --------------------------------------------------------------------------
   // C. SMALL FLEXIBLE ARMS & DISTINCTIVE GLOVES
   // --------------------------------------------------------------------------
-  const armSwing = isWalking ? -stride * 0.65 : hero.animState === 'victory' ? -8 : 0
+  const isCelebratory = hero.animState === 'victory' || hero.animState === 'collecting'
+  const isJumping = hero.animState === 'jump_prep' || hero.animState === 'jump_ascent'
+  const armSwing = isWalking ? -stride * 0.65 : isCelebratory ? -8 : 0
+  const backHandY = -16 + breath + (isCelebratory ? -10 : isJumping ? -6 : 0)
 
   // Back Arm & White/Gold Insulated Glove
   ctx.strokeStyle = '#334155'
   ctx.lineWidth = 3
   ctx.beginPath()
   ctx.moveTo(-8, -22 + breath)
-  ctx.lineTo(-14 + armSwing * 0.5, -16 + breath + (hero.animState === 'victory' ? -10 : 0))
+  ctx.lineTo(-14 + armSwing * 0.5, backHandY)
   ctx.stroke()
   ctx.fillStyle = '#FFFFFF'
   ctx.beginPath()
-  ctx.arc(-14 + armSwing * 0.5, -16 + breath + (hero.animState === 'victory' ? -10 : 0), 3.8, 0, Math.PI * 2)
+  ctx.arc(-14 + armSwing * 0.5, backHandY, 3.8, 0, Math.PI * 2)
   ctx.fill()
 
   // --------------------------------------------------------------------------
-  // D. LARGE FROSTED LED BULB HEAD (Classic Pear/Dome Bulb Silhouette!)
+  // D. GLASS-INSPIRED LIVING LIGHT BULB HEAD WITH INTERNAL FILAMENT
   // --------------------------------------------------------------------------
   const bulbCenterY = -36 + breath
   const bulbRadius = 15.5
 
-  // Realistic translucent frosted diffuser gradient (warm white core -> soft frosted edge)
-  const diffuserGrad = ctx.createRadialGradient(-3, bulbCenterY - 3, 2, 0, bulbCenterY, bulbRadius + 2)
+  // Realistic translucent glass diffuser gradient (warm illuminated core -> glass rim)
+  const diffuserGrad = ctx.createRadialGradient(-2, bulbCenterY - 3, 2, 0, bulbCenterY, bulbRadius + 2)
   if (hero.animState === 'damage') {
     diffuserGrad.addColorStop(0, '#FEE2E2')
     diffuserGrad.addColorStop(0.7, '#FCA5A5')
     diffuserGrad.addColorStop(1, '#EF4444')
+  } else if (isDefeated) {
+    diffuserGrad.addColorStop(0, '#E2E8F0')
+    diffuserGrad.addColorStop(0.7, '#94A3B8')
+    diffuserGrad.addColorStop(1, '#64748B')
   } else {
     diffuserGrad.addColorStop(0, '#FFFFFF')
-    diffuserGrad.addColorStop(0.55, '#FEFCE8')
-    diffuserGrad.addColorStop(0.88, '#FEF08A')
-    diffuserGrad.addColorStop(1, '#FDE047')
+    diffuserGrad.addColorStop(0.5, '#FEFCE8')
+    diffuserGrad.addColorStop(0.84, '#FEF08A')
+    diffuserGrad.addColorStop(1, '#FACC15')
   }
 
   ctx.fillStyle = diffuserGrad
@@ -1250,23 +2171,54 @@ function renderOriginalHeroCharacter(
   ctx.closePath()
   ctx.fill()
 
-  // Crisp subtle glass outline so bulb silhouette pops against bright skies too
-  ctx.strokeStyle = 'rgba(202, 138, 4, 0.55)'
-  ctx.lineWidth = 1.4
+  // Internal Glowing Filament Support Stem & Golden Coil (Authentic Glass Bulb Look!)
+  ctx.save()
+  ctx.strokeStyle = isDefeated ? 'rgba(71, 85, 105, 0.5)' : 'rgba(245, 158, 11, 0.55)'
+  ctx.lineWidth = 1.3
+  ctx.beginPath()
+  ctx.moveTo(-3.5, -25 + breath)
+  ctx.lineTo(-5, bulbCenterY - 5)
+  ctx.lineTo(0, bulbCenterY - 9)
+  ctx.lineTo(5, bulbCenterY - 5)
+  ctx.lineTo(3.5, -25 + breath)
+  ctx.stroke()
+  if (!isDefeated) {
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
+    ctx.lineWidth = 1.6
+    ctx.beginPath()
+    ctx.moveTo(-4.5, bulbCenterY - 6)
+    ctx.quadraticCurveTo(0, bulbCenterY - 11, 4.5, bulbCenterY - 6)
+    ctx.stroke()
+  }
+  ctx.restore()
+
+  // Crisp glass rim outline so bulb silhouette is readable on every background
+  ctx.strokeStyle = isDefeated ? 'rgba(71, 85, 105, 0.7)' : 'rgba(202, 138, 4, 0.65)'
+  ctx.lineWidth = 1.5
   ctx.stroke()
 
-  // Frosted Glass Specular Highlight (top-left curved shine)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
+  // Glass Specular Highlights (top-left curved reflection + right rim highlight)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.88)'
   ctx.beginPath()
-  ctx.ellipse(-6, bulbCenterY - 6, 4.5, 2.4, -0.5, 0, Math.PI * 2)
+  ctx.ellipse(-6.2, bulbCenterY - 6.2, 4.6, 2.3, -0.5, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+  ctx.beginPath()
+  ctx.arc(-9.5, bulbCenterY - 1.5, 1.4, 0, Math.PI * 2)
   ctx.fill()
 
   // --------------------------------------------------------------------------
-  // E. EXPRESSIVE EYES & ANIMATED EYEBROWS ON THE BULB FACE
+  // E. EXPRESSIVE EYES & ANIMATED EYEBROWS ACROSS ALL 11+ STATES
   // --------------------------------------------------------------------------
-  const eyeY = bulbCenterY + 1
-  if (hero.animState === 'damage' || hero.animState === 'defeat') {
-    // Squinting >< eyes on damage
+  const eyeY =
+    bulbCenterY +
+    1 +
+    (isJumping ? -1.2 : hero.animState === 'falling' ? 1.2 : 0)
+  const isBlinking =
+    hero.animState === 'idle' && Math.sin(elapsedSec * 2.1) > 0.96
+
+  if (hero.animState === 'damage' || isDefeated) {
+    // Squinting >< eyes on damage or defeat
     ctx.strokeStyle = '#0F172A'
     ctx.lineWidth = 2
     ctx.beginPath()
@@ -1276,6 +2228,32 @@ function renderOriginalHeroCharacter(
     ctx.moveTo(9, eyeY - 2)
     ctx.lineTo(5, eyeY)
     ctx.lineTo(9, eyeY + 2)
+    ctx.stroke()
+  } else if (hero.animState === 'collecting' || hero.animState === 'victory') {
+    // Happy curved celebratory eyes (^ ^)
+    ctx.strokeStyle = '#0F172A'
+    ctx.lineWidth = 2.1
+    ctx.beginPath()
+    ctx.arc(0, eyeY + 1, 2.5, Math.PI, 0, false)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.arc(7.5, eyeY + 1, 2.5, Math.PI, 0, false)
+    ctx.stroke()
+
+    // Joyful open smile
+    ctx.fillStyle = '#0F172A'
+    ctx.beginPath()
+    ctx.arc(3.8, eyeY + 4, 3.2, 0, Math.PI, false)
+    ctx.fill()
+  } else if (isBlinking) {
+    // Natural eye blink in idle state
+    ctx.strokeStyle = '#0F172A'
+    ctx.lineWidth = 1.8
+    ctx.beginPath()
+    ctx.moveTo(-2, eyeY)
+    ctx.lineTo(2.2, eyeY)
+    ctx.moveTo(5.3, eyeY)
+    ctx.lineTo(9.5, eyeY)
     ctx.stroke()
   } else {
     // Expressive dark eyes with white catchlights
@@ -1292,11 +2270,11 @@ function renderOriginalHeroCharacter(
     ctx.arc(8.2, eyeY - 1.2, 0.9, 0, Math.PI * 2)
     ctx.fill()
 
-    // Animated Eyebrows (Determined when running/dashing/attacking, raised when jumping/collecting)
+    // Animated Eyebrows (Determined when running/dashing/attacking, raised when jumping)
     const browTilt =
       hero.animState === 'attacking' || hero.animState === 'dash' || hero.animState === 'run'
         ? 1.5
-        : hero.animState === 'jump_ascent' || hero.animState === 'collecting'
+        : isJumping
         ? -1.5
         : 0
     ctx.strokeStyle = '#1E293B'
@@ -1317,15 +2295,19 @@ function renderOriginalHeroCharacter(
   }
 
   // Front Arm & Distinctive Glove
+  const frontHandY =
+    -15 +
+    breath +
+    (hero.animState === 'attacking' || isCelebratory ? -8 : isJumping ? -5 : 0)
   ctx.strokeStyle = '#1E293B'
   ctx.lineWidth = 3
   ctx.beginPath()
   ctx.moveTo(7, -22 + breath)
-  ctx.lineTo(13 - armSwing * 0.6, -15 + breath + (hero.animState === 'attacking' ? -6 : 0))
+  ctx.lineTo(13 - armSwing * 0.6, frontHandY)
   ctx.stroke()
   ctx.fillStyle = '#FFFFFF'
   ctx.beginPath()
-  ctx.arc(13 - armSwing * 0.6, -15 + breath + (hero.animState === 'attacking' ? -6 : 0), 4, 0, Math.PI * 2)
+  ctx.arc(13 - armSwing * 0.6, frontHandY, 4, 0, Math.PI * 2)
   ctx.fill()
   ctx.strokeStyle = '#F59E0B'
   ctx.lineWidth = 1.2
@@ -1382,18 +2364,41 @@ function renderForegroundDepthLayer(
   H: number,
   reducedMotion: boolean
 ) {
-  if (!reducedMotion) {
-    const scrollX = cam.x * 1.18
-    ctx.fillStyle =
-      stage.theme === 'city_of_light'
-        ? 'rgba(255, 255, 255, 0.25)'
-        : 'rgba(251, 191, 36, 0.18)'
+  if (reducedMotion) return
+  const scrollX = cam.x * 1.18
+  const theme = stage.theme
+
+  if (theme === 'intercom_district' || theme === 'electricity_street') {
+    // Gentle drifting leaves in residential / garden districts
+    ctx.fillStyle = theme === 'intercom_district' ? 'rgba(16, 185, 129, 0.45)' : 'rgba(245, 158, 11, 0.38)'
     for (let i = 0; i < 6; i++) {
-      const fx = ((i * 190 - scrollX + elapsedSec * 14) % W + W) % W
-      const fy = 60 + ((i * 73) % (H - 120))
+      const lx = ((i * 185 - scrollX + elapsedSec * 18) % W + W) % W
+      const ly = ((i * 89 + elapsedSec * 22) % (H - 80)) + 20
+      ctx.save()
+      ctx.translate(lx, ly)
+      ctx.rotate(elapsedSec * 1.5 + i)
       ctx.beginPath()
-      ctx.arc(fx, fy, 2, 0, Math.PI * 2)
+      ctx.ellipse(0, 0, 4.5, 2.2, 0, 0, Math.PI * 2)
       ctx.fill()
+      ctx.restore()
     }
+    return
+  }
+
+  ctx.fillStyle =
+    theme === 'city_of_light'
+      ? 'rgba(255, 255, 255, 0.3)'
+      : theme === 'dark_city'
+      ? 'rgba(34, 211, 238, 0.25)'
+      : theme === 'darkness_fortress'
+      ? 'rgba(249, 115, 22, 0.28)'
+      : 'rgba(251, 191, 36, 0.2)'
+
+  for (let i = 0; i < 6; i++) {
+    const fx = ((i * 190 - scrollX + elapsedSec * 14) % W + W) % W
+    const fy = 60 + ((i * 73) % (H - 120))
+    ctx.beginPath()
+    ctx.arc(fx, fy, 2, 0, Math.PI * 2)
+    ctx.fill()
   }
 }

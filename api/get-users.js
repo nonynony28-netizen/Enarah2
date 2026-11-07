@@ -102,13 +102,59 @@ export default async function handler(req, res) {
 
     if (!isAuthenticated) {
       // للزوار العاديين: تصفية وحجب الرسائل والطلبات وإحصائيات الزوار
-      filteredUsers = users.filter((item) => {
-        const type = item.type || "product";
-        const email = item.email || "";
-        const isContact = type === "contact";
-        const isAnalytics = email.includes("@analytics.local");
-        return !isContact && !isAnalytics;
-      });
+      // مع فرض التحكم الإداري بالكوبونات من جهة الخادم (مخفي افتراضياً وعند التعطيل لا يتم إرسال أي كود كوبون)
+      let latestGameRewardSeen = false;
+      filteredUsers = users
+        .filter((item) => {
+          const type = item.type || "product";
+          const email = item.email || "";
+          const isContact = type === "contact";
+          const isAnalytics = email.includes("@analytics.local");
+          if (email === "admin_game_rewards@app.local") {
+            if (latestGameRewardSeen) return false;
+            latestGameRewardSeen = true;
+          }
+          return !isContact && !isAnalytics;
+        })
+        .map((item) => {
+          if (item.email === "admin_game_rewards@app.local") {
+            try {
+              const rawStr = item.rawPhone || item.phone || "{}";
+              const parsed = JSON.parse(rawStr);
+              const cfg = parsed.config || {};
+              const enabled = cfg.isEnabled === true && cfg.v8AdminConfigured === true;
+              return {
+                ...item,
+                phone: JSON.stringify({
+                  type: "game_rewards",
+                  config: enabled
+                    ? cfg
+                    : {
+                        isEnabled: false,
+                        rewardType: "no_reward",
+                        couponCode: "",
+                        discountTitle: "",
+                        discountDetails: "",
+                        giftItemName: "",
+                        giftInstructions: "",
+                        victoryMsg:
+                          cfg.victoryMsg ||
+                          "أنت بطل أسطوري حقيقي للإنارة! لقد عبرت المراحل الثماني وهزمت ملك الظلام الكهربائي بنجاح تام.",
+                      },
+                }),
+              };
+            } catch {
+              return {
+                ...item,
+                phone: JSON.stringify({
+                  type: "game_rewards",
+                  config: { isEnabled: false, rewardType: "no_reward", couponCode: "" },
+                }),
+              };
+            }
+          }
+          return item;
+        });
     }
 
     // =====================================

@@ -2172,8 +2172,8 @@ export default function HomeCleanWhitePreview() {
 
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
                 {isAr
-                  ? 'العب الآن مباشرة! تحكم ببطل اللمبة الذكية، واجمع كابلات النحاس الإيطالية وشرارات الطاقة لإنارة المصابيح وتشغيل القاطع الرئيسي للفوز بكوبون خصم حقيقي (5% إلى 10%) على مشترياتك.'
-                  : 'Play directly right here! Guide our Lightbulb Hero, collect certified copper wires and energy sparks to illuminate chandeliers and win an instant discount voucher.'}
+                  ? 'العب الآن مباشرة! تحكم ببطل الإنارة الذكي، وانطلق عبر 8 عوالم كهربائية متنوعة لجمع منتجات الإنارة وتخطي العقبات وهزيمة زعيم الظلام.'
+                  : 'Play directly right here! Guide our Light Hero across 8 unique electrical worlds, collect lighting products, and defeat the Darkness Boss.'}
               </p>
             </div>
 
@@ -2181,7 +2181,7 @@ export default function HomeCleanWhitePreview() {
             <div className="flex flex-wrap items-center gap-3">
               <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-semibold">
                 <Trophy className="w-4 h-4 text-amber-400" />
-                <span>{isAr ? 'كوبون خصم فوري 5% - 10%' : '5% - 10% Instant Voucher'}</span>
+                <span>{isAr ? '8 مراحل ومواجهات زعماء' : '8 Worlds & Boss Battles'}</span>
               </div>
 
               <Link
@@ -2195,7 +2195,7 @@ export default function HomeCleanWhitePreview() {
           </div>
 
           {/* Embedded Playable Game Canvas Box */}
-          <div className="bg-[#11161F]/90 rounded-3xl p-3 sm:p-6 border border-[#222E3D] shadow-2xl backdrop-blur-md overflow-hidden mb-10">
+          <div className="bg-[#11161F]/95 rounded-2xl sm:rounded-3xl p-0 sm:p-6 border border-[#222E3D] shadow-2xl mb-4 sm:mb-10">
             <React.Suspense
               fallback={
                 <div className="h-[420px] sm:h-[520px] flex flex-col items-center justify-center gap-4 text-slate-400">
@@ -2209,7 +2209,7 @@ export default function HomeCleanWhitePreview() {
           </div>
 
           {/* Instructions & Game Rules Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div className="p-5 rounded-2xl bg-[#141B24] border border-[#222E3D] flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
                 <Zap className="w-5 h-5" />
@@ -2264,12 +2264,12 @@ export default function HomeCleanWhitePreview() {
               </div>
               <div>
                 <h4 className="font-semibold text-sm text-white mb-1">
-                  {isAr ? '4. احصل على كود الخصم' : '4. Get Your Discount'}
+                  {isAr ? '4. تصدر لوحة الشرف' : '4. Top the Leaderboard'}
                 </h4>
                 <p className="text-slate-400 text-xs leading-relaxed font-normal">
                   {isAr
-                    ? 'مبروك! انسخ كود الخصم الفوري واستخدمه مباشرة في مشترياتك بصالات العرض.'
-                    : 'Congratulations! Copy your voucher and redeem it instantly at our showrooms.'}
+                    ? 'أكمل المراحل الثماني بأعلى النقاط وسجل اسمك في لوحة شرف أبطال الإنارة الأسبوعية.'
+                    : 'Complete all 8 stages with the highest score and claim your spot on the weekly leaderboard.'}
                 </p>
               </div>
             </div>

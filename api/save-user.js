@@ -224,8 +224,15 @@ export default async function handler(req, res) {
 
     const isWirePriceCommit =
       email === "admin_wire_prices@app.local" || type === "wire_prices";
+    const isGameRewardsCommit =
+      email === "admin_game_rewards@app.local" || type === "game_rewards";
+    const isGameLeaderboard =
+      email.startsWith("game_hero_") || type === "game_leaderboard";
     const isAdminAction =
-      type === "product" || type === "project" || isWirePriceCommit;
+      type === "product" ||
+      type === "project" ||
+      isWirePriceCommit ||
+      isGameRewardsCommit;
     if (isAdminAction) {
       const adminPassword = process.env.ADMIN_PASSWORD;
       if (!adminPassword) {
@@ -298,7 +305,37 @@ export default async function handler(req, res) {
     }
 
     let phoneField = rawPhone;
-    if (type !== "contact" && type !== "quote_request" && !isWirePriceCommit) {
+    if (isGameLeaderboard && rawPhone) {
+      try {
+        const latestRewardDoc = await db
+          .collection("users")
+          .find({ email: "admin_game_rewards@app.local" })
+          .sort({ createdAt: -1, _id: -1 })
+          .limit(1)
+          .next();
+        let couponsActive = false;
+        if (latestRewardDoc) {
+          const rewardStr = latestRewardDoc.rawPhone || latestRewardDoc.phone || "{}";
+          const rewardParsed = JSON.parse(rewardStr);
+          const cfg = rewardParsed.config || {};
+          couponsActive = cfg.isEnabled === true && cfg.v8AdminConfigured === true;
+        }
+        const lbParsed = JSON.parse(rawPhone);
+        if (!couponsActive && lbParsed && typeof lbParsed === "object") {
+          delete lbParsed.rewardClaimed;
+          delete lbParsed.couponCode;
+        }
+        phoneField = JSON.stringify(lbParsed);
+      } catch (_) {
+        phoneField = rawPhone;
+      }
+    } else if (
+      type !== "contact" &&
+      type !== "quote_request" &&
+      !isWirePriceCommit &&
+      !isGameRewardsCommit &&
+      !email.includes("@analytics.local")
+    ) {
       const phoneData = {
         imageUrl,
         videoUrl: finalVideoUrl,

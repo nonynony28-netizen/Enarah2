@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { sound } from './audio'
 import {
   Sparkles,
@@ -24,10 +25,12 @@ import {
   Settings,
   Smartphone,
   ShieldAlert,
-  Compass,
   Flag,
   Lightbulb,
-  Shield,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  LogOut,
 } from 'lucide-react'
 import {
   GAME_STAGES,
@@ -43,6 +46,7 @@ import {
   type HeroPhysicsState,
   type CameraState,
   type PlayerInputFrame,
+  type StepSimulationEvents,
   createInitialHeroState,
   stepPlatformerSimulation,
   updateSideScrollingCamera,
@@ -50,6 +54,7 @@ import {
 import {
   type FloatingScorePopup,
   type LightParticle,
+  type GraphicsQuality,
   renderPlatformerFrame,
 } from './platformerRenderer'
 
@@ -114,6 +119,8 @@ const VIEWPORT_HEIGHT = 540
 export function GameEngine() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const sceneWrapperRef = useRef<HTMLDivElement | null>(null)
+  const dprRef = useRef<number>(1)
 
   // Progression & Stages
   const [progression, setProgression] = useState<PlayerProgressionState>(() => loadPlayerProgression())
@@ -125,10 +132,19 @@ export function GameEngine() {
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
 
-  // Audio & Accessibility Settings (Section 9)
+  // Audio, Graphics Quality & Accessibility Settings (Sections 09, 16, 19)
   const [isMuted, setIsMuted] = useState<boolean>(() => sound.isMuted)
   const [musicVolume, setMusicVolume] = useState<number>(() => sound.musicVolume)
   const [sfxVolume, setSfxVolume] = useState<number>(() => sound.sfxVolume)
+  const [graphicsQuality, setGraphicsQuality] = useState<GraphicsQuality>(() => {
+    try {
+      const saved = localStorage.getItem('enarah_platformer_graphics_quality') as GraphicsQuality | null
+      if (saved === 'high' || saved === 'balanced' || saved === 'low') return saved
+      return typeof window !== 'undefined' && window.innerWidth < 820 ? 'balanced' : 'high'
+    } catch {
+      return 'high'
+    }
+  })
   const [reducedMotion, setReducedMotion] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('enarah_platformer_reduced_motion')
@@ -145,14 +161,29 @@ export function GameEngine() {
       return 'large'
     }
   })
+  const [touchOpacity, setTouchOpacity] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('enarah_platformer_touch_opacity')
+      if (saved !== null) return Math.max(0.4, Math.min(1, Number(saved)))
+      return 0.9
+    } catch {
+      return 0.9
+    }
+  })
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isMobileDevice, setIsMobileDevice] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    return window.innerWidth < 900 || window.innerHeight < 540
+  })
   const [isPortraitMobile, setIsPortraitMobile] = useState(false)
+  const [isLandscapeMobile, setIsLandscapeMobile] = useState(false)
   const [dismissedOrientationHint, setDismissedOrientationHint] = useState(false)
   const [isCanvasVisible, setIsCanvasVisible] = useState(true)
 
   // HUD Reactive State
   const [hudHealth, setHudHealth] = useState(3)
   const [hudMaxHealth, setHudMaxHealth] = useState(3)
+  const [hudBulbEnergy, setHudBulbEnergy] = useState(75)
   const [hudEnergy, setHudEnergy] = useState(0)
   const [hudTotalEnergy, setHudTotalEnergy] = useState(9)
   const [hudScore, setHudScore] = useState(0)
@@ -180,6 +211,8 @@ export function GameEngine() {
     dash: false,
     attack: false,
   })
+  const activePointersRef = useRef<Map<number, 'left' | 'right' | 'jump' | 'dash' | 'attack'>>(new Map())
+  const leftPadRef = useRef<HTMLDivElement | null>(null)
 
   // Mutable Simulation Refs
   const stageRef = useRef<StageDefinition>(cloneStageDefinition(GAME_STAGES[0]))
@@ -280,14 +313,16 @@ export function GameEngine() {
       .catch(() => {})
   }, [weeklyInfo.weekId])
 
+  // Section 12 & V8 Problem 4: Keep the coupon system hidden by default (OFF).
+  // Only enable when administrator-controlled setting explicitly has isEnabled === true && v8AdminConfigured === true.
   const [rewardConfig, setRewardConfig] = useState({
-    isEnabled: true,
-    rewardType: 'coupon' as 'coupon' | 'physical_gift' | 'no_reward',
-    couponCode: 'ENARAH-HERO',
-    discountTitle: 'كوبون أبطال الإنارة الذهبي',
-    discountDetails: 'خصم خاص عند إرسال الكود مع طلبيتك عبر الواتساب!',
-    giftItemName: 'كشاف سبوت لايت ذكي مجاني أو مفتاح لمس VIP',
-    giftInstructions: 'استلم هديتك من أي فرع للإنارة الحديثة بإبراز هذه الشاشة!',
+    isEnabled: false,
+    rewardType: 'no_reward' as 'coupon' | 'physical_gift' | 'no_reward',
+    couponCode: '',
+    discountTitle: '',
+    discountDetails: '',
+    giftItemName: '',
+    giftInstructions: '',
     victoryMsg: 'أنت بطل أسطوري حقيقي للإنارة! لقد عبرت المراحل الثماني وهزمت ملك الظلام الكهربائي بنجاح تام.',
   })
 
@@ -295,7 +330,22 @@ export function GameEngine() {
     try {
       const local = localStorage.getItem('enarah_game_reward_config')
       if (local) {
-        setRewardConfig((prev) => ({ ...prev, ...JSON.parse(local) }))
+        const parsedLocal = JSON.parse(local)
+        const explicitlyEnabled =
+          parsedLocal &&
+          parsedLocal.isEnabled === true &&
+          parsedLocal.v8AdminConfigured === true
+        if (explicitlyEnabled) {
+          setRewardConfig((prev) => ({
+            ...prev,
+            ...parsedLocal,
+            isEnabled: true,
+            rewardType: parsedLocal.rewardType || 'coupon',
+            couponCode: parsedLocal.couponCode || '',
+          }))
+        } else {
+          localStorage.removeItem('enarah_game_reward_config')
+        }
       }
     } catch {}
 
@@ -307,12 +357,37 @@ export function GameEngine() {
           if (data && data.success && Array.isArray(data.data)) {
             const updates = data.data.filter((item: any) => item.email === 'admin_game_rewards@app.local')
             if (updates.length > 0) {
-              const latest = updates[updates.length - 1]
-              const parsed = JSON.parse(latest.phone).config
+              // api/get-users sorts by createdAt: -1, so updates[0] is the newest admin setting
+              const latest = updates[0]
+              const rawPhoneStr = latest.rawPhone || latest.phone || '{}'
+              const parsed = JSON.parse(rawPhoneStr).config
               if (parsed) {
-                setRewardConfig((prev) => ({ ...prev, ...parsed }))
-                localStorage.setItem('enarah_game_reward_config', JSON.stringify(parsed))
+                const enabled = parsed.isEnabled === true && parsed.v8AdminConfigured === true
+                const normalized = {
+                  ...parsed,
+                  isEnabled: enabled,
+                  rewardType: enabled ? parsed.rewardType || 'coupon' : 'no_reward',
+                  couponCode: enabled ? parsed.couponCode || '' : '',
+                  discountTitle: enabled ? parsed.discountTitle || '' : '',
+                  discountDetails: enabled ? parsed.discountDetails || '' : '',
+                }
+                setRewardConfig((prev) => ({ ...prev, ...normalized }))
+                if (enabled) {
+                  localStorage.setItem('enarah_game_reward_config', JSON.stringify(normalized))
+                } else {
+                  localStorage.removeItem('enarah_game_reward_config')
+                }
               }
+            } else {
+              // No admin reward record exists -> keep hidden by default
+              setRewardConfig((prev) => ({
+                ...prev,
+                isEnabled: false,
+                rewardType: 'no_reward',
+                couponCode: '',
+                discountTitle: '',
+                discountDetails: '',
+              }))
             }
           }
         }
@@ -340,25 +415,165 @@ export function GameEngine() {
     }
   }, [currentStageIdx, gameState, isCanvasVisible, isMuted])
 
-  // Check mobile portrait orientation
-  useEffect(() => {
-    const checkOrientation = () => {
-      if (typeof window === 'undefined') return
-      const isMobileWidth = window.innerWidth < 820
-      const isPortrait = window.innerHeight > window.innerWidth
-      setIsPortraitMobile(isMobileWidth && isPortrait)
-    }
-    checkOrientation()
-    window.addEventListener('resize', checkOrientation)
-    window.addEventListener('orientationchange', checkOrientation)
-    return () => {
-      window.removeEventListener('resize', checkOrientation)
-      window.removeEventListener('orientationchange', checkOrientation)
-    }
+  const clearAllInputs = useCallback(() => {
+    keysRef.current = {}
+    activePointersRef.current.clear()
+    touchInputRef.current = { left: false, right: false, jump: false, dash: false, attack: false }
+    prevJumpHeldRef.current = false
+    prevDashHeldRef.current = false
+    prevAttackHeldRef.current = false
+    setTouchVisualState({ left: false, right: false, jump: false, dash: false, attack: false })
   }, [])
+
+  // Responsive Canvas & Camera Zoom Synchronization (V8 Problem 1B, 1C, 1D)
+  const syncViewportAndCameraZoom = useCallback(() => {
+    if (typeof window === 'undefined') return
+    const winW = Math.round(window.visualViewport?.width || window.innerWidth)
+    const winH = Math.round(window.visualViewport?.height || window.innerHeight)
+    const isMob = winW < 900 || winH < 540
+    const isPort = isMob && winH > winW
+    const isLand = isMob && winW >= winH
+
+    setIsMobileDevice(isMob)
+    setIsPortraitMobile(isPort)
+    setIsLandscapeMobile(isLand)
+
+    const wrapper = sceneWrapperRef.current
+    const canvas = canvasRef.current
+    if (!wrapper || !canvas) return
+
+    const rect = wrapper.getBoundingClientRect()
+    const cssW = Math.max(260, Math.round(rect.width || winW))
+    const cssH = Math.max(180, Math.round(rect.height || winH * 0.72))
+    const aspect = cssW / cssH
+
+    let logicalW = VIEWPORT_WIDTH
+    let logicalH = VIEWPORT_HEIGHT
+
+    if (isPort) {
+      // Mobile Portrait: Strong camera zoom (~3.2x larger than 960 world width)
+      // Keep logicalH <= 495 (< stage.height = 540) so zero empty sky is wasted above the stage
+      logicalW = cssW <= 345 ? 290 : cssW <= 395 ? 310 : 330
+      logicalH = Math.round(logicalW / aspect)
+      if (logicalH < 330) {
+        logicalH = 330
+        logicalW = Math.round(logicalH * aspect)
+      } else if (logicalH > 495) {
+        logicalH = 495
+        logicalW = Math.round(logicalH * aspect)
+      }
+    } else if (isLand) {
+      // Mobile Landscape: Strong camera zoom (~1.66x) filling 100% of landscape width without distortion
+      logicalH = 325
+      logicalW = Math.round(logicalH * aspect)
+      if (logicalW < 480) {
+        logicalW = 480
+        logicalH = Math.round(logicalW / aspect)
+      } else if (logicalW > 740) {
+        logicalW = 740
+        logicalH = Math.round(logicalW / aspect)
+      }
+    } else {
+      // Desktop: Standard 960x540 world framing matched to container aspect ratio
+      logicalW = VIEWPORT_WIDTH
+      logicalH = Math.round(logicalW / aspect)
+    }
+
+    const maxDpr = graphicsQuality === 'low' ? 1 : graphicsQuality === 'balanced' ? 1.5 : 1.75
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr)
+    dprRef.current = dpr
+
+    const targetBufW = Math.round(logicalW * dpr)
+    const targetBufH = Math.round(logicalH * dpr)
+    if (canvas.width !== targetBufW || canvas.height !== targetBufH) {
+      canvas.width = targetBufW
+      canvas.height = targetBufH
+    }
+
+    cameraRef.current.viewportW = logicalW
+    cameraRef.current.viewportH = logicalH
+    updateSideScrollingCamera(cameraRef.current, heroRef.current, stageRef.current, 0.25)
+  }, [graphicsQuality])
+
+  // Dedicated Mobile Gameplay Mode: Portal to document.body, hide website UI & lock scroll (V8 Problem 1A & 1D)
+  const isDedicatedMobileGameplay = isMobileDevice && gameState !== 'start'
+
+  useEffect(() => {
+    syncViewportAndCameraZoom()
+    const rafId = requestAnimationFrame(() => {
+      syncViewportAndCameraZoom()
+    })
+    const handleResizeOrOrientation = () => {
+      clearAllInputs()
+      syncViewportAndCameraZoom()
+    }
+    window.addEventListener('resize', handleResizeOrOrientation)
+    window.addEventListener('orientationchange', handleResizeOrOrientation)
+    window.visualViewport?.addEventListener('resize', handleResizeOrOrientation)
+
+    let ro: ResizeObserver | null = null
+    if (typeof ResizeObserver !== 'undefined' && sceneWrapperRef.current) {
+      ro = new ResizeObserver(() => {
+        syncViewportAndCameraZoom()
+      })
+      ro.observe(sceneWrapperRef.current)
+    }
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', handleResizeOrOrientation)
+      window.removeEventListener('orientationchange', handleResizeOrOrientation)
+      window.visualViewport?.removeEventListener('resize', handleResizeOrOrientation)
+      ro?.disconnect()
+    }
+  }, [clearAllInputs, syncViewportAndCameraZoom, gameState, isFullscreen, isDedicatedMobileGameplay])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (isDedicatedMobileGameplay || isFullscreen) {
+      const prevOverflow = document.body.style.overflow
+      const prevOverscroll = document.documentElement.style.overscrollBehavior
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overscrollBehavior = 'none'
+      document.body.setAttribute('data-enarah-mobile-game', '1')
+
+      let styleEl = document.getElementById('enarah-mobile-game-hide-ui') as HTMLStyleElement | null
+      if (!styleEl) {
+        styleEl = document.createElement('style')
+        styleEl.id = 'enarah-mobile-game-hide-ui'
+      }
+      styleEl.textContent = `
+        html:has(body[data-enarah-mobile-game="1"]),
+        body[data-enarah-mobile-game="1"] {
+          overflow: hidden !important;
+          max-width: 100vw !important;
+          overscroll-behavior: none !important;
+        }
+        body[data-enarah-mobile-game="1"] > *:not(#enarah-mobile-game-portal):not(script):not(style) {
+          display: none !important;
+          pointer-events: none !important;
+        }
+      `
+      if (!styleEl.parentNode) {
+        document.head.appendChild(styleEl)
+      }
+
+      return () => {
+        document.body.style.overflow = prevOverflow
+        document.body.style.overscrollBehavior = prevOverscroll
+        document.body.removeAttribute('data-enarah-mobile-game')
+      }
+    } else {
+      document.body.removeAttribute('data-enarah-mobile-game')
+    }
+  }, [isDedicatedMobileGameplay, isFullscreen])
 
   // IntersectionObserver to pause rendering & music when scrolled offscreen
   useEffect(() => {
+    if (isDedicatedMobileGameplay || isFullscreen) {
+      setIsCanvasVisible(true)
+      return
+    }
     const el = containerRef.current
     if (!el || typeof IntersectionObserver === 'undefined') return
     const observer = new IntersectionObserver(
@@ -372,16 +587,7 @@ export function GameEngine() {
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
-
-  const clearAllInputs = useCallback(() => {
-    keysRef.current = {}
-    touchInputRef.current = { left: false, right: false, jump: false, dash: false, attack: false }
-    prevJumpHeldRef.current = false
-    prevDashHeldRef.current = false
-    prevAttackHeldRef.current = false
-    setTouchVisualState({ left: false, right: false, jump: false, dash: false, attack: false })
-  }, [])
+  }, [isDedicatedMobileGameplay, isFullscreen])
 
   useEffect(() => {
     const handleVisibilityOrBlur = () => {
@@ -399,18 +605,27 @@ export function GameEngine() {
     }
   }, [clearAllInputs, gameState])
 
+  // Compact auto-disappearing gameplay tips (Section 9)
   const showAlert = useCallback((msg: string, type: 'info' | 'success' | 'error' = 'info') => {
     setBannerAlert({ msg, type })
     setTimeout(() => {
       setBannerAlert((prev) => (prev?.msg === msg ? null : prev))
-    }, 3400)
+    }, 1850)
   }, [])
 
   const spawnBurstParticles = useCallback(
     (x: number, y: number, color: string, count = 10) => {
       if (reducedMotion) return
-      for (let i = 0; i < count; i++) {
-        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4
+      const effectiveCount =
+        graphicsQuality === 'low'
+          ? Math.max(3, Math.ceil(count * 0.4))
+          : graphicsQuality === 'balanced'
+          ? Math.max(5, Math.ceil(count * 0.7))
+          : count
+      const maxParticles = graphicsQuality === 'low' ? 16 : graphicsQuality === 'balanced' ? 36 : 68
+
+      for (let i = 0; i < effectiveCount; i++) {
+        const angle = (Math.PI * 2 * i) / effectiveCount + Math.random() * 0.4
         const spd = 65 + Math.random() * 145
         particlesRef.current.push({
           x,
@@ -424,11 +639,11 @@ export function GameEngine() {
           maxLife: 0.45 + Math.random() * 0.25,
         })
       }
-      if (particlesRef.current.length > 70) {
-        particlesRef.current.splice(0, particlesRef.current.length - 70)
+      if (particlesRef.current.length > maxParticles) {
+        particlesRef.current.splice(0, particlesRef.current.length - maxParticles)
       }
     },
-    [reducedMotion]
+    [graphicsQuality, reducedMotion]
   )
 
   const addScorePopup = useCallback((x: number, y: number, text: string, color = '#FBBF24') => {
@@ -450,11 +665,13 @@ export function GameEngine() {
       const cloned = cloneStageDefinition(GAME_STAGES[safeIndex])
       stageRef.current = cloned
       heroRef.current = createInitialHeroState(cloned)
+      const currentVw = cameraRef.current.viewportW || VIEWPORT_WIDTH
+      const currentVh = cameraRef.current.viewportH || VIEWPORT_HEIGHT
       cameraRef.current = {
-        x: Math.max(0, cloned.heroSpawn.x - 240),
-        y: 0,
-        viewportW: VIEWPORT_WIDTH,
-        viewportH: VIEWPORT_HEIGHT,
+        x: Math.max(0, cloned.heroSpawn.x - currentVw * 0.35),
+        y: cloned.height - currentVh,
+        viewportW: currentVw,
+        viewportH: currentVh,
         shakeIntensity: 0,
       }
       particlesRef.current = []
@@ -469,6 +686,7 @@ export function GameEngine() {
       setCurrentStageIdx(safeIndex)
       setHudHealth(3)
       setHudMaxHealth(3)
+      setHudBulbEnergy(75)
       setHudEnergy(0)
       setHudTotalEnergy(cloned.collectibles.length)
       setHudStageScore(0)
@@ -527,7 +745,7 @@ export function GameEngine() {
     }
   }, [currentStageIdx, initStage])
 
-  // Keyboard Controls (Desktop — Section 13)
+  // Keyboard Controls (Desktop — Section 11)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return
@@ -570,7 +788,7 @@ export function GameEngine() {
         code === 'ShiftLeft' ||
         code === 'ShiftRight'
       ) {
-        if (code.startsWith('Arrow') || code === 'Space') {
+        if (code.startsWith('Arrow') || code === 'Space' || code === 'KeyE') {
           e.preventDefault()
         }
         keysRef.current[code] = true
@@ -623,12 +841,14 @@ export function GameEngine() {
     }
   }, [])
 
-  // Main 60fps Platformer Physics + Rendering Loop
+  // Main Deterministic Fixed-Timestep Physics + Rendering Loop (Sections 15 & 16)
   useEffect(() => {
     if (!isCanvasVisible) return
 
+    const FIXED_DT = 1 / 60
     let animationFrameId = 0
     let lastTimestamp = performance.now()
+    let simAccumulator = 0
     let hudSyncAccumulator = 0
 
     const loop = (now: number) => {
@@ -639,9 +859,109 @@ export function GameEngine() {
       const canvas = canvasRef.current
       const ctx = canvas?.getContext('2d')
 
-      if (gameState === 'playing') {
+      if (gameState === 'start') {
+        // Gentle idle animation on the start screen so hero & world feel alive
         elapsedSecRef.current += dt
-        totalPlayTimeSecRef.current += dt
+        heroRef.current.onGround = true
+        heroRef.current.y = stageRef.current.groundY - heroRef.current.h
+        heroRef.current.animState = 'idle'
+        heroRef.current.walkCycle += dt * 3.2
+        updateSideScrollingCamera(cameraRef.current, heroRef.current, stageRef.current, dt)
+      } else if (gameState === 'playing') {
+        simAccumulator = Math.min(simAccumulator + dt, FIXED_DT * 4)
+
+        const events: StepSimulationEvents = {
+          jumped: false,
+          highJumped: false,
+          doubleJumped: false,
+          dashed: false,
+          attacked: false,
+          landed: false,
+          collectedStarIds: [],
+          collectedProductKinds: [],
+          collectedValue: 0,
+          abilityActivatedMsg: null,
+          activatedCheckpointId: null,
+          activatedSwitchId: null,
+          openedGateId: null,
+          stompedEnemyId: null,
+          hitBoss: false,
+          bossPhaseChanged: null,
+          bossDefeated: false,
+          tookDamage: false,
+          shieldBlocked: false,
+          fellInPit: false,
+          stageCompleted: false,
+          stageDefeated: false,
+        }
+
+        while (simAccumulator >= FIXED_DT) {
+          simAccumulator -= FIXED_DT
+          elapsedSecRef.current += FIXED_DT
+          totalPlayTimeSecRef.current += FIXED_DT
+
+          const k = keysRef.current
+          const t = touchInputRef.current
+
+          const leftHeld = !!(k['ArrowLeft'] || k['KeyA'] || t.left)
+          const rightHeld = !!(k['ArrowRight'] || k['KeyD'] || t.right)
+          const jumpHeld = !!(k['Space'] || k['ArrowUp'] || k['KeyW'] || t.jump)
+          const dashHeld = !!(k['ShiftLeft'] || k['ShiftRight'] || t.dash)
+          const attackHeld = !!(k['KeyE'] || k['KeyF'] || k['KeyJ'] || t.attack)
+
+          const inputFrame: PlayerInputFrame = {
+            left: leftHeld,
+            right: rightHeld,
+            run: dashHeld,
+            jumpPressed: jumpHeld && !prevJumpHeldRef.current,
+            jumpHeld,
+            jumpReleased: !jumpHeld && prevJumpHeldRef.current,
+            dashPressed: dashHeld && !prevDashHeldRef.current,
+            attackPressed: attackHeld && !prevAttackHeldRef.current,
+          }
+          prevJumpHeldRef.current = jumpHeld
+          prevDashHeldRef.current = dashHeld
+          prevAttackHeldRef.current = attackHeld
+
+          const stepEv = stepPlatformerSimulation(
+            heroRef.current,
+            stageRef.current,
+            inputFrame,
+            FIXED_DT,
+            elapsedSecRef.current
+          )
+
+          events.jumped = events.jumped || stepEv.jumped
+          events.highJumped = events.highJumped || stepEv.highJumped
+          events.doubleJumped = events.doubleJumped || stepEv.doubleJumped
+          events.dashed = events.dashed || stepEv.dashed
+          events.attacked = events.attacked || stepEv.attacked
+          events.landed = events.landed || stepEv.landed
+          if (stepEv.collectedStarIds.length > 0) {
+            events.collectedStarIds.push(...stepEv.collectedStarIds)
+          }
+          if (stepEv.collectedProductKinds.length > 0) {
+            events.collectedProductKinds.push(...stepEv.collectedProductKinds)
+          }
+          events.collectedValue += stepEv.collectedValue
+          if (stepEv.abilityActivatedMsg) events.abilityActivatedMsg = stepEv.abilityActivatedMsg
+          if (stepEv.activatedCheckpointId) events.activatedCheckpointId = stepEv.activatedCheckpointId
+          if (stepEv.activatedSwitchId) events.activatedSwitchId = stepEv.activatedSwitchId
+          if (stepEv.openedGateId) events.openedGateId = stepEv.openedGateId
+          if (stepEv.stompedEnemyId) events.stompedEnemyId = stepEv.stompedEnemyId
+          events.hitBoss = events.hitBoss || stepEv.hitBoss
+          if (stepEv.bossPhaseChanged) events.bossPhaseChanged = stepEv.bossPhaseChanged
+          events.bossDefeated = events.bossDefeated || stepEv.bossDefeated
+          events.tookDamage = events.tookDamage || stepEv.tookDamage
+          events.shieldBlocked = events.shieldBlocked || stepEv.shieldBlocked
+          events.fellInPit = events.fellInPit || stepEv.fellInPit
+          events.stageCompleted = events.stageCompleted || stepEv.stageCompleted
+          events.stageDefeated = events.stageDefeated || stepEv.stageDefeated
+
+          if (events.stageCompleted || events.stageDefeated || events.fellInPit) {
+            break
+          }
+        }
 
         // Decay camera shake
         if (cameraRef.current.shakeIntensity && cameraRef.current.shakeIntensity > 0) {
@@ -657,37 +977,6 @@ export function GameEngine() {
           setGameState('defeat')
           return
         }
-
-        const k = keysRef.current
-        const t = touchInputRef.current
-
-        const leftHeld = !!(k['ArrowLeft'] || k['KeyA'] || t.left)
-        const rightHeld = !!(k['ArrowRight'] || k['KeyD'] || t.right)
-        const jumpHeld = !!(k['Space'] || k['ArrowUp'] || k['KeyW'] || t.jump)
-        const dashHeld = !!(k['ShiftLeft'] || k['ShiftRight'] || t.dash)
-        const attackHeld = !!(k['KeyE'] || k['KeyF'] || k['KeyJ'] || t.attack)
-
-        const inputFrame: PlayerInputFrame = {
-          left: leftHeld,
-          right: rightHeld,
-          run: dashHeld,
-          jumpPressed: jumpHeld && !prevJumpHeldRef.current,
-          jumpHeld,
-          jumpReleased: !jumpHeld && prevJumpHeldRef.current,
-          dashPressed: dashHeld && !prevDashHeldRef.current,
-          attackPressed: attackHeld && !prevAttackHeldRef.current,
-        }
-        prevJumpHeldRef.current = jumpHeld
-        prevDashHeldRef.current = dashHeld
-        prevAttackHeldRef.current = attackHeld
-
-        const events = stepPlatformerSimulation(
-          heroRef.current,
-          stageRef.current,
-          inputFrame,
-          dt,
-          elapsedSecRef.current
-        )
 
         // Transition to Boss Battle music when player enters Boss Arena
         if (
@@ -878,6 +1167,7 @@ export function GameEngine() {
         ) {
           hudSyncAccumulator = 0
           setHudHealth(heroRef.current.hp)
+          setHudBulbEnergy(Math.round(heroRef.current.lightEnergy))
           setHudEnergy(collectedCountRef.current)
           setHudStageScore(stageScoreRef.current)
           setHudScore(totalCampaignScoreRef.current + stageScoreRef.current)
@@ -900,8 +1190,16 @@ export function GameEngine() {
         }
       }
 
-      // Render Canvas Frame
-      if (ctx) {
+      // Render Canvas Frame with DPR scaling
+      if (ctx && canvas) {
+        const dpr = dprRef.current || 1
+        const expectedW = Math.round(cameraRef.current.viewportW * dpr)
+        const expectedH = Math.round(cameraRef.current.viewportH * dpr)
+        if (canvas.width !== expectedW || canvas.height !== expectedH) {
+          canvas.width = expectedW
+          canvas.height = expectedH
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
         renderPlatformerFrame(
           ctx,
           stageRef.current,
@@ -910,7 +1208,8 @@ export function GameEngine() {
           elapsedSecRef.current,
           particlesRef.current,
           popupsRef.current,
-          reducedMotion
+          reducedMotion,
+          graphicsQuality
         )
       }
 
@@ -923,6 +1222,7 @@ export function GameEngine() {
     addScorePopup,
     currentStageIdx,
     gameState,
+    graphicsQuality,
     isCanvasVisible,
     progression,
     reducedMotion,
@@ -930,21 +1230,73 @@ export function GameEngine() {
     spawnBurstParticles,
   ])
 
-  // Pointer Handler for Mobile Multi-Touch Controls
-  const handleTouchControl = useCallback(
-    (button: 'left' | 'right' | 'jump' | 'dash' | 'attack', pressed: boolean) => {
-      touchInputRef.current[button] = pressed
-      setTouchVisualState((prev) => {
-        if (prev[button] === pressed) return prev
-        return { ...prev, [button]: pressed }
-      })
-      if (pressed && (button === 'jump' || button === 'dash')) {
+  // Multi-Touch Independent Pointer Tracking (Section 09 — HIGHEST PRIORITY)
+  const syncActivePointersToInput = useCallback(() => {
+    const nextState = {
+      left: false,
+      right: false,
+      jump: false,
+      dash: false,
+      attack: false,
+    }
+    for (const btn of activePointersRef.current.values()) {
+      nextState[btn] = true
+    }
+    touchInputRef.current = nextState
+    setTouchVisualState((prev) => {
+      if (
+        prev.left === nextState.left &&
+        prev.right === nextState.right &&
+        prev.jump === nextState.jump &&
+        prev.dash === nextState.dash &&
+        prev.attack === nextState.attack
+      ) {
+        return prev
+      }
+      return nextState
+    })
+  }, [])
+
+  const registerPointerControl = useCallback(
+    (pointerId: number, button: 'left' | 'right' | 'jump' | 'dash' | 'attack') => {
+      const prevBtn = activePointersRef.current.get(pointerId)
+      if (prevBtn === button) return
+      activePointersRef.current.set(pointerId, button)
+      syncActivePointersToInput()
+      if (button === 'jump' || button === 'dash') {
         try {
           navigator.vibrate?.(8)
         } catch {}
       }
     },
-    []
+    [syncActivePointersToInput]
+  )
+
+  const releasePointerControl = useCallback(
+    (pointerId: number) => {
+      if (activePointersRef.current.has(pointerId)) {
+        activePointersRef.current.delete(pointerId)
+        syncActivePointersToInput()
+      }
+    },
+    [syncActivePointersToInput]
+  )
+
+  const handleLeftPadPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const currentAssigned = activePointersRef.current.get(e.pointerId)
+      if (currentAssigned !== 'left' && currentAssigned !== 'right') return
+      const pad = leftPadRef.current
+      if (!pad) return
+      const rect = pad.getBoundingClientRect()
+      const midX = rect.left + rect.width * 0.5
+      const nextDir: 'left' | 'right' = e.clientX < midX ? 'left' : 'right'
+      if (nextDir !== currentAssigned) {
+        activePointersRef.current.set(e.pointerId, nextDir)
+        syncActivePointersToInput()
+      }
+    },
+    [syncActivePointersToInput]
   )
 
   // Submit Weekly Leaderboard Score
@@ -993,259 +1345,175 @@ export function GameEngine() {
     showAlert('🏆 رائع! تم تسجيل اسمك في لوحة شرف أبطال هذا الأسبوع!', 'success')
   }
 
-  const activeStage = GAME_STAGES[currentStageIdx] || GAME_STAGES[0]
+  const exitGameplayToMenu = useCallback(() => {
+    sound.playButton()
+    clearAllInputs()
+    sound.stopMusic()
+    if (isFullscreen) {
+      setIsFullscreen(false)
+      const doc = document as any
+      if (doc.fullscreenElement && doc.exitFullscreen) {
+        doc.exitFullscreen().catch(() => {})
+      } else if (doc.webkitFullscreenElement && doc.webkitExitFullscreen) {
+        doc.webkitExitFullscreen()
+      }
+    }
+    setGameState('start')
+  }, [clearAllInputs, isFullscreen])
 
-  return (
+  const activeStage = GAME_STAGES[currentStageIdx] || GAME_STAGES[0]
+  const isFullViewportMode = isDedicatedMobileGameplay || isFullscreen
+
+  const gameContent = (
     <div
+      id={isDedicatedMobileGameplay ? 'enarah-mobile-game-portal' : undefined}
       ref={containerRef}
       dir="rtl"
       className={`w-full flex flex-col items-center select-none ${
-        isFullscreen
-          ? 'fixed inset-0 z-50 bg-[#070B14] justify-between p-2 sm:p-4 overflow-hidden'
+        isFullViewportMode
+          ? 'fixed inset-0 z-[99999] w-screen h-[100dvh] bg-[#070B14] justify-between overflow-hidden'
+          : isMobileDevice
+          ? 'relative w-full h-[min(78dvh,560px)] min-h-[440px] bg-[#070B14] justify-between overflow-hidden rounded-2xl'
           : 'relative'
       }`}
     >
       {/* =====================================================================
-          01. MOBILE PORTRAIT ORIENTATION RECOMMENDATION BANNER
+          01. MINIMAL GAMEPLAY HUD (V8 PROBLEM 2)
+          During mobile gameplay displays ONLY: Hearts • Energy • Small Pause (+ Exit)
           ===================================================================== */}
-      {isPortraitMobile && !dismissedOrientationHint && (
-        <div className="w-full max-w-[960px] mb-2.5 px-3.5 py-2 rounded-2xl bg-gradient-to-l from-amber-500/15 via-blue-950/80 to-slate-900/90 border border-amber-400/35 flex items-center justify-between gap-2 text-amber-200 text-xs shadow-md">
-          <div className="flex items-center gap-2">
-            <Smartphone className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
-            <span className="font-bold leading-snug">
-              لأفضل تجربة لعب، يُفضّل تدوير الهاتف للوضع الأفقي.
+      <div
+        className={`w-full ${
+          isFullViewportMode || isMobileDevice ? '' : 'max-w-[960px] rounded-t-2xl border-x border-t'
+        } h-9 sm:h-11 bg-[#0B1222]/95 border-b border-slate-800/90 px-2.5 sm:px-4 pt-[env(safe-area-inset-top,0px)] flex items-center justify-between gap-2 shrink-0 z-30`}
+      >
+        {/* Desktop Only Stage Badge (Moved to Pause Menu on Mobile per V8 Problem 2) */}
+        {!isMobileDevice && (
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/40 text-[11px] font-black text-amber-300 shrink-0">
+              م {activeStage.worldNumber}
+            </span>
+            <span className="text-xs sm:text-sm font-extrabold text-white truncate">
+              {activeStage.worldTitleAr}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setDismissedOrientationHint(true)}
-            className="px-2 py-0.5 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] text-white/80 font-semibold shrink-0 cursor-pointer"
-          >
-            إخفاء
-          </button>
-        </div>
-      )}
+        )}
 
-      {/* =====================================================================
-          02. COMPACT TOP HUD BAR
-          ===================================================================== */}
-      <div className="w-full max-w-[960px] bg-[#0B1222]/95 border border-slate-800/90 rounded-t-2xl px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-lg backdrop-blur-md">
-        {/* Right Cluster: Level & Stage Badge */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 border border-amber-200/50 flex items-center justify-center text-slate-950 shadow-inner shrink-0">
-            <Lightbulb className="w-5 h-5 fill-slate-950" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-md bg-blue-500/20 border border-blue-400/30 text-[10px] font-black text-cyan-300">
-                المرحلة {activeStage.worldNumber} / 8
-              </span>
-              <span className="text-xs sm:text-sm font-extrabold text-white">
-                {activeStage.worldTitleAr}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block">
-              {activeStage.finalChallengeAr}
-            </p>
-          </div>
-        </div>
-
-        {/* Center Cluster: Health, Collected Products, Timed Challenge & Active Buffs */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Health Hearts */}
-          <div
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800"
-            title="نقاط الطاقة والصحة"
-          >
+        {/* Essential Status: Hearts & Energy ONLY */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Hearts */}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-800">
             {Array.from({ length: hudMaxHealth }).map((_, idx) => (
               <Heart
                 key={idx}
-                className={`w-4 h-4 transition-transform duration-200 ${
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                   idx < hudHealth
-                    ? 'text-rose-500 fill-rose-500 scale-100 drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]'
-                    : 'text-slate-700 fill-slate-800 scale-90'
+                    ? 'text-rose-500 fill-rose-500'
+                    : 'text-slate-700 fill-slate-800'
                 }`}
               />
             ))}
           </div>
 
-          {/* Collected Electrical Products */}
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-amber-500/30 text-amber-300 text-xs font-extrabold"
-            title="المنتجات والأسلاك المجمعة"
-          >
-            <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
-            <span className="font-mono">
-              {hudEnergy} / {hudTotalEnergy}
-            </span>
-          </div>
-
-          {/* Timed Challenge Countdown (Level 3 & Level 6) */}
-          {hudTimeLeftSec !== null && (
-            <div
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-black font-mono ${
-                hudTimeLeftSec <= 18
-                  ? 'bg-rose-950/90 border-rose-500 text-rose-300 animate-pulse'
-                  : 'bg-slate-900/90 border-cyan-500/35 text-cyan-300'
-              }`}
-              title="الوقت المتبقي للتحدي"
-            >
-              <Clock className="w-3.5 h-3.5" />
-              <span>{hudTimeLeftSec}s</span>
+          {/* Energy Bar */}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-800">
+            <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
+            <div className="w-11 sm:w-16 h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-amber-400 transition-all duration-200"
+                style={{ width: `${Math.max(10, Math.min(100, hudBulbEnergy))}%` }}
+              />
             </div>
-          )}
-
-          {/* Active Product Ability Badges */}
-          {hudActiveBuffs.shield && (
-            <span className="px-2 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-[10px] font-black flex items-center gap-1">
-              <Shield className="w-3 h-3" /> درع 4مم
-            </span>
-          )}
-          {hudActiveBuffs.speed && (
-            <span className="px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-black">
-              ⚡ سرعة 2.5مم
-            </span>
-          )}
-          {(hudActiveBuffs.spotlight || hudActiveBuffs.floodlight) && (
-            <span className="px-2 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 text-[10px] font-black">
-              🔦 كشاف نشط
-            </span>
-          )}
-
-          {/* Score */}
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-blue-500/25 text-cyan-300 text-xs font-extrabold">
-            <Star className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
-            <span className="font-mono">{hudScore}</span>
           </div>
         </div>
 
-        {/* Left Cluster: Quick Utility Actions */}
-        <div className="flex items-center gap-1.5">
+        {/* Pause & Dedicated Exit Button */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={() => {
               sound.playButton()
-              setShowStageSelectModal(true)
-            }}
-            className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
-            title="اختيار المرحلة"
-          >
-            <Flag className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden lg:inline">اختيار المرحلة</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              sound.playButton()
-              setShowLeaderboard(true)
-            }}
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-400 cursor-pointer transition-colors"
-            title="لوحة الشرف الأسبوعية"
-            aria-label="لوحة الشرف الأسبوعية"
-          >
-            <Trophy className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              const next = !isMuted
-              setIsMuted(next)
-              sound.setMuted(next)
-            }}
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white cursor-pointer transition-colors"
-            title={isMuted ? 'تشغيل الصوت والموسيقى' : 'كتم الصوت'}
-            aria-label={isMuted ? 'تشغيل الصوت والموسيقى' : 'كتم الصوت'}
-          >
-            {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              sound.playButton()
-              setShowSettingsModal(true)
-            }}
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white cursor-pointer transition-colors"
-            title="الإعدادات"
-            aria-label="الإعدادات"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          {gameState === 'playing' && (
-            <button
-              type="button"
-              onClick={() => {
-                sound.playButton()
+              if (gameState === 'playing') {
                 clearAllInputs()
                 sound.stopMusic()
                 setGameState('paused')
-              }}
-              className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
-              title="إيقاف مؤقت"
+              } else if (gameState === 'paused') {
+                setGameState('playing')
+              } else {
+                setShowSettingsModal(true)
+              }
+            }}
+            className="w-8 h-8 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-400 flex items-center justify-center cursor-pointer transition-colors"
+            aria-label={gameState === 'playing' ? 'إيقاف مؤقت' : 'الإعدادات'}
+          >
+            {gameState === 'playing' ? (
+              <Pause className="w-4 h-4 fill-amber-400" />
+            ) : (
+              <Settings className="w-4 h-4 text-slate-300" />
+            )}
+          </button>
+
+          {isFullViewportMode && (
+            <button
+              type="button"
+              onClick={exitGameplayToMenu}
+              className="h-8 px-2.5 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-200 text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+              aria-label="خروج من اللعب"
             >
-              <Pause className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">إيقاف</span>
+              <LogOut className="w-3.5 h-3.5" />
+              <span>خروج</span>
             </button>
           )}
-
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white cursor-pointer transition-colors"
-            title={isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}
-            aria-label={isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
         </div>
       </div>
 
       {/* =====================================================================
-          03. CANVAS VIEWPORT & IN-WORLD OVERLAY MENUS
+          02. MAXIMIZED PLAYABLE SCENE VIEWPORT (SECTIONS 1, 2, 3, 10, 11, 12)
+          Occupies the largest practical portion of the mobile screen in both
+          Portrait and Landscape modes with responsive camera zoom.
           ===================================================================== */}
-      <div className="relative w-full max-w-[960px] aspect-[16/9] max-h-[68vh] bg-[#070B14] border-x border-b border-slate-800 overflow-hidden shadow-2xl">
+      <div
+        ref={sceneWrapperRef}
+        className={`relative w-full ${
+          isFullViewportMode || isMobileDevice
+            ? 'flex-1 min-h-0'
+            : 'max-w-[960px] aspect-[16/9] max-h-[70vh] border-x border-slate-800 shadow-2xl'
+        } bg-[#070B14] overflow-hidden touch-none`}
+        style={{ touchAction: 'none' }}
+      >
         <canvas
           ref={canvasRef}
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
-          className="w-full h-full block object-contain"
+          className="w-full h-full block"
         />
 
-        {/* Boss Health Bar Overlay */}
+        {/* =================================================================
+            09 — COMPACT BOSS HEALTH BAR (SECTION 9)
+            Displays ONLY Boss Name + Health Bar without blocking gameplay
+            ================================================================= */}
         {gameState === 'playing' && hudBossHp !== null && hudBossHp > 0 && activeStage.boss && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 w-72 sm:w-96 bg-slate-950/90 border border-rose-500/50 rounded-2xl px-4 py-2 shadow-xl backdrop-blur-md">
-            <div className="flex items-center justify-between text-xs font-extrabold text-rose-300 mb-1">
-              <span>
-                ⚡ {activeStage.boss.nameAr} (الطور {hudBossPhase})
-              </span>
-              <span>
-                الدرع: {hudBossHp} / {hudBossMaxHp}
-              </span>
-            </div>
-            <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none px-3 py-1 rounded-full bg-slate-950/80 border border-rose-500/45 flex items-center gap-2.5 shadow-md max-w-[260px] sm:max-w-xs">
+            <span className="text-[11px] font-extrabold text-rose-200 truncate">
+              {activeStage.boss.nameAr}
+            </span>
+            <div className="w-20 sm:w-28 h-2 rounded-full bg-slate-800 overflow-hidden shrink-0">
               <div
-                className="h-full bg-gradient-to-r from-amber-500 to-rose-600 transition-all duration-300"
+                className="h-full bg-gradient-to-r from-amber-400 to-rose-500 transition-all duration-200"
                 style={{ width: `${Math.max(0, (hudBossHp / hudBossMaxHp) * 100)}%` }}
               />
             </div>
-            <p className="text-[10px] text-slate-300 mt-1 text-center">
-              اقفز فوق النواة العلوية للزعيم أو فعّل قواطع التفريغ في الساحة!
-            </p>
           </div>
         )}
 
-        {/* Live Banner Alert */}
+        {/* Compact Auto-Disappearing Gameplay Tip (Never blocks view) */}
         {bannerAlert && (
           <div
-            className={`absolute top-3 right-3 z-30 max-w-xs sm:max-w-md px-4 py-2 rounded-xl border text-xs font-bold shadow-lg backdrop-blur-md transition-all ${
+            className={`absolute top-9 left-1/2 -translate-x-1/2 z-20 pointer-events-none px-3 py-1 rounded-full border text-[11px] font-bold shadow-sm whitespace-nowrap max-w-[92vw] truncate ${
               bannerAlert.type === 'success'
-                ? 'bg-emerald-950/90 border-emerald-400/50 text-emerald-200'
+                ? 'bg-emerald-950/85 border-emerald-400/50 text-emerald-200'
                 : bannerAlert.type === 'error'
-                ? 'bg-rose-950/90 border-rose-400/50 text-rose-200'
-                : 'bg-blue-950/90 border-cyan-400/50 text-cyan-100'
+                ? 'bg-rose-950/85 border-rose-400/50 text-rose-200'
+                : 'bg-slate-900/85 border-slate-700 text-slate-100'
             }`}
           >
             {bannerAlert.msg}
@@ -1253,80 +1521,109 @@ export function GameEngine() {
         )}
 
         {/* =================================================================
-            START SCREEN OVERLAY (شاشة البداية - بطل الإنارة: مغامرة اللمبة الأسطورية)
+            MAIN MENU OVERLAY (Visible Start Game Button & Simple Menu)
             ================================================================= */}
         {gameState === 'start' && (
-          <div className="absolute inset-0 z-20 bg-gradient-to-b from-[#070E20]/88 via-[#0B1528]/92 to-[#070B14]/96 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-xs font-extrabold mb-2.5 shadow-sm">
-              <Lightbulb className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span>مغامرة اللمبة المضيئة 2.5D • 8 مراحل متدرجة الصعوبة</span>
-            </div>
+          <div className="absolute inset-0 z-20 bg-slate-950/35 flex flex-col items-center justify-center p-4 text-center">
+            <div className="bg-[#0B1222]/90 border border-slate-700/80 rounded-3xl px-5 py-5 sm:px-9 sm:py-7 max-w-sm sm:max-w-md w-full shadow-2xl backdrop-blur-md flex flex-col items-center">
+              <div className="w-11 h-11 rounded-2xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2.5">
+                <Lightbulb className="w-6 h-6 fill-amber-400" />
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
+                بطل الإنارة
+              </h2>
 
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1.5 drop-shadow-md">
-              بطل الإنارة <span className="text-amber-400">—</span> مغامرة اللمبة الأسطورية
-            </h2>
-
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed mb-4">
-              تحكم بشخصية <strong className="text-amber-300">لمبة LED الذكية</strong> واجمع منتجات الإنارة الحديثة الحقيقية:{' '}
-              <span className="text-cyan-300">أسلاك النحاس (1.5 و2.5 و4 و6 مم²)</span>،{' '}
-              <span className="text-yellow-300">السبوت لايت وكشافات الطوارئ</span>، و
-              <span className="text-emerald-300">أجهزة الإنترفون</span> عبر 8 مراحل ملحمية حتى هزيمة «ملك الظلام الكهربائي»!
-            </p>
-
-            {/* 8 Levels Preview Grid */}
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2 w-full max-w-3xl mb-5">
-              {GAME_STAGES.map((stg, idx) => {
-                const isUnlocked = idx <= progression.unlockedStageIndex
-                const stars = progression.stageStarsEarned[stg.id] || 0
-                return (
-                  <button
-                    key={stg.id}
-                    type="button"
-                    onClick={() => {
-                      if (isUnlocked) startAdventure(idx)
-                    }}
-                    disabled={!isUnlocked}
-                    className={`p-2 rounded-xl border text-right transition-all flex flex-col justify-between ${
-                      isUnlocked
-                        ? 'bg-slate-900/90 hover:bg-blue-950/80 border-blue-500/40 cursor-pointer hover:-translate-y-0.5 shadow-md'
-                        : 'bg-slate-950/60 border-slate-800/80 opacity-55 cursor-not-allowed'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-[9px] font-black text-cyan-400">{stg.code}</span>
-                      {isUnlocked ? (
-                        <Unlock className="w-2.5 h-2.5 text-emerald-400" />
-                      ) : (
-                        <Lock className="w-2.5 h-2.5 text-slate-500" />
-                      )}
-                    </div>
-                    <div className="text-[10px] font-extrabold text-white truncate w-full">
-                      {stg.worldTitleAr}
-                    </div>
-                    <div className="flex items-center gap-0.5 mt-1">
-                      {[1, 2, 3].map((s) => (
-                        <Star
-                          key={s}
-                          className={`w-2.5 h-2.5 ${
-                            s <= stars ? 'text-amber-400 fill-amber-400' : 'text-slate-700'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Primary Menu Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => startAdventure()}
-                className="px-7 py-3.5 rounded-2xl bg-gradient-to-l from-amber-400 via-amber-500 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm sm:text-base shadow-[0_0_25px_rgba(245,158,11,0.45)] flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+                className="w-full py-3.5 px-6 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-base sm:text-lg flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-98 mb-2.5 shadow-md"
               >
                 <Play className="w-5 h-5 fill-slate-950" />
-                <span>ابدأ المغامرة</span>
+                <span>ابدأ اللعب</span>
+              </button>
+
+              <div className="flex items-center gap-2 w-full mb-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playButton()
+                    setShowStageSelectModal(true)
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                >
+                  <Flag className="w-4 h-4 text-amber-400" />
+                  <span>اختيار المرحلة</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playButton()
+                    setShowSettingsModal(true)
+                  }}
+                  className="p-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white cursor-pointer transition-colors"
+                  aria-label="الإعدادات"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="w-full pt-3 border-t border-slate-800/90 flex items-center justify-between text-xs text-slate-300 font-bold">
+                <span>
+                  المراحل المفتوحة: {Math.min(8, progression.unlockedStageIndex + 1)} / 8
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1 text-amber-400">
+                    <Star className="w-3.5 h-3.5 fill-amber-400" />
+                    {Object.values(progression.stageStarsEarned).reduce((a, b) => a + b, 0)} / 24
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playButton()
+                      setShowLeaderboard(true)
+                    }}
+                    className="text-slate-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer transition-colors"
+                    title="لوحة الشرف"
+                  >
+                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =================================================================
+            PAUSE MENU OVERLAY (Houses Secondary Controls per Section 8)
+            ================================================================= */}
+        {gameState === 'paused' && (
+          <div className="absolute inset-0 z-30 bg-slate-950/88 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
+            <h3 className="text-xl sm:text-2xl font-black text-white mb-1">اللعبة متوقفة مؤقتاً</h3>
+            <p className="text-xs text-slate-400 mb-4">
+              المرحلة {activeStage.worldNumber}: {activeStage.worldTitleAr} • العناصر: {hudEnergy}/{hudTotalEnergy}
+            </p>
+
+            <div className="grid grid-cols-2 gap-2.5 w-full max-w-sm mb-3">
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playButton()
+                  setGameState('playing')
+                }}
+                className="col-span-2 py-3 px-5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-slate-950" />
+                <span>متابعة اللعب</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={retryCurrentStage}
+                className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>إعادة المرحلة</span>
               </button>
 
               <button
@@ -1335,10 +1632,41 @@ export function GameEngine() {
                   sound.playButton()
                   setShowStageSelectModal(true)
                 }}
-                className="px-5 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-blue-400/40 text-white font-bold text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all"
+                className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <Flag className="w-4 h-4 text-cyan-400" />
-                <span>اختيار المرحلة (8 مراحل)</span>
+                <Flag className="w-4 h-4 text-amber-400" />
+                <span>اختيار المرحلة</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !isMuted
+                  setIsMuted(next)
+                  sound.setMuted(next)
+                }}
+                className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                {isMuted ? (
+                  <>
+                    <VolumeX className="w-4 h-4 text-rose-400" />
+                    <span>تشغيل الصوت</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-4 h-4 text-emerald-400" />
+                    <span>كتم الصوت</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                <span>{isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}</span>
               </button>
 
               <button
@@ -1347,57 +1675,7 @@ export function GameEngine() {
                   sound.playButton()
                   setShowSettingsModal(true)
                 }}
-                className="px-4 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer transition-all"
-              >
-                <Settings className="w-4 h-4 text-slate-400" />
-                <span>الإعدادات</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* =================================================================
-            PAUSE MENU OVERLAY (قائمة الإيقاف المؤقت)
-            ================================================================= */}
-        {gameState === 'paused' && (
-          <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-3">
-              <Pause className="w-7 h-7" />
-            </div>
-            <h3 className="text-2xl font-black text-white mb-1">اللعبة متوقفة مؤقتاً</h3>
-            <p className="text-xs text-slate-400 mb-6">
-              {activeStage.worldTitleAr} — {activeStage.titleAr}
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-md justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  sound.playButton()
-                  setGameState('playing')
-                }}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Play className="w-4 h-4 fill-slate-950" />
-                <span>متابعة</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={retryCurrentStage}
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-sm flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>إعادة المحاولة</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  sound.playButton()
-                  setShowSettingsModal(true)
-                }}
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Settings className="w-4 h-4" />
                 <span>الإعدادات</span>
@@ -1405,15 +1683,11 @@ export function GameEngine() {
 
               <button
                 type="button"
-                onClick={() => {
-                  sound.playButton()
-                  clearAllInputs()
-                  sound.stopMusic()
-                  setGameState('start')
-                }}
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-900 hover:bg-rose-950/60 border border-slate-800 text-slate-300 hover:text-rose-200 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer"
+                onClick={exitGameplayToMenu}
+                className="py-2.5 px-3 rounded-xl bg-rose-950/70 hover:bg-rose-900/80 border border-rose-500/40 text-rose-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <span>العودة للقائمة</span>
+                <LogOut className="w-4 h-4" />
+                <span>خروج للقائمة</span>
               </button>
             </div>
           </div>
@@ -1423,16 +1697,16 @@ export function GameEngine() {
             DEFEAT / RETRY OVERLAY
             ================================================================= */}
         {gameState === 'defeat' && (
-          <div className="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400 mb-3">
-              <ShieldAlert className="w-8 h-8" />
+          <div className="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-5 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400 mb-2.5">
+              <ShieldAlert className="w-7 h-7" />
             </div>
-            <h3 className="text-2xl font-black text-white mb-1">انطفأت طاقة لمبة البطل!</h3>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
-              اجمع لمبات LED لاستعادة القلوب وأسلاك 4 مم² لتفعيل الدرع العازل، واستخدم القفز المزدوج والاندفاع السريع لتجاوز العوائق!
+            <h3 className="text-xl sm:text-2xl font-black text-white mb-1.5">انطفأت طاقة البطل</h3>
+            <p className="text-xs text-slate-300 max-w-xs mb-5">
+              حاول مجدداً وتجنب العوائق الكهربائية للوصول إلى نهاية المرحلة.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button
                 type="button"
                 onClick={retryCurrentStage}
@@ -1448,20 +1722,17 @@ export function GameEngine() {
                   sound.playButton()
                   setShowStageSelectModal(true)
                 }}
-                className="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-sm cursor-pointer"
+                className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs cursor-pointer"
               >
                 اختيار المرحلة
               </button>
 
               <button
                 type="button"
-                onClick={() => {
-                  sound.playButton()
-                  setGameState('start')
-                }}
-                className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-sm cursor-pointer"
+                onClick={exitGameplayToMenu}
+                className="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs cursor-pointer"
               >
-                العودة للقائمة
+                خروج
               </button>
             </div>
           </div>
@@ -1471,52 +1742,52 @@ export function GameEngine() {
             STAGE CLEAR OVERLAY (اجتياز المرحلة بنجاح)
             ================================================================= */}
         {gameState === 'stage_clear' && (
-          <div className="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-5 text-center">
+          <div className="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center">
             <div className="flex items-center gap-2 mb-2">
               {[1, 2, 3].map((starIdx) => (
                 <Star
                   key={starIdx}
-                  className={`w-8 h-8 transition-transform ${
+                  className={`w-7 h-7 transition-transform ${
                     starIdx <= hudStarsEarned
-                      ? 'text-amber-400 fill-amber-400 scale-110 drop-shadow-[0_0_10px_rgba(251,191,36,0.7)]'
+                      ? 'text-amber-400 fill-amber-400 scale-110'
                       : 'text-slate-700'
                   }`}
                 />
               ))}
             </div>
 
-            <h3 className="text-2xl sm:text-3xl font-black text-white mb-1">
-              اكتملت مرحلة {activeStage.worldTitleAr} بنجاح!
+            <h3 className="text-xl sm:text-2xl font-black text-white mb-1">
+              اكتملت مرحلة {activeStage.worldTitleAr}
             </h3>
-            <p className="text-xs sm:text-sm text-cyan-300 font-bold mb-4">
-              تم فتح المرحلة التالية: {GAME_STAGES[currentStageIdx + 1]?.worldTitleAr}
+            <p className="text-xs text-cyan-300 font-bold mb-3">
+              المرحلة التالية: {GAME_STAGES[currentStageIdx + 1]?.worldTitleAr}
             </p>
 
-            <div className="grid grid-cols-3 gap-3 w-full max-w-md mb-6 bg-slate-900/90 border border-slate-800 rounded-2xl p-3">
+            <div className="grid grid-cols-3 gap-2.5 w-full max-w-sm mb-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5">
               <div>
-                <div className="text-[11px] text-slate-400">المنتجات المجمعة</div>
-                <div className="text-sm font-black text-amber-400">
+                <div className="text-[10px] text-slate-400">العناصر</div>
+                <div className="text-xs sm:text-sm font-black text-amber-400">
                   {hudEnergy} / {hudTotalEnergy}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] text-slate-400">نقاط المرحلة</div>
-                <div className="text-sm font-black text-cyan-400">+{hudStageScore}</div>
+                <div className="text-[10px] text-slate-400">النقاط</div>
+                <div className="text-xs sm:text-sm font-black text-cyan-400">+{hudStageScore}</div>
               </div>
               <div>
-                <div className="text-[11px] text-slate-400">الزمن</div>
-                <div className="text-sm font-black text-emerald-400">{hudElapsedSec} ثانية</div>
+                <div className="text-[10px] text-slate-400">الزمن</div>
+                <div className="text-xs sm:text-sm font-black text-emerald-400">{hudElapsedSec}s</div>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button
                 type="button"
                 onClick={goToNextStage}
-                className="px-7 py-3 rounded-xl bg-gradient-to-l from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-slate-950 font-black text-sm flex items-center gap-2 cursor-pointer shadow-lg"
+                className="px-6 py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm flex items-center gap-2 cursor-pointer shadow-lg"
               >
                 <Play className="w-4 h-4 fill-slate-950" />
-                <span>متابعة للمرحلة التالية ({GAME_STAGES[currentStageIdx + 1]?.worldTitleAr})</span>
+                <span>المرحلة التالية</span>
               </button>
 
               <button
@@ -1524,47 +1795,46 @@ export function GameEngine() {
                 onClick={retryCurrentStage}
                 className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs cursor-pointer"
               >
-                إعادة المحاولة
+                إعادة
               </button>
 
               <button
                 type="button"
-                onClick={() => setGameState('start')}
+                onClick={exitGameplayToMenu}
                 className="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs cursor-pointer"
               >
-                العودة للقائمة
+                خروج
               </button>
             </div>
           </div>
         )}
 
         {/* =================================================================
-            FINAL CAMPAIGN VICTORY + VOUCHER + LEADERBOARD
+            FINAL CAMPAIGN VICTORY + ADMIN-CONTROLLED REWARD + LEADERBOARD
             ================================================================= */}
         {gameState === 'game_won' && (
-          <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-start sm:justify-center p-4 sm:p-6 text-center overflow-y-auto">
+          <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-start sm:justify-center p-4 text-center overflow-y-auto">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-black mb-2">
               <Trophy className="w-4 h-4 text-amber-400" />
-              <span>بطل الإنارة الأسطوري • تم تحرير المراحل الثماني كاملة!</span>
+              <span>بطل الإنارة • اكتملت المراحل الثماني</span>
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-black text-white mb-1">
-              مبارك الفوز! هزمت ملك الظلام الكهربائي وأعدت النور للمدينة
+            <h3 className="text-lg sm:text-2xl font-black text-white mb-1">
+              مبارك الفوز! أعدت النور للمدينة
             </h3>
             <p className="text-xs text-slate-300 max-w-lg mb-3">
-              {rewardConfig.victoryMsg} — مجموع نقاطك النهائي:{' '}
-              <strong className="text-amber-400 font-mono">{hudScore} نقطة</strong>
+              {rewardConfig.victoryMsg} — مجموع النقاط:{' '}
+              <strong className="text-amber-400 font-mono">{hudScore}</strong>
             </p>
 
-            {/* Reward Coupon / Gift Card */}
             {rewardConfig.isEnabled && rewardConfig.rewardType !== 'no_reward' && (
-              <div className="w-full max-w-md bg-gradient-to-l from-amber-950/50 via-slate-900 to-blue-950/50 border border-amber-400/40 rounded-2xl p-3.5 mb-3 text-right shadow-lg">
+              <div className="w-full max-w-md bg-slate-900 border border-amber-400/40 rounded-2xl p-3 mb-3 text-right shadow-lg">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="text-xs font-extrabold text-amber-300 flex items-center gap-1.5">
                     <Award className="w-4 h-4 text-amber-400" />
                     {rewardConfig.rewardType === 'coupon'
                       ? rewardConfig.discountTitle
-                      : 'هدية فورية من الإنارة الحديثة'}
+                      : 'هدية من الإنارة الحديثة'}
                   </span>
                   {rewardConfig.rewardType === 'coupon' && (
                     <button
@@ -1588,7 +1858,6 @@ export function GameEngine() {
               </div>
             )}
 
-            {/* Leaderboard Submission Form */}
             {!hasSubmittedScore ? (
               <form
                 onSubmit={handleSubmitLeaderboard}
@@ -1620,11 +1889,11 @@ export function GameEngine() {
             ) : (
               <div className="px-4 py-2 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-bold mb-3 flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4" />
-                <span>تم تسجيل نتيجتك في لوحة شرف أبطال الإنارة!</span>
+                <span>تم تسجيل نتيجتك في لوحة الشرف!</span>
               </div>
             )}
 
-            <div className="flex flex-wrap items-center justify-center gap-2.5">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={() => setShowLeaderboard(true)}
@@ -1657,15 +1926,15 @@ export function GameEngine() {
                 onClick={() => startAdventure(0)}
                 className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs cursor-pointer"
               >
-                إعادة المحاولة
+                إعادة اللعب
               </button>
 
               <button
                 type="button"
-                onClick={() => setGameState('start')}
+                onClick={exitGameplayToMenu}
                 className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs cursor-pointer"
               >
-                العودة للقائمة
+                خروج
               </button>
             </div>
           </div>
@@ -1673,17 +1942,31 @@ export function GameEngine() {
       </div>
 
       {/* =====================================================================
-          04. ERGONOMIC MULTI-TOUCH MOBILE CONTROLS DECK (SECTION 12)
-          Left side: Left / Right directional buttons
-          Right side: Attack Pulse + Dash + Prominent Jump (with Double Jump)
+          03. TWO-THUMB MULTI-TOUCH CONTROL SYSTEM (SECTIONS 4, 5, 6)
+          - Left Thumb: Two large buttons (LEFT ←, RIGHT →) — 64–76px targets
+          - Right Thumb: Large Primary JUMP (76–88px) + Smaller DASH (58–68px) + Optional Action
+          - Icon-only controls (zero text labels below buttons!)
+          - In Landscape Mode: Floats in lower-left & lower-right safe areas to maximize canvas
           ===================================================================== */}
       <div
         dir="ltr"
-        className="w-full max-w-[960px] bg-[#0B1222] border-x border-b border-slate-800 rounded-b-2xl px-3 sm:px-6 py-3 flex items-center justify-between gap-2 sm:gap-3 shadow-xl select-none touch-none"
-        style={{ touchAction: 'none' }}
+        className={
+          isLandscapeMobile && isFullViewportMode
+            ? 'fixed bottom-0 inset-x-0 z-30 px-[max(0.75rem,env(safe-area-inset-left))] pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 flex items-end justify-between pointer-events-none select-none touch-none'
+            : `w-full ${
+                isFullViewportMode || isMobileDevice ? '' : 'max-w-[960px] rounded-b-2xl border-x border-b'
+              } bg-[#09101E] border-t border-slate-800/90 px-3 sm:px-6 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-2 shrink-0 select-none touch-none z-30`
+        }
+        style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none', opacity: touchOpacity }}
+        onContextMenu={(e) => e.preventDefault()}
       >
-        {/* LEFT SIDE: Left & Right Directional Thumb Buttons */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* LEFT THUMB: Two Large Directional Buttons (LEFT ← / RIGHT →, 64–76 CSS px) */}
+        {/* LEFT THUMB: Two Large Buttons (LEFT ← / RIGHT →) — 64–76 CSS px */}
+        <div
+          ref={leftPadRef}
+          onPointerMove={handleLeftPadPointerMove}
+          className="flex items-center gap-2 min-[380px]:gap-3 sm:gap-4 pointer-events-auto touch-none"
+        >
           <button
             type="button"
             onPointerDown={(e) => {
@@ -1691,29 +1974,26 @@ export function GameEngine() {
               try {
                 e.currentTarget.setPointerCapture(e.pointerId)
               } catch {}
-              handleTouchControl('left', true)
+              registerPointerControl(e.pointerId, 'left')
             }}
             onPointerUp={(e) => {
               e.preventDefault()
-              handleTouchControl('left', false)
+              releasePointerControl(e.pointerId)
             }}
-            onPointerCancel={() => handleTouchControl('left', false)}
-            onPointerLeave={(e) => {
-              if (e.buttons === 0) handleTouchControl('left', false)
-            }}
+            onPointerCancel={(e) => releasePointerControl(e.pointerId)}
+            onLostPointerCapture={(e) => releasePointerControl(e.pointerId)}
             className={`${
               touchButtonScale === 'large'
-                ? 'w-15 h-14 sm:w-20 sm:h-16'
-                : 'w-13 h-12 sm:w-16 sm:h-14'
-            } rounded-2xl border-2 font-black text-sm sm:text-base flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
+                ? 'w-[64px] h-[64px] min-[360px]:w-[66px] min-[360px]:h-[66px] min-[385px]:w-[72px] min-[385px]:h-[72px] sm:w-[76px] sm:h-[76px]'
+                : 'w-[64px] h-[64px] sm:w-[68px] sm:h-[68px]'
+            } rounded-2xl border-2 flex items-center justify-center transition-transform cursor-pointer select-none shadow-lg ${
               touchVisualState.left
-                ? 'bg-blue-600 border-cyan-300 text-white scale-95 shadow-[0_0_18px_rgba(59,130,246,0.75)]'
-                : 'bg-slate-900/90 hover:bg-slate-800 border-slate-700 text-slate-200 shadow-md'
+                ? 'bg-blue-600 border-cyan-300 text-white scale-95'
+                : 'bg-slate-900/90 border-slate-600/90 text-slate-100 active:bg-blue-600'
             }`}
-            aria-label="تحرك لليسار"
+            aria-label="Move Left"
           >
-            <span className="text-lg leading-none">◀</span>
-            <span className="text-[10px] font-bold text-slate-300 mt-0.5">يسار</span>
+            <ArrowLeft className="w-8 h-8 stroke-[2.75] pointer-events-none" />
           </button>
 
           <button
@@ -1723,49 +2003,48 @@ export function GameEngine() {
               try {
                 e.currentTarget.setPointerCapture(e.pointerId)
               } catch {}
-              handleTouchControl('right', true)
+              registerPointerControl(e.pointerId, 'right')
             }}
             onPointerUp={(e) => {
               e.preventDefault()
-              handleTouchControl('right', false)
+              releasePointerControl(e.pointerId)
             }}
-            onPointerCancel={() => handleTouchControl('right', false)}
-            onPointerLeave={(e) => {
-              if (e.buttons === 0) handleTouchControl('right', false)
-            }}
+            onPointerCancel={(e) => releasePointerControl(e.pointerId)}
+            onLostPointerCapture={(e) => releasePointerControl(e.pointerId)}
             className={`${
               touchButtonScale === 'large'
-                ? 'w-15 h-14 sm:w-20 sm:h-16'
-                : 'w-13 h-12 sm:w-16 sm:h-14'
-            } rounded-2xl border-2 font-black text-sm sm:text-base flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
+                ? 'w-[64px] h-[64px] min-[360px]:w-[66px] min-[360px]:h-[66px] min-[385px]:w-[72px] min-[385px]:h-[72px] sm:w-[76px] sm:h-[76px]'
+                : 'w-[64px] h-[64px] sm:w-[68px] sm:h-[68px]'
+            } rounded-2xl border-2 flex items-center justify-center transition-transform cursor-pointer select-none shadow-lg ${
               touchVisualState.right
-                ? 'bg-blue-600 border-cyan-300 text-white scale-95 shadow-[0_0_18px_rgba(59,130,246,0.75)]'
-                : 'bg-slate-900/90 hover:bg-slate-800 border-slate-700 text-slate-200 shadow-md'
+                ? 'bg-blue-600 border-cyan-300 text-white scale-95'
+                : 'bg-slate-900/90 border-slate-600/90 text-slate-100 active:bg-blue-600'
             }`}
-            aria-label="تحرك لليمين"
+            aria-label="Move Right"
           >
-            <span className="text-lg leading-none">▶</span>
-            <span className="text-[10px] font-bold text-slate-300 mt-0.5">يمين</span>
+            <ArrowRight className="w-8 h-8 stroke-[2.75] pointer-events-none" />
           </button>
         </div>
 
-        {/* CENTER HINT (Desktop Keyboard Guide) */}
-        <div dir="rtl" className="hidden lg:flex flex-col items-center text-center text-[11px] text-slate-400">
-          <div className="font-bold text-slate-300">
-            لوحة المفاتيح: <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono">A</kbd>{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono">D</kbd> أو الأسهم للحركة •{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 font-mono">Space</kbd> قفز / قفز مزدوج •{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono">Shift</kbd> اندفاع (Dash) •{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-yellow-300 font-mono">E</kbd> هجوم ضوئي
-          </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">
-            اجمع الأسلاك ولمبات LED والسبوت لايت والإنترفون لتفعيل القدرات الخاصة!
-          </div>
+        {/* CENTER HINT (Desktop Only) */}
+        <div dir="rtl" className="hidden lg:flex items-center gap-3 text-[11px] text-slate-400 font-semibold">
+          <span>
+            الحركة: <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200 font-mono">A</kbd>{' '}
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200 font-mono">D</kbd> / الأسهم
+          </span>
+          <span>•</span>
+          <span>
+            القفز: <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 font-mono">Space</kbd>
+          </span>
+          <span>•</span>
+          <span>
+            اندفاع: <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono">Shift</kbd>
+          </span>
         </div>
 
-        {/* RIGHT SIDE: Light Pulse Attack + Dash + Prominent Jump Button */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Light Bulb Pulse Attack Button */}
+        {/* RIGHT THUMB: Smaller DASH Button (58–68px) + Large Primary JUMP Button (76–88px) — V8 Problem 2 & 3 */}
+        <div className="flex items-end gap-2.5 min-[380px]:gap-3 sm:gap-4 pointer-events-auto touch-none">
+          {/* Secondary DASH Button (58–68 CSS px) */}
           <button
             type="button"
             onPointerDown={(e) => {
@@ -1773,65 +2052,29 @@ export function GameEngine() {
               try {
                 e.currentTarget.setPointerCapture(e.pointerId)
               } catch {}
-              handleTouchControl('attack', true)
+              registerPointerControl(e.pointerId, 'dash')
             }}
             onPointerUp={(e) => {
               e.preventDefault()
-              handleTouchControl('attack', false)
+              releasePointerControl(e.pointerId)
             }}
-            onPointerCancel={() => handleTouchControl('attack', false)}
-            onPointerLeave={(e) => {
-              if (e.buttons === 0) handleTouchControl('attack', false)
-            }}
+            onPointerCancel={(e) => releasePointerControl(e.pointerId)}
+            onLostPointerCapture={(e) => releasePointerControl(e.pointerId)}
             className={`${
               touchButtonScale === 'large'
-                ? 'w-13 h-14 sm:w-15 sm:h-16'
-                : 'w-12 h-12 sm:w-14 sm:h-14'
-            } rounded-2xl border-2 font-black flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
-              touchVisualState.attack
-                ? 'bg-yellow-400 border-white text-slate-950 scale-95 shadow-[0_0_18px_rgba(250,204,21,0.85)]'
-                : 'bg-slate-900/90 hover:bg-slate-800 border-yellow-500/40 text-yellow-300 shadow-md'
-            }`}
-            aria-label="هجوم ومضة اللمبة"
-          >
-            <Lightbulb className="w-4 h-4 fill-current" />
-            <span className="text-[10px] font-bold mt-0.5">ومضة</span>
-          </button>
-
-          {/* Dash Button (Shift / Mobile Dash) */}
-          <button
-            type="button"
-            onPointerDown={(e) => {
-              e.preventDefault()
-              try {
-                e.currentTarget.setPointerCapture(e.pointerId)
-              } catch {}
-              handleTouchControl('dash', true)
-            }}
-            onPointerUp={(e) => {
-              e.preventDefault()
-              handleTouchControl('dash', false)
-            }}
-            onPointerCancel={() => handleTouchControl('dash', false)}
-            onPointerLeave={(e) => {
-              if (e.buttons === 0) handleTouchControl('dash', false)
-            }}
-            className={`${
-              touchButtonScale === 'large'
-                ? 'w-14 h-14 sm:w-16 sm:h-16'
-                : 'w-12 h-12 sm:w-14 sm:h-14'
-            } rounded-2xl border-2 font-black flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
+                ? 'w-[58px] h-[58px] min-[360px]:w-[60px] min-[360px]:h-[60px] min-[385px]:w-[64px] min-[385px]:h-[64px] sm:w-[68px] sm:h-[68px]'
+                : 'w-[58px] h-[58px] sm:w-[62px] sm:h-[62px]'
+            } rounded-full border-2 flex items-center justify-center transition-transform cursor-pointer select-none shadow-lg ${
               touchVisualState.dash
-                ? 'bg-cyan-500 border-white text-slate-950 scale-95 shadow-[0_0_18px_rgba(6,182,212,0.8)]'
-                : 'bg-slate-900/90 hover:bg-slate-800 border-cyan-500/40 text-cyan-300 shadow-md'
+                ? 'bg-cyan-400 border-white text-slate-950 scale-95'
+                : 'bg-slate-900/90 border-cyan-500/60 text-cyan-300 active:bg-cyan-400 active:text-slate-950'
             }`}
-            aria-label="اندفاع سريع"
+            aria-label="Dash"
           >
-            <Zap className="w-4 h-4 fill-current" />
-            <span className="text-[10px] font-bold mt-0.5">اندفاع</span>
+            <Zap className="w-6 h-6 fill-current pointer-events-none" />
           </button>
 
-          {/* Primary Prominent Jump / Double Jump Button */}
+          {/* LARGE PRIMARY JUMP BUTTON (76–88 CSS px) */}
           <button
             type="button"
             onPointerDown={(e) => {
@@ -1839,181 +2082,237 @@ export function GameEngine() {
               try {
                 e.currentTarget.setPointerCapture(e.pointerId)
               } catch {}
-              handleTouchControl('jump', true)
+              registerPointerControl(e.pointerId, 'jump')
             }}
             onPointerUp={(e) => {
               e.preventDefault()
-              handleTouchControl('jump', false)
+              releasePointerControl(e.pointerId)
             }}
-            onPointerCancel={() => handleTouchControl('jump', false)}
-            onPointerLeave={(e) => {
-              if (e.buttons === 0) handleTouchControl('jump', false)
-            }}
+            onPointerCancel={(e) => releasePointerControl(e.pointerId)}
+            onLostPointerCapture={(e) => releasePointerControl(e.pointerId)}
             className={`${
               touchButtonScale === 'large'
-                ? 'w-18 h-14 sm:w-24 sm:h-16'
-                : 'w-16 h-12 sm:w-20 sm:h-14'
-            } rounded-2xl border-2 font-black flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
+                ? 'w-[76px] h-[76px] min-[385px]:w-[82px] min-[385px]:h-[82px] sm:w-[88px] sm:h-[88px]'
+                : 'w-[76px] h-[76px] sm:w-[80px] sm:h-[80px]'
+            } rounded-full border-2 flex items-center justify-center transition-transform cursor-pointer select-none shadow-xl ${
               touchVisualState.jump
-                ? 'bg-amber-400 border-white text-slate-950 scale-95 shadow-[0_0_22px_rgba(251,191,36,0.9)]'
-                : 'bg-gradient-to-t from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 border-amber-200 text-slate-950 shadow-lg'
+                ? 'bg-amber-300 border-white text-slate-950 scale-95'
+                : 'bg-amber-400 hover:bg-amber-300 border-amber-200 text-slate-950'
             }`}
-            aria-label="قفز"
+            aria-label="Jump"
           >
-            <span className="text-base sm:text-lg leading-none font-black">▲ قفز</span>
-            <span className="text-[9px] font-extrabold opacity-80 mt-0.5">قفز مزدوج</span>
+            <ArrowUp className="w-9 h-9 stroke-[3] pointer-events-none" />
           </button>
         </div>
       </div>
 
       {/* =====================================================================
-          05. STAGE SELECTION & ACHIEVEMENTS MODAL (8 LEVELS + ACHIEVEMENTS)
+          05. STAGE SELECTION UI (SECTION 07)
+          Displays ONLY:
+          - Stage number
+          - Short stage name
+          - Small environment preview
+          - Locked/unlocked state
+          - Completion status
+          (No long descriptions inside stage cards!)
           ===================================================================== */}
       {showStageSelectModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0E1628] border border-blue-500/40 rounded-3xl w-full max-w-3xl p-5 sm:p-6 shadow-2xl text-right max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-[10010] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0E1628] border border-slate-700 rounded-3xl w-full max-w-3xl p-5 sm:p-6 shadow-2xl text-right max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
               <div className="flex items-center gap-2">
                 <Flag className="w-5 h-5 text-amber-400" />
                 <h3 className="text-base sm:text-lg font-black text-white">
-                  اختيار المرحلة والإنجازات — المراحل الثماني (1–8)
+                  اختيار المرحلة
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowStageSelectModal(false)}
                 className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
+                aria-label="إغلاق"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-1">
+            {/* Mobile horizontal carousel / Desktop 4-column responsive grid */}
+            <div className="flex sm:grid sm:grid-cols-4 gap-3 overflow-x-auto sm:overflow-y-auto pb-2 sm:pb-0 snap-x snap-mandatory">
               {GAME_STAGES.map((stg, idx) => {
                 const isUnlocked = idx <= progression.unlockedStageIndex
+                const isCompleted = progression.completedStageIds.includes(stg.id)
+                const isCurrent = idx === currentStageIdx
                 const stars = progression.stageStarsEarned[stg.id] || 0
-                const high = progression.bestStageScores[stg.id] || 0
-                const bestTime = progression.bestStageTimesSec[stg.id]
+
                 return (
-                  <div
+                  <button
                     key={stg.id}
-                    className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all ${
+                    type="button"
+                    disabled={!isUnlocked}
+                    onClick={() => {
+                      if (isUnlocked) startAdventure(idx)
+                    }}
+                    className={`min-w-[190px] sm:min-w-0 snap-center rounded-2xl border p-3 text-right flex flex-col justify-between transition-all ${
                       isUnlocked
-                        ? 'bg-slate-900/90 border-blue-500/35 hover:border-amber-400/60'
-                        : 'bg-slate-950/60 border-slate-800 opacity-60'
+                        ? isCurrent
+                          ? 'bg-slate-900 border-amber-400 cursor-pointer shadow-md'
+                          : 'bg-slate-900/90 hover:bg-slate-800 border-slate-700/90 cursor-pointer'
+                        : 'bg-slate-950/70 border-slate-800/80 opacity-60 cursor-not-allowed'
                     }`}
                   >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded-md bg-blue-500/20 text-cyan-300 text-[10px] font-black">
-                          المرحلة {stg.worldNumber}: {stg.difficultyAr}
-                        </span>
-                        <div className="flex items-center gap-0.5">
-                          {[1, 2, 3].map((s) => (
-                            <Star
-                              key={s}
-                              className={`w-3.5 h-3.5 ${
-                                s <= stars ? 'text-amber-400 fill-amber-400' : 'text-slate-700'
-                              }`}
-                            />
-                          ))}
+                    {/* Small Environment Preview — Unique per Stage World */}
+                    <div
+                      className="w-full h-16 rounded-xl mb-2.5 relative overflow-hidden border border-white/10"
+                      style={{
+                        background: `linear-gradient(to bottom, ${stg.skyTop}, ${stg.skyBottom})`,
+                      }}
+                    >
+                      {/* Stage-Authentic Miniature Environment Silhouette */}
+                      {stg.theme === 'city_of_light' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                          <div className="w-4 h-7 bg-sky-900/80 border-t-2 border-amber-300 rounded-t-xs" />
+                          <div className="w-3 h-4 bg-emerald-500 rounded-full mb-1" />
+                          <div className="w-6 h-9 bg-blue-950/85 border-t-2 border-cyan-300 rounded-t-xs" />
+                          <div className="w-3 h-4 bg-emerald-500 rounded-full mb-1" />
+                          <div className="w-5 h-6 bg-indigo-950/80 rounded-t-xs" />
                         </div>
-                      </div>
-                      <h4 className="text-sm sm:text-base font-black text-white mb-0.5">
-                        {stg.worldTitleAr}
-                      </h4>
-                      <p className="text-[11px] text-amber-300/90 font-semibold mb-1">
-                        🎯 {stg.finalChallengeAr}
-                      </p>
-                      <p className="text-[11px] text-slate-400 leading-relaxed mb-2.5">{stg.subtitleAr}</p>
+                      )}
+                      {stg.theme === 'electricity_street' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                          <div className="w-6 h-6 bg-amber-900/85 border-t-2 border-amber-300 rounded-t-xs" />
+                          <div className="w-7 h-7 bg-orange-950/90 border-t-2 border-yellow-300 rounded-t-sm" />
+                          <div className="w-5 h-5 bg-amber-800/80 border-t-2 border-cyan-300 rounded-t-xs" />
+                        </div>
+                      )}
+                      {stg.theme === 'lighting_factory' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                          <div className="w-3 h-9 bg-slate-700 border-t-2 border-orange-400" />
+                          <div className="w-5 h-5 rounded-full border-2 border-amber-400/80 mb-1" />
+                          <div className="w-7 h-7 bg-slate-800 border-t-2 border-yellow-400" />
+                          <div className="w-3 h-8 bg-slate-700 border-t-2 border-orange-400" />
+                        </div>
+                      )}
+                      {stg.theme === 'intercom_district' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                          <div className="w-3 h-4 bg-emerald-500 rounded-full mb-0.5" />
+                          <div className="w-7 h-6 bg-teal-950 border-t-2 border-emerald-300 rounded-t-sm" />
+                          <div className="w-6 h-1.5 bg-orange-500 mb-3 rounded-full" />
+                          <div className="w-6 h-7 bg-slate-900 border-t-2 border-amber-300 rounded-t-sm" />
+                        </div>
+                      )}
+                      {stg.theme === 'power_station' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                          <div className="w-5 h-8 bg-slate-800 border border-orange-400/70 rounded-t-xs" />
+                          <div className="w-8 h-3 bg-orange-500/90 mb-3 rounded-xs" />
+                          <div className="w-6 h-9 bg-slate-900 border border-cyan-400/70 rounded-t-xs" />
+                        </div>
+                      )}
+                      {stg.theme === 'dark_city' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                          <div className="w-4 h-9 bg-indigo-950 border-t border-cyan-400 rounded-t-sm" />
+                          <div className="w-6 h-1 bg-cyan-400 mb-4 shadow-sm" />
+                          <div className="w-5 h-10 bg-purple-950 border-t border-fuchsia-400 rounded-t-sm" />
+                          <div className="w-4 h-7 bg-slate-900 border-t border-cyan-300 rounded-t-sm" />
+                        </div>
+                      )}
+                      {stg.theme === 'lighting_tower' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-center gap-2 px-2">
+                          <div className="w-4 h-6 border-r border-cyan-300/60" />
+                          <div className="w-5 h-11 bg-sky-950/90 border-x border-t border-amber-300 rounded-t-md" />
+                          <div className="w-4 h-6 border-l border-cyan-300/60" />
+                        </div>
+                      )}
+                      {stg.theme === 'darkness_fortress' && (
+                        <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
+                          <div className="w-4 h-8 bg-slate-900 border-t-2 border-rose-500" />
+                          <div className="w-8 h-10 bg-slate-950 border-t-2 border-orange-500 rounded-t-xs" />
+                          <div className="w-4 h-8 bg-slate-900 border-t-2 border-rose-500" />
+                        </div>
+                      )}
+                      {/* Ground line with stage accent color */}
+                      <div
+                        className="absolute bottom-0 inset-x-0 h-1.5"
+                        style={{ backgroundColor: stg.accentColor }}
+                      />
+                      {/* Stage Number Badge */}
+                      <span className="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-md bg-slate-950/80 text-[10px] font-black text-white">
+                        المرحلة {stg.worldNumber}
+                      </span>
+                      {/* Locked / Unlocked State Icon */}
+                      <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-slate-950/80 text-[10px] font-bold flex items-center gap-1">
+                        {isUnlocked ? (
+                          <Unlock className="w-3 h-3 text-emerald-400" />
+                        ) : (
+                          <Lock className="w-3 h-3 text-slate-400" />
+                        )}
+                      </span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                      <div className="text-[10px] text-slate-400 font-mono space-x-2 space-x-reverse">
-                        <span>
-                          النقاط: <strong className="text-amber-300">{high}</strong>
-                        </span>
-                        {bestTime && (
-                          <span>
-                            • أسرع زمن: <strong className="text-emerald-300">{bestTime}s</strong>
-                          </span>
-                        )}
-                      </div>
-                      {isUnlocked ? (
-                        <button
-                          type="button"
-                          onClick={() => startAdventure(idx)}
-                          className="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer"
-                        >
-                          العب الآن
-                        </button>
-                      ) : (
-                        <span className="text-xs text-slate-500 flex items-center gap-1">
-                          <Lock className="w-3.5 h-3.5" /> مغلق
-                        </span>
-                      )}
+                    {/* Short Stage Name */}
+                    <div className="text-sm font-black text-white truncate mb-2">
+                      {stg.worldTitleAr}
                     </div>
-                  </div>
+
+                    {/* Completion Status & Stars */}
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 w-full">
+                      <span
+                        className={`text-[10px] font-bold ${
+                          isCompleted
+                            ? 'text-emerald-400'
+                            : isUnlocked
+                            ? 'text-amber-300'
+                            : 'text-slate-500'
+                        }`}
+                      >
+                        {isCompleted ? 'مكتملة ✓' : isUnlocked ? 'متاحة' : 'مغلقة'}
+                      </span>
+
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3].map((s) => (
+                          <Star
+                            key={s}
+                            className={`w-3 h-3 ${
+                              s <= stars ? 'text-amber-400 fill-amber-400' : 'text-slate-700'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </button>
                 )
               })}
-            </div>
-
-            {/* Achievements Strip */}
-            <div className="mt-4 pt-3 border-t border-slate-800">
-              <div className="text-xs font-extrabold text-amber-300 mb-2">
-                🏅 إنجازات بطل الإنارة ({progression.achievements.length} / {GAME_ACHIEVEMENTS.length})
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {GAME_ACHIEVEMENTS.map((ach) => {
-                  const earned = progression.achievements.includes(ach.id)
-                  return (
-                    <div
-                      key={ach.id}
-                      className={`p-2 rounded-xl border text-right ${
-                        earned
-                          ? 'bg-amber-500/15 border-amber-400/50 text-white'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-500'
-                      }`}
-                    >
-                      <div className="text-xs font-black truncate">
-                        {ach.icon} {ach.titleAr}
-                      </div>
-                      <div className="text-[10px] opacity-80 leading-tight mt-0.5">{ach.descAr}</div>
-                    </div>
-                  )
-                })}
-              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* =====================================================================
-          06. SETTINGS MODAL (Separate Music & SFX Volume + Reduced Motion)
+          06. SETTINGS MODAL (Audio, Graphics Quality, Reduced Motion, Touch Opacity)
           ===================================================================== */}
       {showSettingsModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0E1628] border border-slate-700 rounded-3xl w-full max-w-md p-6 shadow-2xl text-right">
+        <div className="fixed inset-0 z-[10010] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0E1628] border border-slate-700 rounded-3xl w-full max-w-md p-5 sm:p-6 shadow-2xl text-right max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
               <div className="flex items-center gap-2">
                 <Settings className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-lg font-black text-white">الإعدادات والصوت</h3>
+                <h3 className="text-lg font-black text-white">الإعدادات</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowSettingsModal(false)}
                 className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
+                aria-label="إغلاق"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {/* Master Mute Toggle */}
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800">
                 <div>
                   <div className="text-sm font-bold text-white">تشغيل الصوت العام</div>
-                  <div className="text-xs text-slate-400">تفعيل أو كتم كافة الأصوات والموسيقى</div>
+                  <div className="text-xs text-slate-400">تفعيل أو كتم كافة الأصوات</div>
                 </div>
                 <button
                   type="button"
@@ -2022,7 +2321,7 @@ export function GameEngine() {
                     setIsMuted(next)
                     sound.setMuted(next)
                   }}
-                  className={`px-4 py-2 rounded-xl font-bold text-xs cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-xl font-bold text-xs cursor-pointer ${
                     !isMuted ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
                   }`}
                 >
@@ -2030,10 +2329,10 @@ export function GameEngine() {
                 </button>
               </div>
 
-              {/* Separate Music Volume Control (Section 9) */}
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-bold text-white">مستوى صوت الموسيقى التصويرية</span>
+              {/* Separate Music Volume Control */}
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold text-white">صوت الموسيقى</span>
                   <span className="text-xs font-mono text-amber-300">{Math.round(musicVolume * 100)}%</span>
                 </div>
                 <input
@@ -2051,10 +2350,10 @@ export function GameEngine() {
                 />
               </div>
 
-              {/* Separate SFX Volume Control (Section 9) */}
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-bold text-white">مستوى المؤثرات الصوتية (SFX)</span>
+              {/* Separate SFX Volume Control */}
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold text-white">صوت المؤثرات (SFX)</span>
                   <span className="text-xs font-mono text-cyan-300">{Math.round(sfxVolume * 100)}%</span>
                 </div>
                 <input
@@ -2073,11 +2372,82 @@ export function GameEngine() {
                 />
               </div>
 
+              {/* Graphics Quality Presets (High / Balanced / Low — Section 16) */}
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                <div className="text-xs font-bold text-white mb-2">جودة الرسوميات</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {(
+                    [
+                      { id: 'high', label: 'عالية' },
+                      { id: 'balanced', label: 'متوازنة' },
+                      { id: 'low', label: 'خفيفة' },
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setGraphicsQuality(opt.id)
+                        try {
+                          localStorage.setItem('enarah_platformer_graphics_quality', opt.id)
+                        } catch {}
+                      }}
+                      className={`py-1.5 rounded-xl text-xs font-bold cursor-pointer border ${
+                        graphicsQuality === opt.id
+                          ? 'bg-amber-400 border-amber-300 text-slate-950'
+                          : 'bg-slate-950 border-slate-800 text-slate-300'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Controls Opacity & Size (Section 09) */}
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">شفافية أزرار اللمس</span>
+                  <span className="text-xs font-mono text-cyan-300">{Math.round(touchOpacity * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0.4}
+                  max={1}
+                  step={0.05}
+                  value={touchOpacity}
+                  onChange={(e) => {
+                    const v = Number(e.target.value)
+                    setTouchOpacity(v)
+                    try {
+                      localStorage.setItem('enarah_platformer_touch_opacity', String(v))
+                    } catch {}
+                  }}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-xs font-bold text-white">حجم أزرار اللمس</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = touchButtonScale === 'large' ? 'normal' : 'large'
+                      setTouchButtonScale(next)
+                      try {
+                        localStorage.setItem('enarah_platformer_touch_scale', next)
+                      } catch {}
+                    }}
+                    className="px-3 py-1 rounded-xl bg-slate-800 text-white font-bold text-xs cursor-pointer"
+                  >
+                    {touchButtonScale === 'large' ? 'كبير' : 'قياسي'}
+                  </button>
+                </div>
+              </div>
+
               {/* Reduced Motion Toggle */}
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800">
                 <div>
-                  <div className="text-sm font-bold text-white">تقليل الحركة والمؤثرات</div>
-                  <div className="text-xs text-slate-400">تخفيف اهتزاز الكاميرا والجزيئات</div>
+                  <div className="text-xs font-bold text-white">تقليل الحركة والمؤثرات</div>
+                  <div className="text-[11px] text-slate-400">تخفيف اهتزاز الكاميرا والجزيئات</div>
                 </div>
                 <button
                   type="button"
@@ -2088,37 +2458,16 @@ export function GameEngine() {
                       localStorage.setItem('enarah_platformer_reduced_motion', String(next))
                     } catch {}
                   }}
-                  className={`px-4 py-2 rounded-xl font-bold text-xs cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-xl font-bold text-xs cursor-pointer ${
                     reducedMotion ? 'bg-cyan-400 text-slate-950' : 'bg-slate-800 text-slate-300'
                   }`}
                 >
                   {reducedMotion ? 'مفعّل' : 'عادي'}
                 </button>
               </div>
-
-              {/* Mobile Touch Buttons Size */}
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
-                <div>
-                  <div className="text-sm font-bold text-white">حجم أزرار اللمس للهاتف</div>
-                  <div className="text-xs text-slate-400">تكبير أزرار الحركة والقفز والاندفاع</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = touchButtonScale === 'large' ? 'normal' : 'large'
-                    setTouchButtonScale(next)
-                    try {
-                      localStorage.setItem('enarah_platformer_touch_scale', next)
-                    } catch {}
-                  }}
-                  className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs cursor-pointer"
-                >
-                  {touchButtonScale === 'large' ? 'كبير (موصى به)' : 'قياسي'}
-                </button>
-              </div>
             </div>
 
-            <div className="mt-6 pt-3 border-t border-slate-800">
+            <div className="mt-5 pt-3 border-t border-slate-800">
               <button
                 type="button"
                 onClick={() => setShowSettingsModal(false)}
@@ -2135,7 +2484,7 @@ export function GameEngine() {
           07. WEEKLY LEADERBOARD MODAL
           ===================================================================== */}
       {showLeaderboard && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[10010] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#121316] border border-amber-500/40 rounded-3xl w-full max-w-lg p-5 shadow-2xl relative text-right flex flex-col max-h-[88vh]">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-3">
               <button
@@ -2241,4 +2590,15 @@ export function GameEngine() {
       )}
     </div>
   )
+
+  if (isDedicatedMobileGameplay && typeof document !== 'undefined') {
+    return (
+      <>
+        <div className="w-full h-[360px] bg-[#070B14] rounded-2xl" aria-hidden="true" />
+        {createPortal(gameContent, document.body)}
+      </>
+    )
+  }
+
+  return gameContent
 }
