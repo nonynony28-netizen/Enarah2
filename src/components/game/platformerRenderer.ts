@@ -2026,11 +2026,6 @@ function renderOriginalHeroCharacter(
   const centerX = hero.x + hero.w * 0.5
   const bottomY = hero.y + hero.h
 
-  // Anchor 1.08x visual sprite scale at hero's feet (centerX, bottomY) while preserving exact collision box
-  ctx.translate(centerX, bottomY)
-  ctx.scale(1.08, 1.08)
-  ctx.translate(-centerX, -bottomY)
-
   // 1. Controlled Internal & External Light Illumination (Modulated by lightEnergy & floodlight)
   const isDefeated = hero.animState === 'defeat' || hero.hp <= 0
   const energyRatio = isDefeated ? 0.15 : Math.max(0.45, Math.min(1.25, hero.lightEnergy / 85))

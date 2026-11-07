@@ -1125,8 +1125,6 @@ export function updateSideScrollingCamera(
   dt: number
 ): void {
   const safeDt = Math.max(0.001, Math.min(0.05, dt))
-  const isPortraitView = cam.viewportH > cam.viewportW
-  const isCompactViewport = cam.viewportW < 760
 
   const heroCenterX = hero.x + hero.w * 0.5
   const heroBottom = hero.y + hero.h
@@ -1136,7 +1134,7 @@ export function updateSideScrollingCamera(
   if (cam.focusX === undefined || Number.isNaN(cam.focusX)) {
     cam.focusX = heroCenterX
   }
-  const deadZoneHalfW = isPortraitView ? 22 : 28
+  const deadZoneHalfW = 28
   if (heroCenterX > cam.focusX + deadZoneHalfW) {
     cam.focusX = heroCenterX - deadZoneHalfW
   } else if (heroCenterX < cam.focusX - deadZoneHalfW) {
@@ -1170,7 +1168,7 @@ export function updateSideScrollingCamera(
   const baseAnchorRatio = 0.46
   let desiredCamX = cam.focusX + cam.lookAheadX - cam.viewportW * baseAnchorRatio
 
-  // 3. Dedicated Boss Fight Camera Mode (Section 13)
+  // 3. Dedicated Boss Fight Camera Framing (No Zoom Changes — Pure Horizontal Framing)
   if (cam.bossBlend === undefined || Number.isNaN(cam.bossBlend)) {
     cam.bossBlend = 0
   }
@@ -1182,14 +1180,14 @@ export function updateSideScrollingCamera(
 
   if (cam.bossBlend > 0.01 && stage.boss) {
     const bossCenterX = stage.boss.x + stage.boss.w * 0.5
-    const arenaMidX = ( stage.boss.minX + stage.boss.maxX ) * 0.5
+    const arenaMidX = (stage.boss.minX + stage.boss.maxX) * 0.5
     // Frame the combat midpoint between Hero, Boss, and Arena so both Hero & Boss remain visible
     const combatCenter = heroCenterX * 0.45 + bossCenterX * 0.35 + arenaMidX * 0.2
     const bossCamX = combatCenter - cam.viewportW * 0.5
     desiredCamX = desiredCamX * (1 - cam.bossBlend * 0.65) + bossCamX * (cam.bossBlend * 0.65)
   }
 
-  // 4. Hard Character Visibility Guarantee (Section 10 & 13)
+  // 4. Hard Character Visibility Guarantee
   // Never allow the camera to leave the character near or outside screen edges
   const minHeroScreenMargin = cam.viewportW * 0.18
   const maxHeroScreenMargin = cam.viewportW * 0.82
@@ -1199,7 +1197,7 @@ export function updateSideScrollingCamera(
     desiredCamX = heroCenterX - maxHeroScreenMargin
   }
 
-  // 5. World Boundary Clamping (Section 10)
+  // 5. World Boundary Clamping (Horizontal: strictly [0, maxCamX])
   const maxCamX = Math.max(0, stage.width - cam.viewportW)
   const clampedTargetX = Math.max(0, Math.min(maxCamX, desiredCamX))
 
@@ -1209,46 +1207,33 @@ export function updateSideScrollingCamera(
   cam.x += (clampedTargetX - cam.x) * alphaX
   cam.x = Math.max(0, Math.min(maxCamX, cam.x))
 
-  // 6. Stable Vertical Framing & Jump Dead Zone (Sections 3, 4, 8, 11)
+  // 6. Stable Vertical Framing & World Boundary Clamping (Vertical: strictly [0, maxCamY])
   // Do NOT follow normal jumps or double jumps! Only update vertical focus when grounded on a high platform
   if (cam.focusY === undefined || Number.isNaN(cam.focusY)) {
     cam.focusY = stage.groundY
   }
   if (hero.onGround) {
     cam.focusY = heroBottom
-  } else {
-    // Generous vertical dead zone in mid-air: only adjust if falling below ground or super high
-    if (heroBottom > stage.groundY) {
-      cam.focusY = stage.groundY
-    } else if (heroBottom < cam.focusY - 220) {
-      cam.focusY = heroBottom + 220
-    }
+  } else if (heroBottom > stage.groundY) {
+    cam.focusY = stage.groundY
+  } else if (heroBottom < cam.focusY - 220) {
+    cam.focusY = heroBottom + 220
   }
 
-  if (isPortraitView) {
-    // Portrait Mode: Position stage ground comfortably at ~84% of viewport height
-    // so elevated platforms sit in the middle of the screen and underground foundation fills bottom 16%
-    const subGroundPadding = Math.min(110, Math.max(44, Math.round(cam.viewportH * 0.14)))
-    const effectiveBottomY = stage.groundY + subGroundPadding
-    cam.y = effectiveBottomY - cam.viewportH
+  const maxCamY = Math.max(0, stage.height - cam.viewportH)
+  if (maxCamY <= 0) {
+    cam.y = 0
   } else {
-    // Landscape / Desktop Mode: Keep vertical camera rock-steady on ground + normal jumps,
-    // smoothly panning up only if standing on a very high platform
-    const effectiveBottomY = isCompactViewport ? stage.groundY + 34 : stage.height
-    const baseGroundCamY = effectiveBottomY - cam.viewportH
-    if (baseGroundCamY <= 0) {
-      cam.y = baseGroundCamY
-    } else {
-      const highPlatformThreshold = stage.groundY - 145
-      const desiredCamY =
-        cam.focusY < highPlatformThreshold
-          ? Math.max(0, Math.min(baseGroundCamY, cam.focusY - cam.viewportH * 0.62))
-          : baseGroundCamY
-      const alphaY = 1 - Math.exp(-5.2 * safeDt)
-      cam.y += (desiredCamY - cam.y) * alphaY
-    }
+    const highPlatformThreshold = stage.groundY - 145
+    const desiredCamY =
+      cam.focusY < highPlatformThreshold
+        ? Math.max(0, Math.min(maxCamY, cam.focusY - cam.viewportH * 0.62))
+        : maxCamY
+    const alphaY = 1 - Math.exp(-5.2 * safeDt)
+    cam.y += (desiredCamY - cam.y) * alphaY
+    cam.y = Math.max(0, Math.min(maxCamY, cam.y))
   }
 
-  // Eliminate artificial camera shake during normal gameplay (Sections 3 & 12)
+  // Eliminate artificial camera shake during normal gameplay
   cam.shakeIntensity = 0
 }

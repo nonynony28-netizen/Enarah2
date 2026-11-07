@@ -443,59 +443,36 @@ export function GameEngine() {
     if (!wrapper || !canvas) return
 
     const rect = wrapper.getBoundingClientRect()
-    const cssW = Math.max(260, Math.round(rect.width || winW))
-    const cssH = Math.max(180, Math.round(rect.height || winH * 0.72))
-    const aspect = cssW / cssH
+    const availableWidth = Math.max(240, Math.round(rect.width || winW))
+    const availableHeight = Math.max(150, Math.round(rect.height || winH * 0.6))
 
-    let logicalW = VIEWPORT_WIDTH
-    let logicalH = VIEWPORT_HEIGHT
+    // V10 FIT-TO-SCREEN (CONTAIN) — NO ZOOM, NO CROPPING, ORIGINAL 16:9 (960x540) GAME SIZE:
+    const logicalGameWidth = VIEWPORT_WIDTH
+    const logicalGameHeight = VIEWPORT_HEIGHT
 
-    if (isPort) {
-      // V9 Adaptive Wide Camera (Portrait Mode):
-      // Show a comfortable horizontal span (500–570 world units) so the player clearly sees:
-      // - Their character (~8% of viewport width)
-      // - Current platform + next 2–3 platforms + upcoming obstacles + boss arena
-      // Never clamp logicalH down to 495 (which previously crushed logicalW to ~275 on tall phones!)
-      logicalW = cssW <= 345 ? 500 : cssW <= 395 ? 540 : 570
-      logicalH = Math.round(logicalW / aspect)
-      if (logicalH < 440) {
-        logicalH = 440
-        logicalW = Math.round(logicalH * aspect)
-      } else if (logicalH > 1080) {
-        logicalH = 1080
-        logicalW = Math.round(logicalH * aspect)
-      }
-    } else if (isLand) {
-      // V9 Adaptive Wide Camera (Landscape Mode):
-      // Balanced wide horizontal framing (~720–880 world units) with generous vertical headroom
-      logicalH = 440
-      logicalW = Math.round(logicalH * aspect)
-      if (logicalW < 660) {
-        logicalW = 660
-        logicalH = Math.round(logicalW / aspect)
-      } else if (logicalW > 960) {
-        logicalW = 960
-        logicalH = Math.round(logicalW / aspect)
-      }
-    } else {
-      // Desktop: Standard 960x540 world framing matched to container aspect ratio
-      logicalW = VIEWPORT_WIDTH
-      logicalH = Math.round(logicalW / aspect)
-    }
+    const scale = Math.min(
+      availableWidth / logicalGameWidth,
+      availableHeight / logicalGameHeight
+    )
+    const renderedWidth = Math.max(240, Math.round(logicalGameWidth * scale))
+    const renderedHeight = Math.max(135, Math.round(logicalGameHeight * scale))
 
-    const maxDpr = graphicsQuality === 'low' ? 1 : graphicsQuality === 'balanced' ? 1.5 : 1.75
+    canvas.style.width = `${renderedWidth}px`
+    canvas.style.height = `${renderedHeight}px`
+
+    const maxDpr = graphicsQuality === 'low' ? 1 : graphicsQuality === 'balanced' ? 1.5 : 2
     const dpr = Math.min(window.devicePixelRatio || 1, maxDpr)
     dprRef.current = dpr
 
-    const targetBufW = Math.round(logicalW * dpr)
-    const targetBufH = Math.round(logicalH * dpr)
+    const targetBufW = Math.round(logicalGameWidth * dpr)
+    const targetBufH = Math.round(logicalGameHeight * dpr)
     if (canvas.width !== targetBufW || canvas.height !== targetBufH) {
       canvas.width = targetBufW
       canvas.height = targetBufH
     }
 
-    cameraRef.current.viewportW = logicalW
-    cameraRef.current.viewportH = logicalH
+    cameraRef.current.viewportW = logicalGameWidth
+    cameraRef.current.viewportH = logicalGameHeight
     updateSideScrollingCamera(cameraRef.current, heroRef.current, stageRef.current, 0.25)
   }, [graphicsQuality])
 
@@ -1397,17 +1374,15 @@ export function GameEngine() {
           isFullViewportMode || isMobileDevice ? '' : 'max-w-[960px] rounded-t-2xl border-x border-t'
         } h-9 sm:h-11 bg-[#0B1222]/95 border-b border-slate-800/90 px-2.5 sm:px-4 pt-[env(safe-area-inset-top,0px)] flex items-center justify-between gap-2 shrink-0 z-30`}
       >
-        {/* Desktop Only Stage Badge (Moved to Pause Menu on Mobile per V8 Problem 2) */}
-        {!isMobileDevice && (
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/40 text-[11px] font-black text-amber-300 shrink-0">
-              م {activeStage.worldNumber}
-            </span>
-            <span className="text-xs sm:text-sm font-extrabold text-white truncate">
-              {activeStage.worldTitleAr}
-            </span>
-          </div>
-        )}
+        {/* Stage Badge */}
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="px-1.5 sm:px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/40 text-[10px] sm:text-[11px] font-black text-amber-300 shrink-0">
+            م {activeStage.worldNumber}
+          </span>
+          <span className="text-[11px] sm:text-sm font-extrabold text-white truncate max-w-[110px] sm:max-w-none">
+            {activeStage.worldTitleAr}
+          </span>
+        </div>
 
         {/* Essential Status: Hearts & Energy ONLY */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -1477,17 +1452,34 @@ export function GameEngine() {
         </div>
       </div>
 
+      {/* In Portrait Fullscreen Gameplay: Use space above the 16:9 frame for clean stage stats */}
+      {isPortraitMobile && isFullViewportMode && gameState === 'playing' && (
+        <div className="w-full px-3.5 py-2 flex items-center justify-between text-xs font-bold text-slate-300 bg-[#0B1222]/90 border-b border-slate-800/80 shrink-0 z-20">
+          <span className="text-amber-300">
+            المرحلة {activeStage.worldNumber} / 8 • {activeStage.worldTitleAr}
+          </span>
+          <div className="flex items-center gap-3">
+            <span>
+              ⚡ القطع: <strong className="text-white">{hudEnergy}/{hudTotalEnergy}</strong>
+            </span>
+            <span>
+              🏆 النقاط: <strong className="text-amber-400 font-mono">{hudScore}</strong>
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* =====================================================================
-          02. MAXIMIZED PLAYABLE SCENE VIEWPORT (SECTIONS 1, 2, 3, 10, 11, 12)
-          Occupies the largest practical portion of the mobile screen in both
-          Portrait and Landscape modes with responsive camera zoom.
+          02. FIT-TO-SCREEN (CONTAIN) 16:9 GAMEPLAY VIEWPORT (V10 SECTIONS 1, 2, 4, 10)
+          Preserves the complete 960x540 (16:9) logical game frame without zooming
+          or cropping on any device. Uses remaining portrait vertical space cleanly.
           ===================================================================== */}
       <div
         ref={sceneWrapperRef}
         className={`relative w-full ${
           isFullViewportMode || isMobileDevice
-            ? 'flex-1 min-h-0'
-            : 'max-w-[960px] aspect-[16/9] max-h-[70vh] border-x border-slate-800 shadow-2xl'
+            ? 'flex-1 min-h-0 flex items-center justify-center'
+            : 'max-w-[960px] aspect-[16/9] max-h-[70vh] border-x border-slate-800 shadow-2xl flex items-center justify-center'
         } bg-[#070B14] overflow-hidden touch-none`}
         style={{ touchAction: 'none' }}
       >
@@ -1495,7 +1487,7 @@ export function GameEngine() {
           ref={canvasRef}
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
-          className="w-full h-full block"
+          className="block shrink-0 shadow-2xl border-y sm:border border-slate-800/80"
         />
 
         {/* =================================================================
@@ -1952,6 +1944,19 @@ export function GameEngine() {
         )}
       </div>
 
+      {/* In Portrait Fullscreen Gameplay: Use space below the 16:9 frame for objective & landscape hint */}
+      {isPortraitMobile && isFullViewportMode && gameState === 'playing' && (
+        <div className="w-full px-3.5 py-2 flex flex-col items-center gap-1 text-center bg-[#0B1222]/90 border-t border-slate-800/80 shrink-0 z-20">
+          <span className="text-[11px] font-bold text-slate-200 truncate max-w-full">
+            🎯 الهدف: {activeStage.finalChallengeAr}
+          </span>
+          <span className="text-[10px] font-semibold text-amber-300/90 flex items-center gap-1">
+            <Smartphone className="w-3 h-3 rotate-90 shrink-0" />
+            <span>تدوير الهاتف للوضع الأفقي يمنحك شاشة عرض أكبر بكثير</span>
+          </span>
+        </div>
+      )}
+
       {/* =====================================================================
           03. TWO-THUMB MULTI-TOUCH CONTROL SYSTEM (SECTIONS 4, 5, 6)
           - Left Thumb: Two large buttons (LEFT ←, RIGHT →) — 64–76px targets
@@ -1966,7 +1971,9 @@ export function GameEngine() {
             ? 'fixed bottom-0 inset-x-0 z-30 px-[max(0.75rem,env(safe-area-inset-left))] pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 flex items-end justify-between pointer-events-none select-none touch-none'
             : `w-full ${
                 isFullViewportMode || isMobileDevice ? '' : 'max-w-[960px] rounded-b-2xl border-x border-b'
-              } bg-[#09101E] border-t border-slate-800/90 px-3 sm:px-6 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-2 shrink-0 select-none touch-none z-30`
+              } bg-[#09101E] border-t border-slate-800/90 px-3 sm:px-6 ${
+                isPortraitMobile && isFullViewportMode ? 'pt-3.5 pb-[max(1rem,env(safe-area-inset-bottom))]' : 'pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))]'
+              } flex items-center justify-between gap-2 shrink-0 select-none touch-none z-30`
         }
         style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none', opacity: touchOpacity }}
         onContextMenu={(e) => e.preventDefault()}
