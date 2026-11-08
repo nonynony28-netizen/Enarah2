@@ -190,42 +190,41 @@ function renderSkyAndAtmosphere(
   const skyGrad = ctx.createLinearGradient(0, 0, 0, H)
 
   if (theme === 'city_of_light') {
-    // Stage 1: Bright welcoming daytime blue sky
+    // Stage 1 (مدينة النور): Bright welcoming daytime urban blue sky
     skyGrad.addColorStop(0, '#0284C7')
     skyGrad.addColorStop(0.55, '#38BDF8')
     skyGrad.addColorStop(1, '#E0F2FE')
   } else if (theme === 'electricity_street') {
-    // Stage 2: Warm golden morning / commercial boulevard sky
-    skyGrad.addColorStop(0, '#D97706')
-    skyGrad.addColorStop(0.48, '#F59E0B')
-    skyGrad.addColorStop(1, '#FEF3C7')
+    // Stage 2 (الإنارة فرع البيضاء): Industrial Orange World (Dark Charcoal #18181B -> Vivid Orange #EA580C / #F97316)
+    skyGrad.addColorStop(0, '#18181B')
+    skyGrad.addColorStop(0.38, '#9A3412')
+    skyGrad.addColorStop(0.78, '#EA580C')
+    skyGrad.addColorStop(1, '#F97316')
   } else if (theme === 'lighting_factory') {
-    // Stage 3: Steel-blue & slate industrial factory hall interior
+    // Stage 3 (مصنع الإنارة): Steel-gray & yellow industrial factory hall interior
     skyGrad.addColorStop(0, '#0F172A')
     skyGrad.addColorStop(0.55, '#1E293B')
     skyGrad.addColorStop(1, '#334155')
   } else if (theme === 'intercom_district') {
-    // Stage 4: Fresh residential morning with copper-warm horizon
-    skyGrad.addColorStop(0, '#0F766E')
-    skyGrad.addColorStop(0.55, '#2DD4BF')
-    skyGrad.addColorStop(1, '#FEF3C7')
+    // Stage 4 (الإنارة فرع الليثي): Advanced Electrical City — Primary Color: BLUE (#0F172A -> #1E3A8A -> #2563EB -> #38BDF8)
+    skyGrad.addColorStop(0, '#0F172A')
+    skyGrad.addColorStop(0.45, '#1E3A8A')
+    skyGrad.addColorStop(0.82, '#2563EB')
+    skyGrad.addColorStop(1, '#38BDF8')
   } else if (theme === 'power_station') {
-    // Stage 5: Deep high-voltage industrial blue with copper horizon glow
     skyGrad.addColorStop(0, '#06101E')
     skyGrad.addColorStop(0.65, '#132A4A')
     skyGrad.addColorStop(1, '#2B2D42')
   } else if (theme === 'dark_city') {
-    // Stage 6: Futuristic twilight / blackout city (blue, purple & cyan)
     skyGrad.addColorStop(0, '#070B1E')
     skyGrad.addColorStop(0.55, '#1E1B4B')
     skyGrad.addColorStop(1, '#311042')
   } else if (theme === 'lighting_tower') {
-    // Stage 7: High-altitude stratosphere sky above the clouds
     skyGrad.addColorStop(0, '#0369A1')
     skyGrad.addColorStop(0.55, '#38BDF8')
     skyGrad.addColorStop(1, '#F0F9FF')
   } else {
-    // Stage 8: Final Energy Fortress (deep navy, steel & crimson-orange core glow)
+    // Stage 5 (قلعة الظلام): Final Dark Fortress (deep navy, dark obsidian & crimson-violet core energy)
     skyGrad.addColorStop(0, '#070A12')
     skyGrad.addColorStop(0.6, '#1B1429')
     skyGrad.addColorStop(1, '#3B1219')
@@ -234,11 +233,11 @@ function renderSkyAndAtmosphere(
   ctx.fillStyle = skyGrad
   ctx.fillRect(0, 0, W, H)
 
-  // Stage-specific celestial bodies, factory skylights, or atmospheric lighting
+  // Stage-specific celestial bodies, industrial cranes/skylights, or atmospheric lighting
   if (graphicsQuality !== 'low') {
-    if (theme === 'city_of_light' || theme === 'electricity_street' || theme === 'intercom_district') {
+    if (theme === 'city_of_light') {
       const sunX = W * 0.78 - cam.x * 0.03
-      const sunY = theme === 'electricity_street' ? H * 0.26 : H * 0.18
+      const sunY = H * 0.18
       const sunGlow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 150)
       sunGlow.addColorStop(0, 'rgba(255, 255, 240, 0.95)')
       sunGlow.addColorStop(0.3, 'rgba(253, 224, 71, 0.42)')
@@ -252,6 +251,41 @@ function renderSkyAndAtmosphere(
       ctx.beginPath()
       ctx.arc(sunX, sunY, 26, 0, Math.PI * 2)
       ctx.fill()
+    } else if (theme === 'electricity_street') {
+      // Stage 2 (الإنارة فرع البيضاء): Industrial Orange overhead crane girder & high-bay orange floodlights
+      const girderOffset = (cam.x * 0.07) % 210
+      ctx.fillStyle = '#18181B'
+      ctx.fillRect(0, 0, W, 28)
+      ctx.fillStyle = '#EA580C'
+      ctx.fillRect(0, 26, W, 4)
+      for (let gx = -girderOffset; gx < W + 210; gx += 210) {
+        ctx.fillStyle = '#475569'
+        ctx.fillRect(gx + 24, 4, 48, 18)
+        ctx.fillStyle = '#F8FAFC'
+        ctx.fillRect(gx + 32, 22, 32, 5)
+        // Orange warehouse light cone
+        ctx.fillStyle = 'rgba(249, 115, 22, 0.11)'
+        ctx.beginPath()
+        ctx.moveTo(gx + 32, 28)
+        ctx.lineTo(gx + 64, 28)
+        ctx.lineTo(gx + 115, H - 90)
+        ctx.lineTo(gx - 15, H - 90)
+        ctx.closePath()
+        ctx.fill()
+      }
+    } else if (theme === 'intercom_district') {
+      // Stage 4 (الإنارة فرع الليثي): Electric Blue & Cyan architectural sky-beams & smart grid nodes
+      const beamOffset = (cam.x * 0.06) % 220
+      for (let bx = -beamOffset; bx < W + 220; bx += 220) {
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.09)'
+        ctx.beginPath()
+        ctx.moveTo(bx + 40, 0)
+        ctx.lineTo(bx + 85, 0)
+        ctx.lineTo(bx + 145, H - 80)
+        ctx.lineTo(bx + 10, H - 80)
+        ctx.closePath()
+        ctx.fill()
+      }
     } else if (theme === 'lighting_factory') {
       // Industrial roof trusses & angled daylight skylight shafts
       const trussOffset = (cam.x * 0.08) % 180
@@ -259,10 +293,10 @@ function renderSkyAndAtmosphere(
       ctx.fillRect(0, 0, W, 34)
       for (let tx = -trussOffset; tx < W + 180; tx += 180) {
         // Skylight window pane in factory roof
-        ctx.fillStyle = 'rgba(125, 211, 252, 0.22)'
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.22)'
         ctx.fillRect(tx + 30, 6, 90, 20)
         // Diagonal light beam into factory
-        ctx.fillStyle = 'rgba(186, 230, 253, 0.06)'
+        ctx.fillStyle = 'rgba(254, 249, 195, 0.06)'
         ctx.beginPath()
         ctx.moveTo(tx + 30, 26)
         ctx.lineTo(tx + 120, 26)
@@ -272,7 +306,7 @@ function renderSkyAndAtmosphere(
         ctx.fill()
 
         // Steel roof truss triangles
-        ctx.strokeStyle = '#334155'
+        ctx.strokeStyle = '#475569'
         ctx.lineWidth = 3
         ctx.beginPath()
         ctx.moveTo(tx, 34)
@@ -291,25 +325,17 @@ function renderSkyAndAtmosphere(
         const pulse = 0.3 + 0.35 * Math.sin(elapsedSec * 2.2 + i)
         ctx.fillStyle =
           theme === 'darkness_fortress'
-            ? `rgba(251, 146, 60, ${pulse.toFixed(2)})`
+            ? `rgba(244, 63, 94, ${pulse.toFixed(2)})`
             : `rgba(224, 242, 254, ${pulse.toFixed(2)})`
         ctx.fillRect(sx, sy, 2, 2)
       }
     }
   }
 
-  // Drifting clouds (Stages 1, 2, 4, 7) & distant flying birds (Stages 2 & 4)
-  if (
-    theme === 'city_of_light' ||
-    theme === 'electricity_street' ||
-    theme === 'intercom_district' ||
-    theme === 'lighting_tower'
-  ) {
+  // Drifting clouds in Stage 1 (مدينة النور)
+  if (theme === 'city_of_light' || theme === 'lighting_tower') {
     const cloudCount = graphicsQuality === 'low' ? 3 : 5
-    ctx.fillStyle =
-      theme === 'electricity_street'
-        ? 'rgba(255, 251, 235, 0.55)'
-        : 'rgba(255, 255, 255, 0.72)'
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
     for (let i = 0; i < cloudCount; i++) {
       const cx = ((i * 260 - cam.x * 0.06 + elapsedSec * 9) % (W + 240)) - 120
       const cy = theme === 'lighting_tower' ? H - 105 + (i % 2) * 18 : 54 + (i % 3) * 28
@@ -318,22 +344,6 @@ function renderSkyAndAtmosphere(
       ctx.arc(cx + 22, cy - 7, 30, 0, Math.PI * 2)
       ctx.arc(cx + 46, cy, 22, 0, Math.PI * 2)
       ctx.fill()
-    }
-  }
-
-  // Animated birds in the distant sky for Residential & Commercial stages (Stages 2 & 4)
-  if ((theme === 'electricity_street' || theme === 'intercom_district') && graphicsQuality !== 'low') {
-    ctx.strokeStyle = 'rgba(30, 41, 59, 0.55)'
-    ctx.lineWidth = 1.6
-    for (let b = 0; b < 4; b++) {
-      const bx = ((b * 210 + elapsedSec * 28 - cam.x * 0.05) % (W + 120)) - 60
-      const by = 68 + (b % 2) * 24 + Math.sin(elapsedSec * 3 + b) * 4
-      const wingY = Math.sin(elapsedSec * 9 + b * 1.4) * 4
-      ctx.beginPath()
-      ctx.moveTo(bx - 7, by + wingY)
-      ctx.quadraticCurveTo(bx - 3, by - 4, bx, by)
-      ctx.quadraticCurveTo(bx + 3, by - 4, bx + 7, by + wingY)
-      ctx.stroke()
     }
   }
 }
@@ -358,8 +368,10 @@ function renderFarParallaxLayer(
       theme === 'city_of_light'
         ? '#1E293B'
         : theme === 'electricity_street'
-          ? '#451A03'
-          : '#0F172A'
+          ? '#18181B'
+          : theme === 'intercom_district'
+            ? '#0F172A'
+            : '#0F172A'
     ctx.fillRect(0, baseHorizonY, W, H - baseHorizonY + 4)
   }
 
@@ -415,44 +427,53 @@ function renderFarParallaxLayer(
   }
 
   // --------------------------------------------------------------------------
-  // STAGE 2: COMMERCIAL & RESIDENTIAL AVENUE (شارع الكهرباء)
+  // STAGE 2: الإنارة فرع البيضاء (INDUSTRIAL ORANGE WORLD)
+  // Orange industrial structures, overhead gantry cranes, dark charcoal steel silhouettes
   // --------------------------------------------------------------------------
   if (theme === 'electricity_street') {
-    // Warm distant hills
-    ctx.fillStyle = '#FCD34D'
-    ctx.beginPath()
-    ctx.moveTo(0, baseHorizonY)
-    for (let x = 0; x <= W + 80; x += 80) {
-      const hy = baseHorizonY - 48 - Math.sin((x + scrollX) * 0.008) * 22
-      ctx.lineTo(x, hy)
-    }
-    ctx.lineTo(W, baseHorizonY)
-    ctx.closePath()
-    ctx.fill()
-
-    // Distant pitched-roof neighborhood houses & commercial plazas
-    for (let i = -1; i < 8; i++) {
-      const hx = i * 160 - (scrollX % 160)
-      const seed = Math.abs(i + Math.floor(scrollX / 160))
-      const hw = 96
-      const hh = 64 + (seed % 3) * 18
+    for (let i = -1; i < 7; i++) {
+      const hx = i * 190 - (scrollX % 190)
+      const seed = Math.abs(i + Math.floor(scrollX / 190))
+      const hw = 135
+      const hh = 130 + (seed % 3) * 24
       const hy = baseHorizonY - hh
-      ctx.fillStyle = seed % 2 === 0 ? '#FEF3C7' : '#FDE68A'
+
+      // Dark charcoal warehouse silhouette with vibrant orange industrial structural frame
+      ctx.fillStyle = '#18181B'
       ctx.fillRect(hx, hy, hw, hh)
-      // Terracotta pitched roof
-      ctx.fillStyle = '#EA580C'
+      ctx.strokeStyle = '#EA580C'
+      ctx.lineWidth = 3
+      ctx.strokeRect(hx, hy, hw, hh)
+
+      // Orange roof crown & steel gray cross-bracing
+      ctx.fillStyle = '#F97316'
+      ctx.fillRect(hx - 4, hy - 8, hw + 8, 8)
+      ctx.strokeStyle = '#475569'
+      ctx.lineWidth = 2
       ctx.beginPath()
-      ctx.moveTo(hx - 6, hy)
-      ctx.lineTo(hx + hw * 0.5, hy - 24)
-      ctx.lineTo(hx + hw + 6, hy)
-      ctx.closePath()
-      ctx.fill()
+      ctx.moveTo(hx + 8, hy + 16)
+      ctx.lineTo(hx + hw - 8, hy + 68)
+      ctx.moveTo(hx + hw - 8, hy + 16)
+      ctx.lineTo(hx + 8, hy + 68)
+      ctx.stroke()
+
+      // Moving industrial crane hook in distance
+      const craneX = hx + hw + 26
+      const hookY = hy + 30 + (reducedMotion ? 0 : Math.sin(elapsedSec * 2.1 + seed) * 14)
+      ctx.strokeStyle = '#F97316'
+      ctx.lineWidth = 2.5
+      ctx.beginPath()
+      ctx.moveTo(craneX, 28)
+      ctx.lineTo(craneX, hookY)
+      ctx.stroke()
+      ctx.fillStyle = '#F8FAFC'
+      ctx.fillRect(craneX - 8, hookY, 16, 10)
     }
     return
   }
 
   // --------------------------------------------------------------------------
-  // STAGE 3: THE LIGHTING FACTORY (مصنع الإنارة) — Giant Gears, Silos & Pipes
+  // STAGE 3: THE LIGHTING FACTORY (مصنع الإنارة) — Steel Gray / Yellow / Controlled White
   // --------------------------------------------------------------------------
   if (theme === 'lighting_factory') {
     for (let i = -1; i < 7; i++) {
@@ -462,14 +483,16 @@ function renderFarParallaxLayer(
       // Industrial storage silo & pipework
       ctx.fillStyle = '#1E293B'
       ctx.fillRect(fx + 20, baseHorizonY - 170, 74, 170)
-      ctx.fillStyle = '#334155'
+      ctx.fillStyle = '#475569'
       ctx.beginPath()
       ctx.arc(fx + 57, baseHorizonY - 170, 37, Math.PI, 0)
       ctx.fill()
 
-      // Horizontal overhead factory pipe
+      // Horizontal overhead factory pipe with yellow safety band
       ctx.fillStyle = '#475569'
       ctx.fillRect(fx, baseHorizonY - 135, 200, 12)
+      ctx.fillStyle = '#FACC15'
+      ctx.fillRect(fx + 90, baseHorizonY - 136, 18, 14)
 
       // Giant slowly rotating background gear
       const gx = fx + 145
@@ -477,14 +500,14 @@ function renderFarParallaxLayer(
       ctx.save()
       ctx.translate(gx, gy)
       if (!reducedMotion) ctx.rotate(elapsedSec * (seed % 2 === 0 ? 0.35 : -0.35))
-      ctx.strokeStyle = 'rgba(249, 115, 22, 0.35)'
+      ctx.strokeStyle = 'rgba(250, 204, 21, 0.42)'
       ctx.lineWidth = 8
       ctx.beginPath()
       ctx.arc(0, 0, 36, 0, Math.PI * 2)
       ctx.stroke()
       for (let t = 0; t < 8; t++) {
         const ang = (t * Math.PI) / 4
-        ctx.fillStyle = 'rgba(249, 115, 22, 0.35)'
+        ctx.fillStyle = 'rgba(248, 250, 252, 0.45)'
         ctx.fillRect(Math.cos(ang) * 36 - 4, Math.sin(ang) * 36 - 4, 8, 8)
       }
       ctx.restore()
@@ -493,29 +516,34 @@ function renderFarParallaxLayer(
   }
 
   // --------------------------------------------------------------------------
-  // STAGE 4: RESIDENTIAL & COPPER WORLD (حي الإنترفون) — Green Hills & Villas
+  // STAGE 4: الإنارة فرع الليثي (ADVANCED BLUE ELECTRICAL CITY)
+  // Deep blue & electric blue skyline towers, cyan skybridges, white architectural accents
   // --------------------------------------------------------------------------
   if (theme === 'intercom_district') {
-    // Lush green garden hills
-    ctx.fillStyle = '#5EEAD4'
-    ctx.beginPath()
-    ctx.moveTo(0, baseHorizonY)
-    for (let x = 0; x <= W + 60; x += 60) {
-      ctx.lineTo(x, baseHorizonY - 52 - Math.cos((x + scrollX) * 0.009) * 18)
-    }
-    ctx.lineTo(W, baseHorizonY)
-    ctx.closePath()
-    ctx.fill()
+    for (let i = -1; i < 8; i++) {
+      const bx = i * 175 - (scrollX % 175)
+      const seed = Math.abs(i + Math.floor(scrollX / 175))
+      const bw = 118
+      const bh = 155 + (seed % 4) * 28
+      const by = baseHorizonY - bh
 
-    // Giant insulated copper cable arches in the distance
-    ctx.strokeStyle = '#EA580C'
-    ctx.lineWidth = 5
-    for (let i = -1; i < 6; i++) {
-      const cx = i * 220 - (scrollX % 220)
-      ctx.beginPath()
-      ctx.moveTo(cx, baseHorizonY - 30)
-      ctx.quadraticCurveTo(cx + 110, baseHorizonY - 140, cx + 220, baseHorizonY - 30)
-      ctx.stroke()
+      // Deep blue architectural tower with electric blue & cyan lighting strips
+      ctx.fillStyle = '#0F172A'
+      ctx.fillRect(bx, by, bw, bh)
+      ctx.strokeStyle = '#2563EB'
+      ctx.lineWidth = 2
+      ctx.strokeRect(bx, by, bw, bh)
+
+      // Cyan & Crisp White architectural light columns
+      ctx.fillStyle = seed % 2 === 0 ? '#38BDF8' : '#F8FAFC'
+      ctx.fillRect(bx + 10, by + 12, 4, bh - 24)
+      ctx.fillRect(bx + bw - 14, by + 12, 4, bh - 24)
+
+      // Elevated blue energy road / skyway connecting Al-Laithi towers
+      ctx.fillStyle = 'rgba(37, 99, 235, 0.55)'
+      ctx.fillRect(bx, baseHorizonY - 72, 175, 8)
+      ctx.fillStyle = '#38BDF8'
+      ctx.fillRect(bx, baseHorizonY - 74, 175, 2)
     }
     return
   }
@@ -779,79 +807,56 @@ function renderMidgroundParallaxLayer(
   }
 
   // --------------------------------------------------------------------------
-  // STAGE 2: COMMERCIAL & RESIDENTIAL STREET (شارع الكهرباء)
-  // Houses with pitched roofs, gardens, fences, garages + lively commercial showrooms
+  // STAGE 2: الإنارة فرع البيضاء (ENARAH AL-BAYDA BRANCH — INDUSTRIAL ORANGE WORLD)
+  // Large electrical warehouses, orange industrial structures, cable storage racks, loading platforms, metal bridges
   // --------------------------------------------------------------------------
   if (theme === 'electricity_street') {
     for (let i = -1; i < 7; i++) {
       const mx = i * 280 - (scrollX % 280)
       const idx = Math.abs(i + Math.floor(scrollX / 280))
 
-      if (idx % 2 === 0) {
-        // Warm Residential House with Pitched Roof, Garage & Garden Fence
-        const hX = mx + 20
-        const hW = 155
-        const hH = 115
-        const hY = groundLine - hH
-        ctx.fillStyle = '#FFFBEB'
-        ctx.fillRect(hX, hY, hW, hH)
-        // Pitched terracotta roof
-        ctx.fillStyle = '#C2410C'
-        ctx.beginPath()
-        ctx.moveTo(hX - 10, hY)
-        ctx.lineTo(hX + hW * 0.5, hY - 38)
-        ctx.lineTo(hX + hW + 10, hY)
-        ctx.closePath()
-        ctx.fill()
+      // Large Industrial Orange & Dark Charcoal Warehouse of «الإنارة فرع البيضاء»
+      const sX = mx + 18
+      const sW = 195
+      const sH = 148
+      const sY = groundLine - sH
+      ctx.fillStyle = '#18181B'
+      ctx.fillRect(sX, sY, sW, sH)
+      ctx.fillStyle = '#475569'
+      ctx.fillRect(sX + sW, sY + 6, 14, sH - 6)
+      ctx.strokeStyle = '#EA580C'
+      ctx.lineWidth = 3
+      ctx.strokeRect(sX, sY, sW, sH)
 
-        // Garage door with horizontal slats
-        ctx.fillStyle = '#CBD5E1'
-        ctx.fillRect(hX + 14, groundLine - 48, 56, 48)
-        ctx.strokeStyle = '#64748B'
-        ctx.lineWidth = 1.5
-        for (let gy = groundLine - 40; gy < groundLine - 6; gy += 10) {
-          ctx.beginPath()
-          ctx.moveTo(hX + 16, gy)
-          ctx.lineTo(hX + 68, gy)
-          ctx.stroke()
-        }
+      // Orange roof beam & white highlight trim
+      ctx.fillStyle = '#F97316'
+      ctx.fillRect(sX - 4, sY, sW + 8, 12)
+      ctx.fillStyle = '#F8FAFC'
+      ctx.fillRect(sX + 8, sY + 4, sW - 16, 3)
 
-        // Warm lit house window
-        ctx.fillStyle = '#FDE047'
-        ctx.fillRect(hX + 90, hY + 26, 42, 30)
-
-        // Garden fence & bushes next to house
-        ctx.fillStyle = '#D97706'
-        for (let fx = hX + hW + 8; fx < mx + 265; fx += 12) {
-          ctx.fillRect(fx, groundLine - 28, 6, 28)
-        }
-        ctx.fillRect(hX + hW + 6, groundLine - 20, 82, 4)
-      } else {
-        // Lively Commercial Lighting Showroom with Animated Signboard
-        const sX = mx + 18
-        const sW = 185
-        const sH = 148
-        const sY = groundLine - sH
-        ctx.fillStyle = '#78350F'
-        ctx.fillRect(sX, sY, sW, sH)
-        ctx.fillStyle = '#451A03'
-        ctx.fillRect(sX + sW, sY + 6, 14, sH - 6)
-
-        // Showroom display windows with hanging chandeliers
-        ctx.fillStyle = '#FEF3C7'
-        ctx.fillRect(sX + 16, groundLine - 58, sW - 32, 52)
+      // Cable storage racks & orange spools inside warehouse bay
+      ctx.fillStyle = '#27272A'
+      ctx.fillRect(sX + 16, groundLine - 62, sW - 32, 56)
+      for (let sp = 0; sp < 3; sp++) {
+        const spX = sX + 44 + sp * 52
+        const spY = groundLine - 34
         ctx.fillStyle = '#EA580C'
-        ctx.fillRect(sX + 10, groundLine - 66, sW - 20, 10)
-
-        // Ground-floor storefront fascia sign (positioned below elevated platforms so it never overlaps foreground switches/labels)
-        const signGlow = 0.72 + 0.25 * Math.sin(elapsedSec * 5 + idx)
-        ctx.fillStyle = '#0F172A'
-        ctx.fillRect(sX + 14, groundLine - 88, sW - 28, 19)
-        ctx.fillStyle = `rgba(250, 204, 21, ${signGlow.toFixed(2)})`
-        ctx.font = 'bold 9.5px Cairo, sans-serif'
-        ctx.textAlign = 'center'
-        ctx.fillText('✨ معرض الإنارة والسبوت لايت ✨', sX + sW * 0.5, groundLine - 75)
+        ctx.beginPath()
+        ctx.arc(spX, spY, 15, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.fillStyle = '#F8FAFC'
+        ctx.beginPath()
+        ctx.arc(spX, spY, 5, 0, Math.PI * 2)
+        ctx.fill()
       }
+
+      // Al-Bayda Branch illuminated signage fascia
+      ctx.fillStyle = '#EA580C'
+      ctx.fillRect(sX + 12, groundLine - 90, sW - 24, 20)
+      ctx.fillStyle = '#F8FAFC'
+      ctx.font = 'bold 9.5px Cairo, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('🧡 الإنارة فرع البيضاء • AL-BAYDA 🧡', sX + sW * 0.5, groundLine - 76)
     }
     return
   }
@@ -876,13 +881,15 @@ function renderMidgroundParallaxLayer(
       const mY = groundLine - 132
       ctx.fillStyle = '#1E293B'
       ctx.fillRect(mX, mY, 148, 132)
-      ctx.strokeStyle = '#EA580C'
+      ctx.strokeStyle = '#FACC15'
       ctx.lineWidth = 2
       ctx.strokeRect(mX, mY, 148, 132)
 
-      // Yellow/Black hazard stripe header on machine
+      // Yellow/White hazard stripe header on machine
       ctx.fillStyle = '#FACC15'
       ctx.fillRect(mX, mY, 148, 10)
+      ctx.fillStyle = '#F8FAFC'
+      ctx.fillRect(mX + 8, mY + 3, 132, 3)
 
       // Rotating Ventilation Fan inside machine housing
       const fanX = mX + 46
@@ -894,7 +901,7 @@ function renderMidgroundParallaxLayer(
       ctx.save()
       ctx.translate(fanX, fanY)
       if (!reducedMotion) ctx.rotate(elapsedSec * 3.2 * (idx % 2 === 0 ? 1 : -1))
-      ctx.fillStyle = '#94A3B8'
+      ctx.fillStyle = '#F8FAFC'
       for (let b = 0; b < 4; b++) {
         ctx.rotate(Math.PI / 2)
         ctx.fillRect(-4, -22, 8, 22)
@@ -905,16 +912,16 @@ function renderMidgroundParallaxLayer(
       ctx.fillStyle = '#0F172A'
       ctx.fillRect(mX + 90, mY + 32, 44, 62)
       const blink = Math.floor(elapsedSec * 4 + idx) % 2 === 0
-      ctx.fillStyle = blink ? '#22C55E' : '#EF4444'
+      ctx.fillStyle = blink ? '#FACC15' : '#F8FAFC'
       ctx.beginPath()
       ctx.arc(mX + 104, mY + 46, 4, 0, Math.PI * 2)
       ctx.fill()
-      ctx.fillStyle = '#38BDF8'
+      ctx.fillStyle = '#FACC15'
       ctx.fillRect(mX + 98, mY + 60, 28, 14)
 
       // Animated Warning Beacon on top of machinery
       const beaconPulse = 0.4 + 0.6 * Math.abs(Math.sin(elapsedSec * 6 + idx))
-      ctx.fillStyle = `rgba(249, 115, 22, ${beaconPulse.toFixed(2)})`
+      ctx.fillStyle = `rgba(250, 204, 21, ${beaconPulse.toFixed(2)})`
       ctx.beginPath()
       ctx.arc(mX + 74, mY - 8, 9, 0, Math.PI * 2)
       ctx.fill()
@@ -926,7 +933,7 @@ function renderMidgroundParallaxLayer(
       if (!reducedMotion && graphicsQuality !== 'low') {
         const steamCycle = (elapsedSec * 28 + idx * 19) % 55
         const steamAlpha = Math.max(0, 0.45 - steamCycle / 120)
-        ctx.fillStyle = `rgba(226, 232, 240, ${steamAlpha.toFixed(2)})`
+        ctx.fillStyle = `rgba(248, 250, 252, ${steamAlpha.toFixed(2)})`
         ctx.beginPath()
         ctx.arc(pipeX + 7, groundLine - 155 - steamCycle, 8 + steamCycle * 0.22, 0, Math.PI * 2)
         ctx.fill()
@@ -936,58 +943,66 @@ function renderMidgroundParallaxLayer(
   }
 
   // --------------------------------------------------------------------------
-  // STAGE 4: SMART RESIDENTIAL & COPPER WORLD (حي الإنترفون)
-  // Modern smart villas, gardens, fences, intercom pillars & giant insulated copper cables
+  // STAGE 4: الإنارة فرع الليثي (ENARAH AL-LAITHI BRANCH — ADVANCED BLUE ELECTRICAL CITY)
+  // Modern lighting showrooms, blue architectural lighting, smart electrical control stations, crisp white & cyan trim
   // --------------------------------------------------------------------------
   if (theme === 'intercom_district') {
     for (let i = -1; i < 7; i++) {
-      const mx = i * 270 - (scrollX % 270)
-      const idx = Math.abs(i + Math.floor(scrollX / 270))
+      const mx = i * 275 - (scrollX % 275)
 
-      // Modern Smart Villa
-      const vX = mx + 24
-      const vW = 162
-      const vH = 136
+      // Modern Blue & Crisp White Al-Laithi Showroom
+      const vX = mx + 20
+      const vW = 190
+      const vH = 144
       const vY = groundLine - vH
-      ctx.fillStyle = '#F8FAFC'
+      ctx.fillStyle = '#0F172A'
       ctx.fillRect(vX, vY, vW, vH)
-      ctx.fillStyle = '#0F766E'
-      ctx.fillRect(vX, vY, vW, 12)
-      // Panoramic smart glass balcony
-      ctx.fillStyle = '#38BDF8'
-      ctx.fillRect(vX + 20, vY + 26, 122, 36)
-      // Villa automatic garage & wood door
-      ctx.fillStyle = '#334155'
-      ctx.fillRect(vX + 18, groundLine - 52, 68, 52)
-      ctx.fillStyle = '#B45309'
-      ctx.fillRect(vX + 106, groundLine - 48, 34, 48)
-
-      // Smart Intercom Gate Pillar with Glowing Screen
-      const pillarX = vX + vW + 16
-      ctx.fillStyle = '#1E293B'
-      ctx.fillRect(pillarX, groundLine - 64, 18, 64)
-      ctx.fillStyle = '#10B981'
-      ctx.fillRect(pillarX + 3, groundLine - 50, 12, 16)
-
-      // Giant Insulated Copper Cable Conduit connecting villas
-      ctx.strokeStyle = '#C2410C'
-      ctx.lineWidth = 9
-      ctx.beginPath()
-      ctx.moveTo(vX + vW, vY + 45)
-      ctx.quadraticCurveTo(vX + vW + 54, vY + 78, mx + 294, vY + 45)
-      ctx.stroke()
-      ctx.strokeStyle = '#FDBA74'
+      ctx.strokeStyle = '#2563EB'
       ctx.lineWidth = 3
-      ctx.stroke()
+      ctx.strokeRect(vX, vY, vW, vH)
 
-      // Swaying garden tree
-      const treeX = mx + 242
-      const sway = reducedMotion ? 0 : Math.sin(elapsedSec * 2.4 + idx) * 4
-      ctx.fillStyle = '#78350F'
-      ctx.fillRect(treeX - 4, groundLine - 42, 8, 42)
-      ctx.fillStyle = '#059669'
+      // Electric Blue & White architectural crown
+      ctx.fillStyle = '#2563EB'
+      ctx.fillRect(vX - 4, vY, vW + 8, 12)
+      ctx.fillStyle = '#F8FAFC'
+      ctx.fillRect(vX + 8, vY + 4, vW - 16, 3)
+
+      // Panoramic cyan-blue smart lighting glass gallery
+      ctx.fillStyle = '#1E3A8A'
+      ctx.fillRect(vX + 16, vY + 24, vW - 32, 30)
+      ctx.fillStyle = '#38BDF8'
+      for (let lx = vX + 34; lx < vX + vW - 28; lx += 38) {
+        ctx.fillRect(lx, vY + 28, 18, 4)
+        ctx.fillStyle = '#F8FAFC'
+        ctx.beginPath()
+        ctx.arc(lx + 9, vY + 38, 4, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.fillStyle = '#38BDF8'
+      }
+
+      // Ground-floor Al-Laithi Branch sign fascia
+      ctx.fillStyle = '#1E3A8A'
+      ctx.fillRect(vX + 12, groundLine - 86, vW - 24, 20)
+      ctx.strokeStyle = '#38BDF8'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(vX + 12, groundLine - 86, vW - 24, 20)
+      ctx.fillStyle = '#F8FAFC'
+      ctx.font = 'bold 9.5px Cairo, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('💙 الإنارة فرع الليثي • AL-LAITHI 💙', vX + vW * 0.5, groundLine - 72)
+
+      // Smart electrical control station pillar next to showroom
+      const pillarX = vX + vW + 18
+      ctx.fillStyle = '#0F172A'
+      ctx.fillRect(pillarX, groundLine - 78, 24, 78)
+      ctx.strokeStyle = '#38BDF8'
+      ctx.lineWidth = 2
+      ctx.strokeRect(pillarX, groundLine - 78, 24, 78)
+      ctx.fillStyle = '#2563EB'
+      ctx.fillRect(pillarX + 4, groundLine - 66, 16, 22)
+      ctx.fillStyle = '#F8FAFC'
       ctx.beginPath()
-      ctx.arc(treeX + sway, groundLine - 56, 20, 0, Math.PI * 2)
+      ctx.arc(pillarX + 12, groundLine - 30, 4, 0, Math.PI * 2)
       ctx.fill()
     }
     return
@@ -1061,8 +1076,8 @@ function renderMidgroundParallaxLayer(
   }
 
   // --------------------------------------------------------------------------
-  // STAGE 6: THE FUTURISTIC / DARK CITY (المدينة المظلمة)
-  // Futuristic towers, elevated walkways, energy bridges & animated architectural lights
+  // STAGE 6: SMART CITY (المدينة الذكية)
+  // Futuristic towers, elevated walkways, energy bridges, smart lighting & moving background vehicles
   // --------------------------------------------------------------------------
   if (theme === 'dark_city') {
     for (let i = -1; i < 7; i++) {
@@ -1095,6 +1110,18 @@ function renderMidgroundParallaxLayer(
       ctx.fillRect(bX + bW, groundLine - 88, 100, 10)
       ctx.fillStyle = '#22D3EE'
       ctx.fillRect(bX + bW, groundLine - 88, 100, 2)
+    }
+
+    // Moving Futuristic Background Sky-Vehicles (المركبات الذكية المتحركة)
+    if (!reducedMotion) {
+      for (let v = 0; v < 3; v++) {
+        const vx = ((elapsedSec * (65 + v * 18) + v * 340) % 1060) - 50
+        const vy = 105 + v * 46
+        ctx.fillStyle = v % 2 === 0 ? '#22D3EE' : '#F472B6'
+        ctx.fillRect(vx, vy, 28, 7)
+        ctx.fillStyle = '#FEF08A'
+        ctx.fillRect(vx + 24, vy + 1, 6, 4)
+      }
     }
     return
   }
@@ -1654,6 +1681,93 @@ function renderEnergyGate(
 
 function renderStageHazard(ctx: CanvasRenderingContext2D, haz: StageHazard, elapsedSec: number) {
   ctx.save()
+  if (haz.kind === 'ventilation_fan') {
+    // Industrial Ventilation Fan with spinning blades & upward air currents (Stage 3)
+    ctx.fillStyle = '#1E293B'
+    ctx.fillRect(haz.x, haz.y, haz.w, haz.h)
+    ctx.strokeStyle = '#EA580C'
+    ctx.lineWidth = 2
+    ctx.strokeRect(haz.x, haz.y, haz.w, haz.h)
+
+    // Spinning fan blades inside housing
+    const fcx = haz.x + haz.w * 0.5
+    const fcy = haz.y + haz.h * 0.5
+    ctx.save()
+    ctx.translate(fcx, fcy)
+    ctx.rotate(elapsedSec * 12)
+    ctx.fillStyle = '#94A3B8'
+    ctx.fillRect(-18, -3, 36, 6)
+    ctx.fillRect(-3, -10, 6, 20)
+    ctx.restore()
+
+    // Upward air draft streamlines
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)'
+    ctx.lineWidth = 1.8
+    for (let i = 0; i < 3; i++) {
+      const lx = haz.x + 12 + i * 17
+      const liftOffset = ((elapsedSec * 90 + i * 35) % 110)
+      ctx.beginPath()
+      ctx.moveTo(lx, haz.y - liftOffset)
+      ctx.lineTo(lx, haz.y - liftOffset - 22)
+      ctx.stroke()
+    }
+    ctx.restore()
+    return
+  }
+
+  if (haz.kind === 'falling_obstacle') {
+    // High-altitude Falling Electrical Debris with top warning beacon (Stage 7)
+    const baseY = haz.baseY ?? 115
+    ctx.fillStyle = '#EF4444'
+    ctx.fillRect(haz.x + 6, baseY - 14, haz.w - 12, 8)
+    // Falling plasma-charged core block
+    ctx.fillStyle = '#1E293B'
+    ctx.fillRect(haz.x, haz.y, haz.w, haz.h)
+    ctx.strokeStyle = '#38BDF8'
+    ctx.lineWidth = 2.2
+    ctx.strokeRect(haz.x, haz.y, haz.w, haz.h)
+    ctx.fillStyle = '#FACC15'
+    ctx.beginPath()
+    ctx.arc(haz.x + haz.w * 0.5, haz.y + haz.h * 0.5, 6, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+    return
+  }
+
+  if (haz.kind === 'laser_beam') {
+    // Smart City / Power Station Timed Laser Barrier
+    const period = haz.period || 2.6
+    const onTime = haz.onTime || 1.0
+    const phase = (elapsedSec + (haz.offset || 0)) % period
+    const active = phase < onTime
+    const warning = !active && phase > period - 0.45
+
+    // Top & bottom laser emitters
+    ctx.fillStyle = '#0F172A'
+    ctx.fillRect(haz.x - 4, haz.y, haz.w + 8, 10)
+    ctx.fillRect(haz.x - 4, haz.y + haz.h - 10, haz.w + 8, 10)
+    ctx.strokeStyle = active ? '#F43F5E' : '#22D3EE'
+    ctx.lineWidth = 1.5
+    ctx.strokeRect(haz.x - 4, haz.y, haz.w + 8, 10)
+    ctx.strokeRect(haz.x - 4, haz.y + haz.h - 10, haz.w + 8, 10)
+
+    if (active) {
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.35)'
+      ctx.fillRect(haz.x, haz.y + 10, haz.w, haz.h - 20)
+      ctx.fillStyle = '#FB7185'
+      ctx.fillRect(haz.x + haz.w * 0.5 - 2.5, haz.y + 10, 5, haz.h - 20)
+    } else if (warning && Math.floor(elapsedSec * 16) % 2 === 0) {
+      ctx.strokeStyle = 'rgba(251, 113, 133, 0.55)'
+      ctx.setLineDash([5, 5])
+      ctx.beginPath()
+      ctx.moveTo(haz.x + haz.w * 0.5, haz.y + 10)
+      ctx.lineTo(haz.x + haz.w * 0.5, haz.y + haz.h - 10)
+      ctx.stroke()
+    }
+    ctx.restore()
+    return
+  }
+
   if (haz.kind === 'rotating_hazard') {
     const rad = haz.radius || 48
     const angle = haz.angle || 0
@@ -1755,7 +1869,7 @@ function renderGoalPortal(
 }
 
 // ============================================================================
-// SECTION 7 — 8 UNIQUE ENEMY TYPES WITH TELEGRAPH INDICATORS
+// SECTION 7 — 8 UNIQUE STAGE-SPECIFIC ENEMY TYPES WITH TELEGRAPH INDICATORS
 // ============================================================================
 
 function renderPlatformEnemy(
@@ -1767,6 +1881,7 @@ function renderPlatformEnemy(
   const cx = enemy.x + enemy.w * 0.5
   const cy = enemy.y + enemy.h * 0.5
   const isAlert = enemy.aiState === 'detect' || enemy.aiState === 'attack'
+  const facingDir = enemy.vx >= 0 ? 1 : -1
 
   // Ground shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.28)'
@@ -1774,135 +1889,323 @@ function renderPlatformEnemy(
   ctx.ellipse(cx, enemy.y + enemy.h, enemy.w * 0.42, 4, 0, 0, Math.PI * 2)
   ctx.fill()
 
-  if (enemy.kind === 'electrical_spark') {
-    // 1. Electrical Spark (شرارة كهربائية)
-    ctx.fillStyle = isAlert ? '#F43F5E' : '#38BDF8'
-    ctx.beginPath()
-    for (let i = 0; i < 8; i++) {
-      const ang = (i * Math.PI) / 4 + elapsedSec * 6
-      const r = i % 2 === 0 ? 16 : 8
-      const px = cx + Math.cos(ang) * r
-      const py = cy + Math.sin(ang) * r
-      if (i === 0) ctx.moveTo(px, py)
-      else ctx.lineTo(px, py)
+  // ==========================================================================
+  // STAGE 1 MONSTERS — مدينة النور
+  // ==========================================================================
+  if (enemy.kind === 'shadow_runner' || enemy.kind === 'shadow_bug' || enemy.kind === 'electrical_spark') {
+    // Shadow Runner (عدّاء الظل): Fast dark runner with trailing speed fins & glowing visor
+    ctx.strokeStyle = '#334155'
+    ctx.lineWidth = 2.5
+    for (let leg = -1; leg <= 1; leg += 2) {
+      const step = Math.sin(elapsedSec * 18 + leg * 2) * 5
+      ctx.beginPath()
+      ctx.moveTo(cx + leg * 6, cy + 4)
+      ctx.lineTo(cx + leg * 11 + step, enemy.y + enemy.h)
+      ctx.stroke()
     }
-    ctx.closePath()
+    ctx.fillStyle = '#0F172A'
+    ctx.beginPath()
+    ctx.ellipse(cx, cy, 17, 12, 0, 0, Math.PI * 2)
     ctx.fill()
-  } else if (enemy.kind === 'cable_snake') {
-    // 2. Cable Snake (أفعى الكابلات)
-    ctx.strokeStyle = '#EA580C'
-    ctx.lineWidth = 8
-    ctx.lineCap = 'round'
-    ctx.beginPath()
-    for (let sx = -16; sx <= 16; sx += 8) {
-      const sy = Math.sin(elapsedSec * 10 + sx * 0.3) * 5
-      if (sx === -16) ctx.moveTo(cx + sx, cy + sy)
-      else ctx.lineTo(cx + sx, cy + sy)
-    }
+    ctx.strokeStyle = isAlert ? '#F43F5E' : '#38BDF8'
+    ctx.lineWidth = 2.2
     ctx.stroke()
-    // Eyes
-    ctx.fillStyle = '#FEF08A'
+    // Glowing eyes
+    ctx.fillStyle = '#FACC15'
     ctx.beginPath()
-    ctx.arc(cx + (enemy.vx >= 0 ? 12 : -12), cy - 3, 3, 0, Math.PI * 2)
+    ctx.arc(cx + facingDir * 8, cy - 2, 3.2, 0, Math.PI * 2)
     ctx.fill()
-  } else if (enemy.kind === 'flying_drone') {
-    // 3. Flying Drone (درون طائر)
+  } else if (enemy.kind === 'rooftop_jumper') {
+    // Rooftop Jumper (قافز الأسطح): Spring-legged urban acrobat creature
+    const springStretch = Math.max(0, (enemy.baseY || enemy.y) - enemy.y) * 0.12
+    ctx.strokeStyle = '#0284C7'
+    ctx.lineWidth = 2.5
+    ctx.beginPath()
+    ctx.moveTo(cx - 6, cy + 4)
+    ctx.lineTo(cx - 10, enemy.y + enemy.h + springStretch)
+    ctx.moveTo(cx + 6, cy + 4)
+    ctx.lineTo(cx + 10, enemy.y + enemy.h + springStretch)
+    ctx.stroke()
+    ctx.fillStyle = '#1E293B'
+    ctx.fillRect(enemy.x + 4, enemy.y + 2, enemy.w - 8, enemy.h - 10)
+    ctx.strokeStyle = isAlert ? '#F43F5E' : '#38BDF8'
+    ctx.lineWidth = 2
+    ctx.strokeRect(enemy.x + 4, enemy.y + 2, enemy.w - 8, enemy.h - 10)
+    ctx.fillStyle = '#FDE047'
+    ctx.fillRect(cx + facingDir * 4 - 4, cy - 5, 8, 4)
+  } else if (enemy.kind === 'street_guardian') {
+    // Street Guardian (حارس الشارع): Heavy armored urban defender with front riot shield
+    ctx.fillStyle = '#1E293B'
+    ctx.fillRect(enemy.x + 4, enemy.y + 4, enemy.w - 8, enemy.h - 6)
+    ctx.strokeStyle = isAlert ? '#EF4444' : '#0284C7'
+    ctx.lineWidth = 2.5
+    ctx.strokeRect(enemy.x + 4, enemy.y + 4, enemy.w - 8, enemy.h - 6)
+    // Heavy front shield plate
+    const shieldX = facingDir > 0 ? enemy.x + enemy.w - 6 : enemy.x
+    ctx.fillStyle = '#38BDF8'
+    ctx.fillRect(shieldX, enemy.y + 6, 6, enemy.h - 10)
+    ctx.fillStyle = '#FACC15'
+    ctx.fillRect(cx - 8, enemy.y + 12, 16, 6)
+  }
+  // ==========================================================================
+  // STAGE 2 MONSTERS — الإنارة فرع البيضاء (INDUSTRIAL ORANGE WORLD)
+  // ==========================================================================
+  else if (enemy.kind === 'copper_scorpion' || enemy.kind === 'cable_crawler' || enemy.kind === 'cable_snake') {
+    // Copper Scorpion (عقرب النحاس): Segmented orange-copper mechanical scorpion with articulated stinger tail
+    ctx.fillStyle = '#18181B'
+    ctx.fillRect(enemy.x + 4, cy - 2, enemy.w - 10, 14)
+    ctx.strokeStyle = '#EA580C'
+    ctx.lineWidth = 2.5
+    ctx.strokeRect(enemy.x + 4, cy - 2, enemy.w - 10, 14)
+    // Articulated arched mechanical tail & glowing orange stinger
+    const tailStrike = enemy.aiState === 'attack' ? facingDir * 12 : 0
+    ctx.strokeStyle = '#F97316'
+    ctx.lineWidth = 4
+    ctx.beginPath()
+    ctx.moveTo(cx - facingDir * 10, cy - 2)
+    ctx.quadraticCurveTo(cx - facingDir * 18, enemy.y - 12, cx + tailStrike, enemy.y - 4)
+    ctx.stroke()
+    ctx.fillStyle = '#F8FAFC'
+    ctx.beginPath()
+    ctx.arc(cx + tailStrike, enemy.y - 4, 4, 0, Math.PI * 2)
+    ctx.fill()
+  } else if (enemy.kind === 'magnetic_crusher') {
+    // Magnetic Crusher (الساحق المغناطيسي): Heavy orange/charcoal electromagnet machine with U-magnet coils
+    if (isAlert) {
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.38)'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.arc(cx, cy, 44 + Math.sin(elapsedSec * 12) * 6, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+    ctx.fillStyle = '#18181B'
+    ctx.fillRect(enemy.x + 2, enemy.y + 4, enemy.w - 4, enemy.h - 6)
+    ctx.strokeStyle = '#EA580C'
+    ctx.lineWidth = 3
+    ctx.strokeRect(enemy.x + 2, enemy.y + 4, enemy.w - 4, enemy.h - 6)
+    // Orange magnetic poles on sides
+    ctx.fillStyle = '#F97316'
+    ctx.fillRect(enemy.x, enemy.y + 10, 7, enemy.h - 18)
+    ctx.fillRect(enemy.x + enemy.w - 7, enemy.y + 10, 7, enemy.h - 18)
+    ctx.fillStyle = '#F8FAFC'
+    ctx.fillRect(cx - 10, enemy.y + 14, 20, 6)
+  } else if (enemy.kind === 'orange_spark') {
+    // Orange Spark (الشرارة البرتقالية): High-speed crackling orange plasma elemental
+    const r = 14 + Math.sin(elapsedSec * 18) * 3
+    ctx.fillStyle = 'rgba(249, 115, 22, 0.35)'
+    ctx.beginPath()
+    ctx.arc(cx, cy, r + 6, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#EA580C'
+    ctx.beginPath()
+    ctx.arc(cx, cy, r, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#F8FAFC'
+    ctx.beginPath()
+    ctx.arc(cx + facingDir * 4, cy - 2, 5, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  // ==========================================================================
+  // STAGE 3 MONSTERS — مصنع الإنارة (FACTORY)
+  // ==========================================================================
+  else if (enemy.kind === 'gear_beast' || enemy.kind === 'industrial_robot' || enemy.kind === 'mechanical_spider') {
+    // Gear Beast (وحش التروس): Rotating toothed steel & yellow industrial gear monster
+    ctx.save()
+    ctx.translate(cx, cy)
+    ctx.rotate(elapsedSec * (enemy.aiState === 'attack' ? 11 : 5) * facingDir)
+    ctx.fillStyle = '#334155'
+    ctx.beginPath()
+    ctx.arc(0, 0, 16, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = isAlert ? '#EF4444' : '#FACC15'
+    ctx.lineWidth = 3
+    ctx.stroke()
+    for (let t = 0; t < 8; t++) {
+      ctx.rotate(Math.PI / 4)
+      ctx.fillStyle = '#FACC15'
+      ctx.fillRect(-3, -20, 6, 5)
+    }
+    ctx.restore()
+    ctx.fillStyle = '#F8FAFC'
+    ctx.beginPath()
+    ctx.arc(cx + facingDir * 4, cy, 4, 0, Math.PI * 2)
+    ctx.fill()
+  } else if (enemy.kind === 'welding_drone' || enemy.kind === 'energy_drone' || enemy.kind === 'flying_drone') {
+    // Welding Drone (طائرة اللحام): Flying industrial machine that fires short-range yellow-white welding arc
     ctx.fillStyle = '#1E293B'
     ctx.fillRect(enemy.x + 4, enemy.y + 8, enemy.w - 8, enemy.h - 14)
-    ctx.strokeStyle = '#38BDF8'
+    ctx.strokeStyle = '#FACC15'
     ctx.lineWidth = 2
     ctx.strokeRect(enemy.x + 4, enemy.y + 8, enemy.w - 8, enemy.h - 14)
-    // Rotors
-    ctx.fillStyle = '#94A3B8'
+    // Spinning rotors
+    ctx.fillStyle = '#F8FAFC'
     ctx.fillRect(enemy.x - 2, enemy.y + 2, 14, 3)
     ctx.fillRect(enemy.x + enemy.w - 12, enemy.y + 2, 14, 3)
-    // Eye lens
+    // Welding torch nozzle & beam during attack
+    if (enemy.aiState === 'attack') {
+      ctx.strokeStyle = '#FEF08A'
+      ctx.lineWidth = 3.5
+      ctx.beginPath()
+      ctx.moveTo(cx, enemy.y + enemy.h - 4)
+      ctx.lineTo(cx + facingDir * 18, enemy.y + enemy.h + 24)
+      ctx.stroke()
+    }
     ctx.fillStyle = isAlert ? '#EF4444' : '#FACC15'
     ctx.beginPath()
     ctx.arc(cx, cy, 5, 0, Math.PI * 2)
     ctx.fill()
-  } else if (enemy.kind === 'mechanical_spider') {
-    // 4. Mechanical Spider (عنكبوت ميكانيكي)
-    ctx.strokeStyle = '#94A3B8'
+  } else if (enemy.kind === 'assembly_mimic') {
+    // Assembly Mimic (المحاكي الآلي): Disguised as inactive steel crate until approached, then deploys mechanical limbs
+    const isHidden = enemy.aiState === 'idle'
+    ctx.fillStyle = '#334155'
+    ctx.fillRect(enemy.x + 4, enemy.y + (isHidden ? 8 : 2), enemy.w - 8, enemy.h - (isHidden ? 8 : 4))
+    ctx.strokeStyle = isHidden ? '#64748B' : '#FACC15'
+    ctx.lineWidth = 2.2
+    ctx.strokeRect(enemy.x + 4, enemy.y + (isHidden ? 8 : 2), enemy.w - 8, enemy.h - (isHidden ? 8 : 4))
+    if (!isHidden) {
+      // Deployed mechanical limbs & glowing eye
+      ctx.strokeStyle = '#FACC15'
+      ctx.lineWidth = 3
+      ctx.beginPath()
+      ctx.moveTo(enemy.x + 4, cy)
+      ctx.lineTo(enemy.x - 8, cy - 8)
+      ctx.moveTo(enemy.x + enemy.w - 4, cy)
+      ctx.lineTo(enemy.x + enemy.w + 8, cy - 8)
+      ctx.stroke()
+      ctx.fillStyle = '#EF4444'
+      ctx.fillRect(cx - 7, enemy.y + 10, 14, 5)
+    }
+  }
+  // ==========================================================================
+  // STAGE 4 MONSTERS — الإنارة فرع الليثي (BLUE ELECTRICAL CITY)
+  // ==========================================================================
+  else if (enemy.kind === 'blue_phantom' || enemy.kind === 'light_thief') {
+    // Blue Phantom (الطيف الأزرق): Fast phasing electric-blue energy wraith
+    ctx.fillStyle = 'rgba(37, 99, 235, 0.35)'
+    ctx.beginPath()
+    ctx.arc(cx - facingDir * 8, cy, 14, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#1E3A8A'
+    ctx.beginPath()
+    ctx.arc(cx, cy, 15, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = '#38BDF8'
     ctx.lineWidth = 2.5
+    ctx.stroke()
+    ctx.fillStyle = '#F8FAFC'
+    ctx.fillRect(cx + facingDir * 3 - 5, cy - 4, 10, 4)
+  } else if (enemy.kind === 'electric_spider') {
+    // Electric Spider (العنكبوت الكهربائي): Vertical tether-climbing blue-cyan mechanical spider
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.55)'
+    ctx.lineWidth = 1.8
+    ctx.beginPath()
+    ctx.moveTo(cx, Math.max(0, enemy.y - 120))
+    ctx.lineTo(cx, enemy.y)
+    ctx.stroke()
+    ctx.fillStyle = '#0F172A'
+    ctx.beginPath()
+    ctx.ellipse(cx, cy, 16, 12, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = '#38BDF8'
+    ctx.lineWidth = 2.2
+    ctx.stroke()
+    // 4 articulated blue legs on each side
+    ctx.strokeStyle = '#2563EB'
+    ctx.lineWidth = 2
     for (let l = -1; l <= 1; l += 2) {
       ctx.beginPath()
-      ctx.moveTo(cx, cy)
-      ctx.lineTo(cx + l * 18, cy - 6 + Math.sin(elapsedSec * 16) * 4)
-      ctx.lineTo(cx + l * 22, enemy.y + enemy.h)
+      ctx.moveTo(cx + l * 10, cy)
+      ctx.lineTo(cx + l * 20, cy - 6)
+      ctx.moveTo(cx + l * 10, cy + 4)
+      ctx.lineTo(cx + l * 20, cy + 10)
       ctx.stroke()
     }
-    ctx.fillStyle = '#334155'
+    ctx.fillStyle = '#F8FAFC'
     ctx.beginPath()
-    ctx.arc(cx, cy, 12, 0, Math.PI * 2)
+    ctx.arc(cx + facingDir * 6, cy, 3.2, 0, Math.PI * 2)
     ctx.fill()
-    ctx.fillStyle = '#EF4444'
-    ctx.fillRect(cx - 5, cy - 3, 4, 4)
-    ctx.fillRect(cx + 2, cy - 3, 4, 4)
-  } else if (enemy.kind === 'shadow_creature') {
-    // 6. Shadow Creature (كائن الظل)
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
-    ctx.beginPath()
-    ctx.arc(cx, cy, 16, 0, Math.PI * 2)
-    ctx.fill()
+  } else if (enemy.kind === 'pulse_sentinel' || enemy.kind === 'security_bot' || enemy.kind === 'security_robot') {
+    // Pulse Sentinel (حارس النبض الأزرق): Scans player with blue cone & fires directional pulse
+    if (enemy.aiState === 'patrol' || enemy.aiState === 'detect') {
+      ctx.fillStyle =
+        enemy.aiState === 'detect'
+          ? 'rgba(56, 189, 248, 0.28)'
+          : 'rgba(37, 99, 235, 0.16)'
+      ctx.beginPath()
+      ctx.moveTo(cx + facingDir * 14, cy - 4)
+      ctx.lineTo(cx + facingDir * 110, cy - 24)
+      ctx.lineTo(cx + facingDir * 110, cy + 18)
+      ctx.closePath()
+      ctx.fill()
+    }
+    ctx.fillStyle = '#0F172A'
+    ctx.fillRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
+    ctx.strokeStyle = '#38BDF8'
+    ctx.lineWidth = 2.4
+    ctx.strokeRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
+    ctx.fillStyle = '#F8FAFC'
+    ctx.fillRect(enemy.x + 7, enemy.y + 13, enemy.w - 14, 6)
+  }
+  // ==========================================================================
+  // STAGE 5 MONSTERS — قلعة الظلام (DARKNESS FORTRESS)
+  // ==========================================================================
+  else if (enemy.kind === 'void_flyer' || enemy.kind === 'flying_guardian' || enemy.kind === 'giant_guardian') {
+    // Void Flyer (طائر الفراغ): Winged dark-energy flyer with crimson/violet wings
+    const wingFlap = Math.sin(elapsedSec * 14) * 8
     ctx.strokeStyle = '#A855F7'
-    ctx.lineWidth = 2
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.moveTo(cx - 10, cy)
+    ctx.lineTo(cx - 26, cy - 10 + wingFlap)
+    ctx.moveTo(cx + 10, cy)
+    ctx.lineTo(cx + 26, cy - 10 + wingFlap)
     ctx.stroke()
-    ctx.fillStyle = '#F43F5E'
-    ctx.fillRect(cx - 6, cy - 4, 4, 4)
-    ctx.fillRect(cx + 2, cy - 4, 4, 4)
-  } else if (enemy.kind === 'security_robot') {
-    // 5. Security Robot (روبوت الحراسة)
-    ctx.fillStyle = '#1E293B'
-    ctx.fillRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
-    ctx.strokeStyle = isAlert ? '#EF4444' : '#38BDF8'
-    ctx.lineWidth = 2
-    ctx.strokeRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
-    ctx.fillStyle = '#38BDF8'
-    ctx.fillRect(cx - 8, enemy.y, 16, 5)
-    ctx.fillStyle = isAlert ? '#EF4444' : '#FDE047'
-    ctx.fillRect(enemy.x + 6, enemy.y + 12, enemy.w - 12, 6)
-  } else if (enemy.kind === 'transformer_monster') {
-    // 7. Transformer Monster (وحش المحولات)
-    ctx.fillStyle = '#7C2D12'
-    ctx.fillRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
-    ctx.strokeStyle = isAlert ? '#EF4444' : '#F59E0B'
-    ctx.lineWidth = 2.5
-    ctx.strokeRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
-    // Copper coils on shoulders
-    ctx.fillStyle = '#EA580C'
-    ctx.fillRect(enemy.x - 3, enemy.y + 8, 5, 14)
-    ctx.fillRect(enemy.x + enemy.w - 2, enemy.y + 8, 5, 14)
-    ctx.fillStyle = '#38BDF8'
-    ctx.fillRect(cx - 9, enemy.y, 18, 5)
-    ctx.fillStyle = '#FDE047'
-    ctx.fillRect(enemy.x + 8, enemy.y + 14, enemy.w - 16, 6)
-  } else if (enemy.kind === 'giant_guardian') {
-    // 8. Giant Guardian (الحارس العملاق)
-    ctx.fillStyle = '#312E81'
+    ctx.fillStyle = '#090D16'
+    ctx.fillRect(enemy.x + 5, enemy.y + 5, enemy.w - 10, enemy.h - 10)
+    ctx.strokeStyle = '#F43F5E'
+    ctx.lineWidth = 2.2
+    ctx.strokeRect(enemy.x + 5, enemy.y + 5, enemy.w - 10, enemy.h - 10)
+  } else if (enemy.kind === 'shadow_brute') {
+    // Shadow Brute (عملاق الظل): Massive heavy-armored fortress colossus
+    ctx.fillStyle = '#090D16'
+    ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h - 4)
+    ctx.strokeStyle = '#F43F5E'
+    ctx.lineWidth = 3
+    ctx.strokeRect(enemy.x, enemy.y, enemy.w, enemy.h - 4)
+    ctx.fillStyle = '#A855F7'
+    ctx.fillRect(enemy.x + 8, enemy.y + 12, enemy.w - 16, 8)
+  } else {
+    // Dark Stalker (مطارد الظلام) & Fortress Guardian (حارس القلعة)
+    ctx.fillStyle = '#1E1B4B'
     ctx.fillRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
     ctx.strokeStyle = isAlert ? '#F43F5E' : '#A855F7'
     ctx.lineWidth = 2.5
     ctx.strokeRect(enemy.x, enemy.y + 4, enemy.w, enemy.h - 8)
-    ctx.fillStyle = '#22D3EE'
-    ctx.fillRect(cx - 10, enemy.y, 20, 5)
-    ctx.fillStyle = isAlert ? '#F43F5E' : '#38BDF8'
-    ctx.fillRect(enemy.x + 7, enemy.y + 14, enemy.w - 14, 7)
+    ctx.fillStyle = '#F43F5E'
+    ctx.fillRect(enemy.x - 3, enemy.y + 8, 5, 16)
+    ctx.fillRect(enemy.x + enemy.w - 2, enemy.y + 8, 5, 16)
+    ctx.fillStyle = '#FDE047'
+    ctx.fillRect(enemy.x + 8, enemy.y + 14, enemy.w - 16, 6)
   }
 
-  // Fair Attack Telegraph Indicator
+  // Fair Attack / Retreat Telegraph Indicator
   if (enemy.aiState === 'detect') {
     ctx.fillStyle = '#FACC15'
     ctx.font = 'bold 12px sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText('!', cx, enemy.y - 6)
+  } else if (enemy.aiState === 'retreat') {
+    ctx.fillStyle = '#38BDF8'
+    ctx.font = 'bold 10px Cairo, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('⚡ تراجع', cx, enemy.y - 6)
   }
 
   ctx.restore()
 }
 
 // ============================================================================
-// BOSS ENCOUNTERS & 3-PHASE DARK KING (SECTION 6 & 8)
+// V13 BOSS ENCOUNTERS — ALL 5 UNIQUE STAGE BOSSES
 // ============================================================================
 
 function renderBossEncounter(
@@ -1935,7 +2238,12 @@ function renderBossEncounter(
 
   // Ground Shockwaves
   if (boss.shockwaveActive) {
-    ctx.fillStyle = '#F97316'
+    ctx.fillStyle =
+      boss.archetype === 'blue_sentinel_boss'
+        ? '#38BDF8'
+        : boss.archetype === 'factory_overlord_boss'
+        ? '#FACC15'
+        : '#F97316'
     ctx.beginPath()
     ctx.arc(boss.shockwaveLeftX, boss.shockwaveY, 15, 0, Math.PI * 2)
     ctx.arc(boss.shockwaveRightX, boss.shockwaveY, 15, 0, Math.PI * 2)
@@ -1948,53 +2256,83 @@ function renderBossEncounter(
 
   const { x, y, w, h } = boss
   const cx = x + w * 0.5
+  const isShadowCore =
+    boss.archetype === 'shadow_core_boss' || boss.archetype === 'electric_dark_king_boss'
+  const isOrangeCrusher = boss.archetype === 'orange_crusher_boss'
+  const isFactoryOverlord = boss.archetype === 'factory_overlord_boss'
+  const isBlueSentinel = boss.archetype === 'blue_sentinel_boss'
 
-  // Phase Aura for 3-Phase Dark King
-  if (boss.archetype === 'electric_dark_king_boss') {
-    const auraColor =
-      boss.phase === 3
-        ? 'rgba(244, 63, 94, 0.35)'
-        : boss.phase === 2
-        ? 'rgba(168, 85, 247, 0.3)'
-        : 'rgba(56, 189, 248, 0.25)'
-    ctx.fillStyle = auraColor
-    ctx.beginPath()
-    ctx.arc(cx, y + h * 0.5, w * 0.72, 0, Math.PI * 2)
-    ctx.fill()
-  }
+  // Phase Aura
+  const auraColor = isOrangeCrusher
+    ? 'rgba(234, 88, 12, 0.34)'
+    : isBlueSentinel
+    ? 'rgba(37, 99, 235, 0.36)'
+    : isFactoryOverlord
+    ? 'rgba(250, 204, 21, 0.28)'
+    : isShadowCore
+    ? 'rgba(244, 63, 94, 0.38)'
+    : 'rgba(14, 165, 233, 0.28)'
+  ctx.fillStyle = auraColor
+  ctx.beginPath()
+  ctx.arc(cx, y + h * 0.5, w * 0.72, 0, Math.PI * 2)
+  ctx.fill()
 
-  // Armored Chassis
-  ctx.fillStyle =
-    boss.archetype === 'electric_dark_king_boss'
-      ? '#1E1B4B'
-      : boss.archetype === 'construction_robot_boss'
-      ? '#78350F'
-      : '#0F172A'
+  // Armored Chassis per Boss Identity
+  ctx.fillStyle = isOrangeCrusher
+    ? '#18181B'
+    : isBlueSentinel
+    ? '#0F172A'
+    : isFactoryOverlord
+    ? '#334155'
+    : isShadowCore
+    ? '#090D16'
+    : '#1E293B'
   ctx.fillRect(x, y + 12, w, h - 16)
+
   ctx.strokeStyle =
     boss.state === 'telegraph'
       ? '#EF4444'
-      : boss.phase === 3
+      : isOrangeCrusher
+      ? '#EA580C'
+      : isBlueSentinel
+      ? '#38BDF8'
+      : isFactoryOverlord
+      ? '#FACC15'
+      : isShadowCore
       ? '#F43F5E'
-      : '#F97316'
-  ctx.lineWidth = 3.5
+      : '#0284C7'
+  ctx.lineWidth = 3.8
   ctx.strokeRect(x, y + 12, w, h - 16)
 
+  // Inner Pulsing Core Reactor
+  ctx.fillStyle = isOrangeCrusher
+    ? '#F97316'
+    : isBlueSentinel
+    ? '#2563EB'
+    : isFactoryOverlord
+    ? '#FACC15'
+    : isShadowCore
+    ? '#F43F5E'
+    : '#38BDF8'
+  ctx.beginPath()
+  ctx.arc(cx, y + h * 0.58, 15 + Math.sin(elapsedSec * 8) * 3, 0, Math.PI * 2)
+  ctx.fill()
+
   // Vulnerable Top Energy Core
-  ctx.fillStyle = boss.state === 'vulnerable' ? '#34D399' : '#38BDF8'
+  ctx.fillStyle = boss.state === 'vulnerable' ? '#34D399' : '#F8FAFC'
   ctx.beginPath()
   ctx.arc(cx, y + 12, 18, Math.PI, 0)
   ctx.fill()
 
-  // Visor & Crown for Dark King
-  ctx.fillStyle = boss.state === 'telegraph' ? '#EF4444' : '#FDE047'
+  // Visor
+  ctx.fillStyle = boss.state === 'telegraph' ? '#EF4444' : isBlueSentinel ? '#38BDF8' : '#FDE047'
   ctx.fillRect(x + 14, y + 28, w - 28, 12)
 
-  // Compact world-space shield/phase badge (Boss name & health bar are in the top screen-space HUD pill)
-  const bossBadgeText = `⚡ ${boss.hp}/${boss.maxHp}`
+  // Compact world-space shield/phase badge
+  const bossBadgeText = `⚡ ${boss.hp}/${boss.maxHp} • ط${boss.phase}`
   ctx.font = 'bold 10px Cairo, sans-serif'
   ctx.textAlign = 'center'
-  const btw = Math.max(46, ctx.measureText(bossBadgeText).width + 12)
+  const btw = Math.max(54, ctx.measureText(bossBadgeText).width + 12)
   ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
   ctx.fillRect(cx - btw * 0.5, y - 24, btw, 17)
   ctx.strokeStyle = boss.state === 'vulnerable' ? '#38BDF8' : '#EF4444'

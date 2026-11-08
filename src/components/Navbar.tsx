@@ -85,7 +85,7 @@ export default function Navbar() {
     {
       path: '/game',
       label: isAr ? 'بطل الإنارة (اللعبة)' : 'Light Quest Game',
-      desc: isAr ? 'مغامرة منصات تفاعلية في عوالم الإنارة الثمانية' : 'Interactive 2.5D lighting platformer adventure',
+      desc: isAr ? 'مغامرة منصات تفاعلية في عوالم الإنارة الخمسة' : 'Interactive 2.5D lighting platformer adventure',
       icon: Gamepad2,
       badge: isAr ? 'تفاعلية' : 'Play'
     }

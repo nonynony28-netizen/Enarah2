@@ -264,14 +264,11 @@ class SoundEngine {
   public getTrackForLevel(levelNumber: number, isBossArena = false): MusicTrackId {
     if (isBossArena) return 'boss_battle'
     const map: Record<number, MusicTrackId> = {
-      1: 'level_1',
-      2: 'level_2',
-      3: 'level_3',
-      4: 'level_4',
-      5: 'level_5',
-      6: 'level_6',
-      7: 'level_7',
-      8: 'level_8',
+      1: 'level_1', // Stage 1: مدينة النور
+      2: 'level_2', // Stage 2: الإنارة فرع البيضاء (Orange World)
+      3: 'level_3', // Stage 3: مصنع الإنارة
+      4: 'level_4', // Stage 4: الإنارة فرع الليثي (Blue World)
+      5: 'level_8', // Stage 5: قلعة الظلام (Final Fortress)
     }
     return map[levelNumber] || 'level_1'
   }

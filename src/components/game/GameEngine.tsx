@@ -36,11 +36,21 @@ import {
   GAME_STAGES,
   GAME_ACHIEVEMENTS,
   PRODUCT_CATALOG_META,
+  SESSION_TIMEOUT_MS,
+  SESSION_EXPIRED_MESSAGE_AR,
   type StageDefinition,
   type PlayerProgressionState,
   type CollectibleProductKind,
+  type SessionLifecycleState,
+  type ActiveRunSnapshot,
+  type GameSessionState,
   loadPlayerProgression,
   recordStageCompletion,
+  isSessionExpired,
+  createNewGameSession,
+  loadGameSessionState,
+  saveGameSessionState,
+  clearRunProgressionForExpiredSession,
 } from './platformerWorlds'
 import {
   type HeroPhysicsState,
@@ -285,6 +295,17 @@ export function GameEngine() {
   const [bannerAlert, setBannerAlert] = useState<{ msg: string; type: 'info' | 'success' | 'error' } | null>(null)
   const [copiedCoupon, setCopiedCoupon] = useState(false)
 
+  // V12 5-Minute Session Expiry & Lifecycle State Machine
+  const [sessionLifecycleState, setSessionLifecycleState] = useState<SessionLifecycleState>('ACTIVE')
+  const [sessionExpiredNotice, setSessionExpiredNotice] = useState<string | null>(null)
+  const serverClockOffsetRef = useRef<number>(0)
+  const sessionStateRef = useRef<GameSessionState>(
+    loadGameSessionState() || createNewGameSession(Date.now())
+  )
+  const getCalibratedNow = useCallback(() => {
+    return Date.now() + serverClockOffsetRef.current
+  }, [])
+
   // Active touch button highlights
   const [touchVisualState, setTouchVisualState] = useState({
     left: false,
@@ -403,6 +424,12 @@ export function GameEngine() {
     fetch(`/api/leaderboard?week=${weeklyInfo.weekId}`)
       .then((res) => res.json())
       .then((data) => {
+        if (data && Number.isFinite(Number(data.serverTimeMs))) {
+          const skew = Number(data.serverTimeMs) - Date.now()
+          if (Math.abs(skew) > 15000) {
+            serverClockOffsetRef.current = skew
+          }
+        }
         if (data && data.success && Array.isArray(data.entries)) {
           setLeaderboard((prev) => {
             const merged = dedupeAndRankLeaderboard([...prev, ...data.entries], 10)
@@ -418,6 +445,12 @@ export function GameEngine() {
     fetch(`/api/leaderboard?week=${weeklyInfo.prevWeekId}`)
       .then((res) => res.json())
       .then((data) => {
+        if (data && Number.isFinite(Number(data.serverTimeMs))) {
+          const skew = Number(data.serverTimeMs) - Date.now()
+          if (Math.abs(skew) > 15000) {
+            serverClockOffsetRef.current = skew
+          }
+        }
         if (data && data.success && Array.isArray(data.entries) && data.entries.length > 0) {
           setPreviousWeekBoard((prev) => {
             const merged = dedupeAndRankLeaderboard([...prev, ...data.entries], 10)
@@ -442,7 +475,7 @@ export function GameEngine() {
     discountDetails: '',
     giftItemName: '',
     giftInstructions: '',
-    victoryMsg: 'أنت بطل أسطوري حقيقي للإنارة! لقد عبرت المراحل الثماني وهزمت ملك الظلام الكهربائي بنجاح تام.',
+    victoryMsg: 'أنت بطل أسطوري حقيقي للإنارة! لقد عبرت المراحل الخمس وهزمت نواة الظلام بنجاح تام.',
   })
 
   useEffect(() => {
@@ -717,22 +750,6 @@ export function GameEngine() {
     return () => observer.disconnect()
   }, [isDedicatedMobileGameplay, isFullscreen])
 
-  useEffect(() => {
-    const handleVisibilityOrBlur = () => {
-      clearAllInputs()
-      if (document.hidden && gameState === 'playing') {
-        sound.stopMusic()
-        setGameState('paused')
-      }
-    }
-    window.addEventListener('blur', handleVisibilityOrBlur)
-    document.addEventListener('visibilitychange', handleVisibilityOrBlur)
-    return () => {
-      window.removeEventListener('blur', handleVisibilityOrBlur)
-      document.removeEventListener('visibilitychange', handleVisibilityOrBlur)
-    }
-  }, [clearAllInputs, gameState])
-
   // Compact auto-disappearing gameplay tips (Section 9)
   const showAlert = useCallback((msg: string, type: 'info' | 'success' | 'error' = 'info') => {
     setBannerAlert({ msg, type })
@@ -833,13 +850,307 @@ export function GameEngine() {
     [clearAllInputs, isMuted]
   )
 
+  // ==========================================================================
+  // V12 SECTION 12–16: 5-MINUTE SESSION EXPIRY & SNAPSHOT RESTORATION ENGINE
+  // ==========================================================================
+  const buildCurrentRunSnapshot = useCallback(
+    (overrideScreenState?: GameScreenState): ActiveRunSnapshot => {
+      const st = overrideScreenState || gameState
+      const mappedState: ActiveRunSnapshot['gameState'] =
+        st === 'playing'
+          ? 'playing'
+          : st === 'paused'
+          ? 'paused'
+          : st === 'stage_clear'
+          ? 'stage_clear'
+          : st === 'game_won'
+          ? 'victory'
+          : st === 'defeat'
+          ? 'gameover'
+          : 'start'
+      return {
+        stageIndex: currentStageIdx,
+        gameState: mappedState,
+        heroX: Math.round(heroRef.current.x),
+        heroY: Math.round(heroRef.current.y),
+        respawnX: Math.round(heroRef.current.respawnX),
+        respawnY: Math.round(heroRef.current.respawnY),
+        hp: heroRef.current.hp,
+        lightEnergy: Math.round(heroRef.current.lightEnergy),
+        stageScore: stageScoreRef.current,
+        totalCampaignScore: totalCampaignScoreRef.current,
+        collectedIds: stageRef.current.collectibles.filter((c) => c.collected).map((c) => c.id),
+        activatedSwitchIds: stageRef.current.switches.filter((s) => s.activated).map((s) => s.id),
+        activatedCheckpointIds: stageRef.current.checkpoints.filter((cp) => cp.activated).map((cp) => cp.id),
+        defeatedEnemyIds: stageRef.current.enemies.filter((e) => e.defeated).map((e) => e.id),
+        bossHp: stageRef.current.boss ? stageRef.current.boss.hp : undefined,
+        bossPhase: stageRef.current.boss ? stageRef.current.boss.phase : undefined,
+        elapsedSec: Math.round(elapsedSecRef.current * 10) / 10,
+      }
+    },
+    [currentStageIdx, gameState]
+  )
+
+  const restoreFromRunSnapshot = useCallback(
+    (snap: ActiveRunSnapshot) => {
+      const safeIndex = Math.max(0, Math.min(GAME_STAGES.length - 1, Number(snap.stageIndex) || 0))
+      const cloned = cloneStageDefinition(GAME_STAGES[safeIndex])
+
+      const collectedSet = new Set(Array.isArray(snap.collectedIds) ? snap.collectedIds : [])
+      for (const item of cloned.collectibles) {
+        if (collectedSet.has(item.id)) item.collected = true
+      }
+
+      const switchSet = new Set(Array.isArray(snap.activatedSwitchIds) ? snap.activatedSwitchIds : [])
+      for (const sw of cloned.switches) {
+        if (switchSet.has(sw.id)) sw.activated = true
+      }
+      const activeSwCount = cloned.switches.filter((s) => s.activated).length
+      for (const gate of cloned.gates) {
+        if (gate.requiredSwitchesCount && activeSwCount >= gate.requiredSwitchesCount) {
+          gate.isOpen = true
+        } else if (gate.switchId && switchSet.has(gate.switchId)) {
+          gate.isOpen = true
+        }
+      }
+
+      const cpSet = new Set(Array.isArray(snap.activatedCheckpointIds) ? snap.activatedCheckpointIds : [])
+      for (const cp of cloned.checkpoints) {
+        if (cp.activated || cpSet.has(cp.id)) cp.activated = true
+      }
+
+      const enemySet = new Set(Array.isArray(snap.defeatedEnemyIds) ? snap.defeatedEnemyIds : [])
+      for (const en of cloned.enemies) {
+        if (enemySet.has(en.id)) {
+          en.defeated = true
+          en.aiState = 'defeated'
+        }
+      }
+
+      if (cloned.boss && typeof snap.bossHp === 'number') {
+        cloned.boss.hp = Math.max(0, Math.min(cloned.boss.maxHp, snap.bossHp))
+        cloned.boss.phase = snap.bossPhase || 1
+        if (cloned.boss.hp <= 0) cloned.boss.state = 'defeated'
+      }
+
+      stageRef.current = cloned
+      const restoredHero = createInitialHeroState(cloned)
+      restoredHero.x = Number.isFinite(snap.heroX) ? snap.heroX : cloned.heroSpawn.x
+      restoredHero.y = Number.isFinite(snap.heroY) ? snap.heroY : cloned.heroSpawn.y
+      restoredHero.respawnX = Number.isFinite(snap.respawnX) ? snap.respawnX : cloned.heroSpawn.x
+      restoredHero.respawnY = Number.isFinite(snap.respawnY) ? snap.respawnY : cloned.heroSpawn.y
+      restoredHero.hp = Math.max(1, Math.min(restoredHero.maxHp, Number(snap.hp) || 3))
+      restoredHero.lightEnergy = Math.max(20, Math.min(100, Number(snap.lightEnergy) || 75))
+      heroRef.current = restoredHero
+
+      stageScoreRef.current = Math.max(0, Number(snap.stageScore) || 0)
+      totalCampaignScoreRef.current = Math.max(0, Number(snap.totalCampaignScore) || 0)
+      collectedCountRef.current = cloned.collectibles.filter((c) => c.collected).length
+      elapsedSecRef.current = Math.max(0, Number(snap.elapsedSec) || 0)
+
+      setCurrentStageIdx(safeIndex)
+      setHudHealth(restoredHero.hp)
+      setHudMaxHealth(restoredHero.maxHp)
+      setHudBulbEnergy(restoredHero.lightEnergy)
+      setHudEnergy(collectedCountRef.current)
+      setHudTotalEnergy(cloned.collectibles.length)
+      setHudStageScore(stageScoreRef.current)
+      setHudScore(totalCampaignScoreRef.current + stageScoreRef.current)
+      setHudElapsedSec(Math.floor(elapsedSecRef.current))
+      setHudTimeLeftSec(
+        cloned.challengeTimeLimitSec
+          ? Math.max(0, Math.ceil(cloned.challengeTimeLimitSec - elapsedSecRef.current))
+          : null
+      )
+      setHudBossHp(cloned.boss ? cloned.boss.hp : null)
+      setHudBossMaxHp(cloned.boss ? cloned.boss.maxHp : 3)
+      setHudBossPhase(cloned.boss ? cloned.boss.phase : 1)
+
+      if (snap.gameState === 'playing') {
+        setGameState('playing')
+      } else if (snap.gameState === 'paused') {
+        setGameState('paused')
+      } else if (snap.gameState === 'stage_clear') {
+        setGameState('stage_clear')
+      }
+    },
+    []
+  )
+
+  const triggerExpiredSessionReset = useCallback(() => {
+    const now = getCalibratedNow()
+    setSessionLifecycleState('EXPIRED')
+    clearAllInputs()
+    sound.stopMusic()
+    const { nextProgression, nextSession } = clearRunProgressionForExpiredSession(
+      progression,
+      now
+    )
+    sessionStateRef.current = nextSession
+    setProgression(nextProgression)
+    totalCampaignScoreRef.current = 0
+    totalPlayTimeSecRef.current = 0
+    stageScoreRef.current = 0
+    setHudScore(0)
+    setHudStageScore(0)
+    setHasSubmittedScore(false)
+    initStage(0)
+    setShowStageSelectModal(false)
+    setShowSettingsModal(false)
+    setShowLeaderboard(false)
+    setGameState('start')
+    setSessionLifecycleState('NEW_RUN')
+    setSessionExpiredNotice(SESSION_EXPIRED_MESSAGE_AR)
+    showAlert(`⏰ ${SESSION_EXPIRED_MESSAGE_AR}`, 'info')
+  }, [clearAllInputs, getCalibratedNow, initStage, progression, showAlert])
+
+  // Check session expiry on initial mount / page reload
+  const initialMountCheckedRef = useRef(false)
+  useEffect(() => {
+    if (initialMountCheckedRef.current) return
+    initialMountCheckedRef.current = true
+    const stored = loadGameSessionState()
+    const now = getCalibratedNow()
+    if (!stored) {
+      const fresh = createNewGameSession(now)
+      fresh.lifecycleState = 'ACTIVE'
+      sessionStateRef.current = fresh
+      saveGameSessionState(fresh)
+      return
+    }
+    const referenceTimestamp = stored.departedAt || stored.lastActiveAt
+    if (isSessionExpired(referenceTimestamp, now)) {
+      triggerExpiredSessionReset()
+    } else {
+      // Returned or refreshed in < 5 minutes: preserve active session & restore snapshot!
+      setSessionLifecycleState('RESUMABLE')
+      if (stored.snapshot && stored.snapshot.gameState !== 'start') {
+        restoreFromRunSnapshot(stored.snapshot)
+      }
+      const resumed: GameSessionState = {
+        ...stored,
+        lifecycleState: 'ACTIVE',
+        lastActiveAt: now,
+        departedAt: null,
+      }
+      sessionStateRef.current = resumed
+      saveGameSessionState(resumed)
+      setSessionLifecycleState('ACTIVE')
+    }
+  }, [getCalibratedNow, restoreFromRunSnapshot, triggerExpiredSessionReset])
+
+  // Active gameplay heartbeat (updates lastActiveAt & snapshot every 2s while page is visible)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return
+      const now = getCalibratedNow()
+      const updated: GameSessionState = {
+        ...sessionStateRef.current,
+        lifecycleState: 'ACTIVE',
+        lastActiveAt: now,
+        departedAt: null,
+        currentStageIndex: currentStageIdx,
+        unlockedStagesForRun: progression.unlockedStageIndex,
+        snapshot: buildCurrentRunSnapshot(),
+      }
+      sessionStateRef.current = updated
+      saveGameSessionState(updated)
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [buildCurrentRunSnapshot, currentStageIdx, getCalibratedNow, progression.unlockedStageIndex])
+
+  // Track departure & return across visibilitychange, pagehide, beforeunload, pageshow, focus
+  useEffect(() => {
+    const handleDeparture = () => {
+      clearAllInputs()
+      const latestStored = loadGameSessionState()
+      if (latestStored?.lifecycleState === 'BACKGROUND' && latestStored.departedAt) {
+        sessionStateRef.current = latestStored
+        return
+      }
+      const now = getCalibratedNow()
+      const nextScreenState: GameScreenState =
+        gameState === 'playing' ? 'paused' : gameState
+      if (gameState === 'playing') {
+        sound.stopMusic()
+        setGameState('paused')
+      }
+      const bgSession: GameSessionState = {
+        ...sessionStateRef.current,
+        lifecycleState: 'BACKGROUND',
+        lastActiveAt: now,
+        departedAt: now,
+        currentStageIndex: currentStageIdx,
+        unlockedStagesForRun: progression.unlockedStageIndex,
+        snapshot: buildCurrentRunSnapshot(nextScreenState),
+      }
+      sessionStateRef.current = bgSession
+      saveGameSessionState(bgSession)
+      setSessionLifecycleState('BACKGROUND')
+    }
+
+    const handleReturn = () => {
+      if (typeof document !== 'undefined' && document.hidden) return
+      const stored = loadGameSessionState() || sessionStateRef.current
+      const now = getCalibratedNow()
+      const departedTime = stored?.departedAt || stored?.lastActiveAt || now
+      if (isSessionExpired(departedTime, now)) {
+        triggerExpiredSessionReset()
+      } else {
+        setSessionLifecycleState('RESUMABLE')
+        const resumed: GameSessionState = {
+          ...stored,
+          lifecycleState: 'ACTIVE',
+          lastActiveAt: now,
+          departedAt: null,
+        }
+        sessionStateRef.current = resumed
+        saveGameSessionState(resumed)
+        setSessionLifecycleState('ACTIVE')
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        handleDeparture()
+      } else {
+        handleReturn()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('pagehide', handleDeparture)
+    window.addEventListener('beforeunload', handleDeparture)
+    window.addEventListener('pageshow', handleReturn)
+    window.addEventListener('focus', handleReturn)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('pagehide', handleDeparture)
+      window.removeEventListener('beforeunload', handleDeparture)
+      window.removeEventListener('pageshow', handleReturn)
+      window.removeEventListener('focus', handleReturn)
+    }
+  }, [
+    buildCurrentRunSnapshot,
+    clearAllInputs,
+    currentStageIdx,
+    gameState,
+    getCalibratedNow,
+    progression.unlockedStageIndex,
+    triggerExpiredSessionReset,
+  ])
+
   const startAdventure = useCallback(
     (stageIndex?: number) => {
       sound.playButton()
-      const targetIdx =
+      setSessionExpiredNotice(null)
+      // Enforce sequential stage unlocking: cannot start a stage higher than unlockedStageIndex
+      const requestedIdx =
         typeof stageIndex === 'number'
           ? stageIndex
           : Math.min(progression.unlockedStageIndex, GAME_STAGES.length - 1)
+      const targetIdx = Math.max(0, Math.min(progression.unlockedStageIndex, requestedIdx))
       const targetStage = GAME_STAGES[targetIdx] || GAME_STAGES[0]
       // Sum best stage scores for all OTHER stages so replaying a stage never multiplies rewards
       const otherStagesBestSum = Object.entries(progression.bestStageScores).reduce(
@@ -857,8 +1168,21 @@ export function GameEngine() {
       setShowSettingsModal(false)
       setShowLeaderboard(false)
       setGameState('playing')
+      setSessionLifecycleState('ACTIVE')
+      const now = getCalibratedNow()
+      const updatedSession: GameSessionState = {
+        ...sessionStateRef.current,
+        lifecycleState: 'ACTIVE',
+        lastActiveAt: now,
+        departedAt: null,
+        currentStageIndex: targetIdx,
+        unlockedStagesForRun: progression.unlockedStageIndex,
+        snapshot: buildCurrentRunSnapshot('playing'),
+      }
+      sessionStateRef.current = updatedSession
+      saveGameSessionState(updatedSession)
     },
-    [initStage, progression.bestStageScores, progression.unlockedStageIndex]
+    [buildCurrentRunSnapshot, getCalibratedNow, initStage, progression.bestStageScores, progression.unlockedStageIndex]
   )
 
   const retryCurrentStage = useCallback(() => {
@@ -1651,7 +1975,7 @@ export function GameEngine() {
       {isPortraitMobile && isFullViewportMode && gameState === 'playing' && (
         <div className="w-full px-3.5 py-2 flex items-center justify-between text-xs font-bold text-slate-300 bg-[#0B1222]/90 border-b border-slate-800/80 shrink-0 z-20">
           <span className="text-amber-300">
-            المرحلة {activeStage.worldNumber} / 8 • {activeStage.worldTitleAr}
+            المرحلة {activeStage.worldNumber} / 5 • {activeStage.worldTitleAr}
           </span>
           <div className="flex items-center gap-3">
             <span>
@@ -1723,13 +2047,26 @@ export function GameEngine() {
             ================================================================= */}
         {gameState === 'start' && (
           <div className="absolute inset-0 z-20 bg-slate-950/35 flex flex-col items-center justify-center p-4 text-center">
-            <div className="bg-[#0B1222]/90 border border-slate-700/80 rounded-3xl px-5 py-5 sm:px-9 sm:py-7 max-w-sm sm:max-w-md w-full shadow-2xl backdrop-blur-md flex flex-col items-center">
+            <div
+              data-session-lifecycle={sessionLifecycleState}
+              className="bg-[#0B1222]/90 border border-slate-700/80 rounded-3xl px-5 py-5 sm:px-9 sm:py-7 max-w-sm sm:max-w-md w-full shadow-2xl backdrop-blur-md flex flex-col items-center"
+            >
               <div className="w-11 h-11 rounded-2xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2.5">
                 <Lightbulb className="w-6 h-6 fill-amber-400" />
               </div>
-              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-3">
                 بطل الإنارة
               </h2>
+
+              {sessionExpiredNotice && (
+                <div
+                  id="enarah-session-expired-banner"
+                  className="w-full mb-3 px-3.5 py-2.5 rounded-2xl bg-amber-500/15 border border-amber-400/50 text-amber-200 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 shadow-sm"
+                >
+                  <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>{sessionExpiredNotice}</span>
+                </div>
+              )}
 
               <button
                 type="button"
@@ -1768,12 +2105,12 @@ export function GameEngine() {
 
               <div className="w-full pt-3 border-t border-slate-800/90 flex items-center justify-between text-xs text-slate-300 font-bold">
                 <span>
-                  المراحل المفتوحة: {Math.min(8, progression.unlockedStageIndex + 1)} / 8
+                  المراحل المفتوحة: {Math.min(5, progression.unlockedStageIndex + 1)} / 5
                 </span>
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1 text-amber-400">
                     <Star className="w-3.5 h-3.5 fill-amber-400" />
-                    {Object.values(progression.stageStarsEarned).reduce((a, b) => a + b, 0)} / 24
+                    {Object.values(progression.stageStarsEarned).reduce((a, b) => a + b, 0)} / 15
                   </span>
                   <button
                     type="button"
@@ -2016,7 +2353,7 @@ export function GameEngine() {
           <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-start sm:justify-center p-4 text-center overflow-y-auto">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-black mb-2">
               <Trophy className="w-4 h-4 text-amber-400" />
-              <span>بطل الإنارة • اكتملت المراحل الثماني</span>
+              <span>بطل الإنارة • اكتملت المراحل الخمس</span>
             </div>
 
             <h3 className="text-lg sm:text-2xl font-black text-white mb-1">
@@ -2106,7 +2443,7 @@ export function GameEngine() {
               {rewardConfig.isEnabled && rewardConfig.rewardType !== 'no_reward' && (
                 <a
                   href={`https://wa.me/218916580068?text=${encodeURIComponent(
-                    `مرحباً شركة الإنارة الحديثة، أتممت المراحل الثماني في لعبة بطل الإنارة وحصلت على ${
+                    `مرحباً شركة الإنارة الحديثة، أتممت المراحل الخمس في لعبة بطل الإنارة وحصلت على ${
                       rewardConfig.rewardType === 'coupon'
                         ? `كود الخصم: ${rewardConfig.couponCode}`
                         : `الهدية: ${rewardConfig.giftItemName}`
@@ -2357,8 +2694,8 @@ export function GameEngine() {
                     </button>
                   </div>
 
-                  {/* Mobile horizontal carousel / Desktop 4-column responsive grid */}
-                  <div className="flex sm:grid sm:grid-cols-4 gap-3 overflow-x-auto sm:overflow-y-auto pb-2 sm:pb-0 snap-x snap-mandatory">
+                  {/* Mobile horizontal carousel / Desktop 5-column responsive grid */}
+                  <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-3 overflow-x-auto sm:overflow-y-auto pb-2 sm:pb-0 snap-x snap-mandatory">
                     {GAME_STAGES.map((stg, idx) => {
                       const isUnlocked = idx <= progression.unlockedStageIndex
                       const isCompleted = progression.completedStageIds.includes(stg.id)
@@ -2400,9 +2737,9 @@ export function GameEngine() {
                             )}
                             {stg.theme === 'electricity_street' && (
                               <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                                <div className="w-6 h-6 bg-amber-900/85 border-t-2 border-amber-300 rounded-t-xs" />
-                                <div className="w-7 h-7 bg-orange-950/90 border-t-2 border-yellow-300 rounded-t-sm" />
-                                <div className="w-5 h-5 bg-amber-800/80 border-t-2 border-cyan-300 rounded-t-xs" />
+                                <div className="w-6 h-8 bg-[#18181B] border-t-2 border-[#EA580C] rounded-t-xs" />
+                                <div className="w-8 h-9 bg-[#431407] border-t-2 border-[#F97316] rounded-t-sm" />
+                                <div className="w-5 h-7 bg-[#27272A] border-t-2 border-[#F8FAFC] rounded-t-xs" />
                               </div>
                             )}
                             {stg.theme === 'lighting_factory' && (
@@ -2415,32 +2752,9 @@ export function GameEngine() {
                             )}
                             {stg.theme === 'intercom_district' && (
                               <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                                <div className="w-3 h-4 bg-emerald-500 rounded-full mb-0.5" />
-                                <div className="w-7 h-6 bg-teal-950 border-t-2 border-emerald-300 rounded-t-sm" />
-                                <div className="w-6 h-1.5 bg-orange-500 mb-3 rounded-full" />
-                                <div className="w-6 h-7 bg-slate-900 border-t-2 border-amber-300 rounded-t-sm" />
-                              </div>
-                            )}
-                            {stg.theme === 'power_station' && (
-                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                                <div className="w-5 h-8 bg-slate-800 border border-orange-400/70 rounded-t-xs" />
-                                <div className="w-8 h-3 bg-orange-500/90 mb-3 rounded-xs" />
-                                <div className="w-6 h-9 bg-slate-900 border border-cyan-400/70 rounded-t-xs" />
-                              </div>
-                            )}
-                            {stg.theme === 'dark_city' && (
-                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-around px-2">
-                                <div className="w-4 h-9 bg-indigo-950 border-t border-cyan-400 rounded-t-sm" />
-                                <div className="w-6 h-1 bg-cyan-400 mb-4 shadow-sm" />
-                                <div className="w-5 h-10 bg-purple-950 border-t border-fuchsia-400 rounded-t-sm" />
-                                <div className="w-4 h-7 bg-slate-900 border-t border-cyan-300 rounded-t-sm" />
-                              </div>
-                            )}
-                            {stg.theme === 'lighting_tower' && (
-                              <div className="absolute bottom-1.5 inset-x-0 flex items-end justify-center gap-2 px-2">
-                                <div className="w-4 h-6 border-r border-cyan-300/60" />
-                                <div className="w-5 h-11 bg-sky-950/90 border-x border-t border-amber-300 rounded-t-md" />
-                                <div className="w-4 h-6 border-l border-cyan-300/60" />
+                                <div className="w-5 h-8 bg-[#0F172A] border-t-2 border-[#38BDF8] rounded-t-sm" />
+                                <div className="w-7 h-9 bg-[#1E3A8A] border-t-2 border-[#2563EB] rounded-t-sm" />
+                                <div className="w-5 h-7 bg-[#0F172A] border-t-2 border-[#F8FAFC] rounded-t-sm" />
                               </div>
                             )}
                             {stg.theme === 'darkness_fortress' && (
@@ -2744,7 +3058,7 @@ export function GameEngine() {
                       </div>
                     </div>
                     <p className="text-[11px] text-zinc-400 leading-relaxed">
-                      ⚡ اجمع المنتجات الكهربائية وأكمل المراحل الثماني لتتصدر لوحة الشرف الأسبوعية!
+                      ⚡ اجمع المنتجات الكهربائية وأكمل المراحل الخمس لتتصدر لوحة الشرف الأسبوعية!
                     </p>
                   </div>
 

@@ -143,6 +143,7 @@ export default async function handler(req, res) {
         const ranked = sortAndRankEntries(Array.from(dedupedMap.values()), 15)
         return res.status(200).json({
           success: true,
+          serverTimeMs: Date.now(),
           weekId: requestedWeek,
           currentWeekId: currentWeekKey,
           prevWeekId: weekInfo.prevWeekId,
@@ -158,6 +159,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
+      serverTimeMs: Date.now(),
       weekId: requestedWeek,
       currentWeekId: currentWeekKey,
       prevWeekId: weekInfo.prevWeekId,
@@ -302,6 +304,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
+        serverTimeMs: Date.now(),
         updated: improved,
         weekId: entryWeek,
         message: improved

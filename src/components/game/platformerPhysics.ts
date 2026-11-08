@@ -698,9 +698,55 @@ export function stepPlatformerSimulation(
   }
 
   // --------------------------------------------------------------------------
-  // 11. ENVIRONMENTAL HAZARDS (Timed Arcs, Rotating Hazards, Mechanical Presses)
+  // 11. ENVIRONMENTAL HAZARDS (Timed Arcs, Rotating, Presses, Fans, Lasers, Falling)
   // --------------------------------------------------------------------------
   for (const haz of stage.hazards) {
+    if (haz.kind === 'ventilation_fan') {
+      // Upward industrial air stream in Stage 3 (The Lighting Factory)
+      if (
+        aabbOverlap(
+          hero.x,
+          hero.y,
+          hero.w,
+          hero.h,
+          haz.x - 8,
+          haz.y - 125,
+          haz.w + 16,
+          haz.h + 125
+        )
+      ) {
+        hero.vy = Math.max(-520, hero.vy - 920 * dt)
+        hero.onGround = false
+      }
+      continue
+    }
+
+    if (haz.kind === 'falling_obstacle') {
+      const period = haz.period || 2.4
+      const phase = (elapsedSec + (haz.offset || 0)) % period
+      const baseY = haz.baseY ?? 115
+      const maxDrop = Math.max(120, stage.groundY - baseY - haz.h)
+      // First 0.45s: warning shake at top; next 0.95s: fall to ground; remainder: reset at top
+      if (phase < 0.45) {
+        haz.y = baseY
+      } else if (phase < 1.4) {
+        const ratio = (phase - 0.45) / 0.95
+        haz.y = baseY + ratio * ratio * maxDrop
+      } else {
+        haz.y = baseY
+      }
+      if (
+        phase >= 0.45 &&
+        phase < 1.4 &&
+        hero.invincibleTimer <= 0 &&
+        aabbOverlap(hero.x + 4, hero.y + 4, hero.w - 8, hero.h - 6, haz.x, haz.y, haz.w, haz.h)
+      ) {
+        applyHeroDamage(hero, events)
+        if (events.stageDefeated) return events
+      }
+      continue
+    }
+
     if (haz.kind === 'rotating_hazard') {
       haz.angle = (haz.angle || 0) + dt * 2.6
       const rad = haz.radius || 48
@@ -728,7 +774,7 @@ export function stepPlatformerSimulation(
     }
 
     let isActive = true
-    if (haz.kind === 'timed_arc' && haz.period && haz.onTime) {
+    if ((haz.kind === 'timed_arc' || haz.kind === 'laser_beam') && haz.period && haz.onTime) {
       const phase = (elapsedSec + (haz.offset || 0)) % haz.period
       isActive = phase < haz.onTime
     }
@@ -744,8 +790,8 @@ export function stepPlatformerSimulation(
   }
 
   // --------------------------------------------------------------------------
-  // 12. ENEMY STATE MACHINE & COMBAT (8 UNIQUE ENEMY TYPES — SECTION 7)
-  // States: IDLE -> PATROL -> DETECT -> ATTACK -> RECOVER -> DEFEATED
+  // 12. ENEMY STATE MACHINE & COMBAT (8 STAGE-DISTINCT ENEMY TYPES — V12)
+  // States: IDLE -> PATROL -> DETECT -> ATTACK -> RETREAT -> RECOVER -> DEFEATED
   // --------------------------------------------------------------------------
   const heroCenterX = hero.x + hero.w * 0.5
   const heroCenterY = hero.y + hero.h * 0.5
@@ -758,33 +804,483 @@ export function stepPlatformerSimulation(
     const enemyCenterY = enemy.y + enemy.h * 0.5
     const distToHero = Math.hypot(heroCenterX - enemyCenterX, heroCenterY - enemyCenterY)
 
-    // Update AI State Machine
-    if (!enemy.aiState) enemy.aiState = 'patrol'
+    if (!enemy.aiState) {
+      enemy.aiState = enemy.kind === 'assembly_mimic' ? 'idle' : 'patrol'
+    }
     enemy.aiTimer = (enemy.aiTimer || 0) + dt
 
-    if (distToHero < 190 && enemy.aiState === 'patrol') {
-      enemy.aiState = 'detect'
-      enemy.aiTimer = 0
-    } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.35) {
-      enemy.aiState = 'attack'
-      enemy.aiTimer = 0
-    } else if (enemy.aiState === 'attack' && enemy.aiTimer > 1.1) {
-      enemy.aiState = 'recover'
-      enemy.aiTimer = 0
-    } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.55) {
-      enemy.aiState = 'patrol'
-      enemy.aiTimer = 0
-    }
+    let speedMult = 1.0
 
-    // Species-specific movement behavior
-    const speedMult =
-      enemy.aiState === 'attack'
-        ? enemy.kind === 'security_robot' || enemy.kind === 'cable_snake'
-          ? 1.55
-          : 1.25
-        : enemy.aiState === 'recover'
-        ? 0.45
-        : 1.0
+    switch (enemy.kind) {
+      // ======================================================================
+      // STAGE 1 MONSTERS — مدينة النور
+      // ======================================================================
+      case 'shadow_runner':
+      case 'shadow_bug':
+      case 'electrical_spark': {
+        // Shadow Runner (عدّاء الظل): Fast ground creature that changes direction dynamically
+        if (distToHero < 210 && Math.abs(heroCenterY - enemyCenterY) < 90 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.28) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.85) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.4) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'attack'
+            ? 1.72
+            : enemy.aiState === 'detect'
+            ? 0.35
+            : enemy.aiState === 'recover'
+            ? 0.55
+            : 1.1
+        break
+      }
+
+      case 'rooftop_jumper': {
+        // Rooftop Jumper (قافز الأسطح): Leaps parabolically between platforms/rooftops
+        if (enemy.baseY === undefined) enemy.baseY = enemy.y
+        if (enemy.vy === undefined) enemy.vy = 0
+        if (enemy.aiState === 'patrol' && (distToHero < 220 || enemy.aiTimer > 1.6)) {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.32) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+          enemy.vy = -350
+          if (distToHero < 240) {
+            enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+          }
+        }
+        if (enemy.y < enemy.baseY || (enemy.vy && enemy.vy < 0)) {
+          enemy.vy = (enemy.vy || 0) + 980 * dt
+          enemy.y += enemy.vy * dt
+          if (enemy.y >= enemy.baseY) {
+            enemy.y = enemy.baseY
+            enemy.vy = 0
+            enemy.aiState = 'recover'
+            enemy.aiTimer = 0
+          }
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.45) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult = enemy.aiState === 'attack' ? 1.45 : enemy.aiState === 'detect' ? 0.25 : 1.0
+        break
+      }
+
+      case 'street_guardian': {
+        // Street Guardian (حارس الشارع): Heavy defensive enemy protecting key routes
+        if (distToHero < 200 && Math.abs(heroCenterY - enemyCenterY) < 95 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.52) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.85) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.65) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'detect'
+            ? 0.15
+            : enemy.aiState === 'attack'
+            ? 1.65
+            : enemy.aiState === 'recover'
+            ? 0.35
+            : 0.95
+        break
+      }
+
+      // ======================================================================
+      // STAGE 2 MONSTERS — الإنارة فرع البيضاء (ORANGE WORLD)
+      // ======================================================================
+      case 'copper_scorpion':
+      case 'cable_crawler':
+      case 'cable_snake': {
+        // Copper Scorpion (عقرب النحاس): Crawls, strikes with mechanical tail, and retreats after attacking
+        if (distToHero < 195 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.38) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.65) {
+          enemy.aiState = 'retreat'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? -Math.abs(enemy.vx) : Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'retreat' && enemy.aiTimer > 0.85) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.45) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'attack'
+            ? 1.75
+            : enemy.aiState === 'retreat'
+            ? 1.45
+            : enemy.aiState === 'detect'
+            ? 0.2
+            : enemy.aiState === 'recover'
+            ? 0.5
+            : 1.0
+        break
+      }
+
+      case 'magnetic_crusher': {
+        // Magnetic Crusher (الساحق المغناطيسي): Pulls player toward it and activates crushing attacks
+        if (distToHero < 235 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.55) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.95) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.7) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        // Magnetic Pull effect on Hero during detect/attack when within 225px
+        if ((enemy.aiState === 'detect' || enemy.aiState === 'attack') && distToHero < 225 && distToHero > 28) {
+          const pullDir = enemyCenterX > heroCenterX ? 1 : -1
+          hero.x += pullDir * 68 * dt
+        }
+        speedMult =
+          enemy.aiState === 'detect'
+            ? 0.2
+            : enemy.aiState === 'attack'
+            ? 1.55
+            : enemy.aiState === 'recover'
+            ? 0.3
+            : 0.9
+        break
+      }
+
+      case 'orange_spark': {
+        // Orange Spark (الشرارة البرتقالية): Fast electrical creature accelerating near power nodes/hero
+        if (distToHero < 220 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 1.1) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        const sparkPulse = 1.0 + 0.35 * Math.abs(Math.sin(elapsedSec * 7.0 + enemy.minX * 0.02))
+        speedMult = enemy.aiState === 'attack' ? 1.8 : sparkPulse
+        break
+      }
+
+      // ======================================================================
+      // STAGE 3 MONSTERS — مصنع الإنارة (FACTORY)
+      // ======================================================================
+      case 'gear_beast':
+      case 'industrial_robot':
+      case 'mechanical_spider': {
+        // Gear Beast (وحش التروس): Rotating gear body that rolls & accelerates during attacks
+        if (distToHero < 220 && Math.abs(heroCenterY - enemyCenterY) < 90 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.42) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.95) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.55) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'detect'
+            ? 0.15
+            : enemy.aiState === 'attack'
+            ? 1.92
+            : enemy.aiState === 'recover'
+            ? 0.4
+            : 1.05
+        break
+      }
+
+      case 'welding_drone':
+      case 'energy_drone':
+      case 'flying_drone': {
+        // Welding Drone (طائرة اللحام): Patrols elevated routes, fires short-range welding beams & repositions
+        if (distToHero < 210 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.4) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.9) {
+          enemy.aiState = 'retreat'
+          enemy.aiTimer = 0
+          enemy.vx = -enemy.vx
+        } else if (enemy.aiState === 'retreat' && enemy.aiTimer > 0.65) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'attack'
+            ? 1.45
+            : enemy.aiState === 'retreat'
+            ? 1.35
+            : enemy.aiState === 'detect'
+            ? 0.3
+            : 1.0
+        if (enemy.baseY !== undefined) {
+          const waveOffset = Math.sin(elapsedSec * 3.8 + enemy.minX * 0.04) * 18
+          const swoopDip = enemy.aiState === 'attack' ? Math.sin(enemy.aiTimer * Math.PI) * 32 : 0
+          enemy.y = enemy.baseY + waveOffset + swoopDip
+        }
+        break
+      }
+
+      case 'assembly_mimic': {
+        // Assembly Mimic (المحاكي الآلي): Disguised as inactive machinery until approached, warns & attacks
+        if (enemy.aiState === 'idle') {
+          speedMult = 0
+          if (distToHero < 195) {
+            enemy.aiState = 'detect'
+            enemy.aiTimer = 0
+            enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+          }
+        } else if (enemy.aiState === 'detect') {
+          speedMult = 0.1
+          if (enemy.aiTimer > 0.48) {
+            enemy.aiState = 'attack'
+            enemy.aiTimer = 0
+          }
+        } else if (enemy.aiState === 'attack') {
+          speedMult = 1.85
+          if (enemy.aiTimer > 0.95) {
+            enemy.aiState = 'recover'
+            enemy.aiTimer = 0
+          }
+        } else if (enemy.aiState === 'recover') {
+          speedMult = 0.35
+          if (enemy.aiTimer > 0.6) {
+            enemy.aiState = distToHero < 250 ? 'patrol' : 'idle'
+            enemy.aiTimer = 0
+          }
+        } else {
+          speedMult = 1.05
+          if (distToHero < 185 && enemy.aiTimer > 0.9) {
+            enemy.aiState = 'detect'
+            enemy.aiTimer = 0
+          } else if (distToHero > 310) {
+            enemy.aiState = 'idle'
+            enemy.aiTimer = 0
+          }
+        }
+        break
+      }
+
+      // ======================================================================
+      // STAGE 4 MONSTERS — الإنارة فرع الليثي (BLUE WORLD)
+      // ======================================================================
+      case 'blue_phantom':
+      case 'light_thief': {
+        // Blue Phantom (الطيف الأزرق): Phases/teleports between positions & attacks with energy bursts
+        if (distToHero < 220 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.32) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+          // Phase-blink step toward hero within patrol bounds
+          const blinkDir = heroCenterX >= enemyCenterX ? 1 : -1
+          enemy.x = Math.max(enemy.minX, Math.min(enemy.maxX - enemy.w, enemy.x + blinkDir * 42))
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.85) {
+          enemy.aiState = 'retreat'
+          enemy.aiTimer = 0
+          enemy.vx = -enemy.vx
+        } else if (enemy.aiState === 'retreat' && enemy.aiTimer > 0.6) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'attack'
+            ? 1.75
+            : enemy.aiState === 'retreat'
+            ? 1.4
+            : enemy.aiState === 'detect'
+            ? 0.25
+            : 1.15
+        break
+      }
+
+      case 'electric_spider': {
+        // Electric Spider (العنكبوت الكهربائي): Climbs vertically & drops to create temporary electrical traps
+        if (enemy.baseY === undefined) enemy.baseY = enemy.y
+        if (distToHero < 210 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.35) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.95) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.55) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        const climbWave = Math.sin(elapsedSec * 4.2 + enemy.minX * 0.03) * 34
+        const dropOffset = enemy.aiState === 'attack' ? 46 * Math.sin(enemy.aiTimer * Math.PI) : 0
+        enemy.y = enemy.baseY + climbWave + dropOffset
+        speedMult = enemy.aiState === 'attack' ? 1.4 : enemy.aiState === 'detect' ? 0.3 : 1.0
+        break
+      }
+
+      case 'pulse_sentinel':
+      case 'security_bot':
+      case 'security_robot': {
+        // Pulse Sentinel (حارس النبض الأزرق): Scans player, activates directional energy attacks & repositions
+        if (distToHero < 225 && Math.abs(heroCenterY - enemyCenterY) < 95 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.45) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.85) {
+          enemy.aiState = 'retreat'
+          enemy.aiTimer = 0
+          enemy.vx = -enemy.vx
+        } else if (enemy.aiState === 'retreat' && enemy.aiTimer > 0.55) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'detect'
+            ? 0.15
+            : enemy.aiState === 'attack'
+            ? 1.78
+            : enemy.aiState === 'retreat'
+            ? 1.35
+            : 1.0
+        break
+      }
+
+      // ======================================================================
+      // STAGE 5 MONSTERS — قلعة الظلام (DARKNESS FORTRESS)
+      // ======================================================================
+      case 'void_flyer':
+      case 'flying_guardian':
+      case 'giant_guardian': {
+        // Void Flyer (طائر الفراغ): Complex dual-frequency aerial flight & swoop patterns
+        if (distToHero < 220 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.4) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 1.0) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.5) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'attack'
+            ? 1.62
+            : enemy.aiState === 'detect'
+            ? 0.3
+            : enemy.aiState === 'recover'
+            ? 0.55
+            : 1.1
+        if (enemy.baseY !== undefined) {
+          const complexWave =
+            Math.sin(elapsedSec * 3.6 + enemy.minX * 0.03) * 22 +
+            Math.cos(elapsedSec * 6.2 + enemy.maxX * 0.02) * 10
+          const dive = enemy.aiState === 'attack' ? Math.sin(enemy.aiTimer * Math.PI) * 34 : 0
+          enemy.y = enemy.baseY + complexWave + dive
+        }
+        break
+      }
+
+      case 'shadow_brute': {
+        // Shadow Brute (عملاق الظل): Heavy armored enemy with powerful area shockwave attacks
+        if (distToHero < 215 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.58) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.9) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.75) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'detect'
+            ? 0.1
+            : enemy.aiState === 'attack'
+            ? 1.7
+            : enemy.aiState === 'recover'
+            ? 0.3
+            : 0.92
+        break
+      }
+
+      case 'fortress_guardian':
+      case 'dark_stalker':
+      case 'dark_sentinel':
+      case 'transformer_monster':
+      case 'shadow_creature':
+      default: {
+        // Dark Stalker (مطارد الظلام) & Fortress Guardian (حارس القلعة): Multi-pattern pursuit & slash
+        if (distToHero < 225 && enemy.aiState === 'patrol') {
+          enemy.aiState = 'detect'
+          enemy.aiTimer = 0
+          enemy.attackPattern = ((enemy.attackPattern || 0) + 1) % 2
+          enemy.vx = heroCenterX >= enemyCenterX ? Math.abs(enemy.vx) : -Math.abs(enemy.vx)
+        } else if (enemy.aiState === 'detect' && enemy.aiTimer > 0.45) {
+          enemy.aiState = 'attack'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'attack' && enemy.aiTimer > 0.95) {
+          enemy.aiState = 'recover'
+          enemy.aiTimer = 0
+        } else if (enemy.aiState === 'recover' && enemy.aiTimer > 0.55) {
+          enemy.aiState = 'patrol'
+          enemy.aiTimer = 0
+        }
+        speedMult =
+          enemy.aiState === 'detect'
+            ? 0.15
+            : enemy.aiState === 'attack'
+            ? enemy.attackPattern === 0
+              ? 1.85
+              : 1.55
+            : enemy.aiState === 'recover'
+            ? 0.4
+            : 1.08
+        break
+      }
+    }
 
     enemy.x += enemy.vx * speedMult * dt
     if (enemy.x <= enemy.minX) {
@@ -795,13 +1291,8 @@ export function stepPlatformerSimulation(
       enemy.vx = -Math.abs(enemy.vx)
     }
 
-    // Flying drone sinusoidal hover
-    if (enemy.kind === 'flying_drone' && enemy.baseY !== undefined) {
-      enemy.y = enemy.baseY + Math.sin(elapsedSec * 3.5 + enemy.minX * 0.05) * 18
-    }
-
     // Check if Hero's Light Bulb Pulse Attack hits nearby enemy
-    if (isPulseAttacking && distToHero < 74) {
+    if (isPulseAttacking && distToHero < 76) {
       enemy.defeated = true
       enemy.aiState = 'defeated'
       events.stompedEnemyId = enemy.id
@@ -834,22 +1325,41 @@ export function stepPlatformerSimulation(
   }
 
   // --------------------------------------------------------------------------
-  // 13. BOSS ENCOUNTERS & 3-PHASE FINAL BOSS (LEVELS 2, 5, 7, 8)
+  // 13. V13 MULTI-PHASE STAGE BOSS ENCOUNTERS (ALL 5 STAGES)
   // --------------------------------------------------------------------------
   if (stage.boss && stage.boss.state !== 'defeated') {
     const boss = stage.boss
     if (boss.invulnTimer > 0) boss.invulnTimer = Math.max(0, boss.invulnTimer - dt)
     boss.stateTimer -= dt
 
-    // Determine dynamic phase (especially for Level 8 3-Phase Boss)
+    // Determine dynamic phase (4 phases for Blue Sentinel, 3 phases for Orange Crusher / Factory Overlord / Shadow Core)
     const hpRatio = boss.hp / boss.maxHp
-    const targetPhase: 1 | 2 | 3 = hpRatio <= 0.34 ? 3 : hpRatio <= 0.67 ? 2 : 1
+    let targetPhase: 1 | 2 | 3 | 4 = 1
+    if (boss.archetype === 'blue_sentinel_boss') {
+      targetPhase = hpRatio <= 0.25 ? 4 : hpRatio <= 0.5 ? 3 : hpRatio <= 0.75 ? 2 : 1
+    } else {
+      targetPhase = hpRatio <= 0.34 ? 3 : hpRatio <= 0.67 ? 2 : 1
+    }
     if (targetPhase !== boss.phase) {
       boss.phase = targetPhase
       events.bossPhaseChanged = targetPhase
     }
 
-    const phaseSpeedMult = boss.phase === 3 ? 1.38 : boss.phase === 2 ? 1.18 : 1.0
+    const phaseSpeedMult =
+      boss.phase === 4 ? 1.48 : boss.phase === 3 ? 1.35 : boss.phase === 2 ? 1.18 : 1.0
+
+    // Stage 2 Boss (THE ORANGE CRUSHER): Magnetic Pull Zone in Phase 2+ during telegraph/shockwave
+    if (
+      boss.archetype === 'orange_crusher_boss' &&
+      boss.phase >= 2 &&
+      (boss.state === 'telegraph' || boss.state === 'shockwave')
+    ) {
+      const bossCenterX = boss.x + boss.w * 0.5
+      const distX = bossCenterX - heroCenterX
+      if (Math.abs(distX) < 340 && Math.abs(distX) > 42) {
+        hero.x += Math.sign(distX) * 75 * dt
+      }
+    }
 
     // Update Arena Breaker Switches
     for (const brk of boss.breakers) {
@@ -862,7 +1372,7 @@ export function stepPlatformerSimulation(
         aabbOverlap(hero.x, hero.y, hero.w, hero.h, brk.x - 24, brk.y - 46, 48, 50)
       ) {
         brk.activated = true
-        brk.cooldown = 11.0
+        brk.cooldown = 10.5
         damageBoss(boss, events)
       }
     }
@@ -880,41 +1390,66 @@ export function stepPlatformerSimulation(
 
       if (boss.stateTimer <= 0) {
         boss.state = 'telegraph'
-        boss.stateTimer = boss.phase === 3 ? 0.65 : 0.85
+        boss.stateTimer = boss.phase >= 3 ? 0.62 : 0.82
+        // Stage 4 Boss (THE BLUE SENTINEL): Teleportation step in Phase 2+
+        if (boss.archetype === 'blue_sentinel_boss' && boss.phase >= 2) {
+          const span = boss.maxX - boss.minX - boss.w
+          if (span > 100) {
+            const targetX =
+              heroCenterX < (boss.minX + boss.maxX) * 0.5
+                ? boss.maxX - boss.w - 40
+                : boss.minX + 40
+            boss.x = Math.max(boss.minX, Math.min(boss.maxX - boss.w, targetX))
+          }
+        }
       }
     } else if (boss.state === 'telegraph') {
       if (boss.stateTimer <= 0) {
         boss.state = 'shockwave'
-        boss.stateTimer = 1.55
+        boss.stateTimer = 1.5
         boss.shockwaveActive = true
         boss.shockwaveLeftX = boss.x + boss.w * 0.25
         boss.shockwaveRightX = boss.x + boss.w * 0.75
         boss.shockwaveY = stage.groundY - 36
 
-        // Spawn aimed electrical projectiles in Phase 2/3 or for Transformer/Dark King
-        if (
-          boss.archetype === 'transformer_guardian_boss' ||
-          boss.archetype === 'construction_robot_boss' ||
-          boss.archetype === 'electric_dark_king_boss'
-        ) {
-          const count = boss.phase === 3 ? 3 : boss.phase === 2 ? 2 : 1
-          for (let i = 0; i < count; i++) {
-            const angle = Math.atan2(
-              heroCenterY - (boss.y + 30),
-              heroCenterX - (boss.x + boss.w * 0.5)
-            ) + (i - (count - 1) * 0.5) * 0.24
-            const spd = 235 + boss.phase * 25
-            boss.projectiles.push({
-              id: Date.now() + i,
-              x: boss.x + boss.w * 0.5,
-              y: boss.y + 32,
-              vx: Math.cos(angle) * spd,
-              vy: Math.sin(angle) * spd,
-              radius: 9,
-              color: boss.archetype === 'electric_dark_king_boss' ? '#F43F5E' : '#38BDF8',
-              life: 3.2,
-            })
-          }
+        // Spawn aimed projectiles based on Boss Archetype & Phase
+        const count =
+          boss.archetype === 'street_guardian_boss'
+            ? boss.phase >= 2
+              ? 2
+              : 1
+            : boss.phase >= 3
+            ? 3
+            : boss.phase === 2
+            ? 2
+            : 1
+
+        const projColor =
+          boss.archetype === 'orange_crusher_boss'
+            ? '#F97316'
+            : boss.archetype === 'factory_overlord_boss'
+            ? '#FACC15'
+            : boss.archetype === 'blue_sentinel_boss'
+            ? '#38BDF8'
+            : boss.archetype === 'shadow_core_boss' || boss.archetype === 'electric_dark_king_boss'
+            ? '#F43F5E'
+            : '#0EA5E9'
+
+        for (let i = 0; i < count; i++) {
+          const angle =
+            Math.atan2(heroCenterY - (boss.y + 30), heroCenterX - (boss.x + boss.w * 0.5)) +
+            (i - (count - 1) * 0.5) * 0.22
+          const spd = 230 + boss.phase * 24
+          boss.projectiles.push({
+            id: Date.now() + i,
+            x: boss.x + boss.w * 0.5,
+            y: boss.y + 32,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            radius: 9,
+            color: projColor,
+            life: 3.2,
+          })
         }
       }
     } else if (boss.state === 'shockwave') {
@@ -924,12 +1459,12 @@ export function stepPlatformerSimulation(
       if (boss.stateTimer <= 0) {
         boss.shockwaveActive = false
         boss.state = 'vulnerable'
-        boss.stateTimer = boss.phase === 3 ? 1.8 : 2.2
+        boss.stateTimer = boss.phase >= 3 ? 1.8 : 2.2
       }
     } else if (boss.state === 'vulnerable') {
       if (boss.stateTimer <= 0) {
         boss.state = 'patrol'
-        boss.stateTimer = boss.phase === 3 ? 1.9 : 2.6
+        boss.stateTimer = boss.phase >= 3 ? 1.85 : 2.5
       }
     }
 

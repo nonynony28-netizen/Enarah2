@@ -2172,8 +2172,8 @@ export default function HomeCleanWhitePreview() {
 
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
                 {isAr
-                  ? 'العب الآن مباشرة! تحكم ببطل الإنارة الذكي، وانطلق عبر 8 عوالم كهربائية متنوعة لجمع منتجات الإنارة وتخطي العقبات وهزيمة زعيم الظلام.'
-                  : 'Play directly right here! Guide our Light Hero across 8 unique electrical worlds, collect lighting products, and defeat the Darkness Boss.'}
+                  ? 'العب الآن مباشرة! تحكم ببطل الإنارة الذكي، وانطلق عبر 5 عوالم كهربائية متنوعة لجمع منتجات الإنارة وتخطي العقبات وهزيمة زعيم الظلام.'
+                  : 'Play directly right here! Guide our Light Hero across 5 unique electrical worlds, collect lighting products, and defeat the Darkness Boss.'}
               </p>
             </div>
 
@@ -2181,7 +2181,7 @@ export default function HomeCleanWhitePreview() {
             <div className="flex flex-wrap items-center gap-3">
               <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-semibold">
                 <Trophy className="w-4 h-4 text-amber-400" />
-                <span>{isAr ? '8 مراحل ومواجهات زعماء' : '8 Worlds & Boss Battles'}</span>
+                <span>{isAr ? '5 مراحل ومواجهات زعماء' : '5 Worlds & Boss Battles'}</span>
               </div>
 
               <Link
@@ -2268,8 +2268,8 @@ export default function HomeCleanWhitePreview() {
                 </h4>
                 <p className="text-slate-400 text-xs leading-relaxed font-normal">
                   {isAr
-                    ? 'أكمل المراحل الثماني بأعلى النقاط وسجل اسمك في لوحة شرف أبطال الإنارة الأسبوعية.'
-                    : 'Complete all 8 stages with the highest score and claim your spot on the weekly leaderboard.'}
+                    ? 'أكمل المراحل الخمس بأعلى النقاط وسجل اسمك في لوحة شرف أبطال الإنارة الأسبوعية.'
+                    : 'Complete all 5 stages with the highest score and claim your spot on the weekly leaderboard.'}
                 </p>
               </div>
             </div>

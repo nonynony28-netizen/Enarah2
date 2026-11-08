@@ -244,20 +244,57 @@ export interface CheckpointLamp {
 }
 
 // ============================================================================
-// SECTION 7 — 8 UNIQUE ENEMY TYPES & STATE MACHINE
+// SECTION 7 & V13 SECTION 4–9 — 16 STAGE-UNIQUE MONSTER SPECIES & AI FSM
 // ============================================================================
 
 export type EnemyKind =
-  | 'electrical_spark'    // شرارات كهربائية
-  | 'cable_snake'         // أفاعي الكابلات
-  | 'flying_drone'        // طائرات درون طائرة
-  | 'mechanical_spider'   // عناكب ميكانيكية
-  | 'security_robot'      // روبوتات الحراسة
-  | 'shadow_creature'     // كائنات الظل
-  | 'transformer_monster' // وحوش المحولات
-  | 'giant_guardian'      // الحراس العمالقة
+  // Stage 1 (مدينة النور):
+  | 'shadow_runner'       // عدّاء الظل — Fast ground creature that changes direction dynamically
+  | 'rooftop_jumper'      // قافز الأسطح — Leaps parabolically between platforms/rooftops
+  | 'street_guardian'     // حارس الشارع — Heavy defensive enemy protecting key routes
+  // Stage 2 (الإنارة فرع البيضاء — Industrial Orange World):
+  | 'copper_scorpion'     // عقرب النحاس — Crawls along platforms, strikes with mechanical tail, retreats
+  | 'magnetic_crusher'    // الساحق المغناطيسي — Heavy magnetic machine that pulls player & crushes
+  | 'orange_spark'        // الشرارة البرتقالية — Fast electrical creature accelerating near power nodes
+  // Stage 3 (مصنع الإنارة — Dangerous Mechanical Factory):
+  | 'gear_beast'          // وحش التروس — Rotating gear body that rolls & accelerates during attacks
+  | 'welding_drone'       // طائرة اللحام — Flying machine that patrols, fires short-range welding beams & repositions
+  | 'assembly_mimic'      // المحاكي الآلي — Disguised as inactive machinery until approached, warns & attacks with limbs
+  // Stage 4 (الإنارة فرع الليثي — Advanced Blue Electrical City):
+  | 'blue_phantom'        // الطيف الأزرق — Fast energy enemy that phases/teleports between positions & fires bursts
+  | 'electric_spider'     // العنكبوت الكهربائي — Mechanical spider that climbs vertically & drops electric traps
+  | 'pulse_sentinel'      // حارس النبض الأزرق — Scans player, activates directional energy attacks & repositions
+  // Stage 5 (قلعة الظلام — Final Dark Fortress):
+  | 'dark_stalker'        // مطارد الظلام — Intelligently patrols and pursues the player with lunging slashes
+  | 'void_flyer'          // طائر الفراغ — Flying creature with complex wave/swoop movement patterns
+  | 'shadow_brute'        // عملاق الظل — Heavy armored enemy with powerful area shockwave attacks
+  | 'fortress_guardian'   // حارس القلعة — Advanced defensive machine protecting critical paths
+  // Legacy compatibility aliases
+  | 'shadow_bug'
+  | 'cable_crawler'
+  | 'industrial_robot'
+  | 'light_thief'
+  | 'energy_drone'
+  | 'security_bot'
+  | 'flying_guardian'
+  | 'dark_sentinel'
+  | 'electrical_spark'
+  | 'cable_snake'
+  | 'flying_drone'
+  | 'mechanical_spider'
+  | 'security_robot'
+  | 'shadow_creature'
+  | 'transformer_monster'
+  | 'giant_guardian'
 
-export type EnemyAIState = 'idle' | 'patrol' | 'detect' | 'attack' | 'recover' | 'defeated'
+export type EnemyAIState =
+  | 'idle'
+  | 'patrol'
+  | 'detect'
+  | 'attack'
+  | 'retreat'
+  | 'recover'
+  | 'defeated'
 
 export interface PlatformEnemy {
   id: string
@@ -273,6 +310,7 @@ export interface PlatformEnemy {
   kind: EnemyKind
   aiState?: EnemyAIState
   aiTimer?: number
+  attackPattern?: number
   hp?: number
   maxHp?: number
   defeated: boolean
@@ -285,7 +323,14 @@ export interface StageHazard {
   y: number
   w: number
   h: number
-  kind: 'electric_floor' | 'timed_arc' | 'rotating_hazard' | 'mechanical_press'
+  kind:
+    | 'electric_floor'
+    | 'timed_arc'
+    | 'rotating_hazard'
+    | 'mechanical_press'
+    | 'laser_beam'
+    | 'falling_obstacle'
+    | 'ventilation_fan'
   period?: number
   onTime?: number
   offset?: number
@@ -315,10 +360,16 @@ export interface BossProjectile {
 }
 
 export type BossArchetype =
-  | 'security_robot_boss'        // Level 2 Boss: روبوت الحراسة المدرع
-  | 'transformer_guardian_boss'  // Level 5 Boss: حارس المحطة العملاق
-  | 'construction_robot_boss'    // Level 7 Boss: عملاق البناء الآلي
-  | 'electric_dark_king_boss'    // Level 8 3-Phase Final Boss: ملك الظلام الكهربائي
+  | 'street_guardian_boss'       // Stage 1 Boss: حارس الشارع المدرع — The Street Guardian
+  | 'orange_crusher_boss'        // Stage 2 Boss: الساحق البرتقالي العملاق — The Orange Crusher
+  | 'factory_overlord_boss'      // Stage 3 Boss: سيد المصنع الآلي — The Factory Overlord
+  | 'blue_sentinel_boss'         // Stage 4 Boss: الحارس الأزرق المدرع — The Blue Sentinel
+  | 'shadow_core_boss'           // Stage 5 Final Boss: نواة الظلام — The Shadow Core
+  // Legacy aliases
+  | 'security_robot_boss'
+  | 'transformer_guardian_boss'
+  | 'construction_robot_boss'
+  | 'electric_dark_king_boss'
 
 export interface BossGuardian {
   archetype: BossArchetype
@@ -333,7 +384,7 @@ export interface BossGuardian {
   maxX: number
   hp: number
   maxHp: number
-  phase: 1 | 2 | 3
+  phase: 1 | 2 | 3 | 4
   state: 'patrol' | 'telegraph' | 'shockwave' | 'projectile_barrage' | 'dash_attack' | 'vulnerable' | 'defeated'
   stateTimer: number
   invulnTimer: number
@@ -346,14 +397,14 @@ export interface BossGuardian {
 }
 
 export type FinalChallengeType =
-  | 'three_switches_hazard'    // Level 1: Activate 3 switches while avoiding moving hazards
-  | 'boss_security_robot'      // Level 2: Defeat Security Robot Boss
-  | 'timed_machine_escape'     // Level 3: Escape malfunctioning machine before timer expires
-  | 'intercom_security_puzzle' // Level 4: Multi-stage Intercom & Security Doors puzzle
-  | 'boss_transformer'         // Level 5: Defeat Giant Transformer Guardian
-  | 'timed_power_restoration'  // Level 6: Restore city power generators under time pressure
-  | 'boss_construction_giant'  // Level 7: Defeat Giant Construction Robot in wind & vertical arena
-  | 'boss_dark_king_3phase'    // Level 8: Defeat 3-Phase Electric King of Darkness
+  | 'three_switches_hazard'    // Stage 1: Defeat Street Guardian & restore district lighting
+  | 'boss_security_robot'      // Stage 2: Defeat THE ORANGE CRUSHER in Al-Bayda Branch
+  | 'timed_machine_escape'     // Stage 3: Defeat THE FACTORY OVERLORD & restart production
+  | 'intercom_security_puzzle' // Stage 4: Defeat THE BLUE SENTINEL in Al-Laithi Branch
+  | 'boss_dark_king_3phase'    // Stage 5: Defeat THE SHADOW CORE in Darkness Fortress
+  | 'boss_transformer'
+  | 'timed_power_restoration'
+  | 'boss_construction_giant'
 
 export interface StageDefinition {
   id: string
@@ -404,16 +455,16 @@ export interface WorldDefinition {
 }
 
 // ============================================================================
-// EIGHT PROGRESSIVELY DIFFICULT LEVELS (SECTION 6 & SECTION 8)
+// FIVE HARDCORE MULTI-SECTION LEVELS (V13 SECTIONS 1–9)
 // ============================================================================
 
 export const GAME_STAGES: StageDefinition[] = [
   // ==========================================================================
-  // LEVEL 1 — مدينة النور (THE CITY OF LIGHT)
-  // Environment: Modern city with electrical stores, bright daytime lighting
-  // Enemies: Small electrical sparks
-  // Collectibles: LED bulbs and basic wires (1.5mm, 2.5mm)
-  // Final challenge: Activate 3 electrical switches while avoiding moving hazards
+  // STAGE 1 — مدينة النور (CITY OF LIGHT)
+  // Visual Identity: Living Urban City — Daylight
+  // Multi-Section World (Width: 5200px — Sections A, B, C, D, E + Boss Arena)
+  // Unique Monsters: Shadow Runner (عدّاء الظل), Rooftop Jumper (قافز الأسطح), Street Guardian (حارس الشارع)
+  // Final Boss: The Street Guardian (حارس الشارع المدرع — 4 HP)
   // ==========================================================================
   {
     id: 'lvl-1',
@@ -421,119 +472,225 @@ export const GAME_STAGES: StageDefinition[] = [
     worldNumber: 1,
     stageNumber: 1,
     code: '1-1',
-    titleAr: 'مدينة النور — معارض الإنارة الحديثة',
-    titleEn: 'City of Light — Modern Showrooms',
+    titleAr: 'مدينة النور — شوارع وأسطح الحي التجاري',
+    titleEn: 'City of Light — Urban Rooftops & District Streets',
     worldTitleAr: 'مدينة النور',
     worldTitleEn: 'City of Light',
     subtitleAr:
-      'انطلق بشخصية اللمبة المضيئة عبر شوارع المدينة المشرقة، اجمع أسلاك 1.5 مم² ولمبات LED، ثم فعّل القواطع الثلاثة في نهاية المرحلة!',
-    difficultyAr: 'سهل – متوسط',
-    finalChallengeAr: 'تفعيل 3 قواطع كهربائية مع تفادي الشرارات المتحركة',
+      'انطلق عبر 5 قطاعات حضرية متصلة في مدينة النور: تسلّق أسطح المباني السكنية، تجاوز «عدّاء الظل» و«قافز الأسطح» و«حارس الشارع»، واهزم حارس الشارع المدرع لإعادة الإنارة إلى الحي!',
+    difficultyAr: 'متوسط – متقدم',
+    finalChallengeAr: 'هزيمة حارس الشارع المدرع (The Street Guardian) وتفعيل قواطع إنارة الحي الثلاثة',
     finalChallengeType: 'three_switches_hazard',
     theme: 'city_of_light',
     accentColor: '#0284C7',
-    skyTop: '#38BDF8',
+    skyTop: '#0284C7',
     skyBottom: '#E0F2FE',
-    width: 2650,
+    width: 5200,
     height: 560,
     groundY: 480,
     heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2510, y: 405, labelAr: 'بوابة معرض الإنارة الحديثة' },
+    goalPortal: { x: 5040, y: 405, labelAr: 'بوابة الإنارة فرع البيضاء' },
     platforms: [
-      { id: 'l1-p1', x: 0, y: 480, w: 680, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l1-p2', x: 240, y: 380, w: 145, h: 24, kind: 'solid', material: 'brick' },
-      { id: 'l1-p3', x: 430, y: 315, w: 155, h: 24, kind: 'solid', material: 'brick' },
-      { id: 'l1-p4', x: 750, y: 480, w: 640, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l1-p5', x: 880, y: 370, w: 170, h: 24, kind: 'solid', material: 'steel' },
-      { id: 'l1-p6', x: 1110, y: 295, w: 180, h: 24, kind: 'solid', material: 'copper', isSecret: true },
-      // Final Challenge Arena (3 Switches on elevated & ground tiers)
-      { id: 'l1-p7', x: 1460, y: 480, w: 1190, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l1-p8', x: 1580, y: 375, w: 165, h: 24, kind: 'solid', material: 'brick' },
-      { id: 'l1-p9', x: 1830, y: 310, w: 180, h: 24, kind: 'solid', material: 'steel' },
-      { id: 'l1-p10', x: 2090, y: 375, w: 165, h: 24, kind: 'solid', material: 'brick' },
+      // Section A (0–1000): Introduction & First Urban Obstacles
+      { id: 'l1-p1', x: 0, y: 480, w: 640, h: 80, kind: 'solid', material: 'concrete' },
+      { id: 'l1-p2', x: 220, y: 385, w: 150, h: 24, kind: 'solid', material: 'brick' },
+      { id: 'l1-p3', x: 420, y: 315, w: 165, h: 24, kind: 'solid', material: 'brick' },
+      {
+        id: 'l1-p4',
+        x: 680,
+        y: 415,
+        w: 145,
+        h: 22,
+        kind: 'moving',
+        material: 'steel',
+        startX: 665,
+        startY: 420,
+        endX: 870,
+        endY: 360,
+        speed: 90,
+      },
+      // Section B (1000–2050): Multi-Story Apartment Rooftops & Vertical Shortcuts
+      { id: 'l1-p5', x: 940, y: 480, w: 680, h: 80, kind: 'solid', material: 'concrete' },
+      { id: 'l1-p6', x: 1090, y: 375, w: 165, h: 24, kind: 'solid', material: 'brick' },
+      { id: 'l1-p7', x: 1310, y: 295, w: 175, h: 24, kind: 'solid', material: 'steel' },
+      { id: 'l1-p8', x: 1520, y: 220, w: 190, h: 22, kind: 'secret_spotlight', material: 'copper', isSecret: true },
+      { id: 'l1-p9', x: 1690, y: 480, w: 460, h: 80, kind: 'solid', material: 'concrete' },
+      { id: 'l1-p10', x: 1780, y: 365, w: 170, h: 24, kind: 'solid', material: 'brick' },
+      // Section C (2050–3150): Utility Poles, Maintenance Lifts & First Switch Puzzle
+      { id: 'l1-p11', x: 2220, y: 480, w: 880, h: 80, kind: 'solid', material: 'concrete' },
+      {
+        id: 'l1-p12',
+        x: 2350,
+        y: 375,
+        w: 150,
+        h: 22,
+        kind: 'moving',
+        material: 'steel',
+        startX: 2320,
+        startY: 390,
+        endX: 2540,
+        endY: 310,
+        speed: 105,
+      },
+      { id: 'l1-p13', x: 2620, y: 290, w: 190, h: 24, kind: 'solid', material: 'copper' },
+      { id: 'l1-p14', x: 2860, y: 370, w: 170, h: 24, kind: 'solid', material: 'brick' },
+      // Section D (3150–4120): High-Density Rooftop Gauntlet & Street Guardians
+      { id: 'l1-p15', x: 3170, y: 480, w: 920, h: 80, kind: 'solid', material: 'concrete' },
+      { id: 'l1-p16', x: 3290, y: 380, w: 155, h: 24, kind: 'solid', material: 'brick' },
+      { id: 'l1-p17', x: 3500, y: 300, w: 170, h: 24, kind: 'solid', material: 'steel' },
+      { id: 'l1-p18', x: 3730, y: 230, w: 175, h: 22, kind: 'solid', material: 'copper', isSecret: true },
+      { id: 'l1-p19', x: 3760, y: 375, w: 185, h: 24, kind: 'solid', material: 'brick' },
+      // Section E + Boss Arena (4120–5200): The Street Guardian District Plaza
+      { id: 'l1-p20', x: 4150, y: 480, w: 1050, h: 80, kind: 'solid', material: 'concrete' },
+      { id: 'l1-p21', x: 4280, y: 370, w: 160, h: 22, kind: 'solid', material: 'steel' },
+      { id: 'l1-p22', x: 4540, y: 305, w: 180, h: 22, kind: 'solid', material: 'copper' },
+      { id: 'l1-p23', x: 4800, y: 370, w: 160, h: 22, kind: 'solid', material: 'steel' },
     ],
     collectibles: [
-      { id: 'l1-c1', x: 190, y: 435, kind: 'wire_1_5mm', value: 100, collected: false },
-      { id: 'l1-c2', x: 310, y: 335, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l1-c3', x: 505, y: 270, kind: 'wire_1_5mm', value: 100, collected: false },
-      { id: 'l1-c4', x: 820, y: 435, kind: 'wire_2_5mm', value: 150, collected: false },
-      { id: 'l1-c5', x: 965, y: 325, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l1-c6', x: 1195, y: 250, kind: 'led_spotlight', value: 240, collected: false, isSecret: true },
-      { id: 'l1-c7', x: 1660, y: 330, kind: 'wire_1_5mm', value: 100, collected: false },
-      { id: 'l1-c8', x: 1920, y: 265, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l1-c9', x: 2170, y: 330, kind: 'wire_2_5mm', value: 150, collected: false },
+      { id: 'l1-c1', x: 180, y: 435, kind: 'wire_1_5mm', value: 100, collected: false },
+      { id: 'l1-c2', x: 295, y: 340, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l1-c3', x: 500, y: 270, kind: 'wire_2_5mm', value: 150, collected: false },
+      { id: 'l1-c4', x: 775, y: 335, kind: 'led_spotlight', value: 240, collected: false },
+      { id: 'l1-c5', x: 1170, y: 330, kind: 'wire_1_5mm', value: 100, collected: false },
+      { id: 'l1-c6', x: 1395, y: 250, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l1-c7', x: 1610, y: 175, kind: 'outdoor_fixture', value: 260, collected: false, isSecret: true },
+      { id: 'l1-c8', x: 1865, y: 320, kind: 'wire_2_5mm', value: 150, collected: false },
+      { id: 'l1-c9', x: 2715, y: 245, kind: 'electrical_switch_item', value: 180, collected: false },
+      { id: 'l1-c10', x: 2945, y: 325, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l1-c11', x: 3585, y: 255, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l1-c12', x: 3815, y: 185, kind: 'led_spotlight', value: 240, collected: false, isSecret: true },
+      { id: 'l1-c13', x: 4360, y: 325, kind: 'wire_2_5mm', value: 150, collected: false },
+      { id: 'l1-c14', x: 4630, y: 260, kind: 'led_bulb', value: 250, collected: false },
     ],
     switches: [
-      { id: 'l1-sw1', x: 1660, y: 375, activated: false, targetId: 'l1-gate', labelAr: 'قاطع النور 1/3' },
-      { id: 'l1-sw2', x: 1920, y: 310, activated: false, targetId: 'l1-gate', labelAr: 'قاطع النور 2/3' },
-      { id: 'l1-sw3', x: 2170, y: 375, activated: false, targetId: 'l1-gate', labelAr: 'قاطع النور 3/3' },
+      { id: 'l1-sw1', x: 2715, y: 290, activated: false, targetId: 'l1-gate1', labelAr: 'قاطع تغذية الأسطح (1/3)' },
+      { id: 'l1-sw2', x: 3850, y: 375, activated: false, targetId: 'l1-gate2', labelAr: 'قاطع المحلات التجارية (2/3)' },
+      { id: 'l1-sw3', x: 4630, y: 305, activated: false, targetId: 'l1-gate3', labelAr: 'قاطع إنارة الحي الرئيسي (3/3)' },
     ],
     gates: [
       {
-        id: 'l1-gate',
-        x: 2370,
+        id: 'l1-gate1',
+        x: 3040,
         y: 350,
         w: 28,
         h: 130,
         isOpen: false,
-        requiredSwitchesCount: 3,
-        labelAr: 'بوابة المعرض (فعّل القواطع الثلاثة 3/3)',
+        switchId: 'l1-sw1',
+        labelAr: 'بوابة القطاع السكني (فعّل قاطع الأسطح 1/3)',
+      },
+      {
+        id: 'l1-gate2',
+        x: 4030,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l1-sw2',
+        labelAr: 'بوابة ساحة الحي (فعّل قاطع المحلات 2/3)',
+      },
+      {
+        id: 'l1-gate3',
+        x: 4960,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l1-sw3',
+        labelAr: 'بوابة فرع البيضاء (اهزم حارس الشارع وفعّل القاطع 3/3)',
       },
     ],
     checkpoints: [
-      { id: 'l1-cp1', x: 790, y: 480, activated: false, labelAr: 'عمود إنارة 1' },
-      { id: 'l1-cp2', x: 1510, y: 480, activated: false, labelAr: 'مدخل ساحة القواطع الثلاثة' },
+      { id: 'l1-cp1', x: 980, y: 480, activated: false, labelAr: 'عمود إنارة الأسطح السكنية (B)' },
+      { id: 'l1-cp2', x: 2260, y: 480, activated: false, labelAr: 'محطة أعمدة الكهرباء (C)' },
+      { id: 'l1-cp3', x: 3210, y: 480, activated: false, labelAr: 'شارع المعارض الكهربائية (D)' },
+      { id: 'l1-cp4', x: 4190, y: 480, activated: false, labelAr: 'ساحة حارس الشارع المدرع (E)' },
     ],
     enemies: [
+      // Section A: Shadow Runner
       {
         id: 'l1-e1',
-        x: 490,
+        x: 460,
         y: 448,
-        w: 32,
+        w: 38,
         h: 32,
-        vx: 95,
-        minX: 340,
-        maxX: 640,
-        kind: 'electrical_spark',
+        vx: 135,
+        minX: 250,
+        maxX: 610,
+        kind: 'shadow_runner',
         defeated: false,
         stompable: true,
       },
+      // Section B: Rooftop Jumper & Shadow Runner
       {
         id: 'l1-e2',
-        x: 1050,
-        y: 448,
-        w: 32,
-        h: 32,
-        vx: -105,
-        minX: 830,
-        maxX: 1320,
-        kind: 'electrical_spark',
+        x: 1260,
+        y: 446,
+        w: 40,
+        h: 34,
+        vx: 110,
+        baseY: 446,
+        minX: 1020,
+        maxX: 1580,
+        kind: 'rooftop_jumper',
         defeated: false,
         stompable: true,
       },
       {
         id: 'l1-e3',
-        x: 1780,
+        x: 1920,
         y: 448,
-        w: 32,
+        w: 38,
         h: 32,
-        vx: 115,
-        minX: 1560,
-        maxX: 2020,
-        kind: 'electrical_spark',
+        vx: -145,
+        minX: 1720,
+        maxX: 2110,
+        kind: 'shadow_runner',
+        defeated: false,
+        stompable: true,
+      },
+      // Section C: Street Guardian & Rooftop Jumper
+      {
+        id: 'l1-e4',
+        x: 2680,
+        y: 434,
+        w: 50,
+        h: 46,
+        vx: 82,
+        minX: 2380,
+        maxX: 2980,
+        kind: 'street_guardian',
+        hp: 2,
+        maxHp: 2,
+        defeated: false,
+        stompable: true,
+      },
+      // Section D: Combined Urban Monsters
+      {
+        id: 'l1-e5',
+        x: 3440,
+        y: 446,
+        w: 40,
+        h: 34,
+        vx: -120,
+        baseY: 446,
+        minX: 3240,
+        maxX: 3680,
+        kind: 'rooftop_jumper',
         defeated: false,
         stompable: true,
       },
       {
-        id: 'l1-e4',
-        x: 2120,
-        y: 448,
-        w: 32,
-        h: 32,
-        vx: -120,
-        minX: 1950,
-        maxX: 2330,
-        kind: 'electrical_spark',
+        id: 'l1-e6',
+        x: 3860,
+        y: 434,
+        w: 50,
+        h: 46,
+        vx: -88,
+        minX: 3660,
+        maxX: 3990,
+        kind: 'street_guardian',
+        hp: 2,
+        maxHp: 2,
         defeated: false,
         stompable: true,
       },
@@ -541,36 +698,74 @@ export const GAME_STAGES: StageDefinition[] = [
     hazards: [
       {
         id: 'l1-h1',
-        x: 1755,
+        x: 1480,
         y: 466,
         w: 55,
         h: 14,
         kind: 'timed_arc',
-        period: 2.8,
-        onTime: 1.1,
+        period: 3.0,
+        onTime: 1.0,
         offset: 0,
       },
       {
         id: 'l1-h2',
-        x: 2020,
+        x: 2760,
         y: 466,
-        w: 55,
+        w: 60,
         h: 14,
         kind: 'timed_arc',
         period: 2.8,
-        onTime: 1.1,
-        offset: 1.4,
+        onTime: 1.0,
+        offset: 0.9,
+      },
+      {
+        id: 'l1-h3',
+        x: 3620,
+        y: 466,
+        w: 62,
+        h: 14,
+        kind: 'timed_arc',
+        period: 2.6,
+        onTime: 1.0,
+        offset: 0.4,
       },
     ],
+    boss: {
+      archetype: 'street_guardian_boss',
+      nameAr: 'حارس الشارع المدرع — The Street Guardian',
+      nameEn: 'The Street Guardian',
+      x: 4680,
+      y: 396,
+      w: 78,
+      h: 84,
+      vx: -115,
+      minX: 4250,
+      maxX: 4910,
+      hp: 4,
+      maxHp: 4,
+      phase: 1,
+      state: 'patrol',
+      stateTimer: 2.2,
+      invulnTimer: 0,
+      shockwaveLeftX: 4680,
+      shockwaveRightX: 4680,
+      shockwaveY: 466,
+      shockwaveActive: false,
+      projectiles: [],
+      breakers: [
+        { id: 'l1-bb1', x: 4355, y: 370, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ درع الحارس 1' },
+        { id: 'l1-bb2', x: 4875, y: 370, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ درع الحارس 2' },
+      ],
+    },
   },
 
   // ==========================================================================
-  // LEVEL 2 — شارع الكهرباء (ELECTRICITY STREET)
-  // Environment: Busy commercial district
-  // New mechanics: Moving platforms & rotating hazards + Dash unlocked
-  // Enemies: Cable snakes & small electrical security robots
-  // Collectibles: Wires (2.5mm, 4mm) and LED spotlights
-  // Final Boss: Security Robot (روبوت الحراسة المدرع)
+  // STAGE 2 — الإنارة فرع البيضاء (ENARAH AL-BAYDA BRANCH)
+  // Visual Identity: Industrial Orange World — Primary Color: ORANGE (#EA580C / #F97316)
+  // Secondary Colors: Dark Charcoal (#18181B), Steel Gray (#475569), Controlled White (#F8FAFC)
+  // Multi-Section World (Width: 5400px — Sections A, B, C, D, E + Boss Arena)
+  // Unique Monsters: Copper Scorpion (عقرب النحاس), Magnetic Crusher (الساحق المغناطيسي), Orange Spark (الشرارة البرتقالية)
+  // Stage Boss: THE ORANGE CRUSHER (الساحق البرتقالي العملاق — 5 HP, 3 Phases)
   // ==========================================================================
   {
     id: 'lvl-2',
@@ -578,102 +773,239 @@ export const GAME_STAGES: StageDefinition[] = [
     worldNumber: 2,
     stageNumber: 1,
     code: '2-1',
-    titleAr: 'شارع الكهرباء — الحي التجاري النابض',
-    titleEn: 'Electricity Street — Commercial District',
-    worldTitleAr: 'شارع الكهرباء',
-    worldTitleEn: 'Electricity Street',
+    titleAr: 'الإنارة فرع البيضاء — المستودعات والرافعات البرتقالية',
+    titleEn: 'Enarah Al-Bayda Branch — Industrial Orange Warehouses',
+    worldTitleAr: 'الإنارة فرع البيضاء',
+    worldTitleEn: 'Enarah Al-Bayda Branch',
     subtitleAr:
-      'اعبر المنصات المتحركة والعوائق الدوارة، التقط سبوت لايت LED لكشف المسارات السرية، واهزم «روبوت الحراسة المدرع»!',
-    difficultyAr: 'متوسط',
-    finalChallengeAr: 'مواجهة زعيم المنطقة: روبوت الحراسة المدرع',
+      'ادخل العالم البرتقالي الصناعي لـ «الإنارة فرع البيضاء»: اعبر مستودعات الكابلات العملاقة والرافعات المغناطيسية، قاتل «عقرب النحاس» و«الساحق المغناطيسي» و«الشرارة البرتقالية»، واهزم الساحق البرتقالي العملاق!',
+    difficultyAr: 'متقدم',
+    finalChallengeAr: 'هزيمة الزعيم الساحق البرتقالي العملاق (THE ORANGE CRUSHER) عبر أطواره الثلاثة',
     finalChallengeType: 'boss_security_robot',
     theme: 'electricity_street',
-    accentColor: '#F59E0B',
-    skyTop: '#F59E0B',
-    skyBottom: '#FEF3C7',
-    width: 2750,
+    accentColor: '#EA580C',
+    skyTop: '#18181B',
+    skyBottom: '#EA580C',
+    width: 5400,
     height: 560,
     groundY: 480,
     heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2610, y: 405, labelAr: 'بوابة المنطقة الصناعية' },
+    goalPortal: { x: 5240, y: 405, labelAr: 'بوابة مصنع الإنارة' },
     platforms: [
-      { id: 'l2-p1', x: 0, y: 480, w: 580, h: 80, kind: 'solid', material: 'concrete' },
+      // Section A (0–1050): Al-Bayda Branch Orange Loading Dock & Cable Racks
+      { id: 'l2-p1', x: 0, y: 480, w: 620, h: 80, kind: 'solid', material: 'copper' },
+      { id: 'l2-p2', x: 250, y: 380, w: 165, h: 24, kind: 'solid', material: 'steel' },
       {
-        id: 'l2-p2',
-        x: 640,
-        y: 415,
-        w: 155,
-        h: 24,
-        kind: 'moving',
-        material: 'steel',
-        startX: 620,
-        startY: 415,
-        endX: 850,
-        endY: 365,
-        speed: 95,
-      },
-      { id: 'l2-p3', x: 930, y: 480, w: 520, h: 80, kind: 'solid', material: 'concrete' },
-      // Secret spotlight platform above commercial street
-      { id: 'l2-p4', x: 1050, y: 290, w: 190, h: 22, kind: 'secret_spotlight', material: 'neon_glass', isSecret: true },
-      {
-        id: 'l2-p5',
-        x: 1510,
-        y: 390,
-        w: 155,
+        id: 'l2-p3',
+        x: 680,
+        y: 410,
+        w: 165,
         h: 24,
         kind: 'moving',
         material: 'copper',
-        startX: 1490,
-        startY: 410,
-        endX: 1700,
-        endY: 340,
-        speed: 105,
+        startX: 650,
+        startY: 420,
+        endX: 890,
+        endY: 350,
+        speed: 98,
       },
-      // Boss Arena
-      { id: 'l2-p6', x: 1780, y: 480, w: 970, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l2-p7', x: 1910, y: 365, w: 160, h: 22, kind: 'solid', material: 'steel' },
-      { id: 'l2-p8', x: 2240, y: 365, w: 160, h: 22, kind: 'solid', material: 'steel' },
+      // Section B (1050–2150): Industrial Orange Cranes & Conveyor Racks
+      { id: 'l2-p4', x: 960, y: 480, w: 660, h: 80, kind: 'solid', material: 'steel' },
+      {
+        id: 'l2-p5',
+        x: 1120,
+        y: 375,
+        w: 280,
+        h: 24,
+        kind: 'conveyor',
+        material: 'copper',
+        conveyorSpeed: -90,
+      },
+      { id: 'l2-p6', x: 1440, y: 285, w: 190, h: 22, kind: 'secret_spotlight', material: 'neon_glass', isSecret: true },
+      {
+        id: 'l2-p7',
+        x: 1680,
+        y: 395,
+        w: 160,
+        h: 24,
+        kind: 'moving',
+        material: 'copper',
+        startX: 1660,
+        startY: 415,
+        endX: 1910,
+        endY: 335,
+        speed: 108,
+      },
+      { id: 'l2-p8', x: 1960, y: 480, w: 320, h: 80, kind: 'solid', material: 'copper' },
+      // Section C (2150–3250): Magnetic Platforms & Copper-Wire Switch Puzzle
+      { id: 'l2-p9', x: 2340, y: 480, w: 860, h: 80, kind: 'solid', material: 'steel' },
+      { id: 'l2-p10', x: 2460, y: 375, w: 170, h: 24, kind: 'solid', material: 'copper' },
+      { id: 'l2-p11', x: 2700, y: 295, w: 185, h: 24, kind: 'phase', material: 'copper' },
+      { id: 'l2-p12', x: 2940, y: 375, w: 170, h: 24, kind: 'solid', material: 'steel' },
+      // Section D (3250–4300): Multi-Level Warehouse Exploration & High-Voltage Bridges
+      { id: 'l2-p13', x: 3260, y: 480, w: 980, h: 80, kind: 'solid', material: 'copper' },
+      {
+        id: 'l2-p14',
+        x: 3390,
+        y: 390,
+        w: 290,
+        h: 24,
+        kind: 'conveyor',
+        material: 'steel',
+        conveyorSpeed: 105,
+      },
+      { id: 'l2-p15', x: 3740, y: 305, w: 180, h: 24, kind: 'solid', material: 'copper' },
+      { id: 'l2-p16', x: 3960, y: 225, w: 185, h: 22, kind: 'solid', material: 'neon_glass', isSecret: true },
+      { id: 'l2-p17', x: 3980, y: 375, w: 175, h: 24, kind: 'solid', material: 'steel' },
+      // Section E + Boss Arena (4300–5400): THE ORANGE CRUSHER Arena
+      { id: 'l2-p18', x: 4300, y: 480, w: 1100, h: 80, kind: 'solid', material: 'steel' },
+      { id: 'l2-p19', x: 4430, y: 365, w: 165, h: 22, kind: 'solid', material: 'copper' },
+      { id: 'l2-p20', x: 4700, y: 290, w: 185, h: 22, kind: 'solid', material: 'steel' },
+      { id: 'l2-p21', x: 4970, y: 365, w: 165, h: 22, kind: 'solid', material: 'copper' },
     ],
     collectibles: [
-      { id: 'l2-c1', x: 240, y: 435, kind: 'wire_2_5mm', value: 150, collected: false },
-      { id: 'l2-c2', x: 450, y: 435, kind: 'led_spotlight', value: 240, collected: false },
-      { id: 'l2-c3', x: 745, y: 335, kind: 'wire_2_5mm', value: 150, collected: false },
-      { id: 'l2-c4', x: 1140, y: 245, kind: 'wire_4mm', value: 220, collected: false, isSecret: true },
-      { id: 'l2-c5', x: 1220, y: 435, kind: 'led_spotlight', value: 240, collected: false },
-      { id: 'l2-c6', x: 1610, y: 310, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l2-c7', x: 1990, y: 320, kind: 'wire_4mm', value: 220, collected: false },
-      { id: 'l2-c8', x: 2320, y: 320, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l2-c1', x: 210, y: 435, kind: 'wire_2_5mm', value: 150, collected: false },
+      { id: 'l2-c2', x: 330, y: 335, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l2-c3', x: 765, y: 330, kind: 'led_spotlight', value: 240, collected: false },
+      { id: 'l2-c4', x: 1250, y: 330, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l2-c5', x: 1535, y: 240, kind: 'wire_6mm', value: 300, collected: false, isSecret: true },
+      { id: 'l2-c6', x: 1790, y: 315, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l2-c7', x: 2545, y: 330, kind: 'electrical_switch_item', value: 180, collected: false },
+      { id: 'l2-c8', x: 2790, y: 250, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l2-c9', x: 3025, y: 330, kind: 'electrical_connector', value: 170, collected: false },
+      { id: 'l2-c10', x: 3530, y: 345, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l2-c11', x: 3830, y: 260, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l2-c12', x: 4050, y: 180, kind: 'rechargeable_floodlight', value: 320, collected: false, isSecret: true },
+      { id: 'l2-c13', x: 4510, y: 320, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l2-c14', x: 4790, y: 245, kind: 'led_bulb', value: 250, collected: false },
     ],
-    switches: [],
-    gates: [],
+    switches: [
+      { id: 'l2-sw1', x: 2080, y: 480, activated: false, targetId: 'l2-gate1', labelAr: 'قاطع الرافعة البرتقالية (1/3)' },
+      { id: 'l2-sw2', x: 2790, y: 295, activated: false, targetId: 'l2-gate2', labelAr: 'قاطع مستودع النحاس (2/3)' },
+      { id: 'l2-sw3', x: 4065, y: 375, activated: false, targetId: 'l2-gate3', labelAr: 'قاطع بوابة الساحق البرتقالي (3/3)' },
+    ],
+    gates: [
+      {
+        id: 'l2-gate1',
+        x: 2220,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l2-sw1',
+        labelAr: 'بوابة مستودع البيضاء الأوسط (فعّل القاطع 1/3)',
+      },
+      {
+        id: 'l2-gate2',
+        x: 3150,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l2-sw2',
+        labelAr: 'بوابة الجسور المغناطيسية (فعّل القاطع 2/3)',
+      },
+      {
+        id: 'l2-gate3',
+        x: 5150,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l2-sw3',
+        labelAr: 'بوابة الخروج من فرع البيضاء (اهزم الساحق البرتقالي وفعّل القاطع 3/3)',
+      },
+    ],
     checkpoints: [
-      { id: 'l2-cp1', x: 960, y: 480, activated: false, labelAr: 'تقاطع شارع الكهرباء' },
-      { id: 'l2-cp2', x: 1810, y: 480, activated: false, labelAr: 'ساحة روبوت الحراسة' },
+      { id: 'l2-cp1', x: 1000, y: 480, activated: false, labelAr: 'رصيف شحن فرع البيضاء (B)' },
+      { id: 'l2-cp2', x: 2380, y: 480, activated: false, labelAr: 'مستودع الكابلات البرتقالي (C)' },
+      { id: 'l2-cp3', x: 3300, y: 480, activated: false, labelAr: 'الجسور المغناطيسية العلوية (D)' },
+      { id: 'l2-cp4', x: 4340, y: 480, activated: false, labelAr: 'ساحة الساحق البرتقالي العملاق (E)' },
     ],
     enemies: [
+      // Section A: Copper Scorpion
       {
         id: 'l2-e1',
-        x: 360,
-        y: 452,
-        w: 44,
-        h: 28,
-        vx: 105,
-        minX: 200,
-        maxX: 540,
-        kind: 'cable_snake',
+        x: 420,
+        y: 446,
+        w: 46,
+        h: 34,
+        vx: 112,
+        minX: 210,
+        maxX: 590,
+        kind: 'copper_scorpion',
+        defeated: false,
+        stompable: true,
+      },
+      // Section B: Orange Spark & Copper Scorpion
+      {
+        id: 'l2-e2',
+        x: 1320,
+        y: 448,
+        w: 36,
+        h: 32,
+        vx: 155,
+        minX: 1020,
+        maxX: 1580,
+        kind: 'orange_spark',
+        defeated: false,
+        stompable: true,
+      },
+      // Section C: Magnetic Crusher & Orange Spark
+      {
+        id: 'l2-e3',
+        x: 2680,
+        y: 432,
+        w: 54,
+        h: 48,
+        vx: 85,
+        minX: 2420,
+        maxX: 3060,
+        kind: 'magnetic_crusher',
+        hp: 2,
+        maxHp: 2,
         defeated: false,
         stompable: true,
       },
       {
-        id: 'l2-e2',
-        x: 1180,
-        y: 442,
-        w: 38,
-        h: 38,
-        vx: -110,
-        minX: 980,
-        maxX: 1410,
-        kind: 'security_robot',
+        id: 'l2-e4',
+        x: 2980,
+        y: 448,
+        w: 36,
+        h: 32,
+        vx: -160,
+        minX: 2500,
+        maxX: 3110,
+        kind: 'orange_spark',
+        defeated: false,
+        stompable: true,
+      },
+      // Section D: Copper Scorpion & Magnetic Crusher
+      {
+        id: 'l2-e5',
+        x: 3640,
+        y: 446,
+        w: 46,
+        h: 34,
+        vx: -118,
+        minX: 3350,
+        maxX: 3920,
+        kind: 'copper_scorpion',
+        defeated: false,
+        stompable: true,
+      },
+      {
+        id: 'l2-e6',
+        x: 4040,
+        y: 432,
+        w: 54,
+        h: 48,
+        vx: 90,
+        minX: 3750,
+        maxX: 4210,
+        kind: 'magnetic_crusher',
+        hp: 2,
+        maxHp: 2,
         defeated: false,
         stompable: true,
       },
@@ -681,51 +1013,73 @@ export const GAME_STAGES: StageDefinition[] = [
     hazards: [
       {
         id: 'l2-h1',
-        x: 1120,
+        x: 1380,
         y: 390,
-        w: 36,
-        h: 36,
+        w: 38,
+        h: 38,
         kind: 'rotating_hazard',
         radius: 52,
         angle: 0,
       },
+      {
+        id: 'l2-h2',
+        x: 2790,
+        y: 466,
+        w: 64,
+        h: 14,
+        kind: 'timed_arc',
+        period: 2.5,
+        onTime: 1.0,
+        offset: 0.5,
+      },
+      {
+        id: 'l2-h3',
+        x: 3820,
+        y: 466,
+        w: 68,
+        h: 14,
+        kind: 'timed_arc',
+        period: 2.4,
+        onTime: 1.0,
+        offset: 1.1,
+      },
     ],
     boss: {
-      archetype: 'security_robot_boss',
-      nameAr: 'روبوت الحراسة المدرع',
-      nameEn: 'Armored Security Robot',
-      x: 2180,
-      y: 404,
-      w: 72,
-      h: 76,
+      archetype: 'orange_crusher_boss',
+      nameAr: 'الساحق البرتقالي العملاق — THE ORANGE CRUSHER',
+      nameEn: 'THE ORANGE CRUSHER',
+      x: 4840,
+      y: 390,
+      w: 88,
+      h: 90,
       vx: -125,
-      minX: 1850,
-      maxX: 2460,
-      hp: 3,
-      maxHp: 3,
+      minX: 4390,
+      maxX: 5090,
+      hp: 5,
+      maxHp: 5,
       phase: 1,
       state: 'patrol',
-      stateTimer: 2.6,
+      stateTimer: 2.1,
       invulnTimer: 0,
-      shockwaveLeftX: 2180,
-      shockwaveRightX: 2180,
+      shockwaveLeftX: 4840,
+      shockwaveRightX: 4840,
       shockwaveY: 466,
       shockwaveActive: false,
       projectiles: [],
       breakers: [
-        { id: 'l2-bb1', x: 1990, y: 365, activated: false, cooldown: 0, labelAr: 'قاطع تعطيل الدرع 1' },
-        { id: 'l2-bb2', x: 2320, y: 365, activated: false, cooldown: 0, labelAr: 'قاطع تعطيل الدرع 2' },
+        { id: 'l2-bb1', x: 4510, y: 365, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ المغناطيس 1' },
+        { id: 'l2-bb2', x: 4790, y: 290, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ المغناطيس 2' },
+        { id: 'l2-bb3', x: 5050, y: 365, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ المغناطيس 3' },
       ],
     },
   },
 
   // ==========================================================================
-  // LEVEL 3 — مصنع الإنارة (THE LIGHTING FACTORY)
-  // Environment: Detailed industrial lighting factory
-  // New mechanics: Conveyor belts, mechanical presses, timed doors
-  // Enemies: Mechanical spiders & flying drones
-  // Collectibles: LED strips, outdoor lighting fixtures, waterproof sockets
-  // Final challenge: Escape a malfunctioning production machine before timer expires!
+  // STAGE 3 — مصنع الإنارة (THE LIGHTING FACTORY)
+  // Visual Identity: Dangerous Mechanical Factory — Steel Gray / Yellow / Controlled White
+  // Multi-Section World (Width: 5600px — Sections A, B, C, D, E + Boss Arena)
+  // Unique Monsters: Gear Beast (وحش التروس), Welding Drone (طائرة اللحام), Assembly Mimic (المحاكي الآلي)
+  // Stage Boss: THE FACTORY OVERLORD (سيد المصنع الآلي — 5 HP)
   // ==========================================================================
   {
     id: 'lvl-3',
@@ -733,154 +1087,254 @@ export const GAME_STAGES: StageDefinition[] = [
     worldNumber: 3,
     stageNumber: 1,
     code: '3-1',
-    titleAr: 'مصنع الإنارة — خطوط الإنتاج الآلية',
-    titleEn: 'The Lighting Factory — Automated Lines',
+    titleAr: 'مصنع الإنارة — خطوط التجميع الآلية والمكابس',
+    titleEn: 'The Lighting Factory — Automated Production & Presses',
     worldTitleAr: 'مصنع الإنارة',
     worldTitleEn: 'The Lighting Factory',
     subtitleAr:
-      'تجاوز السيور الناقلة والمكابس الميكانيكية والعناكب الآلية، واجمع شرائط LED، ثم اهرب من خط الإنتاج المتعطل قبل نفاد الوقت!',
-    difficultyAr: 'متوسط – صعب',
-    finalChallengeAr: 'سباق الهروب من الآلة الصناعية المعطلة قبل انتهاء العد التنازلي (75 ثانية)',
+      'اخترق خطوط الإنتاج المؤتمتة والمكابس الميكانيكية ومراوح التهوية، واجه «وحش التروس» و«طائرة اللحام» و«المحاكي الآلي» المتخفي، واهزم سيد المصنع الآلي!',
+    difficultyAr: 'صعب',
+    finalChallengeAr: 'هزيمة الزعيم سيد المصنع الآلي (THE FACTORY OVERLORD) وإعادة تشغيل خط الإنتاج',
     finalChallengeType: 'timed_machine_escape',
-    challengeTimeLimitSec: 75,
+    challengeTimeLimitSec: 180,
     theme: 'lighting_factory',
-    accentColor: '#EA580C',
+    accentColor: '#FACC15',
     skyTop: '#1E293B',
     skyBottom: '#334155',
-    width: 2800,
+    width: 5600,
     height: 560,
     groundY: 480,
     heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2660, y: 405, labelAr: 'مخرج الطوارئ الآمن للمصنع' },
+    goalPortal: { x: 5440, y: 405, labelAr: 'بوابة الإنارة فرع الليثي' },
     platforms: [
-      { id: 'l3-p1', x: 0, y: 480, w: 520, h: 80, kind: 'solid', material: 'steel' },
+      // Section A (0–1100): Assembly Entry & Conveyor Line 1
+      { id: 'l3-p1', x: 0, y: 480, w: 540, h: 80, kind: 'solid', material: 'steel' },
       {
         id: 'l3-p2',
-        x: 560,
-        y: 440,
-        w: 380,
+        x: 580,
+        y: 435,
+        w: 390,
         h: 26,
         kind: 'conveyor',
         material: 'steel',
-        conveyorSpeed: -85,
+        conveyorSpeed: -95,
       },
-      { id: 'l3-p3', x: 990, y: 480, w: 560, h: 80, kind: 'solid', material: 'steel' },
-      { id: 'l3-p4', x: 1120, y: 365, w: 220, h: 24, kind: 'solid', material: 'copper' },
-      // High-speed escape conveyor gauntlet
+      // Section B (1100–2200): Robotic Arms, Ventilation Shafts & Assembly Mimic Zone
+      { id: 'l3-p3', x: 1020, y: 480, w: 620, h: 80, kind: 'solid', material: 'steel' },
+      { id: 'l3-p4', x: 1160, y: 365, w: 210, h: 24, kind: 'solid', material: 'copper' },
+      { id: 'l3-p5', x: 1410, y: 265, w: 190, h: 22, kind: 'secret_spotlight', material: 'neon_glass', isSecret: true },
       {
-        id: 'l3-p5',
-        x: 1610,
+        id: 'l3-p6',
+        x: 1700,
         y: 420,
-        w: 360,
+        w: 380,
         h: 26,
         kind: 'conveyor',
         material: 'steel',
         conveyorSpeed: 115,
       },
+      { id: 'l3-p7', x: 2130, y: 480, w: 280, h: 80, kind: 'solid', material: 'steel' },
+      // Section C (2200–3350): Industrial Elevators & Welding Drone Foundry
       {
-        id: 'l3-p6',
-        x: 2030,
-        y: 375,
-        w: 170,
+        id: 'l3-p8',
+        x: 2460,
+        y: 385,
+        w: 160,
         h: 24,
         kind: 'moving',
-        material: 'copper',
-        startX: 2010,
-        startY: 390,
-        endX: 2220,
-        endY: 340,
-        speed: 120,
+        material: 'steel',
+        startX: 2450,
+        startY: 430,
+        endX: 2660,
+        endY: 290,
+        speed: 115,
       },
-      { id: 'l3-p7', x: 2280, y: 480, w: 520, h: 80, kind: 'solid', material: 'steel' },
+      { id: 'l3-p9', x: 2730, y: 480, w: 640, h: 80, kind: 'solid', material: 'steel' },
+      { id: 'l3-p10', x: 2820, y: 350, w: 200, h: 24, kind: 'solid', material: 'copper' },
+      { id: 'l3-p11', x: 3080, y: 275, w: 190, h: 24, kind: 'solid', material: 'steel' },
+      // Section D (3350–4450): High-Speed Press Corridor & Gear Beast Foundry
+      { id: 'l3-p12', x: 3440, y: 480, w: 960, h: 80, kind: 'solid', material: 'steel' },
+      {
+        id: 'l3-p13',
+        x: 3560,
+        y: 390,
+        w: 320,
+        h: 26,
+        kind: 'conveyor',
+        material: 'copper',
+        conveyorSpeed: -110,
+      },
+      { id: 'l3-p14', x: 3940, y: 310, w: 190, h: 24, kind: 'solid', material: 'steel' },
+      { id: 'l3-p15', x: 4160, y: 375, w: 180, h: 24, kind: 'solid', material: 'copper' },
+      // Section E + Boss Arena (4450–5600): THE FACTORY OVERLORD Control Chamber
+      { id: 'l3-p16', x: 4460, y: 480, w: 1140, h: 80, kind: 'solid', material: 'steel' },
+      { id: 'l3-p17', x: 4590, y: 365, w: 170, h: 22, kind: 'solid', material: 'copper' },
+      { id: 'l3-p18', x: 4870, y: 295, w: 190, h: 22, kind: 'solid', material: 'steel' },
+      { id: 'l3-p19', x: 5150, y: 365, w: 170, h: 22, kind: 'solid', material: 'copper' },
     ],
     collectibles: [
-      { id: 'l3-c1', x: 260, y: 435, kind: 'led_strip', value: 200, collected: false },
-      { id: 'l3-c2', x: 690, y: 395, kind: 'waterproof_socket', value: 190, collected: false },
-      { id: 'l3-c3', x: 840, y: 395, kind: 'led_strip', value: 200, collected: false },
-      { id: 'l3-c4', x: 1230, y: 320, kind: 'outdoor_fixture', value: 260, collected: false },
-      { id: 'l3-c5', x: 1420, y: 435, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l3-c6', x: 1780, y: 375, kind: 'wire_4mm', value: 220, collected: false },
-      { id: 'l3-c7', x: 2120, y: 300, kind: 'outdoor_fixture', value: 260, collected: false },
-      { id: 'l3-c8', x: 2460, y: 435, kind: 'led_strip', value: 200, collected: false },
+      { id: 'l3-c1', x: 250, y: 435, kind: 'led_strip', value: 200, collected: false },
+      { id: 'l3-c2', x: 740, y: 390, kind: 'waterproof_socket', value: 190, collected: false },
+      { id: 'l3-c3', x: 1265, y: 320, kind: 'outdoor_fixture', value: 260, collected: false },
+      { id: 'l3-c4', x: 1505, y: 220, kind: 'led_spotlight', value: 240, collected: false, isSecret: true },
+      { id: 'l3-c5', x: 1890, y: 375, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l3-c6', x: 2555, y: 310, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l3-c7', x: 2920, y: 305, kind: 'electrical_connector', value: 170, collected: false },
+      { id: 'l3-c8', x: 3175, y: 230, kind: 'outdoor_fixture', value: 260, collected: false },
+      { id: 'l3-c9', x: 3720, y: 345, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l3-c10', x: 4035, y: 265, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l3-c11', x: 4250, y: 330, kind: 'led_strip', value: 200, collected: false },
+      { id: 'l3-c12', x: 4675, y: 320, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l3-c13', x: 4965, y: 250, kind: 'led_bulb', value: 250, collected: false },
     ],
     switches: [
       {
         id: 'l3-sw1',
-        x: 1230,
+        x: 1265,
         y: 365,
         activated: false,
         targetId: 'l3-gate1',
-        labelAr: 'مفتاح فتح بوابة الطوارئ الموقوتة',
+        labelAr: 'مفتاح تشغيل خط التجميع الأول (1/3)',
+      },
+      {
+        id: 'l3-sw2',
+        x: 3175,
+        y: 275,
+        activated: false,
+        targetId: 'l3-gate2',
+        labelAr: 'مفتاح مصعد المكابس الصناعية (2/3)',
+      },
+      {
+        id: 'l3-sw3',
+        x: 4250,
+        y: 375,
+        activated: false,
+        targetId: 'l3-gate3',
+        labelAr: 'مفتاح نظام الإنتاج النهائي (3/3)',
       },
     ],
     gates: [
       {
         id: 'l3-gate1',
-        x: 1520,
+        x: 2340,
         y: 350,
         w: 28,
         h: 130,
         isOpen: false,
         switchId: 'l3-sw1',
-        labelAr: 'بوابة خط الإنتاج (فعّل المفتاح العلوي)',
+        labelAr: 'بوابة خط التجميع الأوسط (فعّل المفتاح 1/3)',
+      },
+      {
+        id: 'l3-gate2',
+        x: 3330,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l3-sw2',
+        labelAr: 'بوابة ممر المكابس (فعّل المفتاح 2/3)',
+      },
+      {
+        id: 'l3-gate3',
+        x: 5340,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l3-sw3',
+        labelAr: 'بوابة الخروج من المصنع (اهزم سيد المصنع الآلي وفعّل المفتاح 3/3)',
       },
     ],
     checkpoints: [
-      { id: 'l3-cp1', x: 1020, y: 480, activated: false, labelAr: 'وحدة تحكم المصنع 1' },
-      { id: 'l3-cp2', x: 2320, y: 480, activated: false, labelAr: 'ممر الهروب النهائي' },
+      { id: 'l3-cp1', x: 1050, y: 480, activated: false, labelAr: 'وحدة التجميع ومراوح التهوية (B)' },
+      { id: 'l3-cp2', x: 2760, y: 480, activated: false, labelAr: 'مصاعد المصنع وطائرات اللحام (C)' },
+      { id: 'l3-cp3', x: 3480, y: 480, activated: false, labelAr: 'ممر المكابس ووحوش التروس (D)' },
+      { id: 'l3-cp4', x: 4500, y: 480, activated: false, labelAr: 'قاعة سيد المصنع الآلي (E)' },
     ],
     enemies: [
+      // Section A: Gear Beast
       {
         id: 'l3-e1',
-        x: 340,
-        y: 446,
-        w: 40,
-        h: 34,
-        vx: 115,
+        x: 360,
+        y: 440,
+        w: 42,
+        h: 40,
+        vx: 120,
         minX: 180,
-        maxX: 490,
-        kind: 'mechanical_spider',
+        maxX: 510,
+        kind: 'gear_beast',
         defeated: false,
         stompable: true,
       },
+      // Section B: Assembly Mimic & Welding Drone
       {
         id: 'l3-e2',
-        x: 760,
-        y: 320,
-        w: 40,
-        h: 34,
+        x: 1460,
+        y: 438,
+        w: 44,
+        h: 42,
         vx: 95,
-        baseY: 320,
-        minX: 590,
-        maxX: 920,
-        kind: 'flying_drone',
+        minX: 1120,
+        maxX: 1610,
+        kind: 'assembly_mimic',
+        aiState: 'idle',
         defeated: false,
         stompable: true,
       },
       {
         id: 'l3-e3',
-        x: 1280,
-        y: 446,
-        w: 40,
+        x: 1920,
+        y: 310,
+        w: 44,
         h: 34,
-        vx: -120,
-        minX: 1040,
-        maxX: 1480,
-        kind: 'mechanical_spider',
+        vx: -115,
+        baseY: 310,
+        minX: 1680,
+        maxX: 2120,
+        kind: 'welding_drone',
+        defeated: false,
+        stompable: true,
+      },
+      // Section C: Welding Drone & Gear Beast
+      {
+        id: 'l3-e4',
+        x: 2980,
+        y: 300,
+        w: 44,
+        h: 34,
+        vx: 125,
+        baseY: 300,
+        minX: 2760,
+        maxX: 3290,
+        kind: 'welding_drone',
+        defeated: false,
+        stompable: true,
+      },
+      // Section D: Gear Beast & Assembly Mimic
+      {
+        id: 'l3-e5',
+        x: 3780,
+        y: 440,
+        w: 42,
+        h: 40,
+        vx: -135,
+        minX: 3500,
+        maxX: 4080,
+        kind: 'gear_beast',
         defeated: false,
         stompable: true,
       },
       {
-        id: 'l3-e4',
-        x: 2450,
-        y: 340,
-        w: 40,
-        h: 34,
-        vx: 110,
-        baseY: 340,
-        minX: 2310,
-        maxX: 2610,
-        kind: 'flying_drone',
+        id: 'l3-e6',
+        x: 4180,
+        y: 438,
+        w: 44,
+        h: 42,
+        vx: 100,
+        minX: 3960,
+        maxX: 4360,
+        kind: 'assembly_mimic',
+        aiState: 'idle',
         defeated: false,
         stompable: true,
       },
@@ -888,38 +1342,85 @@ export const GAME_STAGES: StageDefinition[] = [
     hazards: [
       {
         id: 'l3-press1',
-        x: 680,
-        y: 360,
+        x: 720,
+        y: 355,
         w: 48,
         h: 80,
-        baseY: 340,
+        baseY: 335,
         kind: 'mechanical_press',
-        period: 2.4,
+        period: 2.5,
         onTime: 0.9,
         offset: 0,
       },
       {
+        id: 'l3-fan1',
+        x: 1095,
+        y: 448,
+        w: 58,
+        h: 32,
+        kind: 'ventilation_fan',
+      },
+      {
         id: 'l3-press2',
-        x: 1760,
+        x: 1860,
         y: 340,
         w: 48,
         h: 80,
         baseY: 320,
         kind: 'mechanical_press',
-        period: 2.1,
+        period: 2.2,
         onTime: 0.85,
         offset: 1.0,
       },
+      {
+        id: 'l3-press3',
+        x: 3680,
+        y: 310,
+        w: 48,
+        h: 80,
+        baseY: 290,
+        kind: 'mechanical_press',
+        period: 2.1,
+        onTime: 0.85,
+        offset: 0.5,
+      },
     ],
+    boss: {
+      archetype: 'factory_overlord_boss',
+      nameAr: 'سيد المصنع الآلي — THE FACTORY OVERLORD',
+      nameEn: 'THE FACTORY OVERLORD',
+      x: 5020,
+      y: 388,
+      w: 90,
+      h: 92,
+      vx: -130,
+      minX: 4560,
+      maxX: 5260,
+      hp: 5,
+      maxHp: 5,
+      phase: 1,
+      state: 'patrol',
+      stateTimer: 2.0,
+      invulnTimer: 0,
+      shockwaveLeftX: 5020,
+      shockwaveRightX: 5020,
+      shockwaveY: 466,
+      shockwaveActive: false,
+      projectiles: [],
+      breakers: [
+        { id: 'l3-bb1', x: 4675, y: 365, activated: false, cooldown: 0, labelAr: 'قاطع الذراع الميكانيكية 1' },
+        { id: 'l3-bb2', x: 4965, y: 295, activated: false, cooldown: 0, labelAr: 'قاطع التوربين المركزي 2' },
+        { id: 'l3-bb3', x: 5235, y: 365, activated: false, cooldown: 0, labelAr: 'قاطع الذراع الميكانيكية 3' },
+      ],
+    },
   },
 
   // ==========================================================================
-  // LEVEL 4 — حي الإنترفون (THE INTERCOM NEIGHBORHOOD)
-  // Environment: Modern residential neighborhood
-  // New mechanics: Security doors, access switches, elevators + Double Jump unlocked
-  // Enemies: Security drones & patrol robots
-  // Collectibles: Intercom devices and electrical switches
-  // Final challenge: Solve a multi-stage security puzzle while avoiding enemies
+  // STAGE 4 — الإنارة فرع الليثي (ENARAH AL-LAITHI BRANCH)
+  // Visual Identity: Advanced Electrical City — Primary Color: BLUE (#1E3A8A / #2563EB / #38BDF8 / #F8FAFC)
+  // Multi-Section World (Width: 5800px — Sections A, B, C, D, E + Boss Arena)
+  // Unique Monsters: Blue Phantom (الطيف الأزرق), Electric Spider (العنكبوت الكهربائي), Pulse Sentinel (حارس النبض الأزرق)
+  // Stage Boss: THE BLUE SENTINEL (الحارس الأزرق المدرع — 6 HP, 4 Combat Phases)
   // ==========================================================================
   {
     id: 'lvl-4',
@@ -927,174 +1428,329 @@ export const GAME_STAGES: StageDefinition[] = [
     worldNumber: 4,
     stageNumber: 1,
     code: '4-1',
-    titleAr: 'حي الإنترفون — الفلل الذكية وبوابات الأمان',
-    titleEn: 'Intercom Neighborhood — Smart Villas',
-    worldTitleAr: 'حي الإنترفون',
-    worldTitleEn: 'Intercom Neighborhood',
+    titleAr: 'الإنارة فرع الليثي — المعارض الزرقاء والشبكة الذكية',
+    titleEn: 'Enarah Al-Laithi Branch — Blue Showrooms & Smart Grid',
+    worldTitleAr: 'الإنارة فرع الليثي',
+    worldTitleEn: 'Enarah Al-Laithi Branch',
     subtitleAr:
-      'اجمع أجهزة الإنترفون الذكية والمفاتيح الكهربائية، استخدم المصاعد العمودية والقفز المزدوج، وحل لغز بوابات الأمان المتعددة!',
-    difficultyAr: 'صعب',
-    finalChallengeAr: 'لغز بوابات الأمان الذكية متعدد المراحل (جمع أجهزة الإنترفون + تفعيل قواطع الشفرة)',
+      'استكشف المدينة الكهربائية الزرقاء المتطورة لـ «الإنارة فرع الليثي»: اعبر منصات الطاقة الزرقاء وبوابات الانتقال، واجه «الطيف الأزرق» و«العنكبوت الكهربائي» و«حارس النبض الأزرق»، واهزم الحارس الأزرق المدرع!',
+    difficultyAr: 'صعب جداً',
+    finalChallengeAr: 'هزيمة الزعيم الحارس الأزرق المدرع (THE BLUE SENTINEL) وتفعيل دوائر التحكم الزرقاء',
     finalChallengeType: 'intercom_security_puzzle',
     theme: 'intercom_district',
-    accentColor: '#EA580C',
-    skyTop: '#0F766E',
-    skyBottom: '#CCFBF1',
-    width: 2850,
+    accentColor: '#2563EB',
+    skyTop: '#0F172A',
+    skyBottom: '#1E3A8A',
+    width: 5800,
     height: 560,
     groundY: 480,
     heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2710, y: 405, labelAr: 'بوابة القصر الذكي' },
+    goalPortal: { x: 5640, y: 405, labelAr: 'بوابة قلعة الظلام' },
     platforms: [
-      { id: 'l4-p1', x: 0, y: 480, w: 640, h: 80, kind: 'solid', material: 'concrete' },
-      // Vertical Elevator 1
+      // Section A (0–1150): Al-Laithi Modern Blue Showrooms & Phase Bridge 1
+      { id: 'l4-p1', x: 0, y: 480, w: 620, h: 80, kind: 'solid', material: 'neon_glass' },
+      { id: 'l4-p2', x: 260, y: 375, w: 170, h: 24, kind: 'solid', material: 'steel' },
       {
-        id: 'l4-elev1',
-        x: 690,
-        y: 420,
-        w: 135,
+        id: 'l4-bridge1',
+        x: 680,
+        y: 390,
+        w: 175,
         h: 22,
-        kind: 'moving',
+        kind: 'phase',
         material: 'neon_glass',
-        startX: 690,
-        startY: 440,
-        endX: 690,
-        endY: 260,
-        speed: 95,
       },
-      { id: 'l4-p2', x: 870, y: 270, w: 320, h: 24, kind: 'solid', material: 'brick' },
-      { id: 'l4-p3', x: 920, y: 480, w: 720, h: 80, kind: 'solid', material: 'concrete' },
-      // Security Puzzle Multi-tier Complex
+      { id: 'l4-p3', x: 910, y: 290, w: 260, h: 24, kind: 'solid', material: 'neon_glass' },
+      // Section B (1150–2300): Elevated Blue Roads, Teleportation Lifts & Electric Spiders
+      { id: 'l4-p4', x: 930, y: 480, w: 720, h: 80, kind: 'solid', material: 'concrete' },
       {
-        id: 'l4-elev2',
-        x: 1690,
-        y: 410,
-        w: 135,
+        id: 'l4-secret1',
+        x: 1280,
+        y: 235,
+        w: 195,
+        h: 22,
+        kind: 'secret_spotlight',
+        material: 'neon_glass',
+        isSecret: true,
+      },
+      {
+        id: 'l4-warp1',
+        x: 1710,
+        y: 385,
+        w: 165,
         h: 22,
         kind: 'moving',
         material: 'neon_glass',
         startX: 1690,
-        startY: 445,
-        endX: 1690,
-        endY: 250,
-        speed: 105,
+        startY: 425,
+        endX: 1930,
+        endY: 310,
+        speed: 120,
       },
-      { id: 'l4-p4', x: 1870, y: 480, w: 980, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l4-p5', x: 1880, y: 265, w: 240, h: 24, kind: 'solid', material: 'steel' },
-      { id: 'l4-p6', x: 2210, y: 335, w: 220, h: 24, kind: 'solid', material: 'steel' },
+      { id: 'l4-p5', x: 1990, y: 480, w: 410, h: 80, kind: 'solid', material: 'neon_glass' },
+      // Section C (2300–3500): Smart Electrical Control Stations & Rotating Energy Barriers
+      { id: 'l4-p6', x: 2460, y: 480, w: 940, h: 80, kind: 'solid', material: 'concrete' },
+      { id: 'l4-p7', x: 2580, y: 365, w: 180, h: 24, kind: 'solid', material: 'neon_glass' },
+      {
+        id: 'l4-bridge2',
+        x: 2820,
+        y: 290,
+        w: 185,
+        h: 22,
+        kind: 'phase',
+        material: 'neon_glass',
+      },
+      { id: 'l4-p8', x: 3060, y: 365, w: 185, h: 24, kind: 'solid', material: 'steel' },
+      // Section D (3500–4620): Timed Laser Grid & Multi-Route Cyan Skyways
+      { id: 'l4-p9', x: 3470, y: 480, w: 1080, h: 80, kind: 'solid', material: 'neon_glass' },
+      { id: 'l4-p10', x: 3600, y: 375, w: 175, h: 24, kind: 'solid', material: 'steel' },
+      { id: 'l4-p11', x: 3840, y: 290, w: 190, h: 24, kind: 'solid', material: 'neon_glass' },
+      { id: 'l4-p12', x: 4090, y: 215, w: 190, h: 22, kind: 'solid', material: 'copper', isSecret: true },
+      { id: 'l4-p13', x: 4120, y: 365, w: 185, h: 24, kind: 'solid', material: 'neon_glass' },
+      // Section E + Boss Arena (4620–5800): THE BLUE SENTINEL Plaza
+      { id: 'l4-p14', x: 4620, y: 480, w: 1180, h: 80, kind: 'solid', material: 'neon_glass' },
+      { id: 'l4-p15', x: 4760, y: 360, w: 175, h: 22, kind: 'solid', material: 'steel' },
+      { id: 'l4-p16', x: 5050, y: 290, w: 195, h: 22, kind: 'solid', material: 'neon_glass' },
+      { id: 'l4-p17', x: 5340, y: 360, w: 175, h: 22, kind: 'solid', material: 'steel' },
     ],
     collectibles: [
-      { id: 'l4-c1', x: 280, y: 435, kind: 'intercom_device', value: 280, collected: false },
-      { id: 'l4-c2', x: 510, y: 435, kind: 'electrical_switch_item', value: 180, collected: false },
-      { id: 'l4-c3', x: 1020, y: 225, kind: 'intercom_device', value: 280, collected: false },
-      { id: 'l4-c4', x: 1260, y: 435, kind: 'electrical_connector', value: 170, collected: false },
-      { id: 'l4-c5', x: 1990, y: 220, kind: 'intercom_device', value: 280, collected: false },
-      { id: 'l4-c6', x: 2310, y: 290, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l4-c7', x: 2520, y: 435, kind: 'electrical_switch_item', value: 180, collected: false },
+      { id: 'l4-c1', x: 220, y: 435, kind: 'led_spotlight', value: 240, collected: false },
+      { id: 'l4-c2', x: 345, y: 330, kind: 'intercom_device', value: 280, collected: false },
+      { id: 'l4-c3', x: 1040, y: 245, kind: 'outdoor_fixture', value: 260, collected: false },
+      { id: 'l4-c4', x: 1375, y: 190, kind: 'rechargeable_floodlight', value: 320, collected: false, isSecret: true },
+      { id: 'l4-c5', x: 1810, y: 315, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l4-c6', x: 2670, y: 320, kind: 'intercom_device', value: 280, collected: false },
+      { id: 'l4-c7', x: 2910, y: 245, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l4-c8', x: 3150, y: 320, kind: 'electrical_switch_item', value: 180, collected: false },
+      { id: 'l4-c9', x: 3685, y: 330, kind: 'outdoor_fixture', value: 260, collected: false },
+      { id: 'l4-c10', x: 3935, y: 245, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l4-c11', x: 4185, y: 170, kind: 'wire_6mm', value: 300, collected: false, isSecret: true },
+      { id: 'l4-c12', x: 4845, y: 315, kind: 'led_spotlight', value: 240, collected: false },
+      { id: 'l4-c13', x: 5145, y: 245, kind: 'led_bulb', value: 250, collected: false },
     ],
     switches: [
       {
         id: 'l4-sw1',
-        x: 1120,
-        y: 270,
+        x: 1080,
+        y: 290,
         activated: false,
         targetId: 'l4-gate1',
-        labelAr: 'وحدة إنترفون البوابة الأولى',
+        labelAr: 'قاطع معرض الليثي الأزرق (1/3)',
       },
       {
         id: 'l4-sw2',
-        x: 2060,
-        y: 265,
+        x: 3150,
+        y: 365,
         activated: false,
         targetId: 'l4-gate2',
-        labelAr: 'شفرة الأمان العليا (1/2)',
+        labelAr: 'قاطع محطة التحكم الزرقاء (2/3)',
       },
       {
         id: 'l4-sw3',
-        x: 2380,
-        y: 335,
+        x: 4210,
+        y: 365,
         activated: false,
-        targetId: 'l4-gate2',
-        labelAr: 'شفرة الأمان الوسطى (2/2)',
+        targetId: 'l4-gate3',
+        labelAr: 'قاطع الشبكة الذكية لفرع الليثي (3/3)',
       },
     ],
     gates: [
       {
         id: 'l4-gate1',
-        x: 1520,
+        x: 2340,
         y: 350,
         w: 28,
         h: 130,
         isOpen: false,
         switchId: 'l4-sw1',
-        labelAr: 'بوابة الحي السكني (فعّل إنترفون السطح)',
+        labelAr: 'بوابة الجادة الزرقاء (فعّل القاطع 1/3)',
       },
       {
         id: 'l4-gate2',
-        x: 2580,
+        x: 3360,
         y: 350,
         w: 28,
         h: 130,
         isOpen: false,
-        requiredSwitchesCount: 3,
-        labelAr: 'بوابة الأمان الذكية (فعّل جميع وحدات الإنترفون 3/3)',
+        switchId: 'l4-sw2',
+        labelAr: 'بوابة الأبراج الذكية (فعّل القاطع 2/3)',
+      },
+      {
+        id: 'l4-gate3',
+        x: 5540,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l4-sw3',
+        labelAr: 'بوابة قلعة الظلام (اهزم الحارس الأزرق المدرع وفعّل القاطع 3/3)',
       },
     ],
     checkpoints: [
-      { id: 'l4-cp1', x: 960, y: 480, activated: false, labelAr: 'بوابة الفلل الذكية 1' },
-      { id: 'l4-cp2', x: 1910, y: 480, activated: false, labelAr: 'ساحة لغز الإنترفون' },
+      { id: 'l4-cp1', x: 970, y: 480, activated: false, labelAr: 'معارض فرع الليثي الزرقاء (B)' },
+      { id: 'l4-cp2', x: 2500, y: 480, activated: false, labelAr: 'محطة التحكم الذكية الزرقاء (C)' },
+      { id: 'l4-cp3', x: 3510, y: 480, activated: false, labelAr: 'ممر الليزر الأزرق المرتفع (D)' },
+      { id: 'l4-cp4', x: 4660, y: 480, activated: false, labelAr: 'ساحة الحارس الأزرق المدرع (E)' },
     ],
     enemies: [
+      // Section A: Blue Phantom
       {
         id: 'l4-e1',
-        x: 420,
-        y: 442,
+        x: 430,
+        y: 440,
         w: 38,
-        h: 38,
-        vx: 110,
+        h: 40,
+        vx: 140,
         minX: 210,
         maxX: 590,
-        kind: 'security_robot',
+        kind: 'blue_phantom',
         defeated: false,
         stompable: true,
       },
+      // Section B: Electric Spider & Blue Phantom
       {
         id: 'l4-e2',
-        x: 1250,
+        x: 1360,
         y: 340,
-        w: 40,
-        h: 34,
-        vx: -105,
+        w: 42,
+        h: 36,
+        vx: 95,
         baseY: 340,
-        minX: 980,
-        maxX: 1470,
-        kind: 'flying_drone',
+        minX: 1080,
+        maxX: 1580,
+        kind: 'electric_spider',
+        defeated: false,
+        stompable: true,
+      },
+      // Section C: Pulse Sentinel & Electric Spider
+      {
+        id: 'l4-e3',
+        x: 2840,
+        y: 434,
+        w: 48,
+        h: 46,
+        vx: 105,
+        minX: 2540,
+        maxX: 3250,
+        kind: 'pulse_sentinel',
+        hp: 2,
+        maxHp: 2,
+        defeated: false,
+        stompable: true,
+      },
+      // Section D: Blue Phantom, Electric Spider & Pulse Sentinel
+      {
+        id: 'l4-e4',
+        x: 3740,
+        y: 440,
+        w: 38,
+        h: 40,
+        vx: -148,
+        minX: 3530,
+        maxX: 4020,
+        kind: 'blue_phantom',
         defeated: false,
         stompable: true,
       },
       {
-        id: 'l4-e3',
-        x: 2150,
-        y: 442,
-        w: 38,
-        h: 38,
-        vx: 125,
-        minX: 1930,
-        maxX: 2520,
-        kind: 'security_robot',
+        id: 'l4-e5',
+        x: 4040,
+        y: 335,
+        w: 42,
+        h: 36,
+        vx: 102,
+        baseY: 335,
+        minX: 3820,
+        maxX: 4340,
+        kind: 'electric_spider',
+        defeated: false,
+        stompable: true,
+      },
+      {
+        id: 'l4-e6',
+        x: 4360,
+        y: 434,
+        w: 48,
+        h: 46,
+        vx: -110,
+        minX: 4080,
+        maxX: 4510,
+        kind: 'pulse_sentinel',
+        hp: 2,
+        maxHp: 2,
         defeated: false,
         stompable: true,
       },
     ],
-    hazards: [],
+    hazards: [
+      {
+        id: 'l4-rot1',
+        x: 1510,
+        y: 385,
+        w: 38,
+        h: 38,
+        kind: 'rotating_hazard',
+        radius: 54,
+        angle: 0,
+      },
+      {
+        id: 'l4-laser1',
+        x: 2770,
+        y: 350,
+        w: 16,
+        h: 130,
+        kind: 'laser_beam',
+        period: 2.6,
+        onTime: 1.0,
+        offset: 0,
+      },
+      {
+        id: 'l4-laser2',
+        x: 3810,
+        y: 350,
+        w: 16,
+        h: 130,
+        kind: 'laser_beam',
+        period: 2.5,
+        onTime: 1.0,
+        offset: 1.2,
+      },
+    ],
+    boss: {
+      archetype: 'blue_sentinel_boss',
+      nameAr: 'الحارس الأزرق المدرع — THE BLUE SENTINEL',
+      nameEn: 'THE BLUE SENTINEL',
+      x: 5180,
+      y: 386,
+      w: 90,
+      h: 94,
+      vx: -138,
+      minX: 4720,
+      maxX: 5460,
+      hp: 6,
+      maxHp: 6,
+      phase: 1,
+      state: 'patrol',
+      stateTimer: 1.9,
+      invulnTimer: 0,
+      shockwaveLeftX: 5180,
+      shockwaveRightX: 5180,
+      shockwaveY: 466,
+      shockwaveActive: false,
+      projectiles: [],
+      breakers: [
+        { id: 'l4-bb1', x: 4845, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النبض الأزرق 1' },
+        { id: 'l4-bb2', x: 5145, y: 290, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النبض الأزرق 2' },
+        { id: 'l4-bb3', x: 5425, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النبض الأزرق 3' },
+      ],
+    },
   },
 
   // ==========================================================================
-  // LEVEL 5 — محطة الطاقة (THE POWER STATION)
-  // Environment: Large industrial power station
-  // New mechanics: Electrical currents & synchronized moving platforms
-  // Enemies: Electrical creatures & transformer robots
-  // Final Boss: Giant Transformer Guardian (shockwaves, projectiles, area attacks)
+  // STAGE 5 — قلعة الظلام (DARKNESS FORTRESS)
+  // Visual Identity: Final Dark Fortress — Dark / Energy
+  // Multi-Section World (Width: 6000px — Sections A, B, C, D, E + Grand Final Boss Arena)
+  // Unique Monsters: Dark Stalker (مطارد الظلام), Void Flyer (طائر الفراغ), Shadow Brute (عملاق الظل), Fortress Guardian (حارس القلعة)
+  // Final Boss: THE SHADOW CORE (نواة الظلام — 8 HP, 3 Multi-Phase Mechanical Monster)
   // ==========================================================================
   {
     id: 'lvl-5',
@@ -1102,119 +1758,278 @@ export const GAME_STAGES: StageDefinition[] = [
     worldNumber: 5,
     stageNumber: 1,
     code: '5-1',
-    titleAr: 'محطة الطاقة — المولدات عالية الجهد',
-    titleEn: 'The Power Station — High Voltage Grid',
-    worldTitleAr: 'محطة الطاقة',
-    worldTitleEn: 'The Power Station',
+    titleAr: 'قلعة الظلام — المعركة الكبرى ضد نواة الظلام',
+    titleEn: 'Darkness Fortress — Grand Battle Against The Shadow Core',
+    worldTitleAr: 'قلعة الظلام',
+    worldTitleEn: 'Darkness Fortress',
     subtitleAr:
-      'اقفز عبر المنصات المتزامنة والتيارات الكهربائية العالية، اجمع كابلات 6 مم²، وواجه الزعيم «حارس المحطة العملاق»!',
-    difficultyAr: 'صعب+',
-    finalChallengeAr: 'معركة الزعيم: حارس المحطة العملاق (موجات صدمية + قذائف بلازما)',
-    finalChallengeType: 'boss_transformer',
-    theme: 'power_station',
-    accentColor: '#38BDF8',
-    skyTop: '#091526',
-    skyBottom: '#162B4D',
-    width: 2850,
+      'المرحلة الخامسة والختامية الكبرى! اخترق بوابات وغرف الطاقة في قلعة الظلام عبر 5 قطاعات شاسعة، قاتل «مطارد الظلام» و«طائر الفراغ» و«عملاق الظل» و«حارس القلعة»، واهزم الزعيم النهائي «نواة الظلام — THE SHADOW CORE»!',
+    difficultyAr: 'التحدي النهائي الأسطوري',
+    finalChallengeAr: 'تدمير الأجزاء الدفاعية وهزيمة الزعيم النهائي «نواة الظلام — THE SHADOW CORE» عبر أطواره المتعددة',
+    finalChallengeType: 'boss_dark_king_3phase',
+    darknessLevel: 0.14,
+    windForce: -25,
+    theme: 'darkness_fortress',
+    accentColor: '#F43F5E',
+    skyTop: '#090D16',
+    skyBottom: '#1F122B',
+    width: 6000,
     height: 560,
     groundY: 480,
     heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2710, y: 405, labelAr: 'قلب محطة الطاقة' },
+    goalPortal: { x: 5840, y: 405, labelAr: 'القاطع الأسطوري للإنارة الحديثة' },
     platforms: [
-      { id: 'l5-p1', x: 0, y: 480, w: 560, h: 80, kind: 'solid', material: 'copper' },
-      // Synchronized moving platforms over high-voltage gap
+      // Section A (0–1150): Outer Fortress Ramparts & Mechanical Gates
+      { id: 'l5-p1', x: 0, y: 480, w: 620, h: 80, kind: 'solid', material: 'fortress_stone' },
+      { id: 'l5-p2', x: 260, y: 375, w: 170, h: 24, kind: 'solid', material: 'steel' },
       {
-        id: 'l5-sync1',
-        x: 620,
-        y: 410,
-        w: 145,
+        id: 'l5-conv1',
+        x: 670,
+        y: 420,
+        w: 320,
+        h: 24,
+        kind: 'conveyor',
+        material: 'steel',
+        conveyorSpeed: -105,
+      },
+      // Section B (1150–2350): Deep Vertical Energy Chambers & Void Flyer Chasm
+      { id: 'l5-p3', x: 1050, y: 480, w: 660, h: 80, kind: 'solid', material: 'fortress_stone' },
+      { id: 'l5-p4', x: 1190, y: 365, w: 185, h: 24, kind: 'solid', material: 'copper' },
+      { id: 'l5-p5', x: 1440, y: 265, w: 195, h: 22, kind: 'secret_spotlight', material: 'neon_glass', isSecret: true },
+      {
+        id: 'l5-mov1',
+        x: 1770,
+        y: 380,
+        w: 165,
         h: 22,
         kind: 'moving',
         material: 'copper',
-        startX: 600,
-        startY: 410,
-        endX: 810,
-        endY: 350,
-        speed: 115,
+        startX: 1750,
+        startY: 420,
+        endX: 1980,
+        endY: 300,
+        speed: 125,
       },
+      { id: 'l5-p6', x: 2040, y: 480, w: 380, h: 80, kind: 'solid', material: 'fortress_stone' },
+      // Section C (2350–3550): Multi-Stage Puzzle Hall & Shadow Brute Arena
+      { id: 'l5-p7', x: 2480, y: 480, w: 980, h: 80, kind: 'solid', material: 'fortress_stone' },
+      { id: 'l5-p8', x: 2610, y: 365, w: 180, h: 24, kind: 'solid', material: 'steel' },
       {
-        id: 'l5-sync2',
-        x: 890,
-        y: 350,
-        w: 145,
+        id: 'l5-phase1',
+        x: 2860,
+        y: 285,
+        w: 185,
         h: 22,
-        kind: 'moving',
-        material: 'copper',
-        startX: 870,
-        startY: 350,
-        endX: 1080,
-        endY: 410,
-        speed: 115,
+        kind: 'phase',
+        material: 'neon_glass',
       },
-      { id: 'l5-p2', x: 1150, y: 480, w: 520, h: 80, kind: 'solid', material: 'steel' },
+      { id: 'l5-p9', x: 3110, y: 365, w: 185, h: 24, kind: 'solid', material: 'copper' },
+      // Section D (3550–4720): Fortress Guardian Citadel & High-Hazard Gauntlet
+      { id: 'l5-p10', x: 3530, y: 480, w: 1120, h: 80, kind: 'solid', material: 'fortress_stone' },
+      {
+        id: 'l5-conv2',
+        x: 3660,
+        y: 385,
+        w: 310,
+        h: 24,
+        kind: 'conveyor',
+        material: 'steel',
+        conveyorSpeed: 120,
+      },
+      { id: 'l5-p11', x: 4040, y: 295, w: 190, h: 24, kind: 'solid', material: 'copper' },
+      { id: 'l5-p12', x: 4300, y: 365, w: 195, h: 24, kind: 'solid', material: 'steel' },
+      // Section E + Final Boss Arena (4720–6000): THE SHADOW CORE Sanctum
+      { id: 'l5-p13', x: 4720, y: 480, w: 1280, h: 80, kind: 'solid', material: 'fortress_stone' },
       {
         id: 'l5-sp1',
-        x: 1560,
+        x: 4790,
         y: 454,
-        w: 58,
+        w: 60,
         h: 26,
         kind: 'spring',
         material: 'copper',
-        springBoostVy: -750,
+        springBoostVy: -780,
       },
-      // Boss Arena
-      { id: 'l5-arena', x: 1730, y: 480, w: 1120, h: 80, kind: 'solid', material: 'fortress_stone' },
-      { id: 'l5-bplat1', x: 1860, y: 360, w: 165, h: 22, kind: 'solid', material: 'copper' },
-      { id: 'l5-bplat2', x: 2150, y: 305, w: 180, h: 22, kind: 'solid', material: 'copper' },
-      { id: 'l5-bplat3', x: 2440, y: 360, w: 165, h: 22, kind: 'solid', material: 'copper' },
+      { id: 'l5-b1', x: 4920, y: 360, w: 180, h: 22, kind: 'solid', material: 'copper' },
+      { id: 'l5-b2', x: 5230, y: 290, w: 200, h: 22, kind: 'solid', material: 'neon_glass' },
+      { id: 'l5-b3', x: 5560, y: 360, w: 180, h: 22, kind: 'solid', material: 'copper' },
     ],
     collectibles: [
-      { id: 'l5-c1', x: 260, y: 435, kind: 'wire_6mm', value: 300, collected: false },
-      { id: 'l5-c2', x: 710, y: 330, kind: 'wire_4mm', value: 220, collected: false },
-      { id: 'l5-c3', x: 980, y: 330, kind: 'electrical_connector', value: 170, collected: false },
-      { id: 'l5-c4', x: 1350, y: 435, kind: 'wire_6mm', value: 300, collected: false },
-      { id: 'l5-c5', x: 1940, y: 315, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l5-c6', x: 2240, y: 260, kind: 'wire_4mm', value: 220, collected: false },
-      { id: 'l5-c7', x: 2520, y: 315, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l5-c1', x: 220, y: 435, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l5-c2', x: 345, y: 330, kind: 'rechargeable_floodlight', value: 320, collected: false },
+      { id: 'l5-c3', x: 820, y: 375, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l5-c4', x: 1280, y: 320, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l5-c5', x: 1535, y: 220, kind: 'intercom_device', value: 280, collected: false, isSecret: true },
+      { id: 'l5-c6', x: 1865, y: 310, kind: 'rechargeable_floodlight', value: 320, collected: false },
+      { id: 'l5-c7', x: 2700, y: 320, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l5-c8', x: 2950, y: 240, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l5-c9', x: 3200, y: 320, kind: 'electrical_connector', value: 170, collected: false },
+      { id: 'l5-c10', x: 3810, y: 340, kind: 'wire_4mm', value: 220, collected: false },
+      { id: 'l5-c11', x: 4135, y: 250, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l5-c12', x: 5010, y: 315, kind: 'wire_6mm', value: 300, collected: false },
+      { id: 'l5-c13', x: 5330, y: 245, kind: 'led_bulb', value: 250, collected: false },
+      { id: 'l5-c14', x: 5650, y: 315, kind: 'wire_6mm', value: 300, collected: false },
     ],
-    switches: [],
-    gates: [],
+    switches: [
+      { id: 'l5-sw1', x: 1280, y: 365, activated: false, targetId: 'l5-gate1', labelAr: 'قاطع البوابة الميكانيكية الأولى (1/3)' },
+      { id: 'l5-sw2', x: 3200, y: 365, activated: false, targetId: 'l5-gate2', labelAr: 'قاطع غرفة الطاقة المظلمة (2/3)' },
+      { id: 'l5-sw3', x: 4395, y: 365, activated: false, targetId: 'l5-gate3', labelAr: 'قاطع sanctum نواة الظلام (3/3)' },
+    ],
+    gates: [
+      {
+        id: 'l5-gate1',
+        x: 2360,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l5-sw1',
+        labelAr: 'بوابة القلعة الداخلية (فعّل القاطع 1/3)',
+      },
+      {
+        id: 'l5-gate2',
+        x: 3410,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l5-sw2',
+        labelAr: 'بوابة ممر حراس القلعة (فعّل القاطع 2/3)',
+      },
+      {
+        id: 'l5-gate3',
+        x: 4610,
+        y: 350,
+        w: 28,
+        h: 130,
+        isOpen: false,
+        switchId: 'l5-sw3',
+        labelAr: 'بوابة غرفة نواة الظلام (فعّل القاطع 3/3)',
+      },
+    ],
     checkpoints: [
-      { id: 'l5-cp1', x: 1190, y: 480, activated: false, labelAr: 'محول الجهد المتوسط' },
-      { id: 'l5-cp2', x: 1760, y: 480, activated: false, labelAr: 'قاعة حارس المحطة العملاق' },
+      { id: 'l5-cp1', x: 1090, y: 480, activated: false, labelAr: 'غرفة الطاقة العميقة (B)' },
+      { id: 'l5-cp2', x: 2520, y: 480, activated: false, labelAr: 'قاعة عمالقة الظل (C)' },
+      { id: 'l5-cp3', x: 3570, y: 480, activated: false, labelAr: 'ممر حراس القلعة (D)' },
+      { id: 'l5-cp4', x: 4750, y: 480, activated: false, labelAr: 'بوابة نواة الظلام الكبرى (E)' },
     ],
     enemies: [
+      // Section A: Dark Stalker
       {
         id: 'l5-e1',
-        x: 360,
-        y: 448,
-        w: 32,
-        h: 32,
-        vx: 120,
-        minX: 190,
-        maxX: 520,
-        kind: 'electrical_spark',
+        x: 430,
+        y: 436,
+        w: 44,
+        h: 44,
+        vx: 135,
+        minX: 200,
+        maxX: 590,
+        kind: 'dark_stalker',
+        defeated: false,
+        stompable: true,
+      },
+      // Section B: Void Flyer & Dark Stalker
+      {
+        id: 'l5-e2',
+        x: 1480,
+        y: 320,
+        w: 46,
+        h: 38,
+        vx: 130,
+        baseY: 320,
+        minX: 1120,
+        maxX: 1680,
+        kind: 'void_flyer',
+        defeated: false,
+        stompable: true,
+      },
+      // Section C: Shadow Brute & Void Flyer
+      {
+        id: 'l5-e3',
+        x: 2860,
+        y: 426,
+        w: 58,
+        h: 54,
+        vx: 92,
+        minX: 2560,
+        maxX: 3310,
+        kind: 'shadow_brute',
+        hp: 2,
+        maxHp: 2,
         defeated: false,
         stompable: true,
       },
       {
-        id: 'l5-e2',
-        x: 1380,
+        id: 'l5-e4',
+        x: 3120,
+        y: 305,
+        w: 46,
+        h: 38,
+        vx: -135,
+        baseY: 305,
+        minX: 2650,
+        maxX: 3350,
+        kind: 'void_flyer',
+        defeated: false,
+        stompable: true,
+      },
+      // Section D: Fortress Guardian, Dark Stalker & Shadow Brute
+      {
+        id: 'l5-e5',
+        x: 3920,
+        y: 430,
+        w: 52,
+        h: 50,
+        vx: -108,
+        minX: 3620,
+        maxX: 4220,
+        kind: 'fortress_guardian',
+        hp: 2,
+        maxHp: 2,
+        defeated: false,
+        stompable: true,
+      },
+      {
+        id: 'l5-e6',
+        x: 4380,
         y: 436,
         w: 44,
         h: 44,
-        vx: -95,
-        minX: 1210,
-        maxX: 1530,
-        kind: 'transformer_monster',
+        vx: 142,
+        minX: 4080,
+        maxX: 4560,
+        kind: 'dark_stalker',
         defeated: false,
         stompable: true,
       },
     ],
     hazards: [
       {
+        id: 'l5-press1',
+        x: 810,
+        y: 340,
+        w: 48,
+        h: 80,
+        baseY: 320,
+        kind: 'mechanical_press',
+        period: 2.3,
+        onTime: 0.85,
+        offset: 0,
+      },
+      {
+        id: 'l5-laser1',
+        x: 2790,
+        y: 350,
+        w: 16,
+        h: 130,
+        kind: 'laser_beam',
+        period: 2.5,
+        onTime: 1.0,
+        offset: 0.4,
+      },
+      {
         id: 'l5-h1',
-        x: 1290,
+        x: 5130,
         y: 466,
         w: 65,
         h: 14,
@@ -1223,520 +2038,44 @@ export const GAME_STAGES: StageDefinition[] = [
         onTime: 1.0,
         offset: 0,
       },
-    ],
-    boss: {
-      archetype: 'transformer_guardian_boss',
-      nameAr: 'حارس المحطة العملاق',
-      nameEn: 'Giant Transformer Guardian',
-      x: 2260,
-      y: 392,
-      w: 86,
-      h: 88,
-      vx: -130,
-      minX: 1840,
-      maxX: 2580,
-      hp: 4,
-      maxHp: 4,
-      phase: 1,
-      state: 'patrol',
-      stateTimer: 2.4,
-      invulnTimer: 0,
-      shockwaveLeftX: 2260,
-      shockwaveRightX: 2260,
-      shockwaveY: 466,
-      shockwaveActive: false,
-      projectiles: [],
-      breakers: [
-        { id: 'l5-bb1', x: 1940, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ 1' },
-        { id: 'l5-bb2', x: 2240, y: 305, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ 2' },
-        { id: 'l5-bb3', x: 2520, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ 3' },
-      ],
-    },
-  },
-
-  // ==========================================================================
-  // LEVEL 6 — المدينة المظلمة (THE DARK CITY)
-  // Environment: A city during a massive blackout
-  // New mechanics: Limited visibility & temporary light sources (Rechargeable Floodlights)
-  // Enemies: Shadow creatures & flying electrical monsters
-  // Final challenge: Restore power to the city under time pressure (80s)!
-  // ==========================================================================
-  {
-    id: 'lvl-6',
-    stageIndex: 5,
-    worldNumber: 6,
-    stageNumber: 1,
-    code: '6-1',
-    titleAr: 'المدينة المظلمة — مهمة كسر التعتيم الشامل',
-    titleEn: 'The Dark City — Blackout Rescue',
-    worldTitleAr: 'المدينة المظلمة',
-    worldTitleEn: 'The Dark City',
-    subtitleAr:
-      'خيّم الظلام على المدينة! اعتمد على توهج لمبة البطل واجمع «كشافات الشحن» لتوسيع الرؤية، وشغّل مولدات الطوارئ الثلاثة قبل نفاد الوقت!',
-    difficultyAr: 'صعب جداً',
-    finalChallengeAr: 'إعادة التيار للمدينة بتشغيل 3 مولدات طوارئ تحت ضغط الوقت (80 ثانية)',
-    finalChallengeType: 'timed_power_restoration',
-    challengeTimeLimitSec: 80,
-    darknessLevel: 0.56,
-    theme: 'dark_city',
-    accentColor: '#22D3EE',
-    skyTop: '#0F0C29',
-    skyBottom: '#302B63',
-    width: 2800,
-    height: 560,
-    groundY: 480,
-    heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2660, y: 405, labelAr: 'برج استعادة النور' },
-    platforms: [
-      { id: 'l6-p1', x: 0, y: 480, w: 620, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l6-p2', x: 340, y: 365, w: 170, h: 24, kind: 'solid', material: 'brick' },
       {
-        id: 'l6-p3',
-        x: 680,
-        y: 400,
-        w: 155,
-        h: 22,
-        kind: 'phase',
-        material: 'neon_glass',
-        phaseState: 'ready',
-        phaseTimer: 0,
-      },
-      { id: 'l6-p4', x: 900, y: 480, w: 720, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l6-p5', x: 1120, y: 350, w: 210, h: 24, kind: 'solid', material: 'steel' },
-      {
-        id: 'l6-p6',
-        x: 1680,
-        y: 385,
-        w: 160,
-        h: 24,
-        kind: 'moving',
-        material: 'neon_glass',
-        startX: 1660,
-        startY: 400,
-        endX: 1880,
-        endY: 330,
-        speed: 115,
-      },
-      { id: 'l6-p7', x: 1960, y: 480, w: 840, h: 80, kind: 'solid', material: 'concrete' },
-      { id: 'l6-p8', x: 2150, y: 355, w: 200, h: 24, kind: 'solid', material: 'copper' },
-    ],
-    collectibles: [
-      { id: 'l6-c1', x: 220, y: 435, kind: 'rechargeable_floodlight', value: 320, collected: false },
-      { id: 'l6-c2', x: 425, y: 320, kind: 'led_spotlight', value: 240, collected: false },
-      { id: 'l6-c3', x: 980, y: 435, kind: 'rechargeable_floodlight', value: 320, collected: false },
-      { id: 'l6-c4', x: 1225, y: 305, kind: 'outdoor_fixture', value: 260, collected: false },
-      { id: 'l6-c5', x: 1760, y: 315, kind: 'rechargeable_floodlight', value: 320, collected: false },
-      { id: 'l6-c6', x: 2060, y: 435, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l6-c7', x: 2250, y: 310, kind: 'outdoor_fixture', value: 260, collected: false },
-    ],
-    switches: [
-      { id: 'l6-sw1', x: 425, y: 365, activated: false, targetId: 'l6-gate', labelAr: 'مولد طوارئ الحي الغربي (1/3)' },
-      { id: 'l6-sw2', x: 1225, y: 350, activated: false, targetId: 'l6-gate', labelAr: 'مولد طوارئ الساحة الوسطى (2/3)' },
-      { id: 'l6-sw3', x: 2250, y: 355, activated: false, targetId: 'l6-gate', labelAr: 'مولد طوارئ البرج الشرقي (3/3)' },
-    ],
-    gates: [
-      {
-        id: 'l6-gate',
-        x: 2510,
-        y: 350,
-        w: 28,
-        h: 130,
-        isOpen: false,
-        requiredSwitchesCount: 3,
-        labelAr: 'بوابة استعادة النور (شغّل المولدات الثلاثة 3/3)',
-      },
-    ],
-    checkpoints: [
-      { id: 'l6-cp1', x: 940, y: 480, activated: false, labelAr: 'كشاف طوارئ 1' },
-      { id: 'l6-cp2', x: 2010, y: 480, activated: false, labelAr: 'كشاف طوارئ 2' },
-    ],
-    enemies: [
-      {
-        id: 'l6-e1',
-        x: 480,
-        y: 444,
-        w: 36,
-        h: 36,
-        vx: 115,
-        minX: 250,
-        maxX: 590,
-        kind: 'shadow_creature',
-        defeated: false,
-        stompable: true,
-      },
-      {
-        id: 'l6-e2',
-        x: 1340,
-        y: 444,
-        w: 36,
-        h: 36,
-        vx: -125,
-        minX: 1020,
-        maxX: 1560,
-        kind: 'shadow_creature',
-        defeated: false,
-        stompable: true,
-      },
-      {
-        id: 'l6-e3',
-        x: 1450,
-        y: 310,
-        w: 40,
-        h: 34,
-        vx: 115,
-        baseY: 310,
-        minX: 1150,
-        maxX: 1620,
-        kind: 'flying_drone',
-        defeated: false,
-        stompable: true,
-      },
-      {
-        id: 'l6-e4',
-        x: 2340,
-        y: 444,
-        w: 36,
-        h: 36,
-        vx: -130,
-        minX: 2040,
-        maxX: 2470,
-        kind: 'shadow_creature',
-        defeated: false,
-        stompable: true,
-      },
-    ],
-    hazards: [],
-  },
-
-  // ==========================================================================
-  // LEVEL 7 — برج الإنارة (THE LIGHTING TOWER)
-  // Environment: A futuristic skyscraper
-  // New mechanics: Vertical platforming, elevators, moving structures, wind effects
-  // Enemies: Advanced flying drones & giant mechanical guardians
-  // Final Boss: Giant Construction Robot (عملاق البناء الآلي)
-  // ==========================================================================
-  {
-    id: 'lvl-7',
-    stageIndex: 6,
-    worldNumber: 7,
-    stageNumber: 1,
-    code: '7-1',
-    titleAr: 'برج الإنارة — ناطحة السحاب المستقبلية',
-    titleEn: 'The Lighting Tower — Skyscraper Ascent',
-    worldTitleAr: 'برج الإنارة',
-    worldTitleEn: 'The Lighting Tower',
-    subtitleAr:
-      'اصعد عبر المصاعد الفضائية والمنصات العالية في مواجهة الرياح القوية، واهزم «عملاق البناء الآلي» على قمة البرج!',
-    difficultyAr: 'خبير',
-    finalChallengeAr: 'معركة قمة البرج: عملاق البناء الآلي وسط الرياح العالية',
-    finalChallengeType: 'boss_construction_giant',
-    windForce: -42, // Subtle headwind pushing left to test precision platforming & dash
-    theme: 'lighting_tower',
-    accentColor: '#38BDF8',
-    skyTop: '#0284C7',
-    skyBottom: '#E0F2FE',
-    width: 2900,
-    height: 560,
-    groundY: 480,
-    heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2760, y: 405, labelAr: 'منارة قمة برج الإنارة' },
-    platforms: [
-      { id: 'l7-p1', x: 0, y: 480, w: 540, h: 80, kind: 'solid', material: 'neon_glass' },
-      {
-        id: 'l7-elev1',
-        x: 600,
-        y: 410,
-        w: 145,
-        h: 22,
-        kind: 'moving',
-        material: 'steel',
-        startX: 600,
-        startY: 440,
-        endX: 780,
-        endY: 280,
-        speed: 120,
-      },
-      { id: 'l7-p2', x: 850, y: 290, w: 280, h: 24, kind: 'solid', material: 'neon_glass' },
-      {
-        id: 'l7-phase1',
-        x: 1190,
-        y: 330,
-        w: 150,
-        h: 22,
-        kind: 'phase',
-        material: 'neon_glass',
-        phaseState: 'ready',
-        phaseTimer: 0,
-      },
-      { id: 'l7-p3', x: 1400, y: 480, w: 420, h: 80, kind: 'solid', material: 'steel' },
-      {
-        id: 'l7-sp1',
-        x: 1720,
-        y: 454,
-        w: 58,
-        h: 26,
-        kind: 'spring',
-        material: 'copper',
-        springBoostVy: -760,
-      },
-      // Skyscraper Roof Boss Arena
-      { id: 'l7-arena', x: 1860, y: 480, w: 1040, h: 80, kind: 'solid', material: 'neon_glass' },
-      { id: 'l7-b1', x: 1980, y: 360, w: 165, h: 22, kind: 'solid', material: 'steel' },
-      { id: 'l7-b2', x: 2260, y: 300, w: 180, h: 22, kind: 'solid', material: 'copper' },
-      { id: 'l7-b3', x: 2540, y: 360, w: 165, h: 22, kind: 'solid', material: 'steel' },
-    ],
-    collectibles: [
-      { id: 'l7-c1', x: 260, y: 435, kind: 'wire_6mm', value: 300, collected: false },
-      { id: 'l7-c2', x: 690, y: 310, kind: 'led_spotlight', value: 240, collected: false },
-      { id: 'l7-c3', x: 990, y: 245, kind: 'waterproof_socket', value: 190, collected: false },
-      { id: 'l7-c4', x: 1265, y: 285, kind: 'led_strip', value: 200, collected: false },
-      { id: 'l7-c5', x: 1560, y: 435, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l7-c6', x: 2060, y: 315, kind: 'wire_4mm', value: 220, collected: false },
-      { id: 'l7-c7', x: 2350, y: 255, kind: 'led_bulb', value: 250, collected: false },
-    ],
-    switches: [],
-    gates: [],
-    checkpoints: [
-      { id: 'l7-cp1', x: 1440, y: 480, activated: false, labelAr: 'شرفة البرج 70' },
-      { id: 'l7-cp2', x: 1900, y: 480, activated: false, labelAr: 'سطح عملاق البناء الآلي' },
-    ],
-    enemies: [
-      {
-        id: 'l7-e1',
-        x: 350,
-        y: 340,
-        w: 40,
-        h: 34,
-        vx: 120,
-        baseY: 340,
-        minX: 180,
-        maxX: 510,
-        kind: 'flying_drone',
-        defeated: false,
-        stompable: true,
-      },
-      {
-        id: 'l7-e2',
-        x: 1580,
-        y: 430,
-        w: 46,
-        h: 50,
-        vx: -100,
-        minX: 1430,
-        maxX: 1700,
-        kind: 'giant_guardian',
-        defeated: false,
-        stompable: true,
-      },
-    ],
-    hazards: [],
-    boss: {
-      archetype: 'construction_robot_boss',
-      nameAr: 'عملاق البناء الآلي',
-      nameEn: 'Giant Construction Robot',
-      x: 2360,
-      y: 388,
-      w: 90,
-      h: 92,
-      vx: -140,
-      minX: 1950,
-      maxX: 2660,
-      hp: 4,
-      maxHp: 4,
-      phase: 1,
-      state: 'patrol',
-      stateTimer: 2.2,
-      invulnTimer: 0,
-      shockwaveLeftX: 2360,
-      shockwaveRightX: 2360,
-      shockwaveY: 466,
-      shockwaveActive: false,
-      projectiles: [],
-      breakers: [
-        { id: 'l7-bb1', x: 2060, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع الرافعة 1' },
-        { id: 'l7-bb2', x: 2350, y: 300, activated: false, cooldown: 0, labelAr: 'قاطع الرافعة 2' },
-        { id: 'l7-bb3', x: 2620, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع الرافعة 3' },
-      ],
-    },
-  },
-
-  // ==========================================================================
-  // LEVEL 8 — قلعة الظلام (FORTRESS OF DARKNESS)
-  // Environment: Dramatic futuristic electrical fortress combining all mechanics
-  // Enemies: Advanced electrical creatures (Shadow, Transformer, Giant Guardian)
-  // Final Boss: ملك الظلام الكهربائي (3 Distinct Phases!)
-  // ==========================================================================
-  {
-    id: 'lvl-8',
-    stageIndex: 7,
-    worldNumber: 8,
-    stageNumber: 1,
-    code: '8-1',
-    titleAr: 'قلعة الظلام — المواجهة الأسطورية الكبرى',
-    titleEn: 'Fortress of Darkness — Final Battle',
-    worldTitleAr: 'قلعة الظلام',
-    worldTitleEn: 'Fortress of Darkness',
-    subtitleAr:
-      'المرحلة الختامية الكبرى! اعبر دفاعات القلعة المتكاملة، ثم واجه «ملك الظلام الكهربائي» عبر 3 أطوار قتالية لإعادة النور الأبدي!',
-    difficultyAr: 'أسطوري (Master)',
-    finalChallengeAr: 'المعركة النهائية ضد «ملك الظلام الكهربائي» (3 أطوار متدرجة الصعوبة)',
-    finalChallengeType: 'boss_dark_king_3phase',
-    theme: 'darkness_fortress',
-    accentColor: '#F43F5E',
-    skyTop: '#090D16',
-    skyBottom: '#1F122B',
-    width: 3000,
-    height: 560,
-    groundY: 480,
-    heroSpawn: { x: 85, y: 410 },
-    goalPortal: { x: 2860, y: 405, labelAr: 'القاطع الأسطوري للإنارة الحديثة' },
-    platforms: [
-      { id: 'l8-p1', x: 0, y: 480, w: 580, h: 80, kind: 'solid', material: 'fortress_stone' },
-      {
-        id: 'l8-conv1',
-        x: 630,
-        y: 420,
-        w: 280,
-        h: 24,
-        kind: 'conveyor',
-        material: 'steel',
-        conveyorSpeed: -100,
-      },
-      {
-        id: 'l8-mov1',
-        x: 970,
-        y: 360,
-        w: 155,
-        h: 22,
-        kind: 'moving',
-        material: 'copper',
-        startX: 950,
-        startY: 380,
-        endX: 1160,
-        endY: 310,
-        speed: 125,
-      },
-      {
-        id: 'l8-phase1',
-        x: 1240,
-        y: 320,
-        w: 150,
-        h: 22,
-        kind: 'phase',
-        material: 'neon_glass',
-        phaseState: 'ready',
-        phaseTimer: 0,
-      },
-      { id: 'l8-p2', x: 1450, y: 480, w: 1550, h: 80, kind: 'solid', material: 'fortress_stone' },
-      // Spring pad on left of Grand Boss Arena
-      {
-        id: 'l8-sp1',
-        x: 1530,
-        y: 454,
-        w: 60,
-        h: 26,
-        kind: 'spring',
-        material: 'copper',
-        springBoostVy: -780,
-      },
-      // Boss Arena Tactical Platforms
-      { id: 'l8-b1', x: 1680, y: 360, w: 175, h: 22, kind: 'solid', material: 'copper' },
-      { id: 'l8-b2', x: 2020, y: 295, w: 190, h: 22, kind: 'solid', material: 'neon_glass' },
-      { id: 'l8-b3', x: 2390, y: 360, w: 175, h: 22, kind: 'solid', material: 'copper' },
-    ],
-    collectibles: [
-      { id: 'l8-c1', x: 260, y: 435, kind: 'wire_6mm', value: 300, collected: false },
-      { id: 'l8-c2', x: 470, y: 435, kind: 'wire_4mm', value: 220, collected: false },
-      { id: 'l8-c3', x: 760, y: 375, kind: 'rechargeable_floodlight', value: 320, collected: false },
-      { id: 'l8-c4', x: 1060, y: 290, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l8-c5', x: 1315, y: 275, kind: 'intercom_device', value: 280, collected: false },
-      { id: 'l8-c6', x: 1765, y: 315, kind: 'wire_4mm', value: 220, collected: false },
-      { id: 'l8-c7', x: 2115, y: 250, kind: 'led_bulb', value: 250, collected: false },
-      { id: 'l8-c8', x: 2475, y: 315, kind: 'wire_6mm', value: 300, collected: false },
-    ],
-    switches: [],
-    gates: [],
-    checkpoints: [
-      { id: 'l8-cp1', x: 1480, y: 480, activated: false, labelAr: 'بوابة عرش ملك الظلام الكهربائي' },
-    ],
-    enemies: [
-      {
-        id: 'l8-e1',
-        x: 370,
-        y: 436,
-        w: 44,
-        h: 44,
-        vx: 115,
-        minX: 190,
-        maxX: 540,
-        kind: 'transformer_monster',
-        defeated: false,
-        stompable: true,
-      },
-      {
-        id: 'l8-e2',
-        x: 750,
-        y: 384,
-        w: 36,
-        h: 36,
-        vx: -120,
-        minX: 640,
-        maxX: 890,
-        kind: 'shadow_creature',
-        defeated: false,
-        stompable: true,
-      },
-    ],
-    hazards: [
-      {
-        id: 'l8-h1',
-        x: 1920,
+        id: 'l5-h2',
+        x: 5470,
         y: 466,
         w: 65,
         h: 14,
         kind: 'timed_arc',
-        period: 2.5,
+        period: 2.4,
         onTime: 1.0,
-        offset: 0,
-      },
-      {
-        id: 'l8-h2',
-        x: 2290,
-        y: 466,
-        w: 65,
-        h: 14,
-        kind: 'timed_arc',
-        period: 2.5,
-        onTime: 1.0,
-        offset: 1.25,
+        offset: 1.2,
       },
     ],
     boss: {
-      archetype: 'electric_dark_king_boss',
-      nameAr: 'ملك الظلام الكهربائي',
-      nameEn: 'The Electric King of Darkness',
-      x: 2220,
-      y: 384,
-      w: 94,
-      h: 96,
-      vx: -145,
-      minX: 1640,
-      maxX: 2680,
-      hp: 6,
-      maxHp: 6,
+      archetype: 'shadow_core_boss',
+      nameAr: 'نواة الظلام — THE SHADOW CORE',
+      nameEn: 'THE SHADOW CORE',
+      x: 5380,
+      y: 382,
+      w: 96,
+      h: 98,
+      vx: -148,
+      minX: 4880,
+      maxX: 5760,
+      hp: 8,
+      maxHp: 8,
       phase: 1,
       state: 'patrol',
-      stateTimer: 2.2,
+      stateTimer: 2.0,
       invulnTimer: 0,
-      shockwaveLeftX: 2220,
-      shockwaveRightX: 2220,
+      shockwaveLeftX: 5380,
+      shockwaveRightX: 5380,
       shockwaveY: 466,
       shockwaveActive: false,
       projectiles: [],
       breakers: [
-        { id: 'l8-bb1', x: 1765, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع النور النقي 1' },
-        { id: 'l8-bb2', x: 2115, y: 295, activated: false, cooldown: 0, labelAr: 'قاطع النور النقي 2' },
-        { id: 'l8-bb3', x: 2475, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع النور النقي 3' },
+        { id: 'l5-bb1', x: 5010, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النواة 1' },
+        { id: 'l5-bb2', x: 5330, y: 290, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النواة 2' },
+        { id: 'l5-bb3', x: 5650, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النواة 3' },
       ],
     },
   },
@@ -1755,7 +2094,7 @@ export const GAME_WORLDS: WorldDefinition[] = GAME_STAGES.map((stg) => ({
 }))
 
 // ============================================================================
-// SECTION 14 — PROGRESSION, ACHIEVEMENTS & LOCAL SAVE ENGINE
+// SECTION 14 & V13 SECTION 19 — SAFE DATA MIGRATION & PROGRESSION ENGINE
 // ============================================================================
 
 export interface AchievementDef {
@@ -1768,32 +2107,32 @@ export interface AchievementDef {
 export const GAME_ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'first_light',
-    titleAr: 'شرارة النور الأولى',
-    descAr: 'إتمام المرحلة الأولى (مدينة النور) بنجاح',
+    titleAr: 'شرارة مدينة النور',
+    descAr: 'هزيمة حارس الشارع المدرع وإتمام المرحلة الأولى (مدينة النور)',
     icon: '💡',
   },
   {
     id: 'wire_collector',
-    titleAr: 'خبير الكابلات الإيطالية',
-    descAr: 'جمع 10 منتجات كهربائية وأسلاك نحاسية متنوعة',
-    icon: '🔌',
+    titleAr: 'بطل فرع البيضاء البرتقالي',
+    descAr: 'هزيمة الساحق البرتقالي العملاق في المرحلة الثانية (الإنارة فرع البيضاء)',
+    icon: '🧡',
   },
   {
     id: 'security_master',
-    titleAr: 'مهندس الإنترفون الذكي',
-    descAr: 'حل لغز بوابات الأمان في حي الإنترفون (المرحلة 4)',
-    icon: '🛡️',
+    titleAr: 'قائد مصنع الإنارة',
+    descAr: 'هزيمة سيد المصنع الآلي وإتمام المرحلة الثالثة (مصنع الإنارة)',
+    icon: '⚙️',
   },
   {
     id: 'blackout_savior',
-    titleAr: 'قاهر الظلام الدامس',
-    descAr: 'استعادة الكهرباء للمدينة المظلمة تحت ضغط الوقت (المرحلة 6)',
-    icon: '🔦',
+    titleAr: 'فارس فرع الليثي الأزرق',
+    descAr: 'هزيمة الحارس الأزرق المدرع وإتمام المرحلة الرابعة (الإنارة فرع الليثي)',
+    icon: '💙',
   },
   {
     id: 'legendary_bulb',
     titleAr: 'بطل الإنارة الأسطوري',
-    descAr: 'هزيمة ملك الظلام الكهربائي وإتمام المراحل الثماني كاملة',
+    descAr: 'هزيمة نواة الظلام في قلعة الظلام وإتمام المراحل الخمس كاملة',
     icon: '👑',
   },
 ]
@@ -1811,47 +2150,110 @@ export interface PlayerProgressionState {
   doubleJumpUnlocked: boolean
   dashUnlocked: boolean
   reducedMotion: boolean
+  integrityHash?: string
 }
 
-const PROGRESSION_STORAGE_KEY = 'enarah_light_hero_progression_v2'
+export const PROGRESSION_STORAGE_KEY = 'enarah_light_hero_progression_v13'
+export const LEGACY_V12_ARCHIVE_KEY = 'enarah_light_hero_progression_v12_archive'
+
+export function computeProgressionChecksum(
+  unlockedStageIndex: number,
+  completedStageIds: string[]
+): string {
+  const sorted = [...completedStageIds].sort().join(',')
+  const payload = `enarah_v13_prog:${unlockedStageIndex}:${sorted}`
+  let h = 2166136261
+  for (let i = 0; i < payload.length; i++) {
+    h ^= payload.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return (h >>> 0).toString(16)
+}
+
+/**
+ * Enforces strict sequential stage unlocking across the 5 main levels:
+ * Stage 1 (index 0) is unlocked by default.
+ * Stage N+1 (index N) unlocks ONLY if all stages 0..N-1 are in completedStageIds.
+ */
+export function computeSequentialUnlockedIndex(completedStageIds: string[]): number {
+  const set = new Set(completedStageIds)
+  let highestUnlocked = 0
+  for (let i = 0; i < GAME_STAGES.length - 1; i++) {
+    if (set.has(GAME_STAGES[i].id)) {
+      highestUnlocked = i + 1
+    } else {
+      break
+    }
+  }
+  return Math.min(GAME_STAGES.length - 1, highestUnlocked)
+}
 
 export function getDefaultProgression(): PlayerProgressionState {
+  const completedStageIds: string[] = []
   return {
-    version: 2,
+    version: 13,
     unlockedStageIndex: 0,
-    completedStageIds: [],
+    completedStageIds,
     bestStageScores: {},
     bestStageTimesSec: {},
     stageStarsEarned: {},
     totalCollectedEnergy: 0,
     productCounts: {},
     achievements: [],
-    doubleJumpUnlocked: true, // Available & upgradeable so player can enjoy responsive double-jump & dash
+    doubleJumpUnlocked: true,
     dashUnlocked: true,
     reducedMotion: false,
+    integrityHash: computeProgressionChecksum(0, completedStageIds),
   }
 }
 
 export function loadPlayerProgression(): PlayerProgressionState {
   if (typeof window === 'undefined') return getDefaultProgression()
   try {
-    const raw =
-      localStorage.getItem(PROGRESSION_STORAGE_KEY) ||
-      localStorage.getItem('enarah_light_hero_progression_v1')
+    // V13 Section 19: Safe non-destructive migration of legacy 8-stage progression records
+    const legacyV2 = localStorage.getItem('enarah_light_hero_progression_v2')
+    const legacyV1 = localStorage.getItem('enarah_light_hero_progression_v1')
+    if ((legacyV2 || legacyV1) && !localStorage.getItem(LEGACY_V12_ARCHIVE_KEY)) {
+      try {
+        localStorage.setItem(LEGACY_V12_ARCHIVE_KEY, legacyV2 || legacyV1 || '')
+      } catch {}
+    }
+
+    const raw = localStorage.getItem(PROGRESSION_STORAGE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
       if (!parsed || typeof parsed !== 'object') return getDefaultProgression()
       const defaults = getDefaultProgression()
+      const rawCompleted: string[] = Array.isArray(parsed.completedStageIds)
+        ? parsed.completedStageIds.filter((id: unknown) => typeof id === 'string')
+        : []
+      // Enforce sequential completion prefix so skipping stages via localStorage tampering is rejected
+      const validSequentialCompleted: string[] = []
+      for (let i = 0; i < GAME_STAGES.length; i++) {
+        if (rawCompleted.includes(GAME_STAGES[i].id)) {
+          validSequentialCompleted.push(GAME_STAGES[i].id)
+        } else {
+          break
+        }
+      }
+      const maxSequentialUnlocked = computeSequentialUnlockedIndex(validSequentialCompleted)
       const rawUnlocked = Number(parsed.unlockedStageIndex)
+      let safeUnlocked = Math.min(
+        maxSequentialUnlocked,
+        Math.max(0, Number.isFinite(rawUnlocked) ? Math.floor(rawUnlocked) : 0)
+      )
+      // Verify integrityHash if present; if tampered (e.g. unlockedStageIndex inflated without checksum), clamp to valid sequential
+      if (typeof parsed.integrityHash === 'string') {
+        const expected = computeProgressionChecksum(rawUnlocked, rawCompleted)
+        if (parsed.integrityHash !== expected) {
+          safeUnlocked = maxSequentialUnlocked
+        }
+      }
       return {
         ...defaults,
-        unlockedStageIndex: Math.min(
-          GAME_STAGES.length - 1,
-          Math.max(0, Number.isFinite(rawUnlocked) ? Math.floor(rawUnlocked) : 0)
-        ),
-        completedStageIds: Array.isArray(parsed.completedStageIds)
-          ? parsed.completedStageIds.filter((id: unknown) => typeof id === 'string')
-          : [],
+        version: 13,
+        unlockedStageIndex: safeUnlocked,
+        completedStageIds: validSequentialCompleted,
         bestStageScores:
           parsed.bestStageScores && typeof parsed.bestStageScores === 'object' && !Array.isArray(parsed.bestStageScores)
             ? parsed.bestStageScores
@@ -1877,7 +2279,12 @@ export function loadPlayerProgression(): PlayerProgressionState {
         doubleJumpUnlocked: true,
         dashUnlocked: true,
         reducedMotion: Boolean(parsed.reducedMotion),
+        integrityHash: computeProgressionChecksum(safeUnlocked, validSequentialCompleted),
       }
+    } else {
+      const freshDefaults = getDefaultProgression()
+      savePlayerProgression(freshDefaults)
+      return freshDefaults
     }
   } catch {}
   return getDefaultProgression()
@@ -1886,7 +2293,24 @@ export function loadPlayerProgression(): PlayerProgressionState {
 export function savePlayerProgression(state: PlayerProgressionState): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(PROGRESSION_STORAGE_KEY, JSON.stringify(state))
+    const validCompleted: string[] = []
+    for (let i = 0; i < GAME_STAGES.length; i++) {
+      if (state.completedStageIds.includes(GAME_STAGES[i].id)) {
+        validCompleted.push(GAME_STAGES[i].id)
+      } else {
+        break
+      }
+    }
+    const maxUnlocked = computeSequentialUnlockedIndex(validCompleted)
+    const safeUnlocked = Math.min(maxUnlocked, Math.max(0, state.unlockedStageIndex))
+    const signedState: PlayerProgressionState = {
+      ...state,
+      version: 13,
+      unlockedStageIndex: safeUnlocked,
+      completedStageIds: validCompleted,
+      integrityHash: computeProgressionChecksum(safeUnlocked, validCompleted),
+    }
+    localStorage.setItem(PROGRESSION_STORAGE_KEY, JSON.stringify(signedState))
   } catch {}
 }
 
@@ -1901,7 +2325,20 @@ export function recordStageCompletion(
   collectedKinds: CollectibleProductKind[] = []
 ): PlayerProgressionState {
   const completedSet = new Set(current.completedStageIds)
-  completedSet.add(stageId)
+  // Only allow completing stageIndex if all previous stages 0..stageIndex-1 are completed
+  let canUnlockSequential = true
+  for (let i = 0; i < stageIndex; i++) {
+    if (!completedSet.has(GAME_STAGES[i].id)) {
+      canUnlockSequential = false
+      break
+    }
+  }
+  if (canUnlockSequential) {
+    completedSet.add(stageId)
+  }
+
+  const completedArray = Array.from(completedSet)
+  const sequentialUnlocked = computeSequentialUnlockedIndex(completedArray)
 
   const prevBest = current.bestStageScores[stageId] || 0
   const prevStars = current.stageStarsEarned[stageId] || 0
@@ -1914,19 +2351,17 @@ export function recordStageCompletion(
 
   const totalProducts = current.totalCollectedEnergy + Math.max(0, energyCollected)
   const achSet = new Set(current.achievements)
-  if (stageIndex >= 0) achSet.add('first_light')
-  if (totalProducts >= 10) achSet.add('wire_collector')
-  if (stageIndex >= 3) achSet.add('security_master')
-  if (stageIndex >= 5) achSet.add('blackout_savior')
-  if (stageIndex >= 7) achSet.add('legendary_bulb')
+  if (stageIndex >= 0 && canUnlockSequential) achSet.add('first_light')
+  if (stageIndex >= 1 && canUnlockSequential) achSet.add('wire_collector')
+  if (stageIndex >= 2 && canUnlockSequential) achSet.add('security_master')
+  if (stageIndex >= 3 && canUnlockSequential) achSet.add('blackout_savior')
+  if (stageIndex >= 4 && canUnlockSequential) achSet.add('legendary_bulb')
 
   const nextState: PlayerProgressionState = {
     ...current,
-    unlockedStageIndex: Math.min(
-      GAME_STAGES.length - 1,
-      Math.max(current.unlockedStageIndex, stageIndex + 1)
-    ),
-    completedStageIds: Array.from(completedSet),
+    version: 13,
+    unlockedStageIndex: sequentialUnlocked,
+    completedStageIds: completedArray,
     bestStageScores: {
       ...current.bestStageScores,
       [stageId]: Math.max(prevBest, stageScore),
@@ -1944,8 +2379,167 @@ export function recordStageCompletion(
     achievements: Array.from(achSet),
     doubleJumpUnlocked: true,
     dashUnlocked: true,
+    integrityHash: computeProgressionChecksum(sequentialUnlocked, completedArray),
   }
 
   savePlayerProgression(nextState)
   return nextState
+}
+
+// ============================================================================
+// SECTION 15 — 5-MINUTE SESSION EXPIRY & LIFECYCLE STATE MACHINE (V12)
+// ============================================================================
+
+export const SESSION_TIMEOUT_MS = 5 * 60 * 1000
+export const SESSION_STORAGE_KEY = 'enarah_light_hero_session_v12'
+export const SESSION_EXPIRED_MESSAGE_AR = 'انتهت جلستك، ابدأ مغامرة جديدة!'
+
+export type SessionLifecycleState =
+  | 'ACTIVE'
+  | 'BACKGROUND'
+  | 'RESUMABLE'
+  | 'EXPIRED'
+  | 'NEW_RUN'
+
+export interface ActiveRunSnapshot {
+  stageIndex: number
+  gameState: 'start' | 'playing' | 'paused' | 'stage_clear' | 'victory' | 'gameover'
+  heroX: number
+  heroY: number
+  respawnX: number
+  respawnY: number
+  hp: number
+  lightEnergy: number
+  stageScore: number
+  totalCampaignScore: number
+  collectedIds: string[]
+  activatedSwitchIds: string[]
+  activatedCheckpointIds: string[]
+  defeatedEnemyIds: string[]
+  bossHp?: number
+  bossPhase?: 1 | 2 | 3
+  elapsedSec: number
+}
+
+export interface GameSessionState {
+  sessionId: string
+  lifecycleState: SessionLifecycleState
+  sessionStartedAt: number
+  lastActiveAt: number
+  departedAt: number | null
+  currentStageIndex: number
+  unlockedStagesForRun: number
+  snapshot: ActiveRunSnapshot | null
+  checksum: string
+}
+
+export function isSessionExpired(lastActiveAt: number, now: number): boolean {
+  if (!Number.isFinite(lastActiveAt) || lastActiveAt <= 0) return false
+  if (!Number.isFinite(now) || now <= 0) return false
+  return now - lastActiveAt >= SESSION_TIMEOUT_MS
+}
+
+export function computeSessionChecksum(
+  sessionId: string,
+  lastActiveAt: number,
+  departedAt: number | null,
+  currentStageIndex: number,
+  unlockedStagesForRun: number
+): string {
+  const payload = `enarah_sess_v12:${sessionId}:${Math.floor(lastActiveAt)}:${departedAt ? Math.floor(departedAt) : 0}:${currentStageIndex}:${unlockedStagesForRun}`
+  let h = 2166136261
+  for (let i = 0; i < payload.length; i++) {
+    h ^= payload.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return (h >>> 0).toString(16)
+}
+
+export function createNewGameSession(now = Date.now()): GameSessionState {
+  const sessionId = `sess_${now}_${Math.random().toString(36).slice(2, 8)}`
+  return {
+    sessionId,
+    lifecycleState: 'NEW_RUN',
+    sessionStartedAt: now,
+    lastActiveAt: now,
+    departedAt: null,
+    currentStageIndex: 0,
+    unlockedStagesForRun: 0,
+    snapshot: null,
+    checksum: computeSessionChecksum(sessionId, now, null, 0, 0),
+  }
+}
+
+export function loadGameSessionState(): GameSessionState | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(SESSION_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed || typeof parsed !== 'object' || typeof parsed.sessionId !== 'string') {
+      return null
+    }
+    const lastActiveAt = Number(parsed.lastActiveAt)
+    const departedAt = parsed.departedAt !== null && parsed.departedAt !== undefined ? Number(parsed.departedAt) : null
+    const currentStageIndex = Math.max(0, Math.min(GAME_STAGES.length - 1, Math.floor(Number(parsed.currentStageIndex) || 0)))
+    const unlockedStagesForRun = Math.max(0, Math.min(GAME_STAGES.length - 1, Math.floor(Number(parsed.unlockedStagesForRun) || 0)))
+    if (!Number.isFinite(lastActiveAt) || lastActiveAt <= 0) return null
+
+    return {
+      sessionId: parsed.sessionId,
+      lifecycleState: parsed.lifecycleState || 'ACTIVE',
+      sessionStartedAt: Number(parsed.sessionStartedAt) || lastActiveAt,
+      lastActiveAt,
+      departedAt: departedAt && Number.isFinite(departedAt) ? departedAt : null,
+      currentStageIndex,
+      unlockedStagesForRun,
+      snapshot: parsed.snapshot && typeof parsed.snapshot === 'object' ? parsed.snapshot : null,
+      checksum:
+        typeof parsed.checksum === 'string'
+          ? parsed.checksum
+          : computeSessionChecksum(parsed.sessionId, lastActiveAt, departedAt, currentStageIndex, unlockedStagesForRun),
+    }
+  } catch {
+    return null
+  }
+}
+
+export function saveGameSessionState(session: GameSessionState): void {
+  if (typeof window === 'undefined') return
+  try {
+    const signed: GameSessionState = {
+      ...session,
+      checksum: computeSessionChecksum(
+        session.sessionId,
+        session.lastActiveAt,
+        session.departedAt,
+        session.currentStageIndex,
+        session.unlockedStagesForRun
+      ),
+    }
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(signed))
+  } catch {}
+}
+
+/**
+ * Resets only the current run's stage progression, temporary score, energy,
+ * hearts, checkpoint, boss state, and temporary collectibles while preserving
+ * all Weekly Leaderboard records, player identity, and reducedMotion settings.
+ */
+export function clearRunProgressionForExpiredSession(
+  currentProgression: PlayerProgressionState,
+  now = Date.now()
+): { nextProgression: PlayerProgressionState; nextSession: GameSessionState } {
+  const nextProgression: PlayerProgressionState = {
+    ...currentProgression,
+    unlockedStageIndex: 0,
+    completedStageIds: [],
+    totalCollectedEnergy: 0,
+    productCounts: {},
+    integrityHash: computeProgressionChecksum(0, []),
+  }
+  savePlayerProgression(nextProgression)
+  const nextSession = createNewGameSession(now)
+  saveGameSessionState(nextSession)
+  return { nextProgression, nextSession }
 }
