@@ -4,6 +4,7 @@ import {
   type PlatformData,
   type CollectibleProductKind,
   PRODUCT_CATALOG_META,
+  evaluatePuzzleSwitchInteraction,
 } from './platformerWorlds'
 
 // ============================================================================
@@ -126,6 +127,8 @@ export interface StepSimulationEvents {
   activatedCheckpointId: string | null
   activatedSwitchId: string | null
   openedGateId: string | null
+  puzzleFeedbackMsg?: string | null
+  puzzleFeedbackType?: 'info' | 'success' | 'error'
   stompedEnemyId: string | null
   hitBoss: boolean
   bossPhaseChanged: number | null
@@ -231,6 +234,8 @@ export function stepPlatformerSimulation(
     activatedCheckpointId: null,
     activatedSwitchId: null,
     openedGateId: null,
+    puzzleFeedbackMsg: null,
+    puzzleFeedbackType: 'info',
     stompedEnemyId: null,
     hitBoss: false,
     bossPhaseChanged: null,
@@ -652,27 +657,49 @@ export function stepPlatformerSimulation(
   }
 
   // --------------------------------------------------------------------------
-  // 10. ELECTRICAL SWITCHES, MULTI-SWITCH GATES & INTERCOM DOORS
+  // 10. V15 PUZZLE STATE MACHINE, INTERCONNECTED SWITCHES & TELEPORT GATES
   // --------------------------------------------------------------------------
   for (const sw of stage.switches) {
-    if (sw.activated) continue
-    if (aabbOverlap(hero.x, hero.y, hero.w, hero.h, sw.x - 24, sw.y - 46, 48, 50)) {
-      sw.activated = true
-      events.activatedSwitchId = sw.id
+    if (sw.cooldownTimer && sw.cooldownTimer > 0) {
+      sw.cooldownTimer = Math.max(0, sw.cooldownTimer - dt)
+    }
+    const overlapping = aabbOverlap(hero.x, hero.y, hero.w, hero.h, sw.x - 24, sw.y - 46, 48, 50)
+    if (!overlapping) continue
 
-      // Unlock matching single-switch gate or bridge
+    // Keep cooldown refreshed while standing inside the switch box so it only fires once per visit (unless Attack is pressed)
+    if ((sw.cooldownTimer || 0) > 0 && !input.attackPressed) {
+      sw.cooldownTimer = Math.max(sw.cooldownTimer || 0, 0.28)
+      continue
+    }
+
+    if (!sw.toggleable && sw.activated) continue
+
+    sw.cooldownTimer = 0.85
+    const transition = evaluatePuzzleSwitchInteraction(stage, sw)
+    events.activatedSwitchId = sw.id
+    events.puzzleFeedbackMsg = transition.feedbackMessageAr
+    events.puzzleFeedbackType = transition.feedbackType
+
+    if (transition.teleportedTo) {
+      hero.x = transition.teleportedTo.x
+      hero.y = transition.teleportedTo.y
+      hero.vy = 0
+      hero.invincibleTimer = Math.max(hero.invincibleTimer, 0.45)
+    }
+
+    if (transition.puzzleSolvedNow) {
+      events.collectedValue += 300
+      if (sw.targetId) {
+        events.openedGateId = sw.targetId
+      }
+    }
+
+    // Legacy single-switch fallback when switch does not belong to a V15 puzzle
+    if (!sw.puzzleId) {
       for (const gate of stage.gates) {
         if (gate.switchId === sw.id || gate.id === sw.targetId) {
-          if (gate.requiredSwitchesCount) {
-            const activeCount = stage.switches.filter((s) => s.activated).length
-            if (activeCount >= gate.requiredSwitchesCount) {
-              gate.isOpen = true
-              events.openedGateId = gate.id
-            }
-          } else {
-            gate.isOpen = true
-            events.openedGateId = gate.id
-          }
+          gate.isOpen = true
+          events.openedGateId = gate.id
         }
       }
       for (const plat of stage.platforms) {
@@ -683,17 +710,16 @@ export function stepPlatformerSimulation(
     }
   }
 
-  // Also check multi-switch or intercom gates automatically
-  const totalActivatedSwitches = stage.switches.filter((s) => s.activated).length
-  for (const gate of stage.gates) {
-    if (gate.isOpen) continue
-    if (gate.requiredSwitchesCount && totalActivatedSwitches >= gate.requiredSwitchesCount) {
-      gate.isOpen = true
-      events.openedGateId = gate.id
-    }
-    if (gate.requiredIntercoms && hero.intercomsCollected >= gate.requiredIntercoms) {
-      gate.isOpen = true
-      events.openedGateId = gate.id
+  // Synchronize puzzle-controlled gates
+  if (stage.puzzles && stage.puzzles.length > 0) {
+    for (const puz of stage.puzzles) {
+      if (puz.solved && puz.targetGateId) {
+        const g = stage.gates.find((gate) => gate.id === puz.targetGateId)
+        if (g && !g.isOpen) {
+          g.isOpen = true
+          events.openedGateId = g.id
+        }
+      }
     }
   }
 
@@ -1332,10 +1358,10 @@ export function stepPlatformerSimulation(
     if (boss.invulnTimer > 0) boss.invulnTimer = Math.max(0, boss.invulnTimer - dt)
     boss.stateTimer -= dt
 
-    // Determine dynamic phase (4 phases for Blue Sentinel, 3 phases for Orange Crusher / Factory Overlord / Shadow Core)
+    // Determine dynamic phase (4 phases for Blue Sentinel & Shadow Core, 3 phases for Orange Crusher / Factory Overlord)
     const hpRatio = boss.hp / boss.maxHp
     let targetPhase: 1 | 2 | 3 | 4 = 1
-    if (boss.archetype === 'blue_sentinel_boss') {
+    if (boss.archetype === 'blue_sentinel_boss' || boss.archetype === 'shadow_core_boss') {
       targetPhase = hpRatio <= 0.25 ? 4 : hpRatio <= 0.5 ? 3 : hpRatio <= 0.75 ? 2 : 1
     } else {
       targetPhase = hpRatio <= 0.34 ? 3 : hpRatio <= 0.67 ? 2 : 1
@@ -1343,6 +1369,9 @@ export function stepPlatformerSimulation(
     if (targetPhase !== boss.phase) {
       boss.phase = targetPhase
       events.bossPhaseChanged = targetPhase
+      if (boss.archetype === 'shadow_core_boss') {
+        boss.shieldLocked = true
+      }
     }
 
     const phaseSpeedMult =
@@ -1361,7 +1390,7 @@ export function stepPlatformerSimulation(
       }
     }
 
-    // Update Arena Breaker Switches
+    // Update Arena Breaker Switches (Environmental Boss Mechanics — V15 Sections 3–7)
     for (const brk of boss.breakers) {
       if (brk.cooldown > 0) {
         brk.cooldown = Math.max(0, brk.cooldown - dt)
@@ -1373,6 +1402,9 @@ export function stepPlatformerSimulation(
       ) {
         brk.activated = true
         brk.cooldown = 10.5
+        boss.shieldLocked = false
+        boss.state = 'vulnerable'
+        boss.stateTimer = 2.6
         damageBoss(boss, events)
       }
     }
@@ -1536,7 +1568,14 @@ export function stepPlatformerSimulation(
         hero.vy = -520
         hero.onGround = false
         hero.doubleJumpAvailable = true
-        damageBoss(boss, events)
+        if (boss.shieldLocked) {
+          hero.invincibleTimer = Math.max(hero.invincibleTimer, 0.5)
+          events.puzzleFeedbackMsg =
+            '🛡️ درع الزعيم محصّن في هذا الطور! فعّل قواطع وآليات الساحة لتعطيل الدرع أولاً!'
+          events.puzzleFeedbackType = 'info'
+        } else {
+          damageBoss(boss, events)
+        }
       } else if (hero.invincibleTimer <= 0 && boss.invulnTimer <= 0) {
         applyHeroDamage(hero, events)
         if (events.stageDefeated) return events

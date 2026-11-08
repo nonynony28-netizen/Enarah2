@@ -51,6 +51,8 @@ import {
   loadGameSessionState,
   saveGameSessionState,
   clearRunProgressionForExpiredSession,
+  validateAllStagePuzzlesSolvability,
+  evaluatePuzzleSwitchInteraction,
 } from './platformerWorlds'
 import {
   type HeroPhysicsState,
@@ -220,6 +222,9 @@ export function GameEngine() {
   const [showStageSelectModal, setShowStageSelectModal] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showHintModal, setShowHintModal] = useState(false)
+  const [selectedHintPuzzleId, setSelectedHintPuzzleId] = useState<string | null>(null)
+  const [unlockedHintLevelByPuzzle, setUnlockedHintLevelByPuzzle] = useState<Record<string, 1 | 2 | 3>>({})
 
   // Audio, Graphics Quality & Accessibility Settings (Sections 09, 16, 19)
   const [isMuted, setIsMuted] = useState<boolean>(() => sound.isMuted)
@@ -661,7 +666,7 @@ export function GameEngine() {
     }
   }, [clearAllInputs, syncViewportAndCameraZoom, gameState, isFullscreen, isDedicatedMobileGameplay])
 
-  const isAnyGameModalOpen = showStageSelectModal || showSettingsModal || showLeaderboard
+  const isAnyGameModalOpen = showStageSelectModal || showSettingsModal || showLeaderboard || showHintModal
 
   useEffect(() => {
     if (typeof document === 'undefined') return
@@ -883,6 +888,7 @@ export function GameEngine() {
         activatedSwitchIds: stageRef.current.switches.filter((s) => s.activated).map((s) => s.id),
         activatedCheckpointIds: stageRef.current.checkpoints.filter((cp) => cp.activated).map((cp) => cp.id),
         defeatedEnemyIds: stageRef.current.enemies.filter((e) => e.defeated).map((e) => e.id),
+        solvedPuzzleIds: (stageRef.current.puzzles || []).filter((p) => p.solved).map((p) => p.id),
         bossHp: stageRef.current.boss ? stageRef.current.boss.hp : undefined,
         bossPhase: stageRef.current.boss ? stageRef.current.boss.phase : undefined,
         elapsedSec: Math.round(elapsedSecRef.current * 10) / 10,
@@ -904,6 +910,27 @@ export function GameEngine() {
       const switchSet = new Set(Array.isArray(snap.activatedSwitchIds) ? snap.activatedSwitchIds : [])
       for (const sw of cloned.switches) {
         if (switchSet.has(sw.id)) sw.activated = true
+      }
+      const solvedPuzzleSet = new Set(Array.isArray(snap.solvedPuzzleIds) ? snap.solvedPuzzleIds : [])
+      if (cloned.puzzles) {
+        for (const puz of cloned.puzzles) {
+          if (solvedPuzzleSet.has(puz.id)) {
+            puz.solved = true
+            puz.status = 'solved'
+            puz.statusMessageAr = `✅ اكتمل اللغز: ${puz.titleAr}`
+            if (puz.targetGateId) {
+              const gate = cloned.gates.find((g) => g.id === puz.targetGateId)
+              if (gate) gate.isOpen = true
+            }
+            if (puz.unlocksPlatformId) {
+              const plat = cloned.platforms.find((pl) => pl.id === puz.unlocksPlatformId)
+              if (plat) {
+                plat.unlocked = true
+                plat.isSecret = false
+              }
+            }
+          }
+        }
       }
       const activeSwCount = cloned.switches.filter((s) => s.activated).length
       for (const gate of cloned.gates) {
@@ -998,6 +1025,7 @@ export function GameEngine() {
     setShowStageSelectModal(false)
     setShowSettingsModal(false)
     setShowLeaderboard(false)
+    setShowHintModal(false)
     setGameState('start')
     setSessionLifecycleState('NEW_RUN')
     setSessionExpiredNotice(SESSION_EXPIRED_MESSAGE_AR)
@@ -1167,6 +1195,7 @@ export function GameEngine() {
       setShowStageSelectModal(false)
       setShowSettingsModal(false)
       setShowLeaderboard(false)
+      setShowHintModal(false)
       setGameState('playing')
       setSessionLifecycleState('ACTIVE')
       const now = getCalibratedNow()
@@ -1185,11 +1214,95 @@ export function GameEngine() {
     [buildCurrentRunSnapshot, getCalibratedNow, initStage, progression.bestStageScores, progression.unlockedStageIndex]
   )
 
+  // V15 SECTION 11: Intelligent Checkpoint & Puzzle Preservation System
   const retryCurrentStage = useCallback(() => {
     sound.playButton()
+    const curStage = stageRef.current
+    const hasProgressToPreserve =
+      (curStage.puzzles && curStage.puzzles.some((p) => p.solved)) ||
+      curStage.checkpoints.some((cp) => cp.activated)
+
+    if (hasProgressToPreserve) {
+      const savedRespawnX = heroRef.current.respawnX || curStage.heroSpawn.x
+      const savedRespawnY = heroRef.current.respawnY || curStage.heroSpawn.y
+      const solvedPuzzleIds = new Set(
+        (curStage.puzzles || []).filter((p) => p.solved).map((p) => p.id)
+      )
+      const activatedCpIds = new Set(
+        curStage.checkpoints.filter((cp) => cp.activated).map((cp) => cp.id)
+      )
+      const collectedIds = new Set(
+        curStage.collectibles.filter((c) => c.collected).map((c) => c.id)
+      )
+      const preservedStageScore = stageScoreRef.current
+
+      const freshStage = cloneStageDefinition(GAME_STAGES[currentStageIdx])
+      for (const cp of freshStage.checkpoints) {
+        if (activatedCpIds.has(cp.id)) cp.activated = true
+      }
+      for (const item of freshStage.collectibles) {
+        if (collectedIds.has(item.id)) item.collected = true
+      }
+      if (freshStage.puzzles) {
+        for (const puz of freshStage.puzzles) {
+          if (solvedPuzzleIds.has(puz.id)) {
+            const puzSwitches = freshStage.switches.filter((s) => s.puzzleId === puz.id)
+            puz.solved = true
+            puz.status = 'solved'
+            puz.currentStep = puz.totalSteps || puzSwitches.length
+            puz.statusMessageAr = `✅ اكتمل اللغز: ${puz.titleAr}`
+            for (const newSw of puzSwitches) {
+              const prevSw = curStage.switches.find((s) => s.id === newSw.id)
+              newSw.activated = prevSw ? prevSw.activated : true
+              if (newSw.reversesPlatformId) {
+                const prevPlat = curStage.platforms.find((pl) => pl.id === newSw.reversesPlatformId)
+                const newPlat = freshStage.platforms.find((pl) => pl.id === newSw.reversesPlatformId)
+                if (prevPlat && newPlat) newPlat.conveyorSpeed = prevPlat.conveyorSpeed
+              }
+            }
+            if (puz.targetGateId) {
+              const gate = freshStage.gates.find((g) => g.id === puz.targetGateId)
+              if (gate) gate.isOpen = true
+            }
+            if (puz.unlocksPlatformId) {
+              const plat = freshStage.platforms.find((pl) => pl.id === puz.unlocksPlatformId)
+              if (plat) {
+                plat.unlocked = true
+                plat.isSecret = false
+              }
+            }
+          }
+        }
+      }
+
+      stageRef.current = freshStage
+      const newHero = createInitialHeroState(freshStage)
+      newHero.x = savedRespawnX
+      newHero.y = savedRespawnY
+      newHero.respawnX = savedRespawnX
+      newHero.respawnY = savedRespawnY
+      newHero.hp = 3
+      newHero.lightEnergy = 85
+      newHero.invulnerableTimer = 1.2
+      heroRef.current = newHero
+
+      stageScoreRef.current = preservedStageScore
+      collectedCountRef.current = freshStage.collectibles.filter((c) => c.collected).length
+      setHudHealth(3)
+      setHudBulbEnergy(85)
+      setHudEnergy(collectedCountRef.current)
+      setHudStageScore(preservedStageScore)
+      setHudBossHp(freshStage.boss ? freshStage.boss.hp : null)
+      setHudBossPhase(freshStage.boss ? freshStage.boss.phase : 1)
+      clearAllInputs()
+      setGameState('playing')
+      showAlert('🚩 تمت الإعادة من نقطة الحفظ مع الاحتفاظ بالألغاز المحلولة!', 'info')
+      return
+    }
+
     initStage(currentStageIdx)
     setGameState('playing')
-  }, [currentStageIdx, initStage])
+  }, [clearAllInputs, currentStageIdx, initStage, showAlert])
 
   const goToNextStage = useCallback(() => {
     sound.playButton()
@@ -1224,6 +1337,11 @@ export function GameEngine() {
         if (showLeaderboard) {
           e.preventDefault()
           setShowLeaderboard(false)
+          return
+        }
+        if (showHintModal) {
+          e.preventDefault()
+          setShowHintModal(false)
           return
         }
       }
@@ -1546,7 +1664,20 @@ export function GameEngine() {
           spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y, '#34D399', 14)
           showAlert('🚩 تم تفعيل نقطة الحفظ الضوئية!', 'info')
         }
-        if (events.activatedSwitchId || events.openedGateId) {
+        if (events.puzzleFeedbackMsg) {
+          if (events.puzzleFeedbackType === 'error') {
+            sound.playShortCircuit()
+            cameraRef.current.shakeIntensity = 5
+            spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y, '#F43F5E', 16)
+          } else if (events.puzzleFeedbackType === 'success') {
+            sound.playGateOpen()
+            spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y, '#34D399', 18)
+          } else {
+            sound.playButton()
+            spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y, '#38BDF8', 12)
+          }
+          showAlert(events.puzzleFeedbackMsg, events.puzzleFeedbackType || 'info')
+        } else if (events.activatedSwitchId || events.openedGateId) {
           sound.playGateOpen()
           spawnBurstParticles(heroRef.current.x + 17, heroRef.current.y, '#38BDF8', 14)
           showAlert(
@@ -1709,6 +1840,67 @@ export function GameEngine() {
     showAlert,
     spawnBurstParticles,
   ])
+
+  const openHintModal = useCallback(() => {
+    sound.playButton()
+    if (gameState === 'playing') {
+      clearAllInputs()
+      sound.stopMusic()
+      setGameState('paused')
+    }
+    const puzzles = stageRef.current.puzzles || []
+    const firstUnsolved = puzzles.find((p) => !p.solved && !p.isOptionalSecret) || puzzles[0]
+    if (firstUnsolved) {
+      setSelectedHintPuzzleId(firstUnsolved.id)
+      setUnlockedHintLevelByPuzzle((prev) => ({
+        ...prev,
+        [firstUnsolved.id]: prev[firstUnsolved.id] || 1,
+      }))
+    }
+    setShowHintModal(true)
+  }, [clearAllInputs, gameState])
+
+  // Expose V15 Diagnostics & Solvability Verifier for Automated QA
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    ;(window as any).__ENARAH_V15_DIAGNOSTICS__ = {
+      validateAllPuzzles: () => validateAllStagePuzzlesSolvability(),
+      getLiveStage: () => stageRef.current,
+      getLiveHero: () => heroRef.current,
+      triggerSwitchById: (swId: string) => {
+        const sw = stageRef.current.switches.find((s) => s.id === swId)
+        if (!sw) return null
+        return evaluatePuzzleSwitchInteraction(stageRef.current, sw)
+      },
+      activateCheckpointById: (cpId: string) => {
+        const cp = stageRef.current.checkpoints.find((c) => c.id === cpId)
+        if (!cp) return false
+        cp.activated = true
+        heroRef.current.respawnX = cp.x
+        heroRef.current.respawnY = cp.y - 10
+        return true
+      },
+      simulateHeroDeathAndRetry: () => {
+        retryCurrentStage()
+        return {
+          heroX: heroRef.current.x,
+          heroY: heroRef.current.y,
+          hp: heroRef.current.hp,
+          solvedPuzzleIds: (stageRef.current.puzzles || []).filter((p) => p.solved).map((p) => p.id),
+          openGateIds: stageRef.current.gates.filter((g) => g.isOpen).map((g) => g.id),
+          activatedCheckpointIds: stageRef.current.checkpoints.filter((c) => c.activated).map((c) => c.id),
+        }
+      },
+      selectStageForTest: (idx: number) => {
+        initStage(idx)
+        setGameState('playing')
+        return stageRef.current.id
+      },
+    }
+    return () => {
+      delete (window as any).__ENARAH_V15_DIAGNOSTICS__
+    }
+  }, [initStage, retryCurrentStage])
 
   // Multi-Touch Independent Pointer Tracking (Section 09 — HIGHEST PRIORITY)
   const syncActivePointersToInput = useCallback(() => {
@@ -1931,8 +2123,20 @@ export function GameEngine() {
           </div>
         </div>
 
-        {/* Pause & Dedicated Exit Button */}
+        {/* Hint, Pause & Dedicated Exit Button */}
         <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            id="enarah-hint-btn"
+            type="button"
+            onClick={openHintModal}
+            className="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-amber-400/40 text-amber-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+            aria-label="تلميح اللغز"
+            title="نظام التلميحات التدريجي (اختياري)"
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">تلميح</span>
+          </button>
+
           <button
             type="button"
             onClick={() => {
@@ -2204,6 +2408,15 @@ export function GameEngine() {
               >
                 {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                 <span>{isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={openHintModal}
+                className="py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/45 text-amber-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Lightbulb className="w-4 h-4 text-amber-400" />
+                <span>تلميحات الألغاز</span>
               </button>
 
               <button
@@ -3145,6 +3358,195 @@ export function GameEngine() {
                       className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white rounded-xl font-bold text-xs cursor-pointer"
                     >
                       إغلاق والعودة للعبة
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* =================================================================
+                MODAL 04: V15 OPTIONAL 3-LEVEL PROGRESSIVE HINT SYSTEM (SECTION 12)
+                ================================================================= */}
+            {showHintModal && (
+              <div
+                id="enarah-hint-modal"
+                className="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
+                style={{ zIndex: 2147483647, pointerEvents: 'auto' }}
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) setShowHintModal(false)
+                }}
+              >
+                <div className="bg-[#0B1222] border border-amber-500/40 rounded-3xl p-4 sm:p-6 max-w-lg w-full shadow-2xl max-h-[88dvh] flex flex-col">
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5 text-amber-400" />
+                      <div>
+                        <h3 className="text-base sm:text-lg font-black text-white">
+                          نظام التلميحات الهندسي (اختياري)
+                        </h3>
+                        <p className="text-[11px] text-slate-400">
+                          المرحلة {activeStage.worldNumber}: {activeStage.worldTitleAr} • التلميحات متدرجة ولا تكشف الحل تلقائياً
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowHintModal(false)}
+                      className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 cursor-pointer"
+                      aria-label="إغلاق التلميحات"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {(() => {
+                    const livePuzzles = stageRef.current.puzzles || activeStage.puzzles || []
+                    const activePuz =
+                      livePuzzles.find((p) => p.id === selectedHintPuzzleId) ||
+                      livePuzzles.find((p) => !p.solved && !p.isOptionalSecret) ||
+                      livePuzzles[0]
+
+                    if (!activePuz) {
+                      return (
+                        <div className="text-center py-6 text-xs text-slate-400">
+                          لا توجد ألغاز مسجلة في هذه المرحلة.
+                        </div>
+                      )
+                    }
+
+                    const unlockedLvl = unlockedHintLevelByPuzzle[activePuz.id] || 1
+                    const hintLabels: [string, string, string] = [
+                      'المستوى 1: ملاحظة بيئية خفيفة',
+                      'المستوى 2: آلية النظام الهندسي',
+                      'المستوى 3: التوجيه المنطقي الدقيق',
+                    ]
+
+                    return (
+                      <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                        {/* Puzzle Selector Tabs */}
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {livePuzzles.map((puz, idx) => {
+                            const isSelected = puz.id === activePuz.id
+                            return (
+                              <button
+                                key={puz.id}
+                                type="button"
+                                data-puzzle-tab={puz.id}
+                                onClick={() => {
+                                  sound.playButton()
+                                  setSelectedHintPuzzleId(puz.id)
+                                  setUnlockedHintLevelByPuzzle((prev) => ({
+                                    ...prev,
+                                    [puz.id]: prev[puz.id] || 1,
+                                  }))
+                                }}
+                                className={`p-2 rounded-xl border text-right transition-colors cursor-pointer flex items-center justify-between gap-1.5 ${
+                                  isSelected
+                                    ? 'bg-amber-400/15 border-amber-400 text-white'
+                                    : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:bg-slate-800'
+                                }`}
+                              >
+                                <span className="text-[11px] font-extrabold truncate">
+                                  {puz.isOptionalSecret ? `🌟 سري: ${puz.titleAr}` : `لغز ${idx + 1}: ${puz.titleAr}`}
+                                </span>
+                                {puz.solved ? (
+                                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                ) : (
+                                  <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                )}
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        {/* Active Puzzle Status Card */}
+                        <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-right">
+                          <div className="flex items-center justify-between mb-1">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                                activePuz.solved
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                              }`}
+                            >
+                              {activePuz.solved ? '✅ تم حل اللغز' : '🔒 قيد التحليل'}
+                            </span>
+                            <span className="text-xs font-black text-white">{activePuz.titleAr}</span>
+                          </div>
+                          <p className="text-[11px] text-sky-300 font-bold">
+                            الحالة الحالية: {activePuz.statusMessageAr || activePuz.mechanicNameAr}
+                          </p>
+                        </div>
+
+                        {/* 3 Progressive Hint Levels */}
+                        <div className="space-y-2">
+                          {[0, 1, 2].map((lvlIdx) => {
+                            const levelNum = (lvlIdx + 1) as 1 | 2 | 3
+                            const isUnlocked = unlockedLvl >= levelNum
+                            return (
+                              <div
+                                key={levelNum}
+                                data-hint-level={levelNum}
+                                data-hint-unlocked={isUnlocked ? 'true' : 'false'}
+                                className={`p-3 rounded-2xl border text-right ${
+                                  isUnlocked
+                                    ? 'bg-slate-900/95 border-amber-400/40'
+                                    : 'bg-slate-950/70 border-slate-800/80'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-1">
+                                  {isUnlocked ? (
+                                    <span className="text-[10px] font-black text-amber-400">مفتوح</span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      data-unlock-hint-btn={levelNum}
+                                      onClick={() => {
+                                        sound.playButton()
+                                        setUnlockedHintLevelByPuzzle((prev) => ({
+                                          ...prev,
+                                          [activePuz.id]: levelNum,
+                                        }))
+                                      }}
+                                      className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-[10px] font-black cursor-pointer"
+                                    >
+                                      كشف التلميح {levelNum}
+                                    </button>
+                                  )}
+                                  <span className="text-xs font-extrabold text-slate-200">
+                                    {hintLabels[lvlIdx]}
+                                  </span>
+                                </div>
+                                {isUnlocked ? (
+                                  <p className="text-xs text-amber-100 leading-relaxed font-medium">
+                                    {activePuz.hintsAr[lvlIdx]}
+                                  </p>
+                                ) : (
+                                  <p className="text-[11px] text-slate-500">
+                                    اضغط على «كشف التلميح {levelNum}» إذا كنت بحاجة إلى مساعدة إضافية.
+                                  </p>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })()}
+
+                  <div className="pt-3 mt-3 border-t border-slate-800 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sound.playButton()
+                        setShowHintModal(false)
+                        if (gameState === 'paused') {
+                          setGameState('playing')
+                        }
+                      }}
+                      className="flex-1 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-xl font-black text-xs cursor-pointer"
+                    >
+                      العودة ومواصلة اللعب
                     </button>
                   </div>
                 </div>

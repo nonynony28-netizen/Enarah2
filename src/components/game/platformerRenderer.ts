@@ -5,6 +5,7 @@ import {
   type PlatformEnemy,
   type BossGuardian,
   type StageHazard,
+  type StageSwitch,
   type WorldThemeId,
   PRODUCT_CATALOG_META,
 } from './platformerWorlds'
@@ -80,10 +81,10 @@ export function renderPlatformerFrame(
     renderCheckpointBeacon(ctx, cp.x, cp.y, cp.activated, cp.labelAr, elapsedSec)
   }
 
-  // 4B. Electrical Switches
+  // 4B. Electrical Switches & Puzzle Terminals
   for (const sw of stage.switches) {
     if (sw.x + 80 < cam.x || sw.x - 80 > cam.x + W) continue
-    renderStageSwitch(ctx, sw.x, sw.y, sw.activated, sw.labelAr, elapsedSec)
+    renderStageSwitch(ctx, sw, elapsedSec)
   }
 
   // 4C. 2.5D Platforms (Stage-authentic architecture, materials & depth planes)
@@ -95,7 +96,7 @@ export function renderPlatformerFrame(
   // 4D. Energy Gates & Security Doors
   for (const gate of stage.gates) {
     if (gate.x + gate.w < cam.x - 40 || gate.x > cam.x + W + 40) continue
-    renderEnergyGate(ctx, gate.x, gate.y, gate.w, gate.h, gate.isOpen, gate.labelAr, elapsedSec)
+    renderEnergyGate(ctx, gate.x, gate.y, gate.w, gate.h, gate.isOpen, gate.labelAr, elapsedSec, stage, gate.id)
   }
 
   // 4E. Hazards (Timed Arcs, Rotating Hazards, Mechanical Presses)
@@ -1608,38 +1609,59 @@ function renderCheckpointBeacon(
 
 function renderStageSwitch(
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  activated: boolean,
-  labelAr: string,
+  sw: StageSwitch,
   elapsedSec: number
 ) {
+  const { x, y, activated, labelAr, nodeCode, teleportTo } = sw
   ctx.save()
-  ctx.fillStyle = '#1E293B'
-  ctx.fillRect(x - 16, y - 38, 32, 38)
-  ctx.strokeStyle = activated ? '#10B981' : '#F59E0B'
-  ctx.lineWidth = 2
-  ctx.strokeRect(x - 16, y - 38, 32, 38)
+
+  // Blue Phase Teleportation Gate ring if this terminal also teleports the hero
+  if (teleportTo) {
+    const pulseR = 24 + Math.sin(elapsedSec * 6) * 3
+    ctx.strokeStyle = '#38BDF8'
+    ctx.lineWidth = 2.2
+    ctx.beginPath()
+    ctx.arc(x, y - 20, pulseR, 0, Math.PI * 2)
+    ctx.stroke()
+  }
+
+  ctx.fillStyle = '#0F172A'
+  ctx.fillRect(x - 18, y - 42, 36, 42)
+  ctx.strokeStyle = activated ? '#10B981' : teleportTo ? '#38BDF8' : '#F59E0B'
+  ctx.lineWidth = 2.2
+  ctx.strokeRect(x - 18, y - 42, 36, 42)
 
   ctx.fillStyle = activated ? '#10B981' : '#EF4444'
-  ctx.fillRect(x - 8, activated ? y - 32 : y - 18, 16, 10)
+  ctx.fillRect(x - 10, activated ? y - 35 : y - 19, 20, 10)
+
+  if (nodeCode) {
+    ctx.font = 'bold 8.5px Cairo, monospace'
+    ctx.textAlign = 'center'
+    ctx.fillStyle = '#F8FAFC'
+    ctx.fillText(nodeCode, x, y - 6)
+  }
 
   const bob = Math.sin(elapsedSec * 4) * 1.5
   ctx.font = 'bold 9.5px Cairo, sans-serif'
   ctx.textAlign = 'center'
-  const shortLabel = activated
-    ? 'مفعّل ⚡'
-    : labelAr.length > 18
-      ? labelAr.replace('قاطع تعطيل ', 'قاطع ')
-      : labelAr
-  const tw = Math.max(58, ctx.measureText(shortLabel).width + 14)
-  const badgeY = y - 59 + bob
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
+  const safeLabel = labelAr || ''
+  const shortLabel = nodeCode
+    ? activated
+      ? `✓ ${nodeCode} نشط`
+      : `⚡ ${nodeCode}`
+    : activated
+      ? 'مفعّل ⚡'
+      : safeLabel.length > 18
+        ? safeLabel.replace('قاطع تعطيل ', 'قاطع ')
+        : safeLabel
+  const tw = Math.max(60, ctx.measureText(shortLabel).width + 14)
+  const badgeY = y - 63 + bob
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.94)'
   ctx.fillRect(x - tw * 0.5, badgeY, tw, 18)
-  ctx.strokeStyle = activated ? '#10B981' : '#F59E0B'
+  ctx.strokeStyle = activated ? '#10B981' : teleportTo ? '#38BDF8' : '#F59E0B'
   ctx.lineWidth = 1.2
   ctx.strokeRect(x - tw * 0.5, badgeY, tw, 18)
-  ctx.fillStyle = activated ? '#6EE7B7' : '#FDE68A'
+  ctx.fillStyle = activated ? '#6EE7B7' : teleportTo ? '#BAE6FD' : '#FDE68A'
   ctx.fillText(shortLabel, x, badgeY + 13)
   ctx.restore()
 }
@@ -1652,7 +1674,9 @@ function renderEnergyGate(
   h: number,
   isOpen: boolean,
   labelAr: string,
-  elapsedSec: number
+  elapsedSec: number,
+  stage?: StageDefinition,
+  gateId?: string
 ) {
   ctx.save()
   ctx.fillStyle = '#334155'
@@ -1664,17 +1688,27 @@ function renderEnergyGate(
     ctx.fillStyle = `rgba(239, 68, 68, ${pulse.toFixed(2)})`
     ctx.fillRect(x + 4, y + 10, w - 8, h - 18)
 
+    const linkedPuzzle =
+      stage && gateId ? stage.puzzles?.find((p) => p.targetGateId === gateId) : undefined
+    const statusText =
+      linkedPuzzle && linkedPuzzle.statusMessageAr
+        ? `${linkedPuzzle.titleAr} • ${linkedPuzzle.statusMessageAr}`
+        : labelAr
+
     ctx.font = 'bold 9.5px Cairo, sans-serif'
     ctx.textAlign = 'center'
     const cx = x + w * 0.5
-    const tw = Math.max(64, ctx.measureText(labelAr).width + 14)
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
-    ctx.fillRect(cx - tw * 0.5, y - 22, tw, 18)
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.65)'
-    ctx.lineWidth = 1
-    ctx.strokeRect(cx - tw * 0.5, y - 22, tw, 18)
+    const tw = Math.max(68, ctx.measureText(statusText).width + 16)
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.94)'
+    ctx.fillRect(cx - tw * 0.5, y - 24, tw, 19)
+    ctx.strokeStyle =
+      linkedPuzzle?.status === 'overload_reset'
+        ? '#F97316'
+        : 'rgba(239, 68, 68, 0.7)'
+    ctx.lineWidth = 1.2
+    ctx.strokeRect(cx - tw * 0.5, y - 24, tw, 19)
     ctx.fillStyle = '#FCA5A5'
-    ctx.fillText(labelAr, cx, y - 9)
+    ctx.fillText(statusText, cx, y - 10)
   }
   ctx.restore()
 }
@@ -2216,7 +2250,7 @@ function renderBossEncounter(
   ctx.save()
 
   for (const brk of boss.breakers) {
-    renderStageSwitch(ctx, brk.x, brk.y, brk.activated, brk.labelAr, elapsedSec)
+    renderStageSwitch(ctx, brk, elapsedSec)
   }
 
   // Render Boss Projectiles
@@ -2328,17 +2362,29 @@ function renderBossEncounter(
   ctx.fillStyle = boss.state === 'telegraph' ? '#EF4444' : isBlueSentinel ? '#38BDF8' : '#FDE047'
   ctx.fillRect(x + 14, y + 28, w - 28, 12)
 
+  if (boss.shieldLocked) {
+    ctx.strokeStyle = '#38BDF8'
+    ctx.lineWidth = 2.5
+    ctx.setLineDash([6, 4])
+    ctx.beginPath()
+    ctx.arc(cx, y + h * 0.45, w * 0.65, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.setLineDash([])
+  }
+
   // Compact world-space shield/phase badge
-  const bossBadgeText = `⚡ ${boss.hp}/${boss.maxHp} • ط${boss.phase}`
+  const bossBadgeText = boss.shieldLocked
+    ? `🛡️ درع ط${boss.phase} • فعّل قاطع الساحة (${boss.hp}/${boss.maxHp})`
+    : `⚡ ${boss.hp}/${boss.maxHp} • ط${boss.phase}`
   ctx.font = 'bold 10px Cairo, sans-serif'
   ctx.textAlign = 'center'
   const btw = Math.max(54, ctx.measureText(bossBadgeText).width + 12)
   ctx.fillStyle = 'rgba(15, 23, 42, 0.92)'
   ctx.fillRect(cx - btw * 0.5, y - 24, btw, 17)
-  ctx.strokeStyle = boss.state === 'vulnerable' ? '#38BDF8' : '#EF4444'
+  ctx.strokeStyle = boss.shieldLocked ? '#38BDF8' : boss.state === 'vulnerable' ? '#34D399' : '#EF4444'
   ctx.lineWidth = 1.2
   ctx.strokeRect(cx - btw * 0.5, y - 24, btw, 17)
-  ctx.fillStyle = '#FDE047'
+  ctx.fillStyle = boss.shieldLocked ? '#BAE6FD' : '#FDE047'
   ctx.fillText(bossBadgeText, cx, y - 12)
 
   ctx.restore()

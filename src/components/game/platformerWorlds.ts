@@ -220,6 +220,43 @@ export interface StageSwitch {
   activated: boolean
   targetId: string
   labelAr: string
+  puzzleId?: string
+  nodeCode?: string
+  toggleable?: boolean
+  cooldownTimer?: number
+  wattage?: number
+  sequenceOrder?: number
+  coupledSwitchIds?: string[]
+  teleportTo?: { x: number; y: number }
+  reversesPlatformId?: string
+}
+
+export type PuzzleRuleKind =
+  | 'exact_load_sum'       // Load balancing / magnetic flux / valve pressure sum === targetSum (resets if > maxCapacity)
+  | 'ordered_sequence'     // Multi-step sequence 1..N (resets room sequence if out-of-order)
+  | 'coupled_xor_matrix'   // Coupled terminal logic where toggling a node flips coupledSwitchIds until all are ON
+  | 'dependency_chain'     // Prerequisite chain where step k requires step k-1 active first
+
+export interface StagePuzzleDefinition {
+  id: string
+  titleAr: string
+  mechanicNameAr: string
+  ruleKind: PuzzleRuleKind
+  isOptionalSecret?: boolean
+  zoneMinX: number
+  zoneMaxX: number
+  targetGateId: string
+  unlocksPlatformId?: string
+  targetSum?: number
+  maxCapacity?: number
+  currentSum?: number
+  unitLabelAr?: string
+  currentStep?: number
+  totalSteps?: number
+  status: 'active' | 'overload_reset' | 'solved'
+  statusMessageAr?: string
+  solved: boolean
+  hintsAr: [string, string, string]
 }
 
 export interface EnergyGate {
@@ -394,6 +431,7 @@ export interface BossGuardian {
   shockwaveActive: boolean
   projectiles: BossProjectile[]
   breakers: BossBreakerSwitch[]
+  shieldLocked?: boolean
 }
 
 export type FinalChallengeType =
@@ -439,6 +477,7 @@ export interface StageDefinition {
   checkpoints: CheckpointLamp[]
   enemies: PlatformEnemy[]
   hazards: StageHazard[]
+  puzzles?: StagePuzzleDefinition[]
   boss?: BossGuardian
 }
 
@@ -563,9 +602,220 @@ export const GAME_STAGES: StageDefinition[] = [
       { id: 'l1-c14', x: 4630, y: 260, kind: 'led_bulb', value: 250, collected: false },
     ],
     switches: [
-      { id: 'l1-sw1', x: 2715, y: 290, activated: false, targetId: 'l1-gate1', labelAr: 'قاطع تغذية الأسطح (1/3)' },
-      { id: 'l1-sw2', x: 3850, y: 375, activated: false, targetId: 'l1-gate2', labelAr: 'قاطع المحلات التجارية (2/3)' },
-      { id: 'l1-sw3', x: 4630, y: 305, activated: false, targetId: 'l1-gate3', labelAr: 'قاطع إنارة الحي الرئيسي (3/3)' },
+      // Puzzle 1 (District A Load Balance: Target 100kW, Max 100kW -> 60kW + 40kW = 100kW; 60kW + 60kW = 120kW Overload!)
+      {
+        id: 'l1-sw1a',
+        x: 1865,
+        y: 365,
+        activated: false,
+        targetId: 'l1-gate1',
+        puzzleId: 'l1-puz1',
+        nodeCode: '60kW',
+        wattage: 60,
+        toggleable: true,
+        labelAr: 'قاطع الأبراج السكنية (60 كيلوواط)',
+      },
+      {
+        id: 'l1-sw1b',
+        x: 2450,
+        y: 480,
+        activated: false,
+        targetId: 'l1-gate1',
+        puzzleId: 'l1-puz1',
+        nodeCode: '60kW',
+        wattage: 60,
+        toggleable: true,
+        labelAr: 'قاطع التكييف المركزي (60 كيلوواط)',
+      },
+      {
+        id: 'l1-sw1',
+        x: 2715,
+        y: 290,
+        activated: false,
+        targetId: 'l1-gate1',
+        puzzleId: 'l1-puz1',
+        nodeCode: '40kW',
+        wattage: 40,
+        toggleable: true,
+        labelAr: 'قاطع إنارة الشوارع (40 كيلوواط)',
+      },
+      // Puzzle 2 (Commercial District Dependency Chain: 1. Feeder -> 2. Surge Shunt -> 3. Showroom Breaker)
+      {
+        id: 'l1-sw2a',
+        x: 3365,
+        y: 380,
+        activated: false,
+        targetId: 'l1-gate2',
+        puzzleId: 'l1-puz2',
+        nodeCode: '1:مغذّي',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: '1. مغذّي المحول الرئيسي',
+      },
+      {
+        id: 'l1-sw2b',
+        x: 3585,
+        y: 300,
+        activated: false,
+        targetId: 'l1-gate2',
+        puzzleId: 'l1-puz2',
+        nodeCode: '2:مانع',
+        sequenceOrder: 2,
+        toggleable: true,
+        labelAr: '2. مانع الصواعق والتفريغ',
+      },
+      {
+        id: 'l1-sw2',
+        x: 3850,
+        y: 375,
+        activated: false,
+        targetId: 'l1-gate2',
+        puzzleId: 'l1-puz2',
+        nodeCode: '3:توزيع',
+        sequenceOrder: 3,
+        toggleable: true,
+        labelAr: '3. قاطع توزيع المعارض التجارية',
+      },
+      // Puzzle 3 (Central Substation 3-Phase Synchronization: Phase R -> Phase S -> Phase T)
+      {
+        id: 'l1-sw3a',
+        x: 4360,
+        y: 370,
+        activated: false,
+        targetId: 'l1-gate3',
+        puzzleId: 'l1-puz3',
+        nodeCode: 'طور R',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: 'مزامن الطور الأول R (1/3)',
+      },
+      {
+        id: 'l1-sw3',
+        x: 4630,
+        y: 305,
+        activated: false,
+        targetId: 'l1-gate3',
+        puzzleId: 'l1-puz3',
+        nodeCode: 'طور S',
+        sequenceOrder: 2,
+        toggleable: true,
+        labelAr: 'مزامن الطور الثاني S (2/3)',
+      },
+      {
+        id: 'l1-sw3b',
+        x: 4880,
+        y: 370,
+        activated: false,
+        targetId: 'l1-gate3',
+        puzzleId: 'l1-puz3',
+        nodeCode: 'طور T',
+        sequenceOrder: 3,
+        toggleable: true,
+        labelAr: 'مزامن الطور الثالث T (3/3)',
+      },
+      // Optional Secret Puzzle: Rooftop Solar Backup Array
+      {
+        id: 'l1-sec1',
+        x: 1395,
+        y: 295,
+        activated: false,
+        targetId: 'l1-p8',
+        puzzleId: 'l1-puz-sec',
+        nodeCode: 'شمسي 1',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: 'لوح الطاقة الشمسية العلوي (1/2)',
+      },
+      {
+        id: 'l1-sec2',
+        x: 1610,
+        y: 220,
+        activated: false,
+        targetId: 'l1-p8',
+        puzzleId: 'l1-puz-sec',
+        nodeCode: 'شمسي 2',
+        sequenceOrder: 2,
+        toggleable: true,
+        labelAr: 'محول الطاقة الشمسية السري (2/2)',
+      },
+    ],
+    puzzles: [
+      {
+        id: 'l1-puz1',
+        titleAr: 'شبكة توزيع القطاع السكني (100 كيلوواط)',
+        mechanicNameAr: 'موازنة الأحمال الكهربائية ومنع الحمل الزائد',
+        ruleKind: 'exact_load_sum',
+        zoneMinX: 1650,
+        zoneMaxX: 3060,
+        targetGateId: 'l1-gate1',
+        targetSum: 100,
+        maxCapacity: 100,
+        currentSum: 0,
+        unitLabelAr: 'كيلوواط',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: قدرة المولد السكني محدودة بـ 100 كيلوواط فقط؛ تشغيل قاطعين كبيرين معاً يفصل الشبكة.',
+          'تلميح 2: اقرأ قدرة كل قاطع (60kW و60kW و40kW)؛ الجمع بين 60kW و60kW يتجاوز السعة (120kW).',
+          'تلميح 3: فعّل قاطعاً واحداً بقدرة 60kW مع قاطع إنارة الشوارع العلوي 40kW للوصول إلى 100kW بالضبط وفتح البوابة.',
+        ],
+      },
+      {
+        id: 'l1-puz2',
+        titleAr: 'دائرة المعارض التجارية الاعتمادية',
+        mechanicNameAr: 'التسلسل الاعتمادي للمحول ومانع الصواعق',
+        ruleKind: 'dependency_chain',
+        zoneMinX: 3150,
+        zoneMaxX: 4050,
+        targetGateId: 'l1-gate2',
+        currentStep: 0,
+        totalSteps: 3,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: لا يمكن تغذية المعارض التجارية قبل تأمين المحول الرئيسي ومانع الصواعق.',
+          'تلميح 2: كل قاطع يحمل رقماً تسلسلياً (1:مغذّي ثم 2:مانع ثم 3:توزيع).',
+          'تلميح 3: ابدأ بقاطع (1:مغذّي) عند يسار القطاع، ثم اصعد إلى (2:مانع) في الأعلى، وأخيراً فعّل (3:توزيع) أمام البوابة.',
+        ],
+      },
+      {
+        id: 'l1-puz3',
+        titleAr: 'مزامنة أطوار المحطة المركزية (R → S → T)',
+        mechanicNameAr: 'مزامنة الأطوار الثلاثة في ساحة الزعيم',
+        ruleKind: 'ordered_sequence',
+        zoneMinX: 4150,
+        zoneMaxX: 5050,
+        targetGateId: 'l1-gate3',
+        currentStep: 0,
+        totalSteps: 3,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: بوابة الخروج تتطلب مزامنة الأطوار الثلاثة بالترتيب القياسي مع هزيمة حارس الشارع.',
+          'تلميح 2: الترتيب الكهربائي الصحيح هو الطور R ثم الطور S الأوسط ثم الطور T الأيمن.',
+          'تلميح 3: فعّل (طور R) على المنصة اليسرى، ثم اقفز إلى (طور S) في المنتصف، ثم (طور T) على المنصة اليمنى.',
+        ],
+      },
+      {
+        id: 'l1-puz-sec',
+        titleAr: 'مصفوفة الأسطح الشمسية السرية',
+        mechanicNameAr: 'لغز سري اختياري',
+        ruleKind: 'ordered_sequence',
+        isOptionalSecret: true,
+        zoneMinX: 1100,
+        zoneMaxX: 1700,
+        targetGateId: '',
+        unlocksPlatformId: 'l1-p8',
+        currentStep: 0,
+        totalSteps: 2,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: توجد ألواح طاقة شمسية احتياطية فوق أسطح المباني السكنية في القطاع B.',
+          'تلميح 2: فعّل (شمسي 1) أولاً ثم اصعد للمنصة العلوية السرية لتفعيل (شمسي 2).',
+          'تلميح 3: اقفز فوق المنصات المرتفعة عند x=1395 ثم x=1610 بالترتيب للحصول على مكافأة الطاقة السرية.',
+        ],
+      },
     ],
     gates: [
       {
@@ -880,9 +1130,208 @@ export const GAME_STAGES: StageDefinition[] = [
       { id: 'l2-c14', x: 4790, y: 245, kind: 'led_bulb', value: 250, collected: false },
     ],
     switches: [
-      { id: 'l2-sw1', x: 2080, y: 480, activated: false, targetId: 'l2-gate1', labelAr: 'قاطع الرافعة البرتقالية (1/3)' },
-      { id: 'l2-sw2', x: 2790, y: 295, activated: false, targetId: 'l2-gate2', labelAr: 'قاطع مستودع النحاس (2/3)' },
-      { id: 'l2-sw3', x: 4065, y: 375, activated: false, targetId: 'l2-gate3', labelAr: 'قاطع بوابة الساحق البرتقالي (3/3)' },
+      // Stage 2 Puzzle 1 (Magnetic Crane & Container Interlock: 1. Crane -> 2. Latch -> 3. Pressure Pad)
+      {
+        id: 'l2-sw1a',
+        x: 1260,
+        y: 375,
+        activated: false,
+        targetId: 'l2-gate1',
+        puzzleId: 'l2-puz1',
+        nodeCode: '1:رافعة',
+        sequenceOrder: 1,
+        toggleable: true,
+        reversesPlatformId: 'l2-p5',
+        labelAr: '1. تحريك الرافعة المغناطيسية البرتقالية',
+      },
+      {
+        id: 'l2-sw1b',
+        x: 1790,
+        y: 335,
+        activated: false,
+        targetId: 'l2-gate1',
+        puzzleId: 'l2-puz1',
+        nodeCode: '2:قفل',
+        sequenceOrder: 2,
+        toggleable: true,
+        labelAr: '2. تحرير قفل الحاوية المعدنية',
+      },
+      {
+        id: 'l2-sw1',
+        x: 2080,
+        y: 480,
+        activated: false,
+        targetId: 'l2-gate1',
+        puzzleId: 'l2-puz1',
+        nodeCode: '3:ضغط',
+        sequenceOrder: 3,
+        toggleable: true,
+        labelAr: '3. إنزال الحاوية على مفتاح الضغط البرتقالي',
+      },
+      // Stage 2 Puzzle 2 (Magnetic Flux Counterweight Balance: Target 120T, Max 120T -> 70T + 50T = 120T)
+      {
+        id: 'l2-sw2a',
+        x: 2545,
+        y: 375,
+        activated: false,
+        targetId: 'l2-gate2',
+        puzzleId: 'l2-puz2',
+        nodeCode: '70T',
+        wattage: 70,
+        toggleable: true,
+        labelAr: 'مغناطيس الرفع الثقيل (70 تسلا)',
+      },
+      {
+        id: 'l2-sw2',
+        x: 2790,
+        y: 295,
+        activated: false,
+        targetId: 'l2-gate2',
+        puzzleId: 'l2-puz2',
+        nodeCode: '50T',
+        wattage: 50,
+        toggleable: true,
+        labelAr: 'مغناطيس التوجيه الأوسط (50 تسلا)',
+      },
+      {
+        id: 'l2-sw2b',
+        x: 3025,
+        y: 375,
+        activated: false,
+        targetId: 'l2-gate2',
+        puzzleId: 'l2-puz2',
+        nodeCode: '70T',
+        wattage: 70,
+        toggleable: true,
+        labelAr: 'مغناطيس السحب الجانبي (70 تسلا)',
+      },
+      // Stage 2 Puzzle 3 (Coupled Magnetic Conveyor Polarity Matrix: mag1 flips 1&2, mag2 flips 2&3, mag3 flips 3)
+      {
+        id: 'l2-sw3a',
+        x: 3530,
+        y: 390,
+        activated: false,
+        targetId: 'l2-gate3',
+        puzzleId: 'l2-puz3',
+        nodeCode: 'قطب-1',
+        toggleable: true,
+        coupledSwitchIds: ['l2-sw3b'],
+        reversesPlatformId: 'l2-p14',
+        labelAr: 'وحدة القطب المغناطيسي 1 (تعكس 1 و2 + السير)',
+      },
+      {
+        id: 'l2-sw3b',
+        x: 3830,
+        y: 305,
+        activated: false,
+        targetId: 'l2-gate3',
+        puzzleId: 'l2-puz3',
+        nodeCode: 'قطب-2',
+        toggleable: true,
+        coupledSwitchIds: ['l2-sw3'],
+        labelAr: 'وحدة القطب المغناطيسي 2 (تعكس 2 و3)',
+      },
+      {
+        id: 'l2-sw3',
+        x: 4065,
+        y: 375,
+        activated: false,
+        targetId: 'l2-gate3',
+        puzzleId: 'l2-puz3',
+        nodeCode: 'قطب-3',
+        toggleable: true,
+        coupledSwitchIds: [],
+        labelAr: 'وحدة القطب المغناطيسي 3 (تثبّت 3)',
+      },
+      // Optional Secret Puzzle: Warehouse Scrap Magnet Override
+      {
+        id: 'l2-sec1',
+        x: 4050,
+        y: 225,
+        activated: false,
+        targetId: 'l2-p16',
+        puzzleId: 'l2-puz-sec',
+        nodeCode: 'مغ-سري',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: 'مفتاح الرافعة المغناطيسية السرية بالبيضاء',
+      },
+    ],
+    puzzles: [
+      {
+        id: 'l2-puz1',
+        titleAr: 'مجمّع الرافعة المغناطيسية والحاويات',
+        mechanicNameAr: 'نقل الحاوية المعدنية عبر الرافعة ومفتاح الضغط',
+        ruleKind: 'dependency_chain',
+        zoneMinX: 1050,
+        zoneMaxX: 2250,
+        targetGateId: 'l2-gate1',
+        currentStep: 0,
+        totalSteps: 3,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: الحاوية المعدنية البرتقالية معلقة فوق المسار؛ لا يمكن الضغط على مفتاح البوابة الأرضي قبل تحريك الرافعة وتحرير القفل.',
+          'تلميح 2: اتبع ترتيب العمليات الصناعية: (1:رافعة) ثم (2:قفل) ثم (3:ضغط).',
+          'تلميح 3: فعّل (1:رافعة) فوق السير الناقل لعكس اتجاهه، ثم اقفز للمنصة المتحركة لتفعيل (2:قفل)، ثم انزل لتفعيل (3:ضغط).',
+        ],
+      },
+      {
+        id: 'l2-puz2',
+        titleAr: 'توازن الحقل المغناطيسي للمستودع (120 تسلا)',
+        mechanicNameAr: 'موازنة شدة المجال المغناطيسي دون تجاوز الحد الأقصى',
+        ruleKind: 'exact_load_sum',
+        zoneMinX: 2350,
+        zoneMaxX: 3180,
+        targetGateId: 'l2-gate2',
+        targetSum: 120,
+        maxCapacity: 120,
+        currentSum: 0,
+        unitLabelAr: 'تسلا',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: الجسر المغناطيسي يحتاج إلى 120 تسلا بالضبط؛ تشغيل المغناطيسين الثقيلين (70T + 70T) يسبب تنافراً ويفصل النظام.',
+          'تلميح 2: لديك ثلاث وحدات: 70T على اليسار، 50T في الأعلى، و70T على اليمين.',
+          'تلميح 3: فعّل وحدة واحدة بقدرة 70T مع الوحدة العلوية 50T للوصول إلى 120 تسلا وفتح البوابة الثانية.',
+        ],
+      },
+      {
+        id: 'l2-puz3',
+        titleAr: 'مصفوفة الأقطاب المغناطيسية المتشابكة',
+        mechanicNameAr: 'عكس الأقطاب المترابطة ومفاتيح السيور الناقلة',
+        ruleKind: 'coupled_xor_matrix',
+        zoneMinX: 3300,
+        zoneMaxX: 4300,
+        targetGateId: 'l2-gate3',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: الأقطاب المغناطيسية الثلاثة مترابطة؛ تغيير أحدها يقلب حالة القطب المجاور له.',
+          'تلميح 2: (قطب-1) يبدّل 1 و2، بينما (قطب-2) يبدّل 2 و3، و(قطب-3) يبدّل 3 فقط.',
+          'تلميح 3: للوصول إلى تفعيل الأقطاب الثلاثة معاً من البداية: فعّل (قطب-1) ثم (قطب-3) فقط، أو اضبطها بالتدريج من اليسار لليمين.',
+        ],
+      },
+      {
+        id: 'l2-puz-sec',
+        titleAr: 'خزنة النحاس المغناطيسية السرية',
+        mechanicNameAr: 'لغز سري اختياري',
+        ruleKind: 'ordered_sequence',
+        isOptionalSecret: true,
+        zoneMinX: 3700,
+        zoneMaxX: 4200,
+        targetGateId: '',
+        unlocksPlatformId: 'l2-p16',
+        currentStep: 0,
+        totalSteps: 1,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: توجد منصة علوية مخفية فوق القطب المغناطيسي الثالث في فرع البيضاء.',
+          'تلميح 2: اصعد عبر المنصة المرتفعة عند x=3740 للوصول إلى السقف السري.',
+          'تلميح 3: فعّل (مغ-سري) عند x=4050, y=225 لكسب مكافأة الخزنة المغناطيسية.',
+        ],
+      },
     ],
     gates: [
       {
@@ -1188,13 +1637,81 @@ export const GAME_STAGES: StageDefinition[] = [
       { id: 'l3-c13', x: 4965, y: 250, kind: 'led_bulb', value: 250, collected: false },
     ],
     switches: [
+      // Stage 3 Puzzle 1 (4-Step Factory Production Sequence: 1. Copper Feed -> 2. Extruder -> 3. Scanner -> 4. Spooler)
+      {
+        id: 'l3-sw1a',
+        x: 1120,
+        y: 480,
+        activated: false,
+        targetId: 'l3-gate1',
+        puzzleId: 'l3-puz1',
+        nodeCode: '1:سحب',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: '1. وحدة سحب النحاس الخام',
+      },
       {
         id: 'l3-sw1',
         x: 1265,
         y: 365,
         activated: false,
         targetId: 'l3-gate1',
-        labelAr: 'مفتاح تشغيل خط التجميع الأول (1/3)',
+        puzzleId: 'l3-puz1',
+        nodeCode: '2:عزل',
+        sequenceOrder: 2,
+        toggleable: true,
+        reversesPlatformId: 'l3-p2',
+        labelAr: '2. ماكينة بثق العزل الحراري',
+      },
+      {
+        id: 'l3-sw1b',
+        x: 1890,
+        y: 420,
+        activated: false,
+        targetId: 'l3-gate1',
+        puzzleId: 'l3-puz1',
+        nodeCode: '3:فحص',
+        sequenceOrder: 3,
+        toggleable: true,
+        reversesPlatformId: 'l3-p6',
+        labelAr: '3. ماسح الجودة الليزري',
+      },
+      {
+        id: 'l3-sw1c',
+        x: 2210,
+        y: 480,
+        activated: false,
+        targetId: 'l3-gate1',
+        puzzleId: 'l3-puz1',
+        nodeCode: '4:لفّ',
+        sequenceOrder: 4,
+        toggleable: true,
+        labelAr: '4. وحدة لفّ البكرات النهائية',
+      },
+      // Stage 3 Puzzle 2 (Hydraulic Press & Robotic Arm Dependency: 1. Press Clamp -> 2. Robotic Arm -> 3. Gate Release)
+      {
+        id: 'l3-sw2a',
+        x: 2820,
+        y: 480,
+        activated: false,
+        targetId: 'l3-gate2',
+        puzzleId: 'l3-puz2',
+        nodeCode: '1:تثبيت',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: '1. صمام تثبيت المكبس الهيدروليكي',
+      },
+      {
+        id: 'l3-sw2b',
+        x: 2920,
+        y: 350,
+        activated: false,
+        targetId: 'l3-gate2',
+        puzzleId: 'l3-puz2',
+        nodeCode: '2:ذراع',
+        sequenceOrder: 2,
+        toggleable: true,
+        labelAr: '2. تدوير الذراع الروبوتية الناقلة',
       },
       {
         id: 'l3-sw2',
@@ -1202,7 +1719,37 @@ export const GAME_STAGES: StageDefinition[] = [
         y: 275,
         activated: false,
         targetId: 'l3-gate2',
-        labelAr: 'مفتاح مصعد المكابس الصناعية (2/3)',
+        puzzleId: 'l3-puz2',
+        nodeCode: '3:تحرير',
+        sequenceOrder: 3,
+        toggleable: true,
+        labelAr: '3. مفتاح تحرير ممر المكابس',
+      },
+      // Stage 3 Puzzle 3 (Turbine Steam & Coolant Pressure Calibration: Target 90 Bar, Max 90 Bar -> 50 + 40 = 90 Bar)
+      {
+        id: 'l3-sw3a',
+        x: 3720,
+        y: 390,
+        activated: false,
+        targetId: 'l3-gate3',
+        puzzleId: 'l3-puz3',
+        nodeCode: '50Bar',
+        wattage: 50,
+        toggleable: true,
+        reversesPlatformId: 'l3-p13',
+        labelAr: 'صمام البخار الرئيسي (50 بار)',
+      },
+      {
+        id: 'l3-sw3b',
+        x: 4035,
+        y: 310,
+        activated: false,
+        targetId: 'l3-gate3',
+        puzzleId: 'l3-puz3',
+        nodeCode: '60Bar',
+        wattage: 60,
+        toggleable: true,
+        labelAr: 'صمام الضغط العالي (60 بار)',
       },
       {
         id: 'l3-sw3',
@@ -1210,7 +1757,102 @@ export const GAME_STAGES: StageDefinition[] = [
         y: 375,
         activated: false,
         targetId: 'l3-gate3',
-        labelAr: 'مفتاح نظام الإنتاج النهائي (3/3)',
+        puzzleId: 'l3-puz3',
+        nodeCode: '40Bar',
+        wattage: 40,
+        toggleable: true,
+        labelAr: 'صمام التوازن الميكانيكي (40 بار)',
+      },
+      // Optional Secret Puzzle: Factory Prototype Calibration
+      {
+        id: 'l3-sec1',
+        x: 1505,
+        y: 265,
+        activated: false,
+        targetId: 'l3-p5',
+        puzzleId: 'l3-puz-sec',
+        nodeCode: 'معايرة',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: 'وحدة معايرة المختبر السري بالمصنع',
+      },
+    ],
+    puzzles: [
+      {
+        id: 'l3-puz1',
+        titleAr: 'إصلاح تسلسل خط الإنتاج الآلي (1 → 4)',
+        mechanicNameAr: 'تشغيل ماكينات المصنع الأربع بالترتيب الصناعي الصحيح',
+        ruleKind: 'ordered_sequence',
+        zoneMinX: 1020,
+        zoneMaxX: 2360,
+        targetGateId: 'l3-gate1',
+        currentStep: 0,
+        totalSteps: 4,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: خط إنتاج الأسلاك متوقف بسبب خطأ في التسلسل؛ تشغيل ماكينة قبل سابقتها يعيد ضبط الخط.',
+          'تلميح 2: الترتيب الصناعي الصحيح: (1:سحب) النحاس، ثم (2:عزل)، ثم (3:فحص) بالليزر، وأخيراً (4:لفّ) البكرات.',
+          'تلميح 3: ابدأ بـ (1:سحب) أرضاً عند x=1120، ثم اصعد إلى (2:عزل) عند x=1265، ثم اعبر السير إلى (3:فحص) عند x=1890، ثم (4:لفّ) عند x=2210.',
+        ],
+      },
+      {
+        id: 'l3-puz2',
+        titleAr: 'مزامنة الذراع الروبوتية والمكبس الهيدروليكي',
+        mechanicNameAr: 'تأمين المكبس قبل تدوير الذراع الروبوتية',
+        ruleKind: 'dependency_chain',
+        zoneMinX: 2700,
+        zoneMaxX: 3350,
+        targetGateId: 'l3-gate2',
+        currentStep: 0,
+        totalSteps: 3,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: الذراع الروبوتية عالقة تحت المكبس؛ يجب تثبيت المكبس أولاً قبل تحريك الذراع.',
+          'تلميح 2: اتبع الاعتمادية: (1:تثبيت) أرضاً، ثم (2:ذراع) في المنصة الوسطى، ثم (3:تحرير) في الأعلى.',
+          'تلميح 3: فعّل (1:تثبيت) عند x=2820، ثم اقفز إلى (2:ذراع) عند x=2920، ثم اصعد إلى (3:تحرير) عند x=3175.',
+        ],
+      },
+      {
+        id: 'l3-puz3',
+        titleAr: 'معايرة ضغط التوربين المركزي (90 بار)',
+        mechanicNameAr: 'ضبط صمامات الضغط دون تجاوز حد الأمان (90 بار)',
+        ruleKind: 'exact_load_sum',
+        zoneMinX: 3440,
+        zoneMaxX: 4450,
+        targetGateId: 'l3-gate3',
+        targetSum: 90,
+        maxCapacity: 90,
+        currentSum: 0,
+        unitLabelAr: 'بار',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: التوربين يتطلب ضغطاً قدره 90 بار بالضبط؛ تجاوز 90 بار يطلق صمام الأمان ويعيد إغلاق الصمامات.',
+          'تلميح 2: الصمامات المتاحة هي 50Bar و60Bar و40Bar؛ جمع 50 و60 يعطي 110 بار (ضغط زائد!).',
+          'تلميح 3: فعّل صمام (50Bar) فوق السير الناقل مع صمام (40Bar) الأيمن للوصول إلى 90 بار بالضبط.',
+        ],
+      },
+      {
+        id: 'l3-puz-sec',
+        titleAr: 'مختبر الفحص الضوئي السري',
+        mechanicNameAr: 'لغز سري اختياري',
+        ruleKind: 'ordered_sequence',
+        isOptionalSecret: true,
+        zoneMinX: 1150,
+        zoneMaxX: 1650,
+        targetGateId: '',
+        unlocksPlatformId: 'l3-p5',
+        currentStep: 0,
+        totalSteps: 1,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: توجد منصة نيون زجاجية سرية فوق خط التجميع الأول.',
+          'تلميح 2: اقفز من منصة النحاس عند x=1160 باتجاه اليمين الأعلى.',
+          'تلميح 3: فعّل وحدة (معايرة) عند x=1505, y=265 لفتح مكافأة المختبر.',
+        ],
       },
     ],
     gates: [
@@ -1528,13 +2170,69 @@ export const GAME_STAGES: StageDefinition[] = [
       { id: 'l4-c13', x: 5145, y: 245, kind: 'led_bulb', value: 250, collected: false },
     ],
     switches: [
+      // Stage 4 Puzzle 1 (Smart-Grid Coupled Security Matrix + Blue Teleportation Gate: T1 flips T1&T2, T2 flips T2&T3 + teleports, T3 flips T3)
+      {
+        id: 'l4-sw1a',
+        x: 345,
+        y: 375,
+        activated: false,
+        targetId: 'l4-gate1',
+        puzzleId: 'l4-puz1',
+        nodeCode: 'T1',
+        toggleable: true,
+        coupledSwitchIds: ['l4-sw1b'],
+        labelAr: 'محطة الشبكة الزرقاء T1 (تبدّل T1 وT2)',
+      },
+      {
+        id: 'l4-sw1b',
+        x: 1080,
+        y: 480,
+        activated: false,
+        targetId: 'l4-gate1',
+        puzzleId: 'l4-puz1',
+        nodeCode: 'T2+انتقال',
+        toggleable: true,
+        coupledSwitchIds: ['l4-sw1'],
+        teleportTo: { x: 1020, y: 230 },
+        labelAr: 'محطة T2 + بوابة انتقال آني للمنصة العلوية (تبدّل T2 وT3)',
+      },
       {
         id: 'l4-sw1',
         x: 1080,
         y: 290,
         activated: false,
         targetId: 'l4-gate1',
-        labelAr: 'قاطع معرض الليثي الأزرق (1/3)',
+        puzzleId: 'l4-puz1',
+        nodeCode: 'T3',
+        toggleable: true,
+        coupledSwitchIds: [],
+        labelAr: 'محطة الشبكة الزرقاء العلوية T3 (تثبّت T3)',
+      },
+      // Stage 4 Puzzle 2 (Directional Energy Bridge & Smart-Grid Capacity: Target 110MW, Max 110MW -> 70MW + 40MW = 110MW)
+      {
+        id: 'l4-sw2a',
+        x: 2670,
+        y: 365,
+        activated: false,
+        targetId: 'l4-gate2',
+        puzzleId: 'l4-puz2',
+        nodeCode: '70MW',
+        wattage: 70,
+        toggleable: true,
+        labelAr: 'موجّه الجسر الأزرق الشمالي (70 ميغاواط)',
+      },
+      {
+        id: 'l4-sw2b',
+        x: 2910,
+        y: 480,
+        activated: false,
+        targetId: 'l4-gate2',
+        puzzleId: 'l4-puz2',
+        nodeCode: '60MW+انتقال',
+        wattage: 60,
+        toggleable: true,
+        teleportTo: { x: 2910, y: 230 },
+        labelAr: 'موجّه الوسط (60 ميغاواط) + انتقال للجسر العلوي',
       },
       {
         id: 'l4-sw2',
@@ -1542,7 +2240,36 @@ export const GAME_STAGES: StageDefinition[] = [
         y: 365,
         activated: false,
         targetId: 'l4-gate2',
-        labelAr: 'قاطع محطة التحكم الزرقاء (2/3)',
+        puzzleId: 'l4-puz2',
+        nodeCode: '40MW',
+        wattage: 40,
+        toggleable: true,
+        labelAr: 'موجّه الجسر الأزرق الشرقي (40 ميغاواط)',
+      },
+      // Stage 4 Puzzle 3 (Smart-Grid Frequency Encryption Sequence: Alpha -> Beta -> Gamma)
+      {
+        id: 'l4-sw3a',
+        x: 3685,
+        y: 375,
+        activated: false,
+        targetId: 'l4-gate3',
+        puzzleId: 'l4-puz3',
+        nodeCode: 'تردد-1',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: 'عقدة التردد الأزرق الأولى α (1/3)',
+      },
+      {
+        id: 'l4-sw3b',
+        x: 3935,
+        y: 290,
+        activated: false,
+        targetId: 'l4-gate3',
+        puzzleId: 'l4-puz3',
+        nodeCode: 'تردد-2',
+        sequenceOrder: 2,
+        toggleable: true,
+        labelAr: 'عقدة التردد الأزرق الثانية β (2/3)',
       },
       {
         id: 'l4-sw3',
@@ -1550,7 +2277,100 @@ export const GAME_STAGES: StageDefinition[] = [
         y: 365,
         activated: false,
         targetId: 'l4-gate3',
-        labelAr: 'قاطع الشبكة الذكية لفرع الليثي (3/3)',
+        puzzleId: 'l4-puz3',
+        nodeCode: 'تردد-3',
+        sequenceOrder: 3,
+        toggleable: true,
+        labelAr: 'عقدة التردد الأزرق الثالثة γ (3/3)',
+      },
+      // Optional Secret Puzzle: Al-Laithi Quantum Showroom Node
+      {
+        id: 'l4-sec1',
+        x: 4185,
+        y: 215,
+        activated: false,
+        targetId: 'l4-p12',
+        puzzleId: 'l4-puz-sec',
+        nodeCode: 'كوانتم',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: 'محطة التشفير السرية لمعرض الليثي الأزرق',
+      },
+    ],
+    puzzles: [
+      {
+        id: 'l4-puz1',
+        titleAr: 'أمن الشبكة الذكية الزرقاء (T1 • T2 • T3)',
+        mechanicNameAr: 'محطات منطقية مترابطة مع بوابة انتقال آني زرقاء',
+        ruleKind: 'coupled_xor_matrix',
+        zoneMinX: 200,
+        zoneMaxX: 2350,
+        targetGateId: 'l4-gate1',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: محطات التحكم الزرقاء الثلاث مترابطة منطقياً؛ كما أن المحطة الأرضية T2 تحتوي على بوابة انتقال آني ترفعك للمنصة العلوية.',
+          'تلميح 2: (T1) تبدّل حالتي T1 وT2 معاً، بينما (T2) تبدّل T2 وT3 وتنقلك للأعلى، و(T3) تبدّل T3 فقط.',
+          'تلميح 3: فعّل (T1) أولاً لتشتغل T1 وT2، ثم اصعد للمنصة العلوية وفعّل (T3) لتصبح المحطات الثلاث زرقاء نشطة معاً!',
+        ],
+      },
+      {
+        id: 'l4-puz2',
+        titleAr: 'توجيه جسور الطاقة الزرقاء (110 ميغاواط)',
+        mechanicNameAr: 'موازنة تدفق الطاقة الذكية دون تفعيل جدار الحماية',
+        ruleKind: 'exact_load_sum',
+        zoneMinX: 2450,
+        zoneMaxX: 3380,
+        targetGateId: 'l4-gate2',
+        targetSum: 110,
+        maxCapacity: 110,
+        currentSum: 0,
+        unitLabelAr: 'ميغاواط',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: جسر الطاقة في فرع الليثي يتطلب 110 ميغاواط بالضبط؛ تجاوز السعة يفعل الحماية الذكية ويعيد ضبط الموجهات.',
+          'تلميح 2: الموجهات الثلاثة هي 70MW يساراً، 60MW في الأسفل، و40MW يميناً.',
+          'تلميح 3: فعّل موجّه (70MW) الأيسر مع موجّه (40MW) الأيمن للوصول إلى 110 ميغاواط بالضبط وفتح البوابة الثانية.',
+        ],
+      },
+      {
+        id: 'l4-puz3',
+        titleAr: 'فك تشفير ترددات الليثي (α → β → γ)',
+        mechanicNameAr: 'تفعيل عقد التردد الثلاث بالترتيب المشفر',
+        ruleKind: 'ordered_sequence',
+        zoneMinX: 3480,
+        zoneMaxX: 4580,
+        targetGateId: 'l4-gate3',
+        currentStep: 0,
+        totalSteps: 3,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: بوابة ساحة الحارس الأزرق محمية بتشفير ترددي ثلاثي المراحل.',
+          'تلميح 2: يجب تفعيل (تردد-1 α) ثم (تردد-2 β) العلوي ثم (تردد-3 γ) بالترتيب.',
+          'تلميح 3: ابدأ بـ (تردد-1) عند x=3685، ثم اقفز إلى (تردد-2) عند x=3935، ثم انزل إلى (تردد-3) عند x=4210.',
+        ],
+      },
+      {
+        id: 'l4-puz-sec',
+        titleAr: 'خزنة المعرض الأزرق الذكي',
+        mechanicNameAr: 'لغز سري اختياري',
+        ruleKind: 'ordered_sequence',
+        isOptionalSecret: true,
+        zoneMinX: 3800,
+        zoneMaxX: 4350,
+        targetGateId: '',
+        unlocksPlatformId: 'l4-p12',
+        currentStep: 0,
+        totalSteps: 1,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: توجد منصة نحاسية عالية فوق عقدة التردد الثانية في فرع الليثي.',
+          'تلميح 2: اقفز من منصة (تردد-2) عند y=290 نحو الأعلى يميناً.',
+          'تلميح 3: فعّل محطة (كوانتم) عند x=4185, y=215 للحصول على مكافأة الشبكة السرية.',
+        ],
       },
     ],
     gates: [
@@ -1871,9 +2691,221 @@ export const GAME_STAGES: StageDefinition[] = [
       { id: 'l5-c14', x: 5650, y: 315, kind: 'wire_6mm', value: 300, collected: false },
     ],
     switches: [
-      { id: 'l5-sw1', x: 1280, y: 365, activated: false, targetId: 'l5-gate1', labelAr: 'قاطع البوابة الميكانيكية الأولى (1/3)' },
-      { id: 'l5-sw2', x: 3200, y: 365, activated: false, targetId: 'l5-gate2', labelAr: 'قاطع غرفة الطاقة المظلمة (2/3)' },
-      { id: 'l5-sw3', x: 4395, y: 365, activated: false, targetId: 'l5-gate3', labelAr: 'قاطع sanctum نواة الظلام (3/3)' },
+      // Stage 5 Puzzle 1 (Fortress Power Distribution Chamber: Target 120kW, Max 120kW -> 80kW + 40kW = 120kW)
+      {
+        id: 'l5-sw1',
+        x: 1280,
+        y: 365,
+        activated: false,
+        targetId: 'l5-gate1',
+        puzzleId: 'l5-puz1',
+        nodeCode: '80kW',
+        wattage: 80,
+        toggleable: true,
+        reversesPlatformId: 'l5-conv1',
+        labelAr: 'مولّد الجناح الغربي للقلعة (80 كيلوواط)',
+      },
+      {
+        id: 'l5-sw1a',
+        x: 1620,
+        y: 480,
+        activated: false,
+        targetId: 'l5-gate1',
+        puzzleId: 'l5-puz1',
+        nodeCode: '60kW',
+        wattage: 60,
+        toggleable: true,
+        labelAr: 'مولّد الأبراج المظلمة (60 كيلوواط)',
+      },
+      {
+        id: 'l5-sw1b',
+        x: 2150,
+        y: 480,
+        activated: false,
+        targetId: 'l5-gate1',
+        puzzleId: 'l5-puz1',
+        nodeCode: '40kW',
+        wattage: 40,
+        toggleable: true,
+        labelAr: 'مولّد القبو المغناطيسي (40 كيلوواط)',
+      },
+      // Stage 5 Puzzle 2 (Magnetic Containment & Smart-Grid Coupled Lock + Teleportation Gate)
+      {
+        id: 'l5-sw2a',
+        x: 2700,
+        y: 365,
+        activated: false,
+        targetId: 'l5-gate2',
+        puzzleId: 'l5-puz2',
+        nodeCode: 'عزل-1',
+        toggleable: true,
+        coupledSwitchIds: ['l5-sw2b'],
+        labelAr: 'قفل العزل المغناطيسي 1 (يبدّل 1 و2)',
+      },
+      {
+        id: 'l5-sw2b',
+        x: 2950,
+        y: 480,
+        activated: false,
+        targetId: 'l5-gate2',
+        puzzleId: 'l5-puz2',
+        nodeCode: 'عزل-2+انتقال',
+        toggleable: true,
+        coupledSwitchIds: ['l5-sw2'],
+        teleportTo: { x: 2950, y: 225 },
+        labelAr: 'قفل العزل 2 + بوابة انتقال للجسر (يبدّل 2 و3)',
+      },
+      {
+        id: 'l5-sw2',
+        x: 3200,
+        y: 365,
+        activated: false,
+        targetId: 'l5-gate2',
+        puzzleId: 'l5-puz2',
+        nodeCode: 'عزل-3',
+        toggleable: true,
+        coupledSwitchIds: [],
+        labelAr: 'قفل العزل المغناطيسي 3 (يثبّت 3)',
+      },
+      // Stage 5 Puzzle 3 (Master 4-System Override Sequence: 1. Power -> 2. Magnet -> 3. Automation -> 4. Smart Grid)
+      {
+        id: 'l5-sw3a',
+        x: 3620,
+        y: 480,
+        activated: false,
+        targetId: 'l5-gate3',
+        puzzleId: 'l5-puz3',
+        nodeCode: '1:طاقة',
+        sequenceOrder: 1,
+        toggleable: true,
+        reversesPlatformId: 'l5-conv2',
+        labelAr: '1. تحرير خط طاقة القلعة وعكس السير',
+      },
+      {
+        id: 'l5-sw3b',
+        x: 3810,
+        y: 385,
+        activated: false,
+        targetId: 'l5-gate3',
+        puzzleId: 'l5-puz3',
+        nodeCode: '2:مغناطيس',
+        sequenceOrder: 2,
+        toggleable: true,
+        labelAr: '2. فصل القفل المغناطيسي المركزي',
+      },
+      {
+        id: 'l5-sw3c',
+        x: 4135,
+        y: 295,
+        activated: false,
+        targetId: 'l5-gate3',
+        puzzleId: 'l5-puz3',
+        nodeCode: '3:أتمتة',
+        sequenceOrder: 3,
+        toggleable: true,
+        labelAr: '3. إيقاف أتمتة المكابس الدفاعية',
+      },
+      {
+        id: 'l5-sw3',
+        x: 4395,
+        y: 365,
+        activated: false,
+        targetId: 'l5-gate3',
+        puzzleId: 'l5-puz3',
+        nodeCode: '4:شبكة',
+        sequenceOrder: 4,
+        toggleable: true,
+        labelAr: '4. اختراق شبكة أمان نواة الظلام',
+      },
+      // Optional Secret Puzzle: Fortress Ancient Light Relic
+      {
+        id: 'l5-sec1',
+        x: 1535,
+        y: 265,
+        activated: false,
+        targetId: 'l5-p5',
+        puzzleId: 'l5-puz-sec',
+        nodeCode: 'أثر النور',
+        sequenceOrder: 1,
+        toggleable: true,
+        labelAr: 'مفتاح أثر النور السري بالقلعة',
+      },
+    ],
+    puzzles: [
+      {
+        id: 'l5-puz1',
+        titleAr: 'شبكة طاقة القلعة المظلمة (120 كيلوواط)',
+        mechanicNameAr: 'موازنة المولدات الثلاثة لتشغيل القبو المغناطيسي',
+        ruleKind: 'exact_load_sum',
+        zoneMinX: 1050,
+        zoneMaxX: 2380,
+        targetGateId: 'l5-gate1',
+        targetSum: 120,
+        maxCapacity: 120,
+        currentSum: 0,
+        unitLabelAr: 'كيلوواط',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: بوابة القلعة الداخلية تحتاج إلى 120 كيلوواط بالضبط؛ تشغيل 80kW مع 60kW يتجاوز السعة (140kW).',
+          'تلميح 2: المولدات المتوفرة في الغرفة هي 80kW أعلى اليسار، 60kW في الوسط، و40kW قبل البوابة.',
+          'تلميح 3: فعّل مولّد (80kW) عند x=1280 ثم تقدم لتفعيل مولّد (40kW) عند x=2150 للوصول إلى 120 كيلوواط.',
+        ],
+      },
+      {
+        id: 'l5-puz2',
+        titleAr: 'مصفوفة العزل المغناطيسي والشبكة الذكية',
+        mechanicNameAr: 'أقفال عزل مترابطة مع بوابة انتقال علوية',
+        ruleKind: 'coupled_xor_matrix',
+        zoneMinX: 2480,
+        zoneMaxX: 3430,
+        targetGateId: 'l5-gate2',
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: أقفال العزل الثلاثة في قاعة عمالقة الظل مترابطة؛ القفل الأوسط يحتوي أيضاً على انتقال آني للجسر.',
+          'تلميح 2: (عزل-1) يبدّل 1 و2، بينما (عزل-2) يبدّل 2 و3، و(عزل-3) يثبّت 3 فقط.',
+          'تلميح 3: فعّل (عزل-1) لتشغيل 1 و2، ثم اقفز إلى (عزل-3) على اليمين لتشغيله وتفتح البوابة الثانية.',
+        ],
+      },
+      {
+        id: 'l5-puz3',
+        titleAr: 'بروتوكول اختراق sanctum نواة الظلام (1 → 4)',
+        mechanicNameAr: 'دمج أنظمة الطاقة والمغناطيس والأتمتة والشبكة الذكية بالترتيب',
+        ruleKind: 'ordered_sequence',
+        zoneMinX: 3530,
+        zoneMaxX: 4630,
+        targetGateId: 'l5-gate3',
+        currentStep: 0,
+        totalSteps: 4,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: بوابة غرفة الزعيم النهائي تتطلب تعطيل الأنظمة الأربعة بالترتيب الذي تعلمته عبر المراحل السابقة.',
+          'تلميح 2: الترتيب هو: (1:طاقة) ثم (2:مغناطيس) ثم (3:أتمتة) ثم (4:شبكة).',
+          'تلميح 3: فعّل (1:طاقة) عند x=3620 لعكس السير، ثم (2:مغناطيس) فوق السير، ثم اصعد لـ (3:أتمتة) عند x=4135، ثم (4:شبكة) عند x=4395.',
+        ],
+      },
+      {
+        id: 'l5-puz-sec',
+        titleAr: 'محراب أثر النور السري',
+        mechanicNameAr: 'لغز سري اختياري',
+        ruleKind: 'ordered_sequence',
+        isOptionalSecret: true,
+        zoneMinX: 1180,
+        zoneMaxX: 1700,
+        targetGateId: '',
+        unlocksPlatformId: 'l5-p5',
+        currentStep: 0,
+        totalSteps: 1,
+        status: 'active',
+        solved: false,
+        hintsAr: [
+          'تلميح 1: توجد شرفة نيون سرية عالية في غرفة الطاقة العميقة بالقلعة.',
+          'تلميح 2: اقفز من منصة النحاس عند x=1190 نحو الأعلى يميناً.',
+          'تلميح 3: فعّل مفتاح (أثر النور) عند x=1535, y=265 لفتح الكنز السري.',
+        ],
+      },
     ],
     gates: [
       {
@@ -2073,13 +3105,397 @@ export const GAME_STAGES: StageDefinition[] = [
       shockwaveActive: false,
       projectiles: [],
       breakers: [
-        { id: 'l5-bb1', x: 5010, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النواة 1' },
-        { id: 'l5-bb2', x: 5330, y: 290, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النواة 2' },
-        { id: 'l5-bb3', x: 5650, y: 360, activated: false, cooldown: 0, labelAr: 'قاطع تفريغ النواة 3' },
+        { id: 'l5-bb1', x: 4960, y: 360, activated: false, cooldown: 0, labelAr: 'طور 1: قاطع توجيه الدائرة الكهربائية' },
+        { id: 'l5-bb2', x: 5260, y: 290, activated: false, cooldown: 0, labelAr: 'طور 2: رافعة كشف النواة المغناطيسية' },
+        { id: 'l5-bb3', x: 5410, y: 290, activated: false, cooldown: 0, labelAr: 'طور 3: مزامن المكابس الميكانيكية' },
+        { id: 'l5-bb4', x: 5650, y: 360, activated: false, cooldown: 0, labelAr: 'طور 4: قفل المنطق الضوئي النهائي' },
       ],
+      shieldLocked: true,
     },
   },
 ]
+
+// ============================================================================
+// V15 SECTION 2 & 15 — DETERMINISTIC PUZZLE STATE MACHINE & BFS SOLVABILITY VALIDATOR
+// ============================================================================
+
+export interface PuzzleTransitionResult {
+  puzzleSolvedNow: boolean
+  overloadTripped: boolean
+  teleportedTo?: { x: number; y: number }
+  reversedPlatformId?: string
+  feedbackMessageAr: string
+  feedbackType: 'info' | 'success' | 'error'
+}
+
+/**
+ * Applies a player switch/terminal interaction to the stage's puzzle state machine.
+ * Used both by live gameplay (platformerPhysics.ts) and automated BFS state-space validation.
+ */
+export function evaluatePuzzleSwitchInteraction(
+  stage: StageDefinition,
+  clickedSwitch: StageSwitch
+): PuzzleTransitionResult {
+  let teleportedTo: { x: number; y: number } | undefined
+  if (clickedSwitch.teleportTo) {
+    teleportedTo = { ...clickedSwitch.teleportTo }
+  }
+
+  let reversedPlatformId: string | undefined
+  if (clickedSwitch.reversesPlatformId) {
+    reversedPlatformId = clickedSwitch.reversesPlatformId
+    const plat = stage.platforms.find((p) => p.id === reversedPlatformId)
+    if (plat && typeof plat.conveyorSpeed === 'number') {
+      plat.conveyorSpeed = -plat.conveyorSpeed
+    }
+  }
+
+  const puzzle = stage.puzzles?.find((p) => p.id === clickedSwitch.puzzleId)
+  if (!puzzle) {
+    clickedSwitch.activated = true
+    return {
+      puzzleSolvedNow: true,
+      overloadTripped: false,
+      teleportedTo,
+      reversedPlatformId,
+      feedbackMessageAr: `🔓 تم تفعيل ${clickedSwitch.labelAr}`,
+      feedbackType: 'success',
+    }
+  }
+
+  if (puzzle.solved) {
+    return {
+      puzzleSolvedNow: false,
+      overloadTripped: false,
+      teleportedTo,
+      reversedPlatformId,
+      feedbackMessageAr: `✓ اللغز مكتمل مسبقاً: ${puzzle.titleAr}`,
+      feedbackType: 'info',
+    }
+  }
+
+  const puzzleSwitches = stage.switches.filter((s) => s.puzzleId === puzzle.id)
+
+  // 1. EXACT LOAD / PRESSURE / MAGNETIC FLUX SUM RULE
+  if (puzzle.ruleKind === 'exact_load_sum') {
+    clickedSwitch.activated = !clickedSwitch.activated
+    const sum = puzzleSwitches
+      .filter((s) => s.activated)
+      .reduce((acc, s) => acc + (s.wattage || 0), 0)
+    puzzle.currentSum = sum
+    const maxCap = puzzle.maxCapacity ?? puzzle.targetSum ?? 100
+    const target = puzzle.targetSum ?? 100
+    const unit = puzzle.unitLabelAr || 'وحدة'
+
+    if (sum > maxCap) {
+      // Overload trip! Reset all switches in this puzzle cleanly (no soft lock)
+      for (const s of puzzleSwitches) s.activated = false
+      puzzle.currentSum = 0
+      puzzle.status = 'overload_reset'
+      puzzle.statusMessageAr = `حمل زائد (${sum}/${maxCap} ${unit})! أعيد ضبط القواطع.`
+      return {
+        puzzleSolvedNow: false,
+        overloadTripped: true,
+        teleportedTo,
+        reversedPlatformId,
+        feedbackMessageAr: `⚠️ حمل زائد (${sum}/${maxCap} ${unit})! فصلت القواطع تلقائياً — وازن الأحمال للوصول إلى ${target} ${unit}.`,
+        feedbackType: 'error',
+      }
+    }
+
+    if (sum === target) {
+      puzzle.solved = true
+      puzzle.status = 'solved'
+      puzzle.statusMessageAr = `مكتمل (${sum}/${target} ${unit})`
+      for (const gate of stage.gates) {
+        if (gate.id === puzzle.targetGateId) gate.isOpen = true
+      }
+      if (puzzle.unlocksPlatformId) {
+        const p = stage.platforms.find((pl) => pl.id === puzzle.unlocksPlatformId)
+        if (p) {
+          p.unlocked = true
+          p.isSecret = false
+        }
+      }
+      return {
+        puzzleSolvedNow: true,
+        overloadTripped: false,
+        teleportedTo,
+        reversedPlatformId,
+        feedbackMessageAr: `⚡ أحسنت! اكتمل توازن «${puzzle.titleAr}» (${sum}/${target} ${unit}) وفتحت البوابة!`,
+        feedbackType: 'success',
+      }
+    }
+
+    puzzle.status = 'active'
+    puzzle.statusMessageAr = `الحمل الحالي: ${sum} / ${target} ${unit}`
+    return {
+      puzzleSolvedNow: false,
+      overloadTripped: false,
+      teleportedTo,
+      reversedPlatformId,
+      feedbackMessageAr: `🔌 ${clickedSwitch.labelAr}: الحمل الحالي ${sum} / ${target} ${unit}`,
+      feedbackType: 'info',
+    }
+  }
+
+  // 2. COUPLED XOR MATRIX RULE (Smart Grid / Magnetic Interlock)
+  if (puzzle.ruleKind === 'coupled_xor_matrix') {
+    clickedSwitch.activated = !clickedSwitch.activated
+    if (Array.isArray(clickedSwitch.coupledSwitchIds)) {
+      for (const coupledId of clickedSwitch.coupledSwitchIds) {
+        const targetSw = puzzleSwitches.find((s) => s.id === coupledId)
+        if (targetSw) {
+          targetSw.activated = !targetSw.activated
+        }
+      }
+    }
+    const activeCount = puzzleSwitches.filter((s) => s.activated).length
+    if (activeCount === puzzleSwitches.length) {
+      puzzle.solved = true
+      puzzle.status = 'solved'
+      puzzle.statusMessageAr = `جميع الوحدات متزامنة (${activeCount}/${puzzleSwitches.length})`
+      for (const gate of stage.gates) {
+        if (gate.id === puzzle.targetGateId) gate.isOpen = true
+      }
+      return {
+        puzzleSolvedNow: true,
+        overloadTripped: false,
+        teleportedTo,
+        reversedPlatformId,
+        feedbackMessageAr: `🔓 رائع! انتظمت مصفوفة «${puzzle.titleAr}» بالكامل وفتحت البوابة!`,
+        feedbackType: 'success',
+      }
+    }
+    puzzle.status = 'active'
+    puzzle.statusMessageAr = `الوحدات النشطة: ${activeCount} / ${puzzleSwitches.length}`
+    return {
+      puzzleSolvedNow: false,
+      overloadTripped: false,
+      teleportedTo,
+      reversedPlatformId,
+      feedbackMessageAr: `🔄 تبديل ${clickedSwitch.nodeCode || clickedSwitch.labelAr} — الوحدات النشطة الآن: ${activeCount}/${puzzleSwitches.length}`,
+      feedbackType: 'info',
+    }
+  }
+
+  // 3. ORDERED SEQUENCE & DEPENDENCY CHAIN RULES
+  const expectedOrder = (puzzle.currentStep || 0) + 1
+  const swOrder = clickedSwitch.sequenceOrder || 1
+
+  if (clickedSwitch.activated) {
+    return {
+      puzzleSolvedNow: false,
+      overloadTripped: false,
+      teleportedTo,
+      reversedPlatformId,
+      feedbackMessageAr: `ℹ️ ${clickedSwitch.labelAr} مفعّل بالفعل (${puzzle.currentStep || 0}/${puzzle.totalSteps || puzzleSwitches.length})`,
+      feedbackType: 'info',
+    }
+  }
+
+  if (swOrder === expectedOrder) {
+    clickedSwitch.activated = true
+    puzzle.currentStep = expectedOrder
+    const total = puzzle.totalSteps || puzzleSwitches.length
+    if (expectedOrder >= total) {
+      puzzle.solved = true
+      puzzle.status = 'solved'
+      puzzle.statusMessageAr = `اكتمل التسلسل (${total}/${total})`
+      for (const gate of stage.gates) {
+        if (gate.id === puzzle.targetGateId) gate.isOpen = true
+      }
+      if (puzzle.unlocksPlatformId) {
+        const p = stage.platforms.find((pl) => pl.id === puzzle.unlocksPlatformId)
+        if (p) {
+          p.unlocked = true
+          p.isSecret = false
+        }
+      }
+      return {
+        puzzleSolvedNow: true,
+        overloadTripped: false,
+        teleportedTo,
+        reversedPlatformId,
+        feedbackMessageAr: `🏆 ممتاز! اكتمل تسلسل «${puzzle.titleAr}» بنجاح وفتحت البوابة!`,
+        feedbackType: 'success',
+      }
+    }
+    puzzle.status = 'active'
+    puzzle.statusMessageAr = `الخطوة ${expectedOrder} / ${total}`
+    return {
+      puzzleSolvedNow: false,
+      overloadTripped: false,
+      teleportedTo,
+      reversedPlatformId,
+      feedbackMessageAr: `✓ خطوة صحيحة (${expectedOrder}/${total}): ${clickedSwitch.labelAr}`,
+      feedbackType: 'info',
+    }
+  } else {
+    // Out-of-order activation: reset this puzzle's sequence cleanly (no permanent soft lock!)
+    for (const s of puzzleSwitches) s.activated = false
+    puzzle.currentStep = 0
+    puzzle.status = 'overload_reset'
+    puzzle.statusMessageAr = `ترتيب غير صحيح! ابدأ بالخطوة 1.`
+    return {
+      puzzleSolvedNow: false,
+      overloadTripped: true,
+      teleportedTo,
+      reversedPlatformId,
+      feedbackMessageAr: `⚠️ تسلسل خاطئ! أُعيد ضبط «${puzzle.titleAr}» — يجب البدء بالخطوة (1) بالترتيب.`,
+      feedbackType: 'error',
+    }
+  }
+}
+
+export interface PuzzleValidationReport {
+  stageId: string
+  puzzleId: string
+  titleAr: string
+  ruleKind: PuzzleRuleKind
+  solvableFromInitial: boolean
+  shortestSolutionMoves: string[]
+  reachableStateCount: number
+  softLockStatesFound: number
+}
+
+/**
+ * V15 SECTION 15 — AUTOMATED BFS STATE-SPACE SOLVABILITY & NO-SOFT-LOCK VALIDATOR
+ * Proves mathematically via Breadth-First Search that:
+ * 1. A valid sequence of switch actions reaches the goal state (solved === true).
+ * 2. Every reachable state after any incorrect action can still reach the goal state (0 soft locks).
+ */
+export function validateStagePuzzleSolvability(
+  stageTemplate: StageDefinition,
+  puzzleId: string
+): PuzzleValidationReport {
+  const basePuzzle = stageTemplate.puzzles?.find((p) => p.id === puzzleId)
+  if (!basePuzzle) {
+    throw new Error(`Puzzle ${puzzleId} not found in stage ${stageTemplate.id}`)
+  }
+  const swIds = stageTemplate.switches.filter((s) => s.puzzleId === puzzleId).map((s) => s.id)
+
+  interface SearchNode {
+    activeMap: Record<string, boolean>
+    currentStep: number
+    solved: boolean
+    path: string[]
+  }
+
+  const encodeNode = (n: SearchNode) =>
+    `${swIds.map((id) => (n.activeMap[id] ? '1' : '0')).join('')}:${n.currentStep}:${n.solved ? 'S' : 'U'}`
+
+  const simulateMove = (node: SearchNode, clickSwId: string): SearchNode => {
+    const tempStage: StageDefinition = {
+      ...stageTemplate,
+      gates: stageTemplate.gates.map((g) => ({ ...g })),
+      platforms: stageTemplate.platforms.map((p) => ({ ...p })),
+      switches: stageTemplate.switches.map((s) => ({
+        ...s,
+        activated: s.puzzleId === puzzleId ? Boolean(node.activeMap[s.id]) : s.activated,
+      })),
+      puzzles: stageTemplate.puzzles?.map((p) =>
+        p.id === puzzleId
+          ? {
+              ...p,
+              currentStep: node.currentStep,
+              solved: node.solved,
+              status: node.solved ? 'solved' : 'active',
+            }
+          : { ...p }
+      ),
+    }
+    const targetSw = tempStage.switches.find((s) => s.id === clickSwId)!
+    evaluatePuzzleSwitchInteraction(tempStage, targetSw)
+    const updatedPuzzle = tempStage.puzzles!.find((p) => p.id === puzzleId)!
+    const nextMap: Record<string, boolean> = {}
+    for (const id of swIds) {
+      nextMap[id] = Boolean(tempStage.switches.find((s) => s.id === id)?.activated)
+    }
+    return {
+      activeMap: nextMap,
+      currentStep: updatedPuzzle.currentStep || 0,
+      solved: updatedPuzzle.solved,
+      path: [...node.path, clickSwId],
+    }
+  }
+
+  const initialMap: Record<string, boolean> = {}
+  for (const id of swIds) initialMap[id] = false
+  const root: SearchNode = {
+    activeMap: initialMap,
+    currentStep: 0,
+    solved: false,
+    path: [],
+  }
+
+  const visited = new Map<string, SearchNode>()
+  const queue: SearchNode[] = [root]
+  visited.set(encodeNode(root), root)
+  let shortestSolution: string[] | null = null
+
+  while (queue.length > 0) {
+    const curr = queue.shift()!
+    if (curr.solved) {
+      if (!shortestSolution) shortestSolution = curr.path
+      continue
+    }
+    for (const swId of swIds) {
+      const next = simulateMove(curr, swId)
+      const key = encodeNode(next)
+      if (!visited.has(key)) {
+        visited.set(key, next)
+        queue.push(next)
+      }
+    }
+  }
+
+  // Verify that EVERY reachable state can still reach a solved state (no soft locks)
+  let softLockStatesFound = 0
+  for (const [, startNode] of visited.entries()) {
+    if (startNode.solved) continue
+    const subVisited = new Set<string>([encodeNode(startNode)])
+    const subQ: SearchNode[] = [startNode]
+    let canSolve = false
+    while (subQ.length > 0) {
+      const n = subQ.shift()!
+      if (n.solved) {
+        canSolve = true
+        break
+      }
+      for (const swId of swIds) {
+        const nxt = simulateMove(n, swId)
+        const k = encodeNode(nxt)
+        if (!subVisited.has(k)) {
+          subVisited.add(k)
+          subQ.push(nxt)
+        }
+      }
+    }
+    if (!canSolve) softLockStatesFound++
+  }
+
+  return {
+    stageId: stageTemplate.id,
+    puzzleId,
+    titleAr: basePuzzle.titleAr,
+    ruleKind: basePuzzle.ruleKind,
+    solvableFromInitial: shortestSolution !== null,
+    shortestSolutionMoves: shortestSolution || [],
+    reachableStateCount: visited.size,
+    softLockStatesFound,
+  }
+}
+
+export function validateAllStagePuzzlesSolvability(): PuzzleValidationReport[] {
+  const reports: PuzzleValidationReport[] = []
+  for (const stage of GAME_STAGES) {
+    for (const puz of stage.puzzles || []) {
+      reports.push(validateStagePuzzleSolvability(stage, puz.id))
+    }
+  }
+  return reports
+}
 
 export const GAME_WORLDS: WorldDefinition[] = GAME_STAGES.map((stg) => ({
   worldNumber: stg.worldNumber,
@@ -2416,8 +3832,9 @@ export interface ActiveRunSnapshot {
   activatedSwitchIds: string[]
   activatedCheckpointIds: string[]
   defeatedEnemyIds: string[]
+  solvedPuzzleIds?: string[]
   bossHp?: number
-  bossPhase?: 1 | 2 | 3
+  bossPhase?: 1 | 2 | 3 | 4
   elapsedSec: number
 }
 
